@@ -58,6 +58,10 @@ The Owner may grant a persistent one-time authorization for a specific cloud res
 
 AI-generated and other untrusted strategy code must execute in restricted local-process or isolated remote Workers, never as plugins in the trusted Rust risk/execution core. Worker access to broker credentials, direct order routing, risk-policy mutation and production ledger writes is denied; proposals are authenticated, time-bounded and independently risk checked. **Process separation alone is insufficient**: confirm sandboxing constraints on filesystem/environment secrets, network and resource limits before enabling untrusted code on a production machine. Where enforcement is unsupported, deny local execution or relocate to a genuinely isolated environment. WASM is optional, not required.
 
+## Trusted data ingestion boundary and production Worker network rules (ADR-015)
+
+Production strategy Workers must not browse arbitrary websites, directly call uncontrolled third-party APIs, or use a Data Manager as an open URL proxy. Only the trusted Data Manager accesses approved, license-compatible adapters and protects provider secrets; generated Worker code receives governed read-only input with source, availability-time, freshness and quality metadata. Research Agents may discover new sources in isolated research environments, but discoveries alone do not approve new trusted executable adapters. Owner approval is required for new paid services, sensitive-data sharing or API credentials; approved routine fetching needs no repeated prompts. Missing or stale data must not be silently fabricated or treated as a valid basis for opening new risk. Real vendor selection and failover behavior remain open.
+
 ## P0 scenario acceptance examples for later phases
 
 1. Timeout after possible broker acceptance: persist unknown outcome and block **all new account openings**, not only the affected symbol; no blind duplicate retry.
