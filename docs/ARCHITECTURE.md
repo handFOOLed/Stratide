@@ -277,6 +277,10 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - Use versioned snapshots and idempotent immutable events, rejecting stale or exceeding allocations. Do not reset historical loss locks or retroactively rewrite the strategy's trading decisions.
 - Unresolved or invalid group attribution blocks relevant group/instrument automation, while shared account uncertainty blocks all new account risk. **Owner handback under ADR-029 is a separate necessary condition.** M0 has no UI or manual broker trade attribution feature.
 
+## ADR-035: record-date corporate action entitlement
+
+Passive dividends and bonus shares are allocated using verified group holdings at the record date. Broker cash and shares remain authoritative, with no double-counting of dividend receivables or split-created paper wealth. Active rights subscriptions are not authorized. This is future work, not M0.
+
 ## Likely implementation boundaries
 
 - **Production core:** lightweight Rust daemon, no GPU; data, risk, ledger, order state, broker abstraction.
