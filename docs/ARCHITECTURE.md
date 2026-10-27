@@ -1,6 +1,6 @@
 # Architecture — draft for interrogation
 
-**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md) and [ADR-002](adr/0002-in-process-risk-gateway.md).** Do not treat other design options as settled.
+**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md) [ADR-002](adr/0002-in-process-risk-gateway.md), and [ADR-003](adr/0003-account-wide-order-uncertainty.md).** Do not treat other design options as settled.
 
 ## Domains and trust boundaries
 
@@ -46,6 +46,14 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - **Mandatory local gate:** strategies, research Agent and Web UI submit proposals only. Broker order emission is reachable only through a constrained Execution Engine path consuming valid, approved intents.
 - **Untrusted code is outside the trusted process.** Rust module separation is not OS process isolation, and cannot prevent all bugs inside the core itself; critical order/risk paths need focused financial-risk tests.
 - **Persistent halt state:** breaker and ambiguous-order state survive restarts; do not add risk while state is unknown. More detailed unlock/reconciliation policy is not decided yet.
+
+## Accepted decision: account-wide halt on broker uncertainty (ADR-003)
+
+- If a broker order submission has an uncertain outcome (e.g. timed out after possible acceptance), persist an unknown-order state and **halt new risk across the entire account**, including unrelated strategies and instruments.
+- Never infer rejection from a timeout or blindly re-submit. Query broker orders, executions, cash and positions and reconcile before restoring new-entry eligibility.
+- Existing holdings and risk-reducing operations require actual state knowledge; do not automatically liquidate or issue duplicate protective orders.
+- This halt survives restart. Operator-vs-automatic release after verified reconciliation remains an **open decision**.
+- Assume subsequent order submissions may fail as well; avoid repeated probes that create more uncertainty. Use bounded, backoff-aware read queries when available.
 
 ## Likely implementation boundaries
 
