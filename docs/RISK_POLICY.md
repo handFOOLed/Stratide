@@ -15,8 +15,8 @@ These **illustrative** initial numbers must be reviewed against trading strategy
 
 - Position weight cap per instrument: 10% of equity.
 - Total risky exposure cap: 50% of equity.
-- Daily net equity loss alert/entry pause: 1%.
-- Peak-to-trough account drawdown entry lock: 8%.
+- Daily cash-flow-adjusted account-equity loss alert/entry pause: 1% **(illustrative only; ADR-018 calculation basis accepted, percentage not decided).**
+- Peak-to-trough **cash-flow-adjusted** account-equity drawdown entry lock: 8% **(illustrative only; ADR-018 calculation basis accepted, percentage not decided).**
 - No leverage by default.
 - Data stale / portfolio mismatch / unknown broker order: fail closed for **new** risk.
 
@@ -69,6 +69,10 @@ On primary feed failure, the trusted Data Manager may automatically switch to an
 ## Single trading writer and crash-safe recovery (ADR-017)
 
 Only one trusted execution instance may have real order authority for a given broker account. Local process locks do not provide cross-host exclusivity; during host migration, old execution authority must be demonstrably disabled before a replacement is enabled. Persist order intents/correlation IDs, submission uncertainty, broker fills, cash/positions, circuit breakers and Owner bans with crash-safe transaction discipline. On startup load and verify state and broker orders/fills/cash/positions before new risk; unknown/ambiguous states trigger ADR-003's account-wide freeze, with any later technical recovery controlled by ADR-004. Never blindly replay prior orders, treat a timeout as a rejection, clear loss breakers, or force-liquidate unknown positions. Backup/restore uses coherent validated snapshots rather than casual copies of a live SQLite database. M0 only requires paper-mode focused recovery testing.
+
+## Account-equity-based financial loss and drawdown breakers (ADR-018)
+
+Compute daily loss and drawdown from trustworthy **whole-account NAV/equity**, including unrealized market moves as well as realized gains/losses, fees and costs. External deposits and withdrawals must be normalized rather than misreported as investment returns; the peak/high-water-mark and daily reference equity must be measured on a consistent cash-flow-adjusted basis. Risk Kernel, not Agent or strategy Worker, owns valuation checks, threshold checks and persistent breaker state. If valuation or holdings are materially unknown, do not assume zero loss: prevent new account risk until equity can be evaluated reliably. Activation stops **new risky exposure** at the account level; risk-reducing management may proceed only when orders/positions are trustworthy and trading rules permit. No automatic liquidation or guarantee of a realized loss ceiling. Restoring quotations, changing the date or performing ADR-004 technical recovery must **not** clear financial breakers. The example 1% and 8% limits above are not Owner-approved production settings.
 
 ## P0 scenario acceptance examples for later phases
 
