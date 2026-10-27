@@ -1,6 +1,6 @@
 # Architecture — draft for interrogation
 
-**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), [ADR-009](adr/0009-auto-promotion-owner-veto.md), [ADR-011](adr/0011-immediate-promotion-nonblocking-notifications.md), [ADR-012](adr/0012-adaptive-research-daily-hard-budget.md), [ADR-013](adr/0013-one-time-cloud-data-consent.md), [ADR-014](adr/0014-isolated-strategy-workers.md), [ADR-015](adr/0015-automatic-data-manager-network-isolation.md), [ADR-016](adr/0016-verified-data-source-failover.md), and [ADR-017](adr/0017-single-writer-durable-recovery.md) (which supersedes [ADR-010](adr/0010-configurable-deployment-grace-period.md)).** Do not treat other design options as settled.
+**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), [ADR-009](adr/0009-auto-promotion-owner-veto.md), [ADR-011](adr/0011-immediate-promotion-nonblocking-notifications.md), [ADR-012](adr/0012-adaptive-research-daily-hard-budget.md), [ADR-013](adr/0013-one-time-cloud-data-consent.md), [ADR-014](adr/0014-isolated-strategy-workers.md), [ADR-015](adr/0015-automatic-data-manager-network-isolation.md), [ADR-016](adr/0016-verified-data-source-failover.md), [ADR-017](adr/0017-single-writer-durable-recovery.md), and [ADR-018](adr/0018-equity-based-loss-drawdown-breakers.md) (which supersedes [ADR-010](adr/0010-configurable-deployment-grace-period.md)).** Do not treat other design options as settled.
 
 ## Domains and trust boundaries
 
@@ -160,6 +160,15 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - Never blindly replay pending signals or re-submit ambiguous broker orders, and do not auto-liquidate unknown holdings. Old strategy proposals expire rather than turning into fresh decisions on restart.
 - Accept downtime when the only host is offline in exchange for simplicity and avoiding duplicate financial actions. M0 needs a paper-only restart/ledger consistency check, not real broker recovery or failover infrastructure.
 
+## Accepted decision: account-equity loss and drawdown breakers (ADR-018)
+
+- **Use trusted whole-account equity/NAV, not only realized P&L**, for daily-loss and peak-to-trough drawdown circuit breakers. Unrealized mark-to-market losses count alongside realized P&L, net fees, cash, positions and relevant payables.
+- **Owner deposits/withdrawals are not trading gains/losses.** Compare a cash-flow-adjusted start-of-day baseline and cash-flow-adjusted high-water-mark equity history; avoid false triggers from external transfers or dividends/corporate actions misclassified as external capital.
+- The independent Risk Kernel evaluates and persists the baseline, high-water mark, valuation provenance, threshold breaches and resulting financial-risk halt. Financial breakers block account-wide **new risk**, not necessarily trusted risk reductions; no automatic liquidation or guaranteed loss bound.
+- **Material uncertainty in account-wide NAV must not be treated as “safe.”** If stale/missing/conflicting marks or mismatched holdings make the full-account breaker unreliable, stop new account risk; data-fault scopes under ADR-016 cannot bypass account risk checks.
+- Technical recovery via ADR-004, changing day, quote refresh or process restart may **never automatically clear a financial-loss/drawdown lock**; Owner-controlled release is a separate later design. Numeric limits in `docs/RISK_POLICY.md` remain illustrative rather than settled values.
+- M0 only needs a focused paper ledger NAV/update, adjusted deposit/withdrawal case, breaker rejection and persisted restart check, not full multi-asset live valuation.
+
 ## Likely implementation boundaries
 
 - **Production core:** lightweight Rust daemon, no GPU; data, risk, ledger, order state, broker abstraction.
@@ -184,7 +193,7 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 
 - What is the minimal verifiable local OS sandbox and Data Manager interface for Worker read-only access under ADR-014/015 on Windows/macOS ARM64/Linux?
 - What is the minimum broker interface needed for authentic paper fills and later live A-share compliance?
-- How do we define and verify account-equity daily-loss and high-water-mark drawdown thresholds?
+- What specific Owner-authorized daily-loss and drawdown threshold levels and reliable NAV mark-price conventions should be configured when real supported assets are known (ADR-018)?
 - What is the minimal risk-gate API, and how should loss-breaker release differ from ADR-004's technical-only recovery?
 - How to choose practical evaluator holdout reuse limits, diagnostics and promotion criteria for actual candidate strategies without unnecessary statistical infrastructure?
 - Which parts of research can run with bounded CPU locally vs remote-only workers?
