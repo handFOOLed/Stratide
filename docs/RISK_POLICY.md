@@ -90,6 +90,12 @@ For combined compatible same-side broker orders, attribute **only authoritative 
 
 Internal group allocation transfers under ADR-023 are never counted as broker fills. Idempotent broker fill IDs, cumulative-fill deltas, cancellations, partial executions, unknown submission outcomes and restart must not double-record a share or fee. Exact fill-by-fill cost and remainder details remain later implementation tasks; no multi-group engine in M0.
 
+## Bidirectional strategy budget adjustment and code-quality gate (ADR-025)
+
+The trusted Portfolio Allocator may recommend gradual increases in qualified strategy budgets only on sustained independently credible, cost-aware evidence and within pre-authorized portfolio/strategy risk. Verified volatility, correlation/concentration, liquidity deterioration, cost slippage, or evidence of strategy decay can reduce new-risk budgets faster. Do not equate one brief drawdown or noisy short-run results with proven alpha disappearance, and do not oscillate budgets on every mark. Require bounded, versioned, reproducible decision inputs, anti-churn controls, fresh reliable data and independent Risk Kernel acceptance. An allocator cannot clear financial circuit breakers, modify the Owner cap, create collateral, bypass strategy group attribution or send broker orders. A smaller budget is not an actual confirmed sell/fill.
+
+**P0 engineering acceptance before any real-money activation:** deterministic replay/property and boundary tests (all budgets <= Owner and account/strategy constraints), event reorder/duplicate/restart persistence, stale/cross-source-conflict freeze of risk increases, sudden volatility/liquidity/correlation/transaction-cost stress, portfolio cash/holdings accounting consistency, independent unit-level review of execution boundary, and sustained paper/shadow comparison net of turnover and fees. Keep the adaptive live sizing feature disabled until the Owner separately authorizes its activation within live limits and the tests demonstrate adequate coverage; paper tests cannot guarantee successful market adaptation. No adaptive scaling component in M0.
+
 ## P0 scenario acceptance examples for later phases
 
 1. Timeout after possible broker acceptance: persist unknown outcome and block **all new account openings**, not only the affected symbol; no blind duplicate retry.
