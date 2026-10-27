@@ -80,6 +80,10 @@ Risk Kernel independently checks **both** (1) the qualified strategy's assigned 
 
 Attribution of shared trades, costs, cash moves and overlapping positions must be trustworthy and auditable; missing attribution cannot be treated as zero loss. Strategy version, identity, lineage and persistent locks prevent trivial rename/redeployment/splitting resets. Neither the Agent nor technical recovery (ADR-004) may clear a financial lock; strategy-specific reactivation criteria and numeric thresholds remain undecided. Do not auto-liquidate on a trigger or promise bounded realized losses.
 
+## Group-level attribution and account-wide accounting (ADR-020/021)
+
+Changed strategy versions must undergo independent qualification; an old stopped version's losses remain visible. Group-local signals, research and virtual holdings must not be silently accessed or altered by other groups. Different groups may operate on the same instrument but must reconcile virtual shares and costs against a single real cash/position/order ledger. Account risk checks cover every group; internal group netting must not fabricate broker fills. Exact group netting rules remain open.
+
 ## P0 scenario acceptance examples for later phases
 
 1. Timeout after possible broker acceptance: persist unknown outcome and block **all new account openings**, not only the affected symbol; no blind duplicate retry.
