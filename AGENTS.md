@@ -20,6 +20,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 11. **ADR-003: account-wide uncertainty halt.** A submission timeout/unknown broker order freezes all new account risk across instruments and strategies. Persist the halt, do not retry blindly, reconcile broker orders/fills/cash/positions first. ADR-004: configurable `conditional_auto` default or `manual`, both requiring successful authoritative reconciliation and connection health. Repeated faults require manual attention; loss/drawdown breakers never auto-clear because connectivity recovered. Only Owner via trusted management may change this policy; Agent cannot.
 
+12. **ADR-005: tiered research-data evidence.** Research may explore on incomplete/uncertain historical data but must label such results exploratory. Only an independent evaluator may classify verified point-in-time historical evidence; prospective shadow observations are separately timestamped and cannot be retrospectively rewritten. Never use exploratory backtest claims as sole grounds for real-money promotion. Avoid exhaustive exploratory input hardening.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
