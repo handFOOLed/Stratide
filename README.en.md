@@ -6,7 +6,7 @@
 
 Status: **M0 scaffold — NOT a trading system**. No market-data provider, broker connection, order routing, research agent, or real-money execution is implemented. Do not use this repository to manage real funds.
 
-- **ADR-020/021:** New versions require independent requalification. Strategy groups can hold the same instrument with separate internal data/P&L but one real account ledger. See [ADR-020](docs/adr/0020-versioned-requalification-auto-promotion.md) and [ADR-021](docs/adr/0021-group-isolation-shared-instrument-attribution.md).
+- **ADR-020/021/022:** New versions require independent requalification. Strategy groups can hold the same instrument with separate internal data/P&L but one real account ledger. Trusted portfolio allocation nets compatible opposing group intents before actual broker orders; internal virtual transfers are not exchange fills. See [ADR-020](docs/adr/0020-versioned-requalification-auto-promotion.md), [ADR-021](docs/adr/0021-group-isolation-shared-instrument-attribution.md), and [ADR-022](docs/adr/0022-trusted-cross-group-intent-netting.md).
 
 ## Product intent
 
