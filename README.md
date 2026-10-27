@@ -30,6 +30,7 @@ Stratide 是面向个人用户的**低资源占用、本地优先**的自动化�
 - **新版本自主准入：** 策略改参生成新的冻结版本，重新独立验证通过后可自动晋升，不清除历史亏损和禁令（[ADR-020](docs/adr/0020-versioned-requalification-auto-promotion.md)）。
 - **策略组数据隔离：** 不同组可以持有同一股票，但组内生成的数据、信号、虚拟份额和盈亏独立归属；真实资金、仓位和账户风险共用一份账本（[ADR-021](docs/adr/0021-group-isolation-shared-instrument-attribution.md)）。
 - **跨组交易意图净额执行：** 可信组合分配器在执行前合并同股相反买卖意图，尽量减少券商委托；内部虚拟份额变更不是交易所成交，不得虚构现金、收益或绕过实际交易限制（[ADR-022](docs/adr/0022-trusted-cross-group-intent-netting.md)）。
+- **内部转移统一定价：** 跨组虚拟份额调整由可信组合管理器使用同一市场参考价进行双方记账，不生成虚假的买卖价差、真实手续费、券商成交或额外账户净值（[ADR-023](docs/adr/0023-single-market-reference-internal-transfer.md)）。
 - **单实例安全恢复：** 每个真实账户同一时刻只允许一个有执行权的核心，重启后先恢复持久状态并核对券商订单/资金/持仓，不盲目重发订单；迁移主机需先停用旧执行端（[ADR-017](docs/adr/0017-single-writer-durable-recovery.md)）。
 - **不在本地跑大模型：** LLM 推理经可替换的云端 API；重型研究计算可使用远程 Worker。交易核心不需要 GPU。
 - **云端账户研究数据授权：** 用户首次确认云端接收服务与数据范围后，Agent 可持续读取已授权的持仓、资金及交易研究上下文，不反复弹窗；可随时撤销后续共享，但券商密钥和交易权限绝不外传（[ADR-013](docs/adr/0013-one-time-cloud-data-consent.md)）。
