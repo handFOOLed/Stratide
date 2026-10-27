@@ -4,7 +4,7 @@
 - 日期：2026-10-27
 - Owner 选择：**方案 A——人工接管之后，只有 Owner 经过可信身份确认并显式交还执行权，Stratide 才可能恢复自动交易。**
 - 关联：[ADR-028](0028-dedicated-broker-account-initial-live.md) 初始实盘专户、[ADR-017](0017-single-writer-durable-recovery.md) 唯一执行主体/持久恢复、[ADR-003](0003-account-wide-order-uncertainty.md) 未知订单状态全账户停新增风险、[ADR-004](0004-configurable-conditional-recovery.md) 技术故障条件自动恢复、[ADR-018](0018-equity-based-loss-drawdown-breakers.md) 财务风险熔断。
-- 待决：接管时未完成订单的撤单/保留流程、具体管理入口及认证机制、突然在券商 App 抢先介入但尚未来得及暂停系统时的最小告警/自动探测能力、交还操作的用户界面与记录字段。不得假设券商能技术性屏蔽其他终端。
+- 待决：具体管理入口及认证机制、突然在券商 App 抢先介入但尚未来得及暂停系统时的最小告警/自动探测能力、交还操作的用户界面与记录字段。挂单由 Owner 选择保留或尝试撤销的确认按钮方案已由 [ADR-030](0030-owner-takeover-pending-order-choice.md) 确定；不得假设券商能技术性屏蔽其他终端。
 
 ## 背景
 
