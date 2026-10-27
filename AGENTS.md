@@ -75,6 +75,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 39. **ADR-033: Owner-authenticated manual fill-to-group assignment.** The ADR-032 suspense record stays unallocated until the Owner explicitly chooses one/more eligible groups and amounts. No automatic pro-rata default, Agent recommendations or hindsight performance preference. Trusted core validates the confirmed broker trade ID, remaining unassigned quantity, pre-existing group inventory for sells, actual new shares for buys, cost-basis and real fee conservation, stale snapshot/duplicate event avoidance, and durable group-specific adjustments. Never rewrite physical broker fills, clear historic strategy financial locks, or label manual decisions as autonomous alpha. Assignment cannot auto-release ADR-029 takeover or bypass Risk Kernel. M0 has no live account/group assignment UI.
 
+40. **ADR-035: passive corporate action group entitlement.** Use verified record-date eligible strategy group holdings, not payment-date positions, to allocate dividends and share bonuses. Trusted ledgers must reconcile gross/net dividend cash, actual taxes, delayed receivables, bonus shares, per-share cost basis and broker holdings. No duplicated NAV gains from receivable settlement, splits or repeated events; do not mislabel dividends as external Owner cash contributions. Ensure deterministic rounding and idempotent replay. Unknown broker credits/rights eligibility cannot be used to authorize new risk. Never automatically exercise or fund voluntary rights/corporate actions absent separate authorization. No live corporate-action engine in M0.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
