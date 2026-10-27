@@ -1,0 +1,35 @@
+# Rust
+/target/
+**/*.rs.bk
+
+# Python research environment (later)
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# Secrets / local settings
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+config/local.toml
+
+# Runtime money/data artifacts
+state/
+logs/
+data/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.parquet
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

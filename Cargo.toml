@@ -1,0 +1,11 @@
+[workspace]
+resolver = "2"
+members = [
+  "apps/stratided",
+  "apps/stratide-cli",
+  "crates/contracts",
+]
+
+[workspace.package]
+edition = "2021"
+version = "0.0.1"

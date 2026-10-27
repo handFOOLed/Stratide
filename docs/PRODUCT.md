@@ -1,0 +1,29 @@
+# Product Definition — current agreements
+
+Status: **agreed product principles**, not a profitability claim.
+
+## Mission
+
+Stratide autonomously discovers, evaluates, manages and eventually executes trading strategies under independently enforced financial risk constraints. It must be able to conclude there is no credible edge and refrain from opening new risk.
+
+## Owner priorities
+
+- Target **around CNY 100,000** of possible future capital, not immediate commitment.
+- Optimize for **net** results after market friction, data/AI/compute/subscription costs and risks.
+- Prefer accessible and reliable low-cost data; asset universe should follow data economics and executable brokerage access, not an arbitrary product checklist.
+- Stock prices are hard to predict; AI's job is hypothesis and research support, not unquestioned price prophecy.
+- Agent may freely explore novel research directions and generated code; production strategy promotion is gated.
+- Keep independent risk kernel, loss-triggered entry shutdown, account/position reconciliation, bounded exposure, no uncontrolled leverage.
+- Develop and paper trade on user's Windows PC first. A persistent mini PC and private web dashboard are **conditional** on sustained evidence of value.
+- Local footprint should be tiny: no GPU and no local model inference; LLM via cloud API, remote compute when justified.
+- No conventional stock-terminal GUI required. A CLI plus reports is sufficient for now.
+- Prioritize credible financial failure over cosmetic edge cases and speculative enterprise hardening.
+
+## Explicit non-goals now
+
+- Guaranteed positive returns or fixed maximum loss.
+- High-frequency trading / latency racing.
+- Automated live account access at M0.
+- Full multi-agent teams or heavy distributed infrastructure.
+- Publicly accessible order-management endpoints.
+- A polished frontend as the prerequisite for useful product behavior.

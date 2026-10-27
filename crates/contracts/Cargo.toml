@@ -1,0 +1,5 @@
+[package]
+name = "stratide-contracts"
+version.workspace = true
+edition.workspace = true
+publish = false

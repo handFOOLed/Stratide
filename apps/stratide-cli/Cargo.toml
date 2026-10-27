@@ -1,0 +1,8 @@
+[package]
+name = "stratide-cli"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[dependencies]
+stratide-contracts = { path = "../../crates/contracts" }
