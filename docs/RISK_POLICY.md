@@ -82,7 +82,7 @@ Attribution of shared trades, costs, cash moves and overlapping positions must b
 
 ## Group-level attribution and account-wide accounting (ADR-020/021)
 
-Changed strategy versions must undergo independent qualification; an old stopped version's losses remain visible. Group-local signals, research and virtual holdings must not be silently accessed or altered by other groups. Different groups may operate on the same instrument but must reconcile virtual shares and costs against a single real cash/position/order ledger. Account risk checks cover every group; internal group netting must not fabricate broker fills. Exact group netting rules remain open.
+Changed strategy versions must undergo independent qualification; an old stopped version's losses remain visible. Group-local signals, research and virtual holdings must not be silently accessed or altered by other groups. Different groups may operate on the same instrument but must reconcile virtual shares and costs against a single real cash/position/order ledger. Account risk checks cover every group; internal group netting must not fabricate broker fills. ADR-022 accepts trusted pre-execution netting of opposite group intents. A zero external order may reflect an auditable internal virtual allocation transfer, but such an event is not a broker execution and cannot manufacture sellable shares, realized brokerage P&L or cash. Validate strategy and account risk, existing order commitments, available inventory, settlement restrictions and data freshness before netting. Actual external orders affect physical cash and holdings only on confirmed fills. Exact internal reference-price, matching-window and partial-fill attribution policies remain open.
 
 ## P0 scenario acceptance examples for later phases
 
