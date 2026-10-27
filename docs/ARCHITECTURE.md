@@ -1,6 +1,6 @@
 # Architecture — draft for interrogation
 
-**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), and [ADR-009](adr/0009-auto-promotion-owner-veto.md).** Do not treat other design options as settled.
+**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), [ADR-009](adr/0009-auto-promotion-owner-veto.md), and [ADR-010](adr/0010-configurable-deployment-grace-period.md).** Do not treat other design options as settled.
 
 ## Domains and trust boundaries
 
@@ -102,6 +102,14 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - **No promotion power for the Agent itself.** The Evaluator and Promotion Gate hold distinct decision authority, and neither can change Risk Kernel rules or raise authorized account principal.
 - No broker or live-promotion implementation belongs in M0; exact qualification standards, veto scope and safe unwind policy remain to be designed.
 
+## Accepted decision: Owner-configurable pre-activation delay (ADR-010)
+
+- **Default 10-minute buffer before automatic activation.** Eligible candidates enter persistent `PENDING_ACTIVATION` so an Owner can undo accidental settings or veto undesired strategies; only the Owner may configure this window.
+- **Not manual approval.** When the timer expires, the trusted Promotion Gate can automatically activate only after renewing qualification, capital/risk permissions, current account status, and veto checks.
+- **Persist and revalidate.** Restart, time drift, stale decisions or lack of state cannot cause blind activation. A canceled or vetoed candidate cannot resume merely because time elapsed.
+- Notify the Owner of pending candidates and cancellation methods. Delivery-channel and notification-failure semantics remain open; do not assert delivery was successful without evidence.
+- This is a design goal for later auto promotion, not an M0 real-money capability.
+
 ## Likely implementation boundaries
 
 - **Production core:** lightweight Rust daemon, no GPU; data, risk, ledger, order state, broker abstraction.
@@ -130,7 +138,7 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - What is the minimal risk-gate API, and how should loss-breaker release differ from ADR-004's technical-only recovery?
 - How to choose practical evaluator holdout reuse limits, diagnostics and promotion criteria for actual candidate strategies without unnecessary statistical infrastructure?
 - Which parts of research can run with bounded CPU locally vs remote-only workers?
-- What minimal trusted Promotion Gate contract, veto scope and live activation boundary should enforce ADR-009, without turning automatic promotion into per-strategy approval?
+- What minimal trusted Promotion Gate contract, veto scope and live activation boundary should enforce ADR-009/010, including pending-notification failures, without turning automatic promotion into per-strategy approval?
 - Which data can be stored/shipped to external providers under licenses and privacy expectations?
 - What is the resource budget and minimum uptime/recovery test for macOS/Linux mini PC deployment, considering broker compatibility?
 
