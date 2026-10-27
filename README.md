@@ -38,6 +38,7 @@ Stratide 是面向个人用户的**低资源占用、本地优先**的自动化�
 - **初始实盘专用账户：** 真实资金运行时优先使用不与日常人工交易混用的 Stratide 专用证券账户；仍需向券商对账，发现未知订单、成交或持仓差异时停止该账户新增风险。具体券商与开户条件须先验证（[ADR-028](docs/adr/0028-dedicated-broker-account-initial-live.md)）。
 - **紧急人工接管：** Owner 接管后立即持久禁止所有新的自动券商委托；网络恢复、重启或对账成功也不能自行恢复。必须由 Owner 明确交还，且券商订单、持仓、资金及所有风控检查通过（[ADR-029](docs/adr/0029-owner-manual-takeover-explicit-return.md)）。
 - **接管时挂单处理选择：** 相邻普通「保留挂单并接管」与红色警示「尝试撤单并接管」，另一侧独立「取消」仅关闭界面。撤单不保证成功，保护性卖单可能受影响；不将撤单请求当作券商确认（[ADR-030](docs/adr/0030-owner-takeover-pending-order-choice.md)）。
+- **保护性挂单撤销确认：** 当撤单涉及保护性委托，必须在原接管界面额外勾选风险确认，不弹第二层窗口；订单情况变化后旧确认失效（[ADR-031](docs/adr/0031-inline-confirmation-for-protective-order-cancellation.md)）。
 - **不在本地跑大模型：** LLM 推理经可替换的云端 API；重型研究计算可使用远程 Worker。交易核心不需要 GPU。
 - **云端账户研究数据授权：** 用户首次确认云端接收服务与数据范围后，Agent 可持续读取已授权的持仓、资金及交易研究上下文，不反复弹窗；可随时撤销后续共享，但券商密钥和交易权限绝不外传（[ADR-013](docs/adr/0013-one-time-cloud-data-consent.md)）。
 - **动态组合资金池：** 已通过资格验证的策略可在授权范围内动态共享资金。研究、回测和模拟账户的起始本金不得超过你明确授权的账户本金，Agent 不得虚构资金、重复分配现金或默认使用杠杆（[ADR-008](docs/adr/0008-dynamic-portfolio-capital-cap.md)）。
