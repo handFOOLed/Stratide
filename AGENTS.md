@@ -22,6 +22,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 12. **ADR-005: tiered research-data evidence.** Research may explore on incomplete/uncertain historical data but must label such results exploratory. Only an independent evaluator may classify verified point-in-time historical evidence; prospective shadow observations are separately timestamped and cannot be retrospectively rewritten. Never use exploratory backtest claims as sole grounds for real-money promotion. Avoid exhaustive exploratory input hardening.
 
+13. **ADR-006: evaluator independence.** Never give the research Agent access to protected holdout answers or the authority to certify itself. Freeze candidate code/model/version/params before formal evaluation, track submission history and holdout reuse, do not treat one lucky backtest as an edge, and use genuinely forward-observed evidence before live promotion. Do not build needless experimental statistical infrastructure at M0.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
