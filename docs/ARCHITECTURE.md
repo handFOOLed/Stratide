@@ -1,6 +1,6 @@
 # Architecture — draft for interrogation
 
-**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), [ADR-009](adr/0009-auto-promotion-owner-veto.md), [ADR-011](adr/0011-immediate-promotion-nonblocking-notifications.md), [ADR-012](adr/0012-adaptive-research-daily-hard-budget.md), [ADR-013](adr/0013-one-time-cloud-data-consent.md), [ADR-014](adr/0014-isolated-strategy-workers.md), [ADR-015](adr/0015-automatic-data-manager-network-isolation.md), and [ADR-016](adr/0016-verified-data-source-failover.md) (which supersedes [ADR-010](adr/0010-configurable-deployment-grace-period.md)).** Do not treat other design options as settled.
+**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), [ADR-009](adr/0009-auto-promotion-owner-veto.md), [ADR-011](adr/0011-immediate-promotion-nonblocking-notifications.md), [ADR-012](adr/0012-adaptive-research-daily-hard-budget.md), [ADR-013](adr/0013-one-time-cloud-data-consent.md), [ADR-014](adr/0014-isolated-strategy-workers.md), [ADR-015](adr/0015-automatic-data-manager-network-isolation.md), [ADR-016](adr/0016-verified-data-source-failover.md), and [ADR-017](adr/0017-single-writer-durable-recovery.md) (which supersedes [ADR-010](adr/0010-configurable-deployment-grace-period.md)).** Do not treat other design options as settled.
 
 ## Domains and trust boundaries
 
@@ -152,6 +152,14 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - Audit provider IDs, switch dates and data versions; require consistent/healthy source before switching back to prevent flapping. Emergency failover cannot trust unapproved adapters, new paid sources or missing privacy consent.
 - Provider thresholds and real adapters are future phases, not M0.
 
+## Accepted decision: single execution writer with durable recovery (ADR-017)
+
+- **One trusted trading writer per actual broker account.** Do not build dual-active or automatically promoted backup trading instances. A same-host exclusive lock prevents duplicate local core processes but **does not protect across hosts**; transferring live authority to Windows/macOS/Linux requires ensuring the old machine can no longer submit orders before enabling the new machine.
+- Persist order intent and uncertain statuses, broker correlation IDs, fills, cash/positions, risk breakers, Owner authority/veto and strategy version references in reliable local state. Backup with consistent snapshots and restore validation, not naive copies of a live database.
+- **On restart, no immediate new risk.** Reload and validate critical state, recover technical halt/unknown-order flags, then use authoritative broker order/fill/cash/position reconciliation before resuming live entries. ADR-003 freezes account-wide new risk for uncertainty; ADR-004 governs conditional-auto/manual *technical* recovery, and loss breakers remain unaffected.
+- Never blindly replay pending signals or re-submit ambiguous broker orders, and do not auto-liquidate unknown holdings. Old strategy proposals expire rather than turning into fresh decisions on restart.
+- Accept downtime when the only host is offline in exchange for simplicity and avoiding duplicate financial actions. M0 needs a paper-only restart/ledger consistency check, not real broker recovery or failover infrastructure.
+
 ## Likely implementation boundaries
 
 - **Production core:** lightweight Rust daemon, no GPU; data, risk, ledger, order state, broker abstraction.
@@ -182,6 +190,6 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - Which parts of research can run with bounded CPU locally vs remote-only workers?
 - What minimal Promotion Gate/veto and portfolio strategy selection policy should enforce ADR-009/011 while retaining genuinely unattended operation?
 - For actual chosen AI/data vendors, what license, retention/training, deletion and transfer constraints apply within ADR-013's one-time authorized research scope?
-- What is the resource budget and minimum uptime/recovery test for macOS/Linux mini PC deployment, considering broker compatibility?
+- What is the minimal platform-specific account authority transfer and verified state/backup restore procedure for ADR-017, given actual broker adapter compatibility?
 
 See `docs/GRILL_BRIEF.md` for a discussion-ready agenda.
