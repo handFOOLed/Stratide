@@ -61,6 +61,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 32. **ADR-026: resource-bounded shadow observation and strategy registry.** Limit active paper/shadow observers and research disk/CPU usage. Index immutable strategy metadata, lineage, prior failures and evidence locally (SQLite; optional FTS5), filtering by authorized group scope before sending only bounded summaries to cloud research APIs. Keep shared public market data separate from group-private generated signals and outputs. Preserve actual broker/ledger/risk/Owner authorization and qualification evidence; archive expendable records without fabricating observations during paused periods. Apply ADR-012 paid research budgeting. Under disk pressure stop nonessential experiments before jeopardizing durable financial writes. M0 must not implement the registry, shadow pool or vector-search platform.
 
+33. **ADR-027: failed strategy findings are evidence, not permanent research blacklists.** Before costly near-duplicate research, use ADR-026 local authorized index, prior frozen hashes/lineage, data versions, failed evidence and a testable reason for renewed investigation. Cache equivalent verified runs and do not send full history to an LLM. Do not relabel exposed holdout data as newly independent evidence, erase unsuccessful trials or treat a new hash as an unrelated strategy. Research remains possible under ADR-012 costs; any live promotion still requires ADR-006/020 independent evaluation and never resets Owner veto, financial locks or account Risk Kernel rules. Group-private failure logs stay protected. M0 must not build a research agent, permanent blacklist or semantic search system.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
