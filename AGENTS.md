@@ -38,6 +38,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 20. **ADR-014: untrusted strategy Workers.** Run generated strategy code exclusively in separate restricted local Worker processes or isolated remote workers. Support appropriate Python/scientific/ML dependencies without forcing WASM, but never load generated code into trusted Rust `stratided`. Worker output is only an authenticated, versioned, expiring proposal subjected to Portfolio → Risk → Execution. No Worker access to brokerage keys, order API, production ledger writes, risk-limit writes or local secrets. OS child processes are not security sandboxes; apply verifiable file/network/compute restrictions or reject unsafe local execution. Do not build complex runtime orchestration in M0.
 
+21. **ADR-015: automatic data management, no arbitrary production Worker egress.** Let isolated research Agent discover and evaluate public data sources, but use a trusted Data Manager to expose approved standardized inputs to production Workers. No arbitrary external network access, secrets, broker APIs or open-URL proxy from production Worker. Built-in compliant public sources should work without manual per-source setup. Agent-discovered adapters must pass lightweight trust/licensing/quality checks before trusted integration; never execute untrusted fetched code in the trusted Rust core. First-time Owner authorization for new API keys, paid services and new sensitive-data recipients only (ADR-013), with ADR-012 spending caps and ADR-005 data-time provenance. No market-data/connector platform in M0.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
