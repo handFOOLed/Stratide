@@ -1,6 +1,6 @@
 # Architecture — draft for interrogation
 
-**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), and [ADR-005](adr/0005-tiered-data-evidence.md).** Do not treat other design options as settled.
+**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), and [ADR-006](adr/0006-independent-validation-isolation.md).** Do not treat other design options as settled.
 
 ## Domains and trust boundaries
 
@@ -70,6 +70,14 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - Research Agent cannot certify its own data or backtest as promotion-grade evidence. The independent Evaluator enforces evidence boundaries; shadow trading is not live trading.
 - No mandate to acquire expensive data or exhaustively verify all exploration inputs at M0; spend verification effort only when financial decisions depend on it.
 
+## Accepted decision: independent validation isolation (ADR-006)
+
+- **Open-ended research remains unrestricted in strategy families**, but the independent Evaluator controls formal holdouts, evaluation rules and promotion-grade metrics. Research Agent cannot certify its own results.
+- Freeze the candidate's code/model hash, parameters, dataset version and research lineage **before** protected evaluation. Subsequent modifications form a new candidate.
+- Record evaluation attempts and held-out windows; limit repeated peek/optimization against the same holdout. High backtest scores across thousands of trials are not necessarily evidence of tradeable alpha.
+- Forward-observed paper/shadow testing of a frozen candidate on genuinely new data supplements independently validated point-in-time backtests. Account for costs and execution realism.
+- **No-edge and no-promotion are valid outcomes.** Evaluation success is not itself live-trading authorization. Exact statistics, budgets and gate criteria are separate future choices.
+
 ## Likely implementation boundaries
 
 - **Production core:** lightweight Rust daemon, no GPU; data, risk, ledger, order state, broker abstraction.
@@ -96,7 +104,7 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - What is the minimum broker interface needed for authentic paper fills and later live A-share compliance?
 - How do we define and verify account-equity daily-loss and high-water-mark drawdown thresholds?
 - What is the minimal risk-gate API, and how should loss-breaker release differ from ADR-004's technical-only recovery?
-- How should the independent evaluator avoid multiple-testing/holdout reuse while allowing open-ended Agent exploration?
+- How to choose practical evaluator holdout reuse limits, diagnostics and promotion criteria for actual candidate strategies without unnecessary statistical infrastructure?
 - Which parts of research can run with bounded CPU locally vs remote-only workers?
 - What constitutes strategy promotion and when is human authorization mandatory?
 - Which data can be stored/shipped to external providers under licenses and privacy expectations?
