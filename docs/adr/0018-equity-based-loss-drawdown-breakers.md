@@ -4,7 +4,7 @@
 - 日期：2026-10-27
 - Owner 选择：**方案 B — 以可信账户净值变化，而非仅已实现亏损，作为每日亏损与回撤熔断依据**
 - 关联：[ADR-003](0003-account-wide-order-uncertainty.md) 订单未知全账户停增仓、[ADR-004](0004-configurable-conditional-recovery.md) 技术性故障恢复与财务熔断区分、[ADR-008](0008-dynamic-portfolio-capital-cap.md) 共享账户资金、[ADR-016](0016-verified-data-source-failover.md) 数据质量、[ADR-017](0017-single-writer-durable-recovery.md) 持久化
-- 尚未决定：Owner 的具体每日亏损/回撤百分比、权益估值刷新频率、停牌/无成交标的的可靠估值方法、实盘来源细节、亏损熔断的人工复位流程
+- 尚未决定：Owner 的具体每日亏损/回撤百分比、权益估值刷新频率、停牌/无成交标的的可靠估值方法、实盘来源细节、亏损熔断的人工复位流程。策略级风险预算、归属与局部熔断已由 [ADR-019](0019-account-and-strategy-risk-layers.md) 确认。
 
 ## 问题与背景
 
