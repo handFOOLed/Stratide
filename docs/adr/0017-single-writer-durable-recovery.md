@@ -6,7 +6,7 @@
 - 范围：`stratided` 交易执行权、断电/重启恢复、跨 Windows/Mac mini/Linux 主机迁移
 - 暂未决定：实际券商的接管/登录限制、备份频率及位置、存储事务细节、具体恢复核对协议与健康检测指标
 
-首个真实资金版本采用 Stratide 专用证券账户，不允许常规人工交易混入；但单实例执行权并不保证不会出现外部活动，异常成交/仓位仍必须权威对账。参见 [ADR-028](0028-dedicated-broker-account-initial-live.md)。
+首个真实资金版本采用 Stratide 专用证券账户，不允许常规人工交易混入；但单实例执行权并不保证不会出现外部活动，异常成交/仓位仍必须权威对账。参见 [ADR-028](0028-dedicated-broker-account-initial-live.md)。紧急人工接管后需持久停用新的自动委托，并经 Owner 认证明确交还、完整对账才能恢复自动执行，参见 [ADR-029](0029-owner-manual-takeover-explicit-return.md)。
 
 ## 背景
 
