@@ -21,6 +21,7 @@ Use this opening frame:
 - **ADR-003 accepted:** uncertain broker submission freezes all new risk for the account, not only the affected ticker; preserve state, reconcile orders/fills/cash/positions and never blindly retry.
 - **ADR-004 accepted:** recovery of technical-only broker halts is configurable (`conditional_auto` default / `manual`), but always needs full reconciliation and stable connection; repeated faults require Owner intervention. Loss/drawdown breakers never auto-clear as a side effect.
 - **ADR-005 accepted:** incomplete/low-cost historical data may be used for exploratory research, but promotion-grade historical backtests need independently verified point-in-time inputs; forward-observed shadow trading can build new evidence when historical availability is unprovable. Do not equate shadow testing with live deployment.
+- **ADR-006 accepted:** Agent freely explores, but cannot inspect/alter protected evaluation rules or repeatedly use the same holdout as an unlimited tuning oracle. Freeze and hash candidates, track attempts and research lineage, use genuine forward observation before live eligibility. Do not mandate complex statistics or arbitrary test-count limits at M0.
 - Financial-risk-driven testing; do not spend days on harmless malformed names.
 
 ## Decision tree — highest-value unresolved choices
@@ -29,7 +30,7 @@ Use this opening frame:
 2. **Risk gateway implementation (ADR-002)**: how do private APIs and persisted breaker state prevent unchecked order emission; what minimal operator-unlock rule is needed?
 3. **ADR-003/004 implementation (open):** minimal order identifiers, broker reconciliation and bounded query behavior; exact stability/repeated-fault policy should be tuned for the actual adapter, not speculated about now.
 4. **ADR-005 implementation (open):** minimal point-in-time evidence metadata, forward-observation journaling and corporate-action handling; no exhaustive data-quality engineering at M0.
-5. **Research overfitting (open):** how to avoid repeatedly selecting from thousands of models using the same historical holdout, before forward shadow evaluation?
+5. **ADR-006 implementation (open):** choose minimal candidate freeze, evaluator feedback, held-out data isolation and eventually appropriate thresholds; core principle is settled.
 6. **Paper fidelity**: how are A-share T+1, daily price limits, unavailable fills, lot size, fees, and liquidity handled? What cannot be simulated reliably?
 7. **Live automation authority**: what is the smallest default manual-approval boundary before any novel promoted strategy can route a real order? Regulatory reporting must be checked.
 8. **Local-to-miniPC migration**: what state must be backed up, recovered, and reconciled so identical logic can resume safely on macOS ARM64 or Linux (given broker OS constraints)?
