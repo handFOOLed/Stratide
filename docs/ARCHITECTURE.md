@@ -1,6 +1,6 @@
 # Architecture — draft for interrogation
 
-**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), and [ADR-007](adr/0007-conservative-frequency-matched-simulation.md).** Do not treat other design options as settled.
+**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), and [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md).** Do not treat other design options as settled.
 
 ## Domains and trust boundaries
 
@@ -85,6 +85,15 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - Separate decision data availability from execution time: a close-derived signal must not be backfilled at the same known closing price without a supported execution mechanism.
 - Models needing minute/tick/order-book information may be explored freely, but are not promotion-eligible on an unsupported daily-bar simulation. Add higher-fidelity simulators only when credible candidate strategies justify them.
 - M0 validates a minimal paper-only, reproducible order/risk/ledger slice rather than an extensive microstructure exchange simulator.
+
+## Accepted decision: dynamic portfolio allocation and account-principal cap (ADR-008)
+
+- Portfolio-level funds are a **single shared cash/positions ledger**. Qualified strategies may receive dynamic weights within the owner's authorized capital and independent risk constraints; a unit of cash cannot be simultaneously allocated twice.
+- **Hard research scale limit:** backtest and forward-paper initial capital must not exceed the Owner-authorized account principal. The Agent cannot increase it, invent external deposits, use default leverage, or turn a not-yet-funded illustrative account size into verified capital.
+- Standalone candidate backtests may each use the same capped initial capital for comparison; a concurrent multi-strategy portfolio must share one actual simulated cash balance and cannot add those standalone capitals together.
+- Owner research-capital authorization is **not** the same as the maximum market exposure allowed by the Risk Kernel. Profit/loss and cash flows are reported honestly; test profit cannot silently raise the principal authorization for a new trial.
+- Allocation authority does not confer production strategy promotion permission. The auto-vs-human live promotion decision is still open.
+- M0 only needs a constrained shared paper ledger and one rejection demonstrating the capital/risk limits, not an optimizer.
 
 ## Likely implementation boundaries
 
