@@ -54,6 +54,10 @@ A trusted budget gate, not the research Agent itself, enforces the Owner-configu
 
 The Owner may grant a persistent one-time authorization for a specific cloud research receiver, data categories and purpose, including detailed portfolio/transaction history. The trusted control plane reuses it for normal subsequent research queries without re-prompting; scope expansion, a new receiving service or new purpose requires fresh permission. Revocation stops future sending but cannot by itself erase data already transmitted to a vendor. Brokerage secrets, identity credentials, order submission and Risk Kernel writes are never included, no matter what analytical context is authorized. Check the actual API provider's retention/training contract and market-data redistribution licenses. Record authorization changes without scattering raw sensitive data in logs.
 
+## Isolated generated-strategy execution (ADR-014)
+
+AI-generated and other untrusted strategy code must execute in restricted local-process or isolated remote Workers, never as plugins in the trusted Rust risk/execution core. Worker access to broker credentials, direct order routing, risk-policy mutation and production ledger writes is denied; proposals are authenticated, time-bounded and independently risk checked. **Process separation alone is insufficient**: confirm sandboxing constraints on filesystem/environment secrets, network and resource limits before enabling untrusted code on a production machine. Where enforcement is unsupported, deny local execution or relocate to a genuinely isolated environment. WASM is optional, not required.
+
 ## P0 scenario acceptance examples for later phases
 
 1. Timeout after possible broker acceptance: persist unknown outcome and block **all new account openings**, not only the affected symbol; no blind duplicate retry.
