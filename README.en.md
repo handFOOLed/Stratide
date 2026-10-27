@@ -2,7 +2,7 @@
 
 # Stratide
 
-[ADR-032](docs/adr/0032-manual-trades-suspense-ledger-unassigned-attribution.md): confirmed Owner-manual fills enter a separate suspense ledger until attributed to strategy groups; physical broker balances update immediately.
+[ADR-032](docs/adr/0032-manual-trades-suspense-ledger-unassigned-attribution.md): confirmed Owner-manual fills enter a separate suspense ledger; real broker balances update immediately. [ADR-033](docs/adr/0033-owner-explicit-manual-fill-group-attribution.md): only explicit Owner-directed group quantities can resolve suspense, subject to verified inventories, fee/cost reconciliation and unchanged broker facts.
 
 [ADR-026](docs/adr/0026-budgeted-shadow-observation-and-local-strategy-registry.md): bounded shadow observation, locally indexed strategy lookup and limited cloud-LLM context. [ADR-027](docs/adr/0027-historical-failure-as-evidence-not-permanent-ban.md): past failures are research evidence, not permanent research bans or permission to bypass live financial locks.
 
