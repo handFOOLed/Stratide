@@ -30,6 +30,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 16. **ADR-009: default eventual autonomous promotion, Owner veto.** A separate trusted Promotion Gate may admit independently validated strategies without individual human approval **only after** the Owner has explicitly enabled live mode and authorized capital/risk limits. The Owner can veto/disable any strategy, for any reason; persist and enforce bans against fresh deployment and new risk, without unsafe forced liquidation. Agent/strategy cannot self-approve, rewrite vetoes or expand budget/limits. M0 remains paper-only.
 
+17. **ADR-010: pre-activation grace period.** Default 10 minutes after trusted qualification, configurable by Owner only. Persist pending state; Owner can undo accidental setup or veto before activation. No mandatory per-strategy approval. Recheck eligibility, account and risk authorization at expiry; Agent cannot shorten timer or bypass veto. Notification failure handling is still open. No extra timer daemons or live deployment machinery in M0.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
