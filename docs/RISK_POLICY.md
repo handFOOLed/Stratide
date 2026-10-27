@@ -32,7 +32,7 @@ Data with unverified historical availability may support exploration, **not** li
 
 ## Independent evaluator and overfitting controls (ADR-006)
 
-The Agent must not control protected holdout evaluation, fabricate its own qualification, or selectively conceal trial history. Freeze and version submitted candidates; keep evaluation attempts, costs and holdout usage auditable. Repeated testing against the same history reduces its value as independent evidence. Use prospective forward observation on genuinely unseen data before any possible live-money promotion. The final promotion policy is separate and not yet determined.
+The Agent must not control protected holdout evaluation, fabricate its own qualification, or selectively conceal trial history. Freeze and version submitted candidates; keep evaluation attempts, costs and holdout usage auditable. Repeated testing against the same history reduces its value as independent evidence. Use prospective forward observation on genuinely unseen data before any possible live-money promotion. The separate promotion policy is established by [ADR-009](adr/0009-auto-promotion-owner-veto.md): a trusted gate may auto-promote eligible candidates inside Owner-preauthorized live limits, subject to an effective, persisted Owner veto. Neither the Agent nor Evaluator may self-grant trading access.
 
 ## Conservative execution simulation (ADR-007)
 
@@ -40,7 +40,11 @@ First-stage historical and paper execution uses **frequency-matched conservative
 
 ## Account-principal ceiling for research and portfolio allocation (ADR-008)
 
-The Owner sets the maximum authorized account principal used as starting capital for a research, backtest or paper account; it must not exceed a verifiable real-account capital basis when connected. The research Agent cannot raise that limit or invent deposits. Independent candidate comparisons may each run at the same capped capital; concurrent strategies must share one ledger and cannot double-spend cash. No default leverage or borrowed cash. Distinguish this **starting principal ceiling** from the independent Risk Kernel's potentially lower exposure/position limits; example percentages above remain drafts, not configured permissions. The dynamic allocator may rebalance qualified strategies but cannot approve novel ones for live deployment.
+The Owner sets the maximum authorized account principal used as starting capital for a research, backtest or paper account; it must not exceed a verifiable real-account capital basis when connected. The research Agent cannot raise that limit or invent deposits. Independent candidate comparisons may each run at the same capped capital; concurrent strategies must share one ledger and cannot double-spend cash. No default leverage or borrowed cash. Distinguish this **starting principal ceiling** from the independent Risk Kernel's potentially lower exposure/position limits; example percentages above remain drafts, not configured permissions. The dynamic allocator may rebalance qualified strategies but cannot approve novel ones for live deployment; only a separate trusted Promotion Gate may do so within Owner-preauthorized limits under ADR-009.
+
+## Autonomous promotion and Owner veto (ADR-009)
+
+When live trading has been **separately authorized** by the Owner and financial/risk limits are already enforced, the trusted Promotion Gate (not the Agent) may admit independently qualified strategies without requiring approval for each strategy. The Owner can reject/disable a strategy for any reason; veto state persists and cannot be modified by Agent code. Veto immediately stops new risk from that strategy; existing broker orders and positions need safe reconciliation/exit handling instead of blind forced liquidation. No automatic risk-limit increase, reopening of loss breakers, or unapproved live-mode enablement.
 
 ## P0 scenario acceptance examples for later phases
 
