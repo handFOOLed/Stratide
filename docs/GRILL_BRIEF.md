@@ -26,6 +26,7 @@ Use this opening frame:
 - **ADR-008 accepted:** portfolio allocation may change weights among eligible strategies, but every formal backtest/forward-paper run must start with at most the Owner-authorized account principal. Combined multi-strategy paper execution must share one cash ledger and cannot double-count capital; default no borrowing or leverage. Allocation does not itself authorize live promotion.
 - **ADR-009 accepted:** develop toward B (automatic, independently qualified strategy promotion within separately Owner-enabled live capital and risk limits), while Owner can reject or disable any strategy for any reason. A trusted Promotion Gate applies vetoes; Agent cannot approve itself, override a veto, or expand limits. Do NOT quietly reintroduce mandatory per-strategy approval, and do NOT enable real orders in M0.
 - **ADR-010 superseded by ADR-011:** default grace period is now 0m, with a 10m delay only if the Owner opts in. Ordinary notifications must not delay qualified autonomous promotion; avoid nightly/manual strategy review queues. Independent qualification and portfolio/risk gating still apply, and risk controls are not a guarantee of capped losses.
+- **ADR-012 accepted:** Agent may adaptively prioritize research experiments but may never raise the Owner-set daily research hard cap. A trusted budget gate reserves cost before paid jobs, handles concurrency and billing uncertainty; research exhaustion does not stop existing trading/risk operations. Exact amount and reset timezone are Owner-configured later.
 - Financial-risk-driven testing; do not spend days on harmless malformed names.
 
 ## Decision tree — highest-value unresolved choices
@@ -39,7 +40,7 @@ Use this opening frame:
 7. **ADR-009/011 implementation (open):** minimal trusted immediate Promotion Gate, optional Owner-configured grace period, durable veto, nonblocking low-noise notifications and proper incident alerts; separate initial live authorization remains required.
 8. **Local-to-miniPC migration**: what state must be backed up, recovered, and reconciled so identical logic can resume safely on macOS ARM64 or Linux (given broker OS constraints)?
 9. **External data and cloud privacy**: who may receive raw datasets, account/portfolio metadata and research logs? What licensing or confidentiality applies?
-10. **Cost control**: what daily/monthly budgets and stop conditions keep remote research cheaper than plausible incremental edge?
+10. **ADR-012 implementation (open):** choose smallest trusted daily research-cost ledger, conservative reservation model and provider budget alerts when paid agents are introduced; do not guess the Owner's daily monetary limit or timezone.
 
 ## Output expectations
 
