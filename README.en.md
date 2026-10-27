@@ -16,6 +16,7 @@ Stratide is a resource-light, local-first automated trading system with open-end
 - **Hybrid strategy execution:** light strategies may compute locally and demanding ones remotely. Both submit standardized proposals through the local risk gateway ([ADR-001](docs/adr/0001-hybrid-strategy-execution.md)).
 - **Production:** accepts only promoted, versioned strategy artifacts under a separately enforced risk authority.
 - **Capital discipline:** eligible strategies may share a dynamically allocated portfolio, but the research/backtest/paper starting principal cannot exceed the Owner-authorized account principal. The Agent cannot invent deposits, duplicate cash across simultaneous strategies or enable default leverage ([ADR-008](docs/adr/0008-dynamic-portfolio-capital-cap.md)).
+- **Daily research spending cap:** the Agent may dynamically plan paid research within an Owner-defined daily limit, enforced by a trusted budget gate. Exhaustion pauses new paid research, not ongoing trading-risk/reconciliation operations ([ADR-012](docs/adr/0012-adaptive-research-daily-hard-budget.md)).
 - **Priority:** test failure modes that can lose money; avoid speculative hardening of inconsequential UI/metadata cases.
 
 ## Repository map
