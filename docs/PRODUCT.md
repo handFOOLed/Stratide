@@ -12,7 +12,7 @@ Stratide autonomously discovers, evaluates, manages and eventually executes trad
 - Optimize for **net** results after market friction, data/AI/compute/subscription costs and risks.
 - Prefer accessible and reliable low-cost data; asset universe should follow data economics and executable brokerage access, not an arbitrary product checklist.
 - Stock prices are hard to predict; AI's job is hypothesis and research support, not unquestioned price prophecy.
-- Agent may freely explore novel research directions and generated code; production strategy promotion is gated.
+- Agent may freely explore novel research directions and generated code; production strategy promotion is gated. **ADR-005:** incomplete historical datasets are acceptable for labeled exploratory research, but promotion evidence must be independently verified for point-in-time availability or accumulated in forward-observed paper/shadow evaluation.
 - Keep independent risk kernel, loss-triggered entry shutdown, account/position reconciliation, bounded exposure, no uncontrolled leverage.
 - Develop and paper trade on user's Windows PC first. A persistent **macOS ARM64 Mac mini or Linux mini PC** and private web dashboard are **conditional** on sustained evidence of value; broker integration may be OS-specific.
 - Local footprint should be tiny: no GPU and no local model inference; LLM via cloud API, remote compute when justified. **Hybrid strategy decisions** are accepted: light strategies may run locally, complex ones remotely, but all proposals must pass local risk and order controls ([ADR-001](adr/0001-hybrid-strategy-execution.md)).
