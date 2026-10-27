@@ -23,6 +23,7 @@ Use this opening frame:
 - **ADR-005 accepted:** incomplete/low-cost historical data may be used for exploratory research, but promotion-grade historical backtests need independently verified point-in-time inputs; forward-observed shadow trading can build new evidence when historical availability is unprovable. Do not equate shadow testing with live deployment.
 - **ADR-006 accepted:** Agent freely explores, but cannot inspect/alter protected evaluation rules or repeatedly use the same holdout as an unlimited tuning oracle. Freeze and hash candidates, track attempts and research lineage, use genuine forward observation before live eligibility. Do not mandate complex statistics or arbitrary test-count limits at M0.
 - **ADR-007 accepted:** initial paper/backtesting fills use conservative daily-bar assumptions, with instrument-specific tradability, fees and timing; no assumed favorable fills from OHLC alone. Higher-fidelity market simulation only when the strategy/data actually requires it.
+- **ADR-008 accepted:** portfolio allocation may change weights among eligible strategies, but every formal backtest/forward-paper run must start with at most the Owner-authorized account principal. Combined multi-strategy paper execution must share one cash ledger and cannot double-count capital; default no borrowing or leverage. Allocation does not authorize live promotion.
 - Financial-risk-driven testing; do not spend days on harmless malformed names.
 
 ## Decision tree — highest-value unresolved choices
@@ -33,7 +34,7 @@ Use this opening frame:
 4. **ADR-005 implementation (open):** minimal point-in-time evidence metadata, forward-observation journaling and corporate-action handling; no exhaustive data-quality engineering at M0.
 5. **ADR-006 implementation (open):** choose minimal candidate freeze, evaluator feedback, held-out data isolation and eventually appropriate thresholds; core principle is settled.
 6. **ADR-007 implementation (open):** when instruments/data are chosen, define a minimal conservative daily-bar fill model, fee schedule and supported tradability rules; avoid inventing a tick-level simulator.
-7. **Live automation authority**: what is the smallest default manual-approval boundary before any novel promoted strategy can route a real order? Regulatory reporting must be checked.
+7. **Live automation authority (open; next):** may a newly validated frozen strategy automatically become eligible to trade real funds within preauthorized capital/risk limits, or must the Owner explicitly approve each new strategy? Regulatory reporting must be checked when real brokerage is chosen.
 8. **Local-to-miniPC migration**: what state must be backed up, recovered, and reconciled so identical logic can resume safely on macOS ARM64 or Linux (given broker OS constraints)?
 9. **External data and cloud privacy**: who may receive raw datasets, account/portfolio metadata and research logs? What licensing or confidentiality applies?
 10. **Cost control**: what daily/monthly budgets and stop conditions keep remote research cheaper than plausible incremental edge?
