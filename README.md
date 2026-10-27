@@ -2,6 +2,8 @@
 
 # Stratide
 
+[ADR-026](docs/adr/0026-budgeted-shadow-observation-and-local-strategy-registry.md)：限额研究与策略索引。
+
 **自主量化交易与开放式策略发现平台**  
 *Autonomous Quantitative Trading & Open-Ended Strategy Discovery*
 
