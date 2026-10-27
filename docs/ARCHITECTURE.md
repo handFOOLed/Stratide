@@ -1,6 +1,6 @@
 # Architecture — draft for interrogation
 
-**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), [ADR-009](adr/0009-auto-promotion-owner-veto.md), [ADR-011](adr/0011-immediate-promotion-nonblocking-notifications.md) and [ADR-012](adr/0012-adaptive-research-daily-hard-budget.md) (which supersedes [ADR-010](adr/0010-configurable-deployment-grace-period.md)).** Do not treat other design options as settled.
+**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), [ADR-009](adr/0009-auto-promotion-owner-veto.md), [ADR-011](adr/0011-immediate-promotion-nonblocking-notifications.md) [ADR-012](adr/0012-adaptive-research-daily-hard-budget.md), and [ADR-013](adr/0013-one-time-cloud-data-consent.md) (which supersedes [ADR-010](adr/0010-configurable-deployment-grace-period.md)).** Do not treat other design options as settled.
 
 ## Domains and trust boundaries
 
@@ -119,6 +119,14 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - Define Owner-configured daily reset timezone and billable cost categories when provider interfaces are chosen. Operational critical API costs need a **separate** budget and safe service-failure behavior.
 - Keep M0 paper-only; no paid-research orchestration platform or artificial daily monetary figure.
 
+## Accepted decision: persistent cloud research-data authorization (ADR-013)
+
+- **One explicit consent for a defined receiver, research purpose and data scope**, then reuse it for subsequent requests and account updates; do not pester the Owner with per-call or per-field approvals.
+- Owner may allow **rich account context** (holdings, cash history, trades, portfolio metrics and research logs) for cloud analysis. It is not inherently limited to anonymized percentages when explicitly authorized.
+- Scope expands or receiver/purpose changes only with a new Owner authorization. The Owner can inspect or revoke future sharing at any time. Do not claim a revocation erases third-party records already transmitted.
+- No cloud research-side access to broker credentials, execution tokens, account identity secrets, Owner settings or risk-configuration write interfaces. Market-data provider redistribution licenses and specific provider retention/training policies must be checked.
+- Keep the control lightweight, trusted and auditable; **permission to read/share data is not permission to trade**. M0 does not implement cloud account synchronization.
+
 ## Likely implementation boundaries
 
 - **Production core:** lightweight Rust daemon, no GPU; data, risk, ledger, order state, broker abstraction.
@@ -148,7 +156,7 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - How to choose practical evaluator holdout reuse limits, diagnostics and promotion criteria for actual candidate strategies without unnecessary statistical infrastructure?
 - Which parts of research can run with bounded CPU locally vs remote-only workers?
 - What minimal Promotion Gate/veto and portfolio strategy selection policy should enforce ADR-009/011 while retaining genuinely unattended operation?
-- Which data can be stored/shipped to external providers under licenses and privacy expectations?
+- For actual chosen AI/data vendors, what license, retention/training, deletion and transfer constraints apply within ADR-013's one-time authorized research scope?
 - What is the resource budget and minimum uptime/recovery test for macOS/Linux mini PC deployment, considering broker compatibility?
 
 See `docs/GRILL_BRIEF.md` for a discussion-ready agenda.
