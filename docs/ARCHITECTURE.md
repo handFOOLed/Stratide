@@ -1,6 +1,6 @@
 # Architecture — draft for interrogation
 
-**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), [ADR-009](adr/0009-auto-promotion-owner-veto.md), [ADR-011](adr/0011-immediate-promotion-nonblocking-notifications.md), [ADR-012](adr/0012-adaptive-research-daily-hard-budget.md), [ADR-013](adr/0013-one-time-cloud-data-consent.md), [ADR-014](adr/0014-isolated-strategy-workers.md), and [ADR-015](adr/0015-automatic-data-manager-network-isolation.md) (which supersedes [ADR-010](adr/0010-configurable-deployment-grace-period.md)).** Do not treat other design options as settled.
+**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), [ADR-009](adr/0009-auto-promotion-owner-veto.md), [ADR-011](adr/0011-immediate-promotion-nonblocking-notifications.md), [ADR-012](adr/0012-adaptive-research-daily-hard-budget.md), [ADR-013](adr/0013-one-time-cloud-data-consent.md), [ADR-014](adr/0014-isolated-strategy-workers.md), [ADR-015](adr/0015-automatic-data-manager-network-isolation.md), and [ADR-016](adr/0016-verified-data-source-failover.md) (which supersedes [ADR-010](adr/0010-configurable-deployment-grace-period.md)).** Do not treat other design options as settled.
 
 ## Domains and trust boundaries
 
@@ -141,8 +141,16 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - Automatically use legally accessible, trusted built-in public sources. Automatically discovering a new source does **not** permit Agent-written adapters to execute inside the trusted core: promote sources into production only after lightweight source, security, quality and licensing checks.
 - Trusted adapters own API keys, request limits, cache, provenance, source versions, `event_time` and `available_at` semantics. Never expose an arbitrary-URL proxy, broker interface or owner-risk writes to Workers.
 - First-time Owner authorization is needed for new billable services, API keys and previously unapproved sensitive account-data transfers; existing authorized use follows ADR-013 without repetitive prompts. Research spend remains bounded by ADR-012.
-- Production data uncertainty/staleness must not be silently treated as fresh execution evidence. Exactly when to fail closed versus use a verified fallback source remains an open decision.
+- Production data uncertainty/staleness must not be treated as fresh execution evidence. ADR-016 permits automatic failover to trusted fresh backup sources; unresolved material conflicts or missing data halt new exposure for affected dependent strategies.
 - Data Manager is a **logical trust boundary**, not a requirement for a new microservice. M0 remains paper-only and does not require real data subscriptions.
+
+## Accepted decision: verified automatic source failover (ADR-016)
+
+- Data Manager can autonomously replace a failing primary with an **already-approved, legally usable, compatible and fresh** backup, after normalizing instrument identities, sessions, units, price adjustments and availability timestamps.
+- **Unexplained material conflicts or no valid feed** freeze new risk for instruments/strategies dependent on the compromised data; a compromised shared portfolio input affects all its consumers. No favorable source-picking, fake quotes, stale signal replay or blind liquidations.
+- Data-feed uncertainty is distinct from **ADR-003 account-wide order uncertainty**: ambiguous broker submissions continue to freeze the entire relevant account; new market data cannot resolve them.
+- Audit provider IDs, switch dates and data versions; require consistent/healthy source before switching back to prevent flapping. Emergency failover cannot trust unapproved adapters, new paid sources or missing privacy consent.
+- Provider thresholds and real adapters are future phases, not M0.
 
 ## Likely implementation boundaries
 
