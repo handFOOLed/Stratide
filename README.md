@@ -33,6 +33,7 @@ Stratide 是面向个人用户的**低资源占用、本地优先**的自动化�
 - **账户与策略双层风控：** 单策略亏损/超额仅限制该策略新增风险；账户级亏损熔断或订单状态不明则禁止所有策略新增风险。策略预算共用账户资金且不得靠改名重置熔断（[ADR-019](docs/adr/0019-account-and-strategy-risk-layers.md)）。
 - **新版本自主准入：** 策略改参生成新的冻结版本，重新独立验证通过后可自动晋升，不清除历史亏损和禁令（[ADR-020](docs/adr/0020-versioned-requalification-auto-promotion.md)）。
 - **策略组数据隔离：** 不同组可以持有同一股票，但组内生成的数据、信号、虚拟份额和盈亏独立归属；真实资金、仓位和账户风险共用一份账本（[ADR-021](docs/adr/0021-group-isolation-shared-instrument-attribution.md)）。
+- **分红送股自动归属：** 按可信股权登记日权益份额，将现金分红和送股自动记到对应策略组，并对账券商实际金额、税费、份额与成本；不重复计算收益。配股缴款等需新增资金的选择另议（[ADR-035](docs/adr/0035-record-date-corporate-action-group-attribution.md)）。
 - **跨组交易意图净额执行：** 可信组合分配器在执行前合并同股相反买卖意图，尽量减少券商委托；内部虚拟份额变更不是交易所成交，不得虚构现金、收益或绕过实际交易限制（[ADR-022](docs/adr/0022-trusted-cross-group-intent-netting.md)）。
 - **内部转移统一定价：** 跨组虚拟份额调整由可信组合管理器使用同一市场参考价进行双方记账，不生成虚假的买卖价差、真实手续费、券商成交或额外账户净值（[ADR-023](docs/adr/0023-single-market-reference-internal-transfer.md)）。
 - **外部部分成交按比例归属：** 同优先级内各组按有效需求占比分配券商真实确认成交的份额；风险减仓可有可信优先级，取整和实际费用分摊必须可复现，绝不把未成交数量算入持仓（[ADR-024](docs/adr/0024-prorata-partial-fill-attribution.md)）。
