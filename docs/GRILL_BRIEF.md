@@ -27,6 +27,7 @@ Use this opening frame:
 - **ADR-009 accepted:** develop toward B (automatic, independently qualified strategy promotion within separately Owner-enabled live capital and risk limits), while Owner can reject or disable any strategy for any reason. A trusted Promotion Gate applies vetoes; Agent cannot approve itself, override a veto, or expand limits. Do NOT quietly reintroduce mandatory per-strategy approval, and do NOT enable real orders in M0.
 - **ADR-010 superseded by ADR-011:** default grace period is now 0m, with a 10m delay only if the Owner opts in. Ordinary notifications must not delay qualified autonomous promotion; avoid nightly/manual strategy review queues. Independent qualification and portfolio/risk gating still apply, and risk controls are not a guarantee of capped losses.
 - **ADR-012 accepted:** Agent may adaptively prioritize research experiments but may never raise the Owner-set daily research hard cap. A trusted budget gate reserves cost before paid jobs, handles concurrency and billing uncertainty; research exhaustion does not stop existing trading/risk operations. Exact amount and reset timezone are Owner-configured later.
+- **ADR-013 accepted:** Owner gives a single persisted authorization for each material cloud service/purpose/data scope and is not repeatedly prompted for ordinary subsequent research requests. Owner can authorize rich account/transaction context and revoke future sharing. No broker credentials, execution permissions or risk-config write access ever leave trusted local control. New receiver/category/purpose requires new consent; actual provider retention/data licenses still need checking.
 - Financial-risk-driven testing; do not spend days on harmless malformed names.
 
 ## Decision tree — highest-value unresolved choices
@@ -39,7 +40,7 @@ Use this opening frame:
 6. **ADR-007 implementation (open):** when instruments/data are chosen, define a minimal conservative daily-bar fill model, fee schedule and supported tradability rules; avoid inventing a tick-level simulator.
 7. **ADR-009/011 implementation (open):** minimal trusted immediate Promotion Gate, optional Owner-configured grace period, durable veto, nonblocking low-noise notifications and proper incident alerts; separate initial live authorization remains required.
 8. **Local-to-miniPC migration**: what state must be backed up, recovered, and reconciled so identical logic can resume safely on macOS ARM64 or Linux (given broker OS constraints)?
-9. **External data and cloud privacy**: who may receive raw datasets, account/portfolio metadata and research logs? What licensing or confidentiality applies?
+9. **ADR-013 implementation (open):** straightforward one-time consent UI and trusted durable scope enforcement, plus real vendor retention/training and third-party market-data licensing checks. No repetitive field-level popups.
 10. **ADR-012 implementation (open):** choose smallest trusted daily research-cost ledger, conservative reservation model and provider budget alerts when paid agents are introduced; do not guess the Owner's daily monetary limit or timezone.
 
 ## Output expectations
