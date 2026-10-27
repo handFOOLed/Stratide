@@ -6,6 +6,8 @@
 
 Status: **M0 scaffold — NOT a trading system**. No market-data provider, broker connection, order routing, research agent, or real-money execution is implemented. Do not use this repository to manage real funds.
 
+- **ADR-020/021:** New versions require independent requalification. Strategy groups can hold the same instrument with separate internal data/P&L but one real account ledger. See [ADR-020](docs/adr/0020-versioned-requalification-auto-promotion.md) and [ADR-021](docs/adr/0021-group-isolation-shared-instrument-attribution.md).
+
 ## Product intent
 
 Stratide is a resource-light, local-first automated trading system with open-ended autonomous research, cloud LLMs only, independent financial risk controls, and a future optional private Web Dashboard. Target design is a personal account around CNY 100,000; this is a sizing assumption, not funds committed or a return promise.
