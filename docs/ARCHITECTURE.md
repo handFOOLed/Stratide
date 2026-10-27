@@ -1,6 +1,6 @@
 # Architecture — draft for interrogation
 
-**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), [ADR-009](adr/0009-auto-promotion-owner-veto.md), [ADR-011](adr/0011-immediate-promotion-nonblocking-notifications.md) [ADR-012](adr/0012-adaptive-research-daily-hard-budget.md), and [ADR-013](adr/0013-one-time-cloud-data-consent.md) (which supersedes [ADR-010](adr/0010-configurable-deployment-grace-period.md)).** Do not treat other design options as settled.
+**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), [ADR-009](adr/0009-auto-promotion-owner-veto.md), [ADR-011](adr/0011-immediate-promotion-nonblocking-notifications.md) [ADR-012](adr/0012-adaptive-research-daily-hard-budget.md), [ADR-013](adr/0013-one-time-cloud-data-consent.md), and [ADR-014](adr/0014-isolated-strategy-workers.md) (which supersedes [ADR-010](adr/0010-configurable-deployment-grace-period.md)).** Do not treat other design options as settled.
 
 ## Domains and trust boundaries
 
@@ -37,7 +37,7 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 
 - **Local and remote strategy decisions are both allowed.** Each produces a versioned, authenticated, time-bounded proposal via one contract and a locally enforced Portfolio → Risk → Execution path. Remote compute has no brokerage or risk-config privileges.
 - **Cloud loss does not authorize stale trades.** Missing or expired proposals cannot add risk; local risk, ledger and reconciliation remain operational.
-- **No runtime format chosen yet.** WASM versus a restricted native worker versus declarative/remote computation is still open.
+- **Independent local/remote strategy Workers are accepted (ADR-014).** Flexible Python/NumPy/PyTorch workloads run outside the Rust core; WASM is optional, not a required artifact/runtime format. Exact OS isolation and protocol fields remain implementation details.
 - **Cross-platform direction:** Windows x64 for development; macOS ARM64 (Mac mini) or Linux x64/ARM64 as *possible future* low-power deployment hosts. Broker-specific compatibility remains unproven and may require a separate gateway.
 
 ## Accepted decision: in-process risk module and one order gateway (ADR-002)
@@ -127,12 +127,20 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - No cloud research-side access to broker credentials, execution tokens, account identity secrets, Owner settings or risk-configuration write interfaces. Market-data provider redistribution licenses and specific provider retention/training policies must be checked.
 - Keep the control lightweight, trusted and auditable; **permission to read/share data is not permission to trade**. M0 does not implement cloud account synchronization.
 
+## Accepted decision: independent isolated strategy workers (ADR-014)
+
+- Run untrusted generated strategies in **separate local restricted processes or remote isolated Workers**, not as dynamically loaded code inside `stratided`. Local CPU/resource-light strategies and remotely computed intensive strategies share one authenticated, versioned, time-limited proposal boundary (ADR-001).
+- Python and practical scientific/ML ecosystems are permitted in Workers; **WASM is not mandatory**. Existing production strategy artifacts must be frozen and independently validated before eligibility (ADR-006/009).
+- Process separation alone **does not prove containment**. Limit access to filesystem, host environment/secrets, child processes, network, CPU/memory and wall-clock time using platform-verifiable restrictions. If a particular Windows/macOS/Linux host cannot enforce its required sandbox policy, place the workload in trusted isolated remote compute or reject it, not in the credential-bearing core.
+- Worker crash, misbehavior or disconnection must not bypass Portfolio/Risk/Execution or authorize stale proposals. Worker never owns broker keys, a brokerage API, production ledger writes or Owner risk-setting writes.
+- Worker egress/network design, sandbox implementation and concrete proposal serialization are still open. Avoid large plugin systems and speculative cross-OS sandbox matrices in M0.
+
 ## Likely implementation boundaries
 
 - **Production core:** lightweight Rust daemon, no GPU; data, risk, ledger, order state, broker abstraction.
 - **Research:** external model providers and isolated compute workers; no account credentials.
 - **Persistence:** SQLite for authoritative trading/operational state; Parquet possibly for research datasets. Need transaction/backup design.
-- **Strategy runtime:** local lightweight workers or remote compute behind a unified proposal boundary (ADR-001). Artifact format (WASM/native/other) is not selected.
+- **Strategy runtime:** isolated local Worker process or remote Worker, supporting Python/ML as needed, producing proposals through the same trust boundary (ADR-001/014). WASM is optional; exact packaging and OS sandbox details remain open.
 - **User interface:** CLI initially; authenticated Control API loopback-only; future standalone Web Dashboard for a private site.
 - **Deployment:** Windows now; macOS ARM64 Mac mini or Linux mini PC later if justified. No required Docker, Redis, Kafka, or Kubernetes in the core.
 
@@ -149,7 +157,7 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 
 ## Open design questions (not decisions)
 
-- Which **local strategy runtime/artifact format** best enforces the hybrid proposal boundary while supporting unusual ML/AI strategies?
+- How should an isolated strategy Worker obtain market/research data and network access without creating an exfiltration/broker bypass? Which minimal OS-specific sandbox is actually viable on Windows/macOS ARM64/Linux?
 - What is the minimum broker interface needed for authentic paper fills and later live A-share compliance?
 - How do we define and verify account-equity daily-loss and high-water-mark drawdown thresholds?
 - What is the minimal risk-gate API, and how should loss-breaker release differ from ADR-004's technical-only recovery?
