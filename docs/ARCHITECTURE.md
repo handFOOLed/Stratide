@@ -1,6 +1,6 @@
 # Architecture — draft for interrogation
 
-**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), [ADR-009](adr/0009-auto-promotion-owner-veto.md), and [ADR-011](adr/0011-immediate-promotion-nonblocking-notifications.md) (which supersedes [ADR-010](adr/0010-configurable-deployment-grace-period.md)).** Do not treat other design options as settled.
+**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), [ADR-009](adr/0009-auto-promotion-owner-veto.md), [ADR-011](adr/0011-immediate-promotion-nonblocking-notifications.md) and [ADR-012](adr/0012-adaptive-research-daily-hard-budget.md) (which supersedes [ADR-010](adr/0010-configurable-deployment-grace-period.md)).** Do not treat other design options as settled.
 
 ## Domains and trust boundaries
 
@@ -110,6 +110,14 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - Always recheck qualification, available budget, account and risk freezes, current exposure and veto at activation. **Risk limits cannot guarantee realized loss ceilings** during gaps, limit-down, halts, T+1, or broker failures; independent evaluation remains mandatory.
 - Many simultaneous strategies use one shared allocation and exposure budget (ADR-008), not separate copies of principal. Exact selection/retirement policy is open.
 - M0 remains paper-only; no real orders or promotion machinery.
+
+## Accepted decision: adaptive research with a daily Owner hard cap (ADR-012)
+
+- **Research Agent plans its work autonomously** within the Owner-set `research.daily_spend_limit`; no valid cap means no paid research starts. Agent cannot raise the cap, auto-top-up or borrow trade principal for experiments.
+- **Trusted, shared Budget Gate** accounts for daily consumed fees and conservative reservations for concurrent / cross-day LLM, remote compute or metered research calls before launch. Exhausted budget pauses new paid research, **not** live risk/ledger/order controls.
+- Provider billing lag and unbounded metering mean an app-only budget gate is **not a perfect guarantee** of final provider charges; reconcile actual invoices and use provider-side caps where available.
+- Define Owner-configured daily reset timezone and billable cost categories when provider interfaces are chosen. Operational critical API costs need a **separate** budget and safe service-failure behavior.
+- Keep M0 paper-only; no paid-research orchestration platform or artificial daily monetary figure.
 
 ## Likely implementation boundaries
 
