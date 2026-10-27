@@ -8,6 +8,8 @@
 
 组间检索、索引授权与策略摘要返回需遵循 [ADR-026](0026-budgeted-shadow-observation-and-local-strategy-registry.md)，不能因为有全局策略注册表就开放其他组私有数据。
 
+当 Owner 人工接管后实际成交使总持仓与组级历史份额不符时，不得自动按比例扣组别份额；先在可信待归属账簿记录差异并停用受影响的旧库存，参见 [ADR-032](0032-manual-trades-suspense-ledger-unassigned-attribution.md)。
+
 ## 核心模型
 
 - `group_id` 是策略组的数据与运行归属边界；`family_id` 表示研究血缘，两者不自动等同。
