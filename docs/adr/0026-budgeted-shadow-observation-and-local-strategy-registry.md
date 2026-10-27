@@ -5,6 +5,7 @@
 - Owner 选择：**方案 B（修订版）**。暂停实盘的策略允许继续影子观察，但不保证所有策略无限期运行；以有上限的存储/计算/检索预算管理观察池，并用本地策略注册表低成本筛选，再按需向云端 Agent 提供有限摘要。
 - 关联：[ADR-012](0012-adaptive-research-daily-hard-budget.md) 研究费用闸门、[ADR-021](0021-group-isolation-shared-instrument-attribution.md) 组间数据隔离、[ADR-025](0025-adaptive-risk-budget-decay-quality-gates.md) 策略衰退与质量验证、[ADR-006](0006-independent-validation-isolation.md) 验证证据隔离、[ADR-017](0017-single-writer-durable-recovery.md) 资金相关状态持久化。
 - 尚未决定：Owner 的实际磁盘容量与配额、观察池并行数/CPU 限额、数据保留周期、检索条数和单次 Token 上限、归档介质、策略排序与唤醒规则。不得将示例资源额度视为已批准配置。
+- 历史失败记录只用作可检索的研究证据，允许基于可检验新理由重新研究；不将失败自动设为永久研究禁令。旧版熔断、Owner 有效禁令和独立实盘再认证仍然有效，参见 [ADR-027](0027-historical-failure-as-evidence-not-permanent-ban.md)。
 
 ## 问题
 
