@@ -2,6 +2,10 @@
 
 Status: **agreed product principles**, not a profitability claim.
 
+## Approved implementation priority (ADR-037)
+
+First ship a **working, observable paper trading simulator**, not a broker adapter, cloud Agent or dashboard. Deliver deterministic paper risk/order/fill/ledger replay and restart recovery (M0), then provenance-tagged genuine forward paper observation and readable daily NAV/trades/fee/drawdown reports (M1). Historical backtests or synthetic scenarios must never be mislabelled as live observations. GPT-6.1 Sol implements, GPT-6.1 Terra independently validates and merges **only after** ChatGPT code review resolves blocking issues. Owner controls scope and reviews actual paper outcomes. See [paper trading roadmap](PAPER_TRADING_ROADMAP.md).
+
 ## Mission
 
 Stratide autonomously discovers, evaluates, manages and eventually executes trading strategies under independently enforced financial risk constraints. It must be able to conclude there is no credible edge and refrain from opening new risk.
