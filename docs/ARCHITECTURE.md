@@ -1,6 +1,6 @@
 # Architecture — draft for interrogation
 
-**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), and [ADR-006](adr/0006-independent-validation-isolation.md).** Do not treat other design options as settled.
+**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), and [ADR-007](adr/0007-conservative-frequency-matched-simulation.md).** Do not treat other design options as settled.
 
 ## Domains and trust boundaries
 
@@ -77,6 +77,14 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - Record evaluation attempts and held-out windows; limit repeated peek/optimization against the same holdout. High backtest scores across thousands of trials are not necessarily evidence of tradeable alpha.
 - Forward-observed paper/shadow testing of a frozen candidate on genuinely new data supplements independently validated point-in-time backtests. Account for costs and execution realism.
 - **No-edge and no-promotion are valid outcomes.** Evaluation success is not itself live-trading authorization. Exact statistics, budgets and gate criteria are separate future choices.
+
+## Accepted decision: conservative, frequency-matched execution simulation (ADR-007)
+
+- **Default first-stage simulation is daily-bar and conservative** about fills. An OHLC price touch is not proof of execution; never assume favorable intrabar ordering without adequate data.
+- Enforce **instrument-specific** trading rules where applicable: lot sizes, trading/settlement availability (including T+1 only where it applies), suspensions, price limits, tick sizes, fees/taxes, and plausible execution costs/liquidity.
+- Separate decision data availability from execution time: a close-derived signal must not be backfilled at the same known closing price without a supported execution mechanism.
+- Models needing minute/tick/order-book information may be explored freely, but are not promotion-eligible on an unsupported daily-bar simulation. Add higher-fidelity simulators only when credible candidate strategies justify them.
+- M0 validates a minimal paper-only, reproducible order/risk/ledger slice rather than an extensive microstructure exchange simulator.
 
 ## Likely implementation boundaries
 
