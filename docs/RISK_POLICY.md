@@ -96,6 +96,10 @@ The trusted Portfolio Allocator may recommend gradual increases in qualified str
 
 **P0 engineering acceptance before any real-money activation:** deterministic replay/property and boundary tests (all budgets <= Owner and account/strategy constraints), event reorder/duplicate/restart persistence, stale/cross-source-conflict freeze of risk increases, sudden volatility/liquidity/correlation/transaction-cost stress, portfolio cash/holdings accounting consistency, independent unit-level review of execution boundary, and sustained paper/shadow comparison net of turnover and fees. Keep the adaptive live sizing feature disabled until the Owner separately authorizes its activation within live limits and the tests demonstrate adequate coverage; paper tests cannot guarantee successful market adaptation. No adaptive scaling component in M0.
 
+## Resource-bounded research and critical durability (ADR-026)
+
+Limit active shadow observers, research disk and CPU use, and local registry result counts. Do not send entire strategy archives to a paid LLM; use authorized local indexed summaries subject to ADR-012 costs and ADR-021 group isolation. Mark dormant observation gaps explicitly. Retain critical account records and independent validation evidence. When optional research threatens available storage, pause it; if reliable account-state persistence cannot be ensured, reject new real-risk orders. No registry implementation in M0.
+
 ## P0 scenario acceptance examples for later phases
 
 1. Timeout after possible broker acceptance: persist unknown outcome and block **all new account openings**, not only the affected symbol; no blind duplicate retry.
