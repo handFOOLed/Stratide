@@ -18,7 +18,7 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 10. **ADR-002: in-process mandatory risk gate.** Keep Risk Kernel and Execution Engine as distinct modules in the trusted Rust core process, with a single order submission path. Do not load untrusted Agent-generated code into that process; the broker adapter must not accept unreviewed strategy proposals. Revisit process separation only for a concrete financial-risk reason.
 
-11. **ADR-003: account-wide uncertainty halt.** A submission timeout/unknown broker order freezes all new account risk across instruments and strategies. Persist the halt, do not retry blindly, reconcile broker orders/fills/cash/positions first. Whether the owner must manually authorize resumption is not decided.
+11. **ADR-003: account-wide uncertainty halt.** A submission timeout/unknown broker order freezes all new account risk across instruments and strategies. Persist the halt, do not retry blindly, reconcile broker orders/fills/cash/positions first. ADR-004: configurable `conditional_auto` default or `manual`, both requiring successful authoritative reconciliation and connection health. Repeated faults require manual attention; loss/drawdown breakers never auto-clear because connectivity recovered. Only Owner via trusted management may change this policy; Agent cannot.
 
 ## Financial-Risk-Driven Engineering
 
