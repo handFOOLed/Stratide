@@ -2,7 +2,7 @@
 
 # Stratide
 
-[ADR-026](docs/adr/0026-budgeted-shadow-observation-and-local-strategy-registry.md): bounded shadow observation, locally indexed strategy lookup and limited cloud-LLM context.
+[ADR-026](docs/adr/0026-budgeted-shadow-observation-and-local-strategy-registry.md): bounded shadow observation, locally indexed strategy lookup and limited cloud-LLM context. [ADR-027](docs/adr/0027-historical-failure-as-evidence-not-permanent-ban.md): past failures are research evidence, not permanent research bans or permission to bypass live financial locks.
 
 **Autonomous Quantitative Trading & Open-Ended Strategy Discovery**
 
