@@ -1,52 +1,60 @@
+**简体中文** | [English](README.en.md)
+
 # Stratide
 
-**Autonomous Quantitative Trading & Open-Ended Strategy Discovery**
+**自主量化交易与开放式策略发现平台**  
+*Autonomous Quantitative Trading & Open-Ended Strategy Discovery*
 
-Status: **M0 scaffold — NOT a trading system**. No market-data provider, broker connection, order routing, research agent, or real-money execution is implemented. Do not use this repository to manage real funds.
+> **当前状态：M0 工程骨架，尚不是可用的交易系统。** 目前尚未实现行情接入、券商接口、下单执行、研究 Agent 或真实资金交易。**请勿使用当前代码管理真实资金。**
 
-## Product intent
+## 项目愿景
 
-Stratide is a resource-light, local-first automated trading system with open-ended autonomous research, cloud LLMs only, independent financial risk controls, and a future optional private Web Dashboard. Target design is a personal account around CNY 100,000; this is a sizing assumption, not funds committed or a return promise.
+Stratide 是面向个人用户的**低资源占用、本地优先**的自动化交易平台。它允许云端 AI Agent 自主探索新的交易策略，但所有实际交易必须受到**独立、不可绕过的风控系统**约束。
 
-- **Now:** develop and run on Windows PC; backtesting and paper trading first.
-- **Later, conditional:** move unchanged core to a low-power 24/7 Linux mini PC, accessed through a private, authenticated web interface.
-- **Research:** free to explore models, asset types and hypotheses; generated code runs in isolated research workers.
-- **Production:** accepts only promoted, versioned strategy artifacts under a separately enforced risk authority.
-- **Priority:** test failure modes that can lose money; avoid speculative hardening of inconsequential UI/metadata cases.
+设计参考规模约为 **人民币 10 万元的潜在交易账户**。这只是工程容量假设，既不代表已投入资金，也不代表收益承诺。
 
-## Repository map
+核心原则：
+
+- **先验证，后实盘：** 目前在 Windows 电脑上开发、回测和模拟交易。
+- **有效才部署：** 仅在稳定性和扣除成本后的表现得到充分验证后，才考虑迁移至低功耗、24 小时运行的 Linux 迷你主机。
+- **未来可远程管理：** 预留独立 Web Dashboard，与个人网站连接时需采用严格的访问认证，且不直接暴露交易内核。
+- **研究自由：** Agent 可探索各种模型、资产和假设；生成代码只在隔离环境运行。
+- **实盘受控：** 只有完成独立验证并获得授权的版本化策略才可能进入生产环境。
+- **风控独立：** 必须具备基础亏损熔断、仓位与订单约束、状态持久化和异常对账；熔断不能保证成交或锁定最大亏损。
+- **不在本地跑大模型：** LLM 推理经可替换的云端 API；重型研究计算可使用远程 Worker。交易核心不需要 GPU。
+- **风险驱动工程：** 深入测试可能带来财产损失的问题；不为无关紧要的名称、格式或极端展示异常投入过度开发时间。
+- **控制总成本：** 综合考虑交易摩擦、数据订阅、模型 API、计算和维护费用；允许系统在缺乏可信交易优势时保持不交易。
+
+## 仓库结构
 
 ```text
 apps/
-  stratided/           tiny placeholder for future background service
-  stratide-cli/        tiny placeholder for future local CLI
-  dashboard/           future private Web UI (not implemented)
+  stratided/           Rust 后台服务占位程序
+  stratide-cli/        本地 CLI 占位程序
+  dashboard/           未来的私有 Web 控制台（未实现）
 crates/
-  contracts/           shared protocol placeholder
-  data/                future data acquisition module
-  strategy-runtime/    future isolated strategy runtime
-  portfolio/           future portfolio accounting/allocation
-  risk/                future independent risk decision module
-  execution/           future order state machine
-  ledger/              future append-only transaction/audit ledger
-  control-api/         future local-only control interface
-research/              cloud LLM and remote worker design notes
-config/                environment and deployment notes
-scripts/               local workflow helpers
+  contracts/           共享契约占位库
+research/              云端 Agent / 远程计算的设计说明
+config/                配置与部署说明
+scripts/               本地辅助工具说明
 
-docs/PRODUCT.md        fixed product goals
-docs/ARCHITECTURE.md   draft, not frozen
-docs/GRILL_BRIEF.md    decisions for grill-with-docs
-docs/M0.md             first milestone and stopping rule
-docs/RISK_POLICY.md    risk-driven engineering policy
-AGENTS.md              instructions for coding agents
+docs/
+  PRODUCT.md           已确认的产品原则
+  ARCHITECTURE.md      待讨论的架构草案
+  GRILL_BRIEF.md       grill-with-docs 质询议程
+  M0.md                第一阶段范围与验收标准
+  RISK_POLICY.md       财务风险优先的开发规范
+
+AGENTS.md              Codex 等编程 Agent 的工作规则
+Cargo.toml             Rust Workspace
+README.en.md           English README
 ```
 
-Empty feature modules are **not** pre-created as fake crates. Add them only when M0 requirements justify it.
+数据、策略运行时、风控、执行、账本、控制 API 等模块**尚未实现**；后续只在真实开发任务需要时增加，不提前堆空目录和无意义的抽象。
 
-## Quick start
+## 本地运行
 
-Install a current stable Rust toolchain. This repo is a minimal Cargo workspace with no external dependencies at initialization.
+安装稳定版 Rust 工具链，然后在仓库根目录执行：
 
 ```powershell
 cargo check --workspace
@@ -55,15 +63,13 @@ cargo run -p stratide-cli -- status
 cargo run -p stratided
 ```
 
-Both executables only identify themselves as M0 placeholders. A successful build **does not** mean it is safe to trade.
+目前两个可执行程序仅用于验证 M0 工程结构，**编译成功不代表能够安全交易**。当前版本尚未经过完整本地编译与测试验证。
 
-## GitHub repository
+仓库：[handFOOLed/Stratide](https://github.com/handFOOLed/Stratide)（Private）。请使用正常的 GitHub 身份认证拉取，不要将 API Key、券商凭据或个人账户数据提交到仓库。
 
-Repository: https://github.com/handFOOLed/Stratide (private). The M0 scaffold is checked in. Clone with your normal GitHub authentication; never commit credentials.
+## 开发前：grill-with-docs
 
-## Before implementation: grill-with-docs
-
-The original [grill-with-docs skill](https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs) delegates to **grilling** and **domain-modeling**. Install all three into your Codex workspace, then run `grill-with-docs` explicitly against [`docs/GRILL_BRIEF.md`](docs/GRILL_BRIEF.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) and [`AGENTS.md`](AGENTS.md).
+在进入实质性编码前，先用 [grill-with-docs](https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs) 对产品设计和技术架构进行针对性质询。原版工作流依赖 `grilling` 与 `domain-modeling`。可按需在 Codex 环境安装：
 
 ```powershell
 npx skills add mattpocock/skills --skill grilling
@@ -71,8 +77,17 @@ npx skills add mattpocock/skills --skill domain-modeling
 npx skills add mattpocock/skills --skill grill-with-docs
 ```
 
-Review external skill instructions before installing them. Keep terminology in `GLOSSARY.md` and irreversible trade-offs in `docs/adr/` **only when decided**; do not create boilerplate ADRs. Exact CLI invocation may depend on your Codex version.
+安装外部 skill 前应先检查其说明。重点阅读：
 
-## Development rule
+- [架构草案](docs/ARCHITECTURE.md)
+- [架构质询议程](docs/GRILL_BRIEF.md)
+- [Agent 开发规则](AGENTS.md)
+- [风险策略](docs/RISK_POLICY.md)
 
-**Research freely. Deploy carefully. Risk authority is not negotiable.**
+不要为了形式提前生成一堆 ADR 或术语文档。只有确实形成重要技术决策后才记录。具体 skill 命令取决于 Codex 环境。
+
+## 开发纪律
+
+**研究可以大胆探索，生产部署必须谨慎，风控权限不可妥协。**
+
+开发任务优先用中文沟通。对真实资金有影响的风险必须认真验证；普通 UI、展示文本和无财务后果的边缘问题应以简单实现为主，避免过度工程化。
