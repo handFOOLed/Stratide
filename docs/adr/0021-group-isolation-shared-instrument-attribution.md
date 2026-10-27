@@ -8,7 +8,7 @@
 
 组间检索、索引授权与策略摘要返回需遵循 [ADR-026](0026-budgeted-shadow-observation-and-local-strategy-registry.md)，不能因为有全局策略注册表就开放其他组私有数据。
 
-当 Owner 人工接管后实际成交使总持仓与组级历史份额不符时，不得自动按比例扣组别份额；先在可信待归属账簿记录差异并停用受影响的旧库存，参见 [ADR-032](0032-manual-trades-suspense-ledger-unassigned-attribution.md)。
+当 Owner 人工接管后实际成交使总持仓与组级历史份额不符时，不得自动按比例扣组别份额；先在可信待归属账簿记录差异并停用受影响的旧库存，参见 [ADR-032](0032-manual-trades-suspense-ledger-unassigned-attribution.md)。最终归属由 Owner 显式指定策略组及分配数量，可信核心核验而非自行按比例扣减，见 [ADR-033](0033-owner-explicit-manual-fill-group-attribution.md)。
 
 ## 核心模型
 
