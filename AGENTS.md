@@ -32,6 +32,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 17. **ADR-010 superseded by ADR-011: immediate default promotion.** A trusted Gate may immediately activate independently validated strategies (`promotion.grace_period = 0m`) after explicit initial Owner live authorization and checks of portfolio funds, risk freezes and veto state. Owner may opt into a 10-minute grace period; Agent cannot change settings. Do not block otherwise authorized promotion on routine notifications or user being asleep. Aggregate ordinary events into daily summaries and alert on material incidents. Risk controls do not guarantee maximum realized loss. M0 is paper-only.
 
+18. **ADR-012: research spending budget.** Agent may schedule/prioritize paid research only within a trusted Owner-defined `research.daily_spend_limit`. Before each paid call reserve conservative worst-case budget in a shared daily ledger, including concurrency and current commitments. No set cap → do not launch billable research. Agent cannot raise the cap, auto-top-up or spend trading principal. Provider billing lag may cause real charges to differ; reconcile and use provider-side limits where available. Budget exhaustion pauses research only, never disables risk/execution/reconciliation. Owner sets actual amount and reset timezone later; no FinOps frameworks in M0.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
