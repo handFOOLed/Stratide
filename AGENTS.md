@@ -50,3 +50,10 @@ Do not add abstractions, frameworks, background services or comprehensive test m
 ## M0 stop rule
 
 No UI, no live broker, no orchestration complexity, no multi-agent framework, no paid CI, no order placement. Establish naming/contracts, cross-platform workspace, and a minimal safety-oriented simulation foundation only after architecture questions are resolved.
+
+## Documentation and communication language
+
+- **Use Simplified Chinese as the default language** for communication with the owner, explanations, issue/PR summaries, decision discussions, and newly authored owner-facing documentation.
+- Keep `README.md` in Simplified Chinese and `README.en.md` in English. If core product information changes, maintain both consistently with reciprocal language links.
+- Leave Rust/Python identifiers, public API fields, file paths and technical terms in conventional English when appropriate; don't translate symbols just to satisfy the language preference.
+- Existing English architecture documents may be updated incrementally; do not undertake a full translation project unless requested. Prioritize correctness and financial risk over translation polish.
