@@ -3,7 +3,7 @@
 - 状态：**已接受（Accepted）**
 - 日期：2026-10-27
 - 决策范围：研究、回测、模拟交易的起始本金，以及多策略组合资金分配
-- 尚未决定：动态分配算法、具体账户/策略风险比例、盈亏后的授权本金调整规则；账户与策略双层强制风控已由 [ADR-019](0019-account-and-strategy-risk-layers.md) 确定，实盘策略自动晋升及 Owner 否决见 [ADR-009](0009-auto-promotion-owner-veto.md)
+- 尚未决定：具体动态分配算法与百分比、扩缩容幅度、冷却期和盈利后的授权调整规则；动态**双向**预算与质量门槛见 [ADR-025](0025-adaptive-risk-budget-decay-quality-gates.md)，双层风控见 [ADR-019](0019-account-and-strategy-risk-layers.md)，自动晋升及 Owner 否决见 [ADR-009](0009-auto-promotion-owner-veto.md)
 
 跨策略组共享标的但内部研究、持仓份额及盈亏独立归属的规则见 [ADR-021](0021-group-isolation-shared-instrument-attribution.md)。组级虚拟资产不构成额外实际本金。
 
