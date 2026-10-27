@@ -65,6 +65,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 34. **ADR-028: dedicated first live broker account.** The initial real-money account belongs exclusively to Stratide operation, separate from Owner's routine manual brokerage activity; multiple internal groups share its one real cash/position/order ledger. Dedicated does not imply no reconciliation or technical broker-level exclusivity: unexplained external fills/orders/balance differences stop all new account exposure pending authoritative broker reconciliation. Never invent fill attribution or profits for deposits/corporate actions. Emergency manual intervention requires a later designed controlled pause/reconciliation process. Confirm that an actual broker permits a legally available separate account and necessary APIs before live integration. M0 has no live broker features.
 
+35. **ADR-029: Owner emergency manual handoff is a distinct durable execution lock.** On authenticated takeover, persist a manual-control state and fence every new automated broker order submission (including automated liquidation/reduction); do not claim existing or in-flight broker orders were cancelled. Read-only monitoring and reconciliation may continue. Tech-only ADR-004 conditional recovery, restart, a timer or cloud Agent cannot clear this lock. Require explicit authenticated Owner handback AND authoritative broker reconciliation, single-writer, fresh proposals, all Owner/risk eligibility checks before automation may resume. Stale pending proposal replay forbidden. Actual open-order cancellation behavior remains to decide; no implementation in M0.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
