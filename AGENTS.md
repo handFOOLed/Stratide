@@ -24,6 +24,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 13. **ADR-006: evaluator independence.** Never give the research Agent access to protected holdout answers or the authority to certify itself. Freeze candidate code/model/version/params before formal evaluation, track submission history and holdout reuse, do not treat one lucky backtest as an edge, and use genuinely forward-observed evidence before live promotion. Do not build needless experimental statistical infrastructure at M0.
 
+14. **ADR-007: pragmatic conservative paper fills.** Use an initial daily-bar simulator with traceable fill and cost assumptions; do not pretend OHLC price touches or same-bar closes guarantee execution. Apply instrument-specific trading rules, including T+1 only where applicable, applicable limit/lot/suspension rules, and fees. Allow higher-fidelity simulation later only for strategies that actually require it; no speculative exchange microstructure framework at M0.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
