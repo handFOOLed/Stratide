@@ -6,6 +6,7 @@
 - Owner 追加要求：**高度重视代码质量与可验证正确性**；这部分很难设计妥当，不得草率交给 AI 直接控制资金。
 - 关联：[ADR-008](0008-dynamic-portfolio-capital-cap.md) 共享本金与动态分配、[ADR-009](0009-auto-promotion-owner-veto.md) 可信自动晋升、[ADR-018](0018-equity-based-loss-drawdown-breakers.md) 账户净值熔断、[ADR-019](0019-account-and-strategy-risk-layers.md) 双层风险、[ADR-020](0020-versioned-requalification-auto-promotion.md) 新版本再认证。
 - 尚未决定：具体风险与失效特征、测量窗口/证据要求、扩缩容幅度和冷却周期、波动与相关性模型、初次风险预算百分比、真实部署开关与审核验收参数。**不得把示例数字当成生产默认值。**
+- 影子策略运行及历史策略检索的资源治理见 [ADR-026](0026-budgeted-shadow-observation-and-local-strategy-registry.md)：有界活跃观察池、按需本地索引检索、保留必要风险及独立验证证据。
 
 ## 背景
 
