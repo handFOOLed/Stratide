@@ -14,8 +14,8 @@ Stratide autonomously discovers, evaluates, manages and eventually executes trad
 - Stock prices are hard to predict; AI's job is hypothesis and research support, not unquestioned price prophecy.
 - Agent may freely explore novel research directions and generated code; production strategy promotion is gated.
 - Keep independent risk kernel, loss-triggered entry shutdown, account/position reconciliation, bounded exposure, no uncontrolled leverage.
-- Develop and paper trade on user's Windows PC first. A persistent mini PC and private web dashboard are **conditional** on sustained evidence of value.
-- Local footprint should be tiny: no GPU and no local model inference; LLM via cloud API, remote compute when justified.
+- Develop and paper trade on user's Windows PC first. A persistent **macOS ARM64 Mac mini or Linux mini PC** and private web dashboard are **conditional** on sustained evidence of value; broker integration may be OS-specific.
+- Local footprint should be tiny: no GPU and no local model inference; LLM via cloud API, remote compute when justified. **Hybrid strategy decisions** are accepted: light strategies may run locally, complex ones remotely, but all proposals must pass local risk and order controls ([ADR-001](adr/0001-hybrid-strategy-execution.md)).
 - No conventional stock-terminal GUI required. A CLI plus reports is sufficient for now.
 - Prioritize credible financial failure over cosmetic edge cases and speculative enterprise hardening.
 
