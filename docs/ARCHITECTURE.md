@@ -279,7 +279,7 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 
 ## ADR-035: record-date corporate action entitlement
 
-Passive dividends and bonus shares are allocated using verified group holdings at the record date. Broker cash and shares remain authoritative, with no double-counting of dividend receivables or split-created paper wealth. Active rights subscriptions are not authorized. This is future work, not M0.
+Passive dividends and bonus shares are allocated using verified group holdings at the record date. Broker cash and shares remain authoritative, with no double-counting of dividend receivables or split-created paper wealth. Voluntary rights and other active corporate actions need explicit per-event Owner approval under ADR-036; no autonomous subscription is authorized. This is future work, not M0.
 
 ## ADR-036: Owner approval for voluntary corporate actions
 
