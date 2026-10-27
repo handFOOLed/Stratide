@@ -53,6 +53,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 28. **ADR-022: trusted cross-group net-order aggregation.** Each strategy group independently emits attributable intentions; a trusted Portfolio Allocator may net compatible opposing intents before a single mandatory Risk Kernel/Execution route. An auditable internal virtual position transfer is not a broker fill or new capital. Verify actual eligible ownership/sellable quantity, settlement/T+1, pending orders, strategy/account locks, and consistent per-group P&L; never fabricate cash, trades or internal profits. External balances change only on confirmed real fills. Internal matching price, window and partial-fill attribution are not yet decided. No multi-group netting engine in M0.
 
+29. **ADR-023: one trusted reference price for virtual group transfers.** For an eligible internal reallocation, both sides share one validated, fresh market-reference price and timestamp from trusted Data Manager. This is a virtual attribution event, never a real broker trade, taxable sale, actual commission or newly created account P&L. Group-level virtual P&L reclassification may occur but must reconcile to one physical account NAV/cash/holdings. Reject stale/conflicted quotes, ineligible holdings or attempts to bypass trade restrictions. Reference quote field and partial-fill allocation details remain unchosen. No internal transfer engine in M0.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
