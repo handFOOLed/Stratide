@@ -42,6 +42,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 22. **ADR-016: verified automatic data-source failover.** Data Manager may replace failed primary data with a vetted, compatible, fresh backup without Owner input. Validate symbol, market, timestamps, point-in-time availability, price adjustments, data quality and license; audit effective source versions and avoid flip-flops. If all sources fail or materially conflict, stop new risk only for affected dependencies, not unrelated instruments. ADR-003's uncertain broker order still freezes the whole relevant account. Never choose favorable data, invent prices, bypass consent or load unapproved adapters. M0 requires no real providers.
 
+23. **ADR-017: single authoritative execution instance and crash-safe recovery.** At most one trusted writer per broker account may submit real orders. Use same-host exclusion and an explicit authority handoff for host migration; a local lock never proves cross-machine exclusivity. Persist order intents/unknown outcomes, broker IDs, ledger, risk breakers and Owner veto state, with consistent snapshots/backups. On restart reconcile with authoritative broker orders/fills/positions/cash before authorizing new risk; ADR-003/004 apply. Never blindly resend or replay old signals, auto-liquidate unknown holdings, or clear loss breakers. Do not implement standby cluster/failover coordination in M0.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
