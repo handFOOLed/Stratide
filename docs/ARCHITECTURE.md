@@ -1,6 +1,6 @@
 # Architecture — draft for interrogation
 
-**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), and [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md).** Do not treat other design options as settled.
+**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), and [ADR-009](adr/0009-auto-promotion-owner-veto.md).** Do not treat other design options as settled.
 
 ## Domains and trust boundaries
 
@@ -76,7 +76,7 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - Freeze the candidate's code/model hash, parameters, dataset version and research lineage **before** protected evaluation. Subsequent modifications form a new candidate.
 - Record evaluation attempts and held-out windows; limit repeated peek/optimization against the same holdout. High backtest scores across thousands of trials are not necessarily evidence of tradeable alpha.
 - Forward-observed paper/shadow testing of a frozen candidate on genuinely new data supplements independently validated point-in-time backtests. Account for costs and execution realism.
-- **No-edge and no-promotion are valid outcomes.** Evaluation success is not itself live-trading authorization. Exact statistics, budgets and gate criteria are separate future choices.
+- **No-edge and no-promotion are valid outcomes.** Passing the Evaluator is only one prerequisite: a separate trusted Promotion Gate checks the independently verified evidence and Owner veto/previously authorized live scope (ADR-009). Exact thresholds remain open.
 
 ## Accepted decision: conservative, frequency-matched execution simulation (ADR-007)
 
@@ -92,8 +92,15 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - **Hard research scale limit:** backtest and forward-paper initial capital must not exceed the Owner-authorized account principal. The Agent cannot increase it, invent external deposits, use default leverage, or turn a not-yet-funded illustrative account size into verified capital.
 - Standalone candidate backtests may each use the same capped initial capital for comparison; a concurrent multi-strategy portfolio must share one actual simulated cash balance and cannot add those standalone capitals together.
 - Owner research-capital authorization is **not** the same as the maximum market exposure allowed by the Risk Kernel. Profit/loss and cash flows are reported honestly; test profit cannot silently raise the principal authorization for a new trial.
-- Allocation authority does not confer production strategy promotion permission. The auto-vs-human live promotion decision is still open.
+- Allocation authority does not itself confer strategy promotion permission. A separate trusted Promotion Gate may autonomously promote eligible, non-vetoed strategies **only inside Owner-preauthorized live capital/risk limits** (ADR-009).
 - M0 only needs a constrained shared paper ledger and one rejection demonstrating the capital/risk limits, not an optimizer.
+
+## Accepted decision: autonomous strategy promotion with Owner veto (ADR-009)
+
+- **B is the target for eventual live capability:** the trusted Promotion Gate can automatically promote independently validated, versioned strategies when live mode has separately been enabled and all preauthorized account/capital/risk limits are satisfied. A mandatory per-strategy Owner approval step is **not** the default.
+- **Owner can reject any strategy for any reason.** Persist strategy bans/vetoes in trusted state, prevent Agent overrides and notification-based approval loopholes; rejection blocks new risk immediately. Existing orders/positions are managed conservatively, not blindly liquidated.
+- **No promotion power for the Agent itself.** The Evaluator and Promotion Gate hold distinct decision authority, and neither can change Risk Kernel rules or raise authorized account principal.
+- No broker or live-promotion implementation belongs in M0; exact qualification standards, veto scope and safe unwind policy remain to be designed.
 
 ## Likely implementation boundaries
 
@@ -123,7 +130,7 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - What is the minimal risk-gate API, and how should loss-breaker release differ from ADR-004's technical-only recovery?
 - How to choose practical evaluator holdout reuse limits, diagnostics and promotion criteria for actual candidate strategies without unnecessary statistical infrastructure?
 - Which parts of research can run with bounded CPU locally vs remote-only workers?
-- What constitutes strategy promotion and when is human authorization mandatory?
+- What minimal trusted Promotion Gate contract, veto scope and live activation boundary should enforce ADR-009, without turning automatic promotion into per-strategy approval?
 - Which data can be stored/shipped to external providers under licenses and privacy expectations?
 - What is the resource budget and minimum uptime/recovery test for macOS/Linux mini PC deployment, considering broker compatibility?
 
