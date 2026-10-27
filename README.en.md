@@ -3,6 +3,7 @@
 # Stratide
 
 [ADR-035](docs/adr/0035-record-date-corporate-action-group-attribution.md): record-date dividends and bonus shares are attributed automatically to eligible groups.
+[ADR-036](docs/adr/0036-owner-approval-for-voluntary-corporate-actions.md): funded rights subscriptions and voluntary issuer elections require event-specific Owner approval, never silent automatic execution.
 
 [ADR-032](docs/adr/0032-manual-trades-suspense-ledger-unassigned-attribution.md): confirmed Owner-manual fills enter a separate suspense ledger; real broker balances update immediately. [ADR-033](docs/adr/0033-owner-explicit-manual-fill-group-attribution.md): only explicit Owner-directed group quantities can resolve suspense, subject to verified inventories, fee/cost reconciliation and unchanged broker facts.
 
