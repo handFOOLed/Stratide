@@ -83,6 +83,8 @@ Both executables only identify themselves as M0 placeholders. A successful build
 
 Repository: https://github.com/handFOOLed/Stratide (private). The M0 scaffold is checked in. Clone with your normal GitHub authentication; never commit credentials.
 
+Protective-order cancellation confirmation follows [ADR-031](docs/adr/0031-inline-confirmation-for-protective-order-cancellation.md).
+
 ## Before implementation: grill-with-docs
 
 The original [grill-with-docs skill](https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs) delegates to **grilling** and **domain-modeling**. Install all three into your Codex workspace, then run `grill-with-docs` explicitly against [`docs/GRILL_BRIEF.md`](docs/GRILL_BRIEF.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) and [`AGENTS.md`](AGENTS.md).
