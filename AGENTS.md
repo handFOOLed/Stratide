@@ -11,10 +11,12 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 3. **Independent risk authority.** Agent-generated strategy code never gets broker credentials, order submission permissions, risk-configuration write access or production data-store write privileges.
 4. **Loss circuit breakers remain.** Trading and operational risk checks must survive process restart. A stop-trigger is not a guarantee of fill or maximum loss. On uncertain order status, reconcile before retrying.
 5. **Open-ended research.** Do not limit exploration to a hard-coded family of technical indicators. Research freedom does not imply production deployment permission.
-6. **Local-first, deployable later.** Develop on Windows; plan for low-power Linux mini PC and optional private Web Dashboard, without building cloud infrastructure prematurely.
+6. **Local-first, deployable later.** Develop on Windows; plan for optional low-power macOS ARM64 Mac mini or Linux mini PC and private Web Dashboard, without building cloud infrastructure prematurely.
 7. **No forced GUI.** Headless service and CLI first, Web Dashboard later, with core decoupled from front end.
 8. **Financial correctness.** Use integer shares and decimal/fixed-point currency types when implemented; maintain time-of-availability data semantics; account for A-share constraints when applicable.
 9. **Costs matter.** Minimize subscriptions, trading friction, compute cost, CI cost and owner review effort.
+
+10. **ADR-002: in-process mandatory risk gate.** Keep Risk Kernel and Execution Engine as distinct modules in the trusted Rust core process, with a single order submission path. Do not load untrusted Agent-generated code into that process; the broker adapter must not accept unreviewed strategy proposals. Revisit process separation only for a concrete financial-risk reason.
 
 ## Financial-Risk-Driven Engineering
 
