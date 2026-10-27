@@ -34,6 +34,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 18. **ADR-012: research spending budget.** Agent may schedule/prioritize paid research only within a trusted Owner-defined `research.daily_spend_limit`. Before each paid call reserve conservative worst-case budget in a shared daily ledger, including concurrency and current commitments. No set cap → do not launch billable research. Agent cannot raise the cap, auto-top-up or spend trading principal. Provider billing lag may cause real charges to differ; reconcile and use provider-side limits where available. Budget exhaustion pauses research only, never disables risk/execution/reconciliation. Owner sets actual amount and reset timezone later; no FinOps frameworks in M0.
 
+19. **ADR-013: once-authorized cloud research context.** Owner authorizes a specific receiving cloud service/purpose/data scope once; re-use that persisted grant without annoying per-request consent prompts. Rich authorized position, cash, trade and research-history inputs are permissible. New service, purpose or materially new data category requires another explicit grant; Owner can revoke future sending. Broker credentials, account secrets, actual execution capability and risk-policy writes stay exclusively in trusted local control regardless of sharing preferences. Check real provider retention/data redistribution rules; do not promise revocation deletes already transmitted records. Keep this simple; no enterprise IAM in M0.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
