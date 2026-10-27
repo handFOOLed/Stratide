@@ -100,6 +100,12 @@ The trusted Portfolio Allocator may recommend gradual increases in qualified str
 
 Limit active shadow observers, research disk and CPU use, and local registry result counts. Do not send entire strategy archives to a paid LLM; use authorized local indexed summaries subject to ADR-012 costs and ADR-021 group isolation. Mark dormant observation gaps explicitly. Retain critical account records and independent validation evidence. When optional research threatens available storage, pause it; if reliable account-state persistence cannot be ensured, reject new real-risk orders. No registry implementation in M0.
 
+## Historical failure evidence and permitted exploration (ADR-027)
+
+Failure flags in the local strategy registry must not be used as an irreversible ban on *research*. Before repeat/similar paid experiments, retrieve only a bounded, authorized summary of prior failures, immutable candidate lineage, data versions and known limitations; record the new falsifiable hypothesis and changes that warrant retesting. Preserve previous adverse results and repeated trial counts. Exact duplicate experiments with the same trusted configuration may reuse existing verifiable results. Agent must not reclassify previously exposed data as untouched holdout evidence, treat changed hashes as independence, expose another group's private records through search, or spend beyond ADR-012/026 caps.
+
+**Research permission is not financial authorization**: old strategy financial stops, Owner veto, account-wide loss limits and independent Evaluator/Promotion Gate approval remain in force for any future live deployment. No permanent blacklist or new re-research engine is required at M0.
+
 ## P0 scenario acceptance examples for later phases
 
 1. Timeout after possible broker acceptance: persist unknown outcome and block **all new account openings**, not only the affected symbol; no blind duplicate retry.
