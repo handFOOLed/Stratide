@@ -2,7 +2,7 @@
 
 # Stratide
 
-[ADR-026](docs/adr/0026-budgeted-shadow-observation-and-local-strategy-registry.md)：限额研究与策略索引。
+[ADR-026](docs/adr/0026-budgeted-shadow-observation-and-local-strategy-registry.md)：限额研究与策略索引。[ADR-027](docs/adr/0027-historical-failure-as-evidence-not-permanent-ban.md)：历史失败作为研究证据，而不是永久研究禁令；重新研究也不会解除真实资金风控。
 
 **自主量化交易与开放式策略发现平台**  
 *Autonomous Quantitative Trading & Open-Ended Strategy Discovery*
