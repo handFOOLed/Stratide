@@ -48,6 +48,9 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 25. **ADR-019: account and strategy dual risk gating.** Require every proposal to pass both account-wide and strategy-specific exposure/loss controls (including open-order reservations). A strategy loss lock prevents *that strategy's* new risk; account loss/drawdown/broker-uncertainty locks prevent *all* new risk. A shared cash/position ledger cannot be duplicated in allocations. Attribute strategy trades, internal capital shifts, costs and realized/unrealized P&L consistently; preserve strategy identity/lineage and lock state so renaming or cloning cannot reset loss. Agent cannot raise budgets or remove locks. No unapproved threshold values or automatic financial-lock recovery; defer sophisticated multi-strategy accounting to later phases, keeping M0 a focused paper slice.
 
+26. **ADR-020:** New changed parameter/code artifacts require fresh independent requalification before automatic admission; prior version loss locks and Owner veto remain effective.
+27. **ADR-021:** Groups may share instruments but not group-private signals, research, runtime state or virtual P&L. Keep explicit group attribution while enforcing one real cash/position/order ledger and account risk across groups. Do not fabricate internal executions; defer multi-group allocation to later phases.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
