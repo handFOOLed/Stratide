@@ -1,6 +1,6 @@
 # Architecture — draft for interrogation
 
-**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), and [ADR-004](adr/0004-configurable-conditional-recovery.md).** Do not treat other design options as settled.
+**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), and [ADR-005](adr/0005-tiered-data-evidence.md).** Do not treat other design options as settled.
 
 ## Domains and trust boundaries
 
@@ -62,6 +62,14 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - **Repeated or conflicting failures:** remain halted and require Owner intervention; store reason/evidence/state across restart. Precise stability/repetition thresholds are broker-specific and remain open until adapter design.
 - **Trusted configuration only:** Owner settings are audited; Agent and strategies cannot modify recovery authority. Favor a small enumerated choice over UI slider proliferation.
 
+## Accepted decision: tiered market-data evidence (ADR-005)
+
+- **Exploration can use incomplete historical data** provided results are honestly labeled exploratory; doing so does not grant strategy promotion permission.
+- **Formal historical promotion evidence** must independently establish point-in-time availability for all features used at each decision (including announcement/revision timing where relevant). Avoid look-ahead, revision and survivorship bias.
+- **Forward-observed evidence** is permitted when point-in-time history is unavailable: collect strategy signals, actual input snapshots and simulated execution outcomes prospectively, without retroactive rewriting or confusing exploratory results with verified backtests.
+- Research Agent cannot certify its own data or backtest as promotion-grade evidence. The independent Evaluator enforces evidence boundaries; shadow trading is not live trading.
+- No mandate to acquire expensive data or exhaustively verify all exploration inputs at M0; spend verification effort only when financial decisions depend on it.
+
 ## Likely implementation boundaries
 
 - **Production core:** lightweight Rust daemon, no GPU; data, risk, ledger, order state, broker abstraction.
@@ -88,6 +96,7 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - What is the minimum broker interface needed for authentic paper fills and later live A-share compliance?
 - How do we define and verify account-equity daily-loss and high-water-mark drawdown thresholds?
 - What is the minimal risk-gate API, and how should loss-breaker release differ from ADR-004's technical-only recovery?
+- How should the independent evaluator avoid multiple-testing/holdout reuse while allowing open-ended Agent exploration?
 - Which parts of research can run with bounded CPU locally vs remote-only workers?
 - What constitutes strategy promotion and when is human authorization mandatory?
 - Which data can be stored/shipped to external providers under licenses and privacy expectations?
