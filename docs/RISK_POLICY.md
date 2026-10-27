@@ -50,6 +50,10 @@ When live trading has been **separately authorized** by the Owner and financial/
 
 A trusted budget gate, not the research Agent itself, enforces the Owner-configured daily research spending cap before launching paid model/remote-compute experiments. Include already consumed fees plus conservative per-job reservations across concurrent tasks. The Agent may optimize priorities but cannot top up, change the cap, duplicate allocations or use trading principal. Third-party billing delays mean spend-estimate checks cannot guarantee exact final charges; reconcile bills and use provider-side spending controls where supported. Paid research stops at the cap; existing account/risk/ledger duties continue, and production-critical metered API budgets must be separately handled.
 
+## Cloud research authorization and strict execution boundary (ADR-013)
+
+The Owner may grant a persistent one-time authorization for a specific cloud research receiver, data categories and purpose, including detailed portfolio/transaction history. The trusted control plane reuses it for normal subsequent research queries without re-prompting; scope expansion, a new receiving service or new purpose requires fresh permission. Revocation stops future sending but cannot by itself erase data already transmitted to a vendor. Brokerage secrets, identity credentials, order submission and Risk Kernel writes are never included, no matter what analytical context is authorized. Check the actual API provider's retention/training contract and market-data redistribution licenses. Record authorization changes without scattering raw sensitive data in logs.
+
 ## P0 scenario acceptance examples for later phases
 
 1. Timeout after possible broker acceptance: persist unknown outcome and block **all new account openings**, not only the affected symbol; no blind duplicate retry.
