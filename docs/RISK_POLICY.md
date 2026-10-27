@@ -24,7 +24,7 @@ Circuit breakers are **operational triggers**, not guaranteed realized loss limi
 
 ## Accepted account-level uncertainty protection (ADR-003)
 
-An ambiguous broker submission halts **all new risk for the affected account** until trustworthy full-account reconciliation; no blind duplicate sends and no inference that timeout means rejection. Persist the freeze through restart. Confirmed orders, executions, cash and positions are prerequisites to any recovery; whether owner approval is additionally required is still open.
+An ambiguous broker submission halts **all new risk for the affected account** until trustworthy full-account reconciliation; no blind duplicate sends and no inference that timeout means rejection. Persist the freeze through restart. Confirmed orders, executions, cash and positions are prerequisites to any recovery. Per [ADR-004](adr/0004-configurable-conditional-recovery.md), the owner chooses `conditional_auto` (default) or `manual`; repeated technical failures require manual intervention. Network recovery must not release loss/drawdown circuit breakers.
 
 ## P0 scenario acceptance examples for later phases
 
