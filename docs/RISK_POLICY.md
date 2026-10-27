@@ -126,6 +126,10 @@ ADR-032 manual-trade suspense can be closed only by trusted, explicit Owner-dire
 
 Use trusted eligible group ownership at the equity record-date cutoff to apportion passive dividends and share bonuses. Reconcile actual broker cash, shares, tax and withholding; a dividend receivable later settled in cash is not two profits, and split/bonus quantity is not new wealth. Cash dividends are investment returns, not Owner deposits. Use deterministic fixed-point attribution and preserve event IDs across restart/replays. Unknown settlement, tax or eligibility blocks affected new risk, never fabricates tradeable assets. Active subscription/rights elections involving spending are not approved. No production adapter in M0.
 
+## Owner-gated voluntary corporate actions (ADR-036)
+
+Funded rights subscriptions and issuer elections requiring a cash commitment, tender decision or submission are not passive entitlements. Trusted services may notify the Owner of verified event terms, deadlines, account entitlements, estimated cost and source, but no automatic cash spend, broker application or implied opt-in is permitted. Event-specific authenticated Owner approval is necessary, not sufficient: reconcile available cash, broker capabilities, deadlines, account/strategy restrictions and existing financial locks before any permitted execution. Without approval do not apply; do not freeze unrelated trading merely because an optional action expires. Unknown submission state or broker outcome must not cause duplicate instruction or fictitious shares. Cash dividends and bonus shares remain automatic under ADR-035. M0 excludes active company-action execution.
+
 ## P0 scenario acceptance examples for later phases
 
 1. Timeout after possible broker acceptance: persist unknown outcome and block **all new account openings**, not only the affected symbol; no blind duplicate retry.
