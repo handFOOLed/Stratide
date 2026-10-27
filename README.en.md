@@ -11,8 +11,9 @@ Status: **M0 scaffold — NOT a trading system**. No market-data provider, broke
 Stratide is a resource-light, local-first automated trading system with open-ended autonomous research, cloud LLMs only, independent financial risk controls, and a future optional private Web Dashboard. Target design is a personal account around CNY 100,000; this is a sizing assumption, not funds committed or a return promise.
 
 - **Now:** develop and run on Windows PC; backtesting and paper trading first.
-- **Later, conditional:** move unchanged core to a low-power 24/7 Linux mini PC, accessed through a private, authenticated web interface.
+- **Later, conditional:** deploy the same portable core on a low-power 24/7 **Apple Silicon Mac mini (macOS ARM64) or Linux mini PC**, with private authenticated web access. Broker adapters may require separate platform-specific integration.
 - **Research:** free to explore models, asset types and hypotheses; generated code runs in isolated research workers.
+- **Hybrid strategy execution:** light strategies may compute locally and demanding ones remotely. Both submit standardized proposals through the local risk gateway ([ADR-001](docs/adr/0001-hybrid-strategy-execution.md)).
 - **Production:** accepts only promoted, versioned strategy artifacts under a separately enforced risk authority.
 - **Priority:** test failure modes that can lose money; avoid speculative hardening of inconsequential UI/metadata cases.
 
