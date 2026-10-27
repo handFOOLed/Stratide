@@ -6,6 +6,8 @@
 - 关联：ADR-008 共享资金池、ADR-019 双层风控、ADR-020 新版本准入、ADR-002 可信订单网关。
 - 尚待设计：跨组内部虚拟权益转移的参考价具体行情字段与部分成交归属、组级权限的具体存储结构、跨组共享风险的最简暴露指标。可信组合层进行跨组净额处理的方向已由 [ADR-022](0022-trusted-cross-group-intent-netting.md) 确定。
 
+组间检索、索引授权与策略摘要返回需遵循 [ADR-026](0026-budgeted-shadow-observation-and-local-strategy-registry.md)，不能因为有全局策略注册表就开放其他组私有数据。
+
 ## 核心模型
 
 - `group_id` 是策略组的数据与运行归属边界；`family_id` 表示研究血缘，两者不自动等同。
