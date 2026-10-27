@@ -22,9 +22,13 @@ These **illustrative** initial numbers must be reviewed against trading strategy
 
 Circuit breakers are **operational triggers**, not guaranteed realized loss limits. A-share T+1, stops, limit-down, gaps, halts, and network failure can prevent execution. Forced liquidation is not an automatic response to unknown account/order state.
 
+## Accepted account-level uncertainty protection (ADR-003)
+
+An ambiguous broker submission halts **all new risk for the affected account** until trustworthy full-account reconciliation; no blind duplicate sends and no inference that timeout means rejection. Persist the freeze through restart. Confirmed orders, executions, cash and positions are prerequisites to any recovery; whether owner approval is additionally required is still open.
+
 ## P0 scenario acceptance examples for later phases
 
-1. Timeout after send: no uncontrolled duplicate retry; reconcile first.
+1. Timeout after possible broker acceptance: persist unknown outcome and block **all new account openings**, not only the affected symbol; no blind duplicate retry.
 2. Restart while circuit breaker active: breaker remains active.
 3. Agent submits trade bypassing risk: rejected at independent gateway.
 4. Market event arrives after decision-time: never enters historical strategy inputs.
