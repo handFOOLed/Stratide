@@ -51,6 +51,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 26. **ADR-020:** New changed parameter/code artifacts require fresh independent requalification before automatic admission; prior version loss locks and Owner veto remain effective.
 27. **ADR-021:** Groups may share instruments but not group-private signals, research, runtime state or virtual P&L. Keep explicit group attribution while enforcing one real cash/position/order ledger and account risk across groups. Do not fabricate internal executions; defer multi-group allocation to later phases.
 
+28. **ADR-022: trusted cross-group net-order aggregation.** Each strategy group independently emits attributable intentions; a trusted Portfolio Allocator may net compatible opposing intents before a single mandatory Risk Kernel/Execution route. An auditable internal virtual position transfer is not a broker fill or new capital. Verify actual eligible ownership/sellable quantity, settlement/T+1, pending orders, strategy/account locks, and consistent per-group P&L; never fabricate cash, trades or internal profits. External balances change only on confirmed real fills. Internal matching price, window and partial-fill attribution are not yet decided. No multi-group netting engine in M0.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
