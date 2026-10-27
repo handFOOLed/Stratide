@@ -15,19 +15,20 @@ Use this opening frame:
 - Paper testing and local Windows before any live money.
 - Independent risk authority and loss circuit breakers.
 - Low operating cost, low local resource requirements.
-- Future mini PC and private Web Dashboard only after evidence of value.
+- Future macOS ARM64 Mac mini or Linux mini PC and private Web Dashboard only after evidence of value.
+- **ADR-001 accepted:** hybrid local/remote strategy computation with unified proposals, always locally risk-gated. Do not re-litigate hybrid vs all-local vs all-cloud.
 - Financial-risk-driven testing; do not spend days on harmless malformed names.
 
 ## Decision tree — highest-value unresolved choices
 
-1. **Strategy-runtime boundary**: can the production interface accept complex ML output without introducing heavyweight local dependencies? WASM vs declarative signal artifacts vs restricted native child process vs remote inference. What actually runs at trading time?
+1. **Implementation of ADR-001 (still open)**: local strategy artifact/runtime choices (WASM, declarative, restricted child process) and minimal unified proposal contract; remote compute is allowed but must not bypass local risk.
 2. **Risk authority**: does a Rust module offer sufficient isolation from the research component? What prevents configuration writes and bypasses? How does manual risk unlock work?
 3. **Executable order semantics**: if a broker times out after accepting an order, which identifiers and persisted states prevent duplicate execution?
 4. **Market-data semantics**: can a daily strategy prove `available_at <= decision_time` for all inputs, and support price adjustments/corporate actions?
 5. **Backtesting promotion**: how to avoid evaluating thousands of models on recycled held-out data and overfitting selection to chance?
 6. **Paper fidelity**: how are A-share T+1, daily price limits, unavailable fills, lot size, fees, and liquidity handled? What cannot be simulated reliably?
 7. **Live automation authority**: what is the smallest default manual-approval boundary before any novel promoted strategy can route a real order? Regulatory reporting must be checked.
-8. **Local-to-miniPC migration**: what state must be backed up, recovered, and reconciled so identical logic can resume safely on Linux?
+8. **Local-to-miniPC migration**: what state must be backed up, recovered, and reconciled so identical logic can resume safely on macOS ARM64 or Linux (given broker OS constraints)?
 9. **External data and cloud privacy**: who may receive raw datasets, account/portfolio metadata and research logs? What licensing or confidentiality applies?
 10. **Cost control**: what daily/monthly budgets and stop conditions keep remote research cheaper than plausible incremental edge?
 
