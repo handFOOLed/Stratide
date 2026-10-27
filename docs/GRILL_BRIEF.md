@@ -36,6 +36,7 @@ Use this opening frame:
 - **ADR-019 accepted:** dual Risk Kernel constraints: Owner account-wide cash/exposure/NAV locks apply to all strategies, while a losing strategy's own budget/loss lock stops only that strategy's new risk. Attribution and pending-order reservations must avoid double-counting a shared cash/position pool. Persist strategy lineage and blocks; no rename/clone evasion. Specific strategy thresholds and financial-lock reinstatement are not decided.
 - **ADR-020 accepted:** changed strategy versions require independent requalification before automatic promotion; prior version losses and locks persist.
 - **ADR-021 accepted:** each strategy group's research and internal signals are isolated, even when groups hold the same ticker; real account cash, positions and limits are shared.
+- **ADR-022 accepted:** preserve independently generated per-group intents, then let trusted Portfolio Allocator aggregate compatible opposing intents into one net external order before risk/execution. Zero external orders may be appropriate if auditable eligible virtual position reallocation exists; never fabricate exchange fills or bypass sellable inventory/T+1. Internal allocation pricing and partial fill cost assignment remain open.
 - Financial-risk-driven testing; do not spend days on harmless malformed names.
 
 ## Decision tree — highest-value unresolved choices
