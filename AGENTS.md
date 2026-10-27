@@ -40,6 +40,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 21. **ADR-015: automatic data management, no arbitrary production Worker egress.** Let isolated research Agent discover and evaluate public data sources, but use a trusted Data Manager to expose approved standardized inputs to production Workers. No arbitrary external network access, secrets, broker APIs or open-URL proxy from production Worker. Built-in compliant public sources should work without manual per-source setup. Agent-discovered adapters must pass lightweight trust/licensing/quality checks before trusted integration; never execute untrusted fetched code in the trusted Rust core. First-time Owner authorization for new API keys, paid services and new sensitive-data recipients only (ADR-013), with ADR-012 spending caps and ADR-005 data-time provenance. No market-data/connector platform in M0.
 
+22. **ADR-016: verified automatic data-source failover.** Data Manager may replace failed primary data with a vetted, compatible, fresh backup without Owner input. Validate symbol, market, timestamps, point-in-time availability, price adjustments, data quality and license; audit effective source versions and avoid flip-flops. If all sources fail or materially conflict, stop new risk only for affected dependencies, not unrelated instruments. ADR-003's uncertain broker order still freezes the whole relevant account. Never choose favorable data, invent prices, bypass consent or load unapproved adapters. M0 requires no real providers.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
