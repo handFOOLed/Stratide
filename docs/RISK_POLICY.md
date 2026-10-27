@@ -106,6 +106,10 @@ Failure flags in the local strategy registry must not be used as an irreversible
 
 **Research permission is not financial authorization**: old strategy financial stops, Owner veto, account-wide loss limits and independent Evaluator/Promotion Gate approval remain in force for any future live deployment. No permanent blacklist or new re-research engine is required at M0.
 
+## Dedicated live brokerage account and unexplained external activity (ADR-028)
+
+The initial real-money account must be dedicated to Stratide, separate from routine manual app trading. This operational preference does not remove the need to independently verify broker orders, fills, cash, usable positions and settlement status. Unexpected external transactions or unexplained asset changes freeze all new risk for the affected real account until authoritative reconciliation and valid technical recovery; do not auto-assign missing fills to an arbitrary strategy or classify cash transfers/corporate actions as investment profit. A manual emergency takeover requires an explicit pause/reconciliation process yet to be chosen. The first live release is conditional on a legally available dedicated account, adequate supported broker API and Owner live authorization. M0 has no live adapter.
+
 ## P0 scenario acceptance examples for later phases
 
 1. Timeout after possible broker acceptance: persist unknown outcome and block **all new account openings**, not only the affected symbol; no blind duplicate retry.
