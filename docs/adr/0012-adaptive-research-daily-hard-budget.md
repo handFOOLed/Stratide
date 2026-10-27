@@ -6,6 +6,8 @@
 - 决策范围：Agent 的研究、实验与相关模型/API/按量计算成本；不是交易账户的本金/风险预算（见 ADR-008）
 - 待决定：具体每日金额、货币与报价来源、重置时区、预付数据订阅是否计入、预估计费误差容忍与第三方账单对账方式
 
+Related bounded local strategy retrieval: [ADR-026](0026-budgeted-shadow-observation-and-local-strategy-registry.md). Its paid LLM calls remain within this budget.
+
 ## 目标
 
 允许研究 Agent 根据候选课题的预期信息增益、实际实验价值与剩余额度，自主规划当天的研究任务，不为每个研究实验请求人工批准。但 Owner 的每日研究支出上限不可由 Agent 自行提高，也不得通过启动多项并行/跨日实验规避。
