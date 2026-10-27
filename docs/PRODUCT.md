@@ -10,6 +10,7 @@ Stratide autonomously discovers, evaluates, manages and eventually executes trad
 
 - Target **around CNY 100,000** of possible future capital, not immediate commitment.
 - Optimize for **net** results after market friction, data/AI/compute/subscription costs and risks.
+- **ADR-012:** allow the Agent to choose and allocate research/experiment spending flexibly **within an Owner-defined daily hard cap** enforced outside the Agent. Exhaustion halts new paid research, not existing portfolio risk/order management. Research budget is distinct from account principal and operating-critical service costs.
 - Prefer accessible and reliable low-cost data; asset universe should follow data economics and executable brokerage access, not an arbitrary product checklist.
 - Stock prices are hard to predict; AI's job is hypothesis and research support, not unquestioned price prophecy.
 - Agent may freely explore novel research directions and generated code; production strategy promotion is gated. **ADR-005:** incomplete historical datasets are acceptable for labeled exploratory research, but promotion evidence must be independently verified for point-in-time availability or accumulated in forward-observed paper/shadow evaluation.
