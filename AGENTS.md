@@ -77,6 +77,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 40. **ADR-035: passive corporate action group entitlement.** Use verified record-date eligible strategy group holdings, not payment-date positions, to allocate dividends and share bonuses. Trusted ledgers must reconcile gross/net dividend cash, actual taxes, delayed receivables, bonus shares, per-share cost basis and broker holdings. No duplicated NAV gains from receivable settlement, splits or repeated events; do not mislabel dividends as external Owner cash contributions. Ensure deterministic rounding and idempotent replay. Unknown broker credits/rights eligibility cannot be used to authorize new risk. Never automatically exercise or fund voluntary rights/corporate actions absent separate authorization. No live corporate-action engine in M0.
 
+41. **ADR-036: Owner approval for voluntary corporate actions.** Unlike passive ADR-035 dividends and bonus shares, funded rights subscriptions, tender elections and other discretionary issuer actions must not be auto-executed by Agent or core. Trusted broker/data services may surface independently verified events, deadlines, source and estimated required cash. Silence means no authorization. Owner permission must be explicit for the exact event, terms and spending scope; it never bypasses broker capability, available funds, account/strategy Risk Kernel gates or financial locks. Track approval separately from broker submission/settlement; unknown outcomes cannot be retried blindly or booked as assets. No optional action should unnecessarily freeze healthy unrelated trading. No corporate action approval UI or live execution in M0.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
