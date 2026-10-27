@@ -66,6 +66,10 @@ Production strategy Workers must not browse arbitrary websites, directly call un
 
 On primary feed failure, the trusted Data Manager may automatically switch to an approved, fresh and compatible backup. Compare normalized time and `available_at`, symbol/market identity, unit and adjustment semantics before trusting a substitution. With no fresh valid feed or unexplained material cross-source conflict, halt **affected strategies/instruments' new exposure** rather than automatically freezing unrelated trading; expand scope if shared input is affected. Preserve current holdings/ledger and risk duties. Do not choose the favorable provider or rewrite forward records. Switching feeds cannot clear ADR-003's account-wide broker order uncertainty halt. Unapproved/paid/new-consent sources do not gain permissions via emergency failover.
 
+## Single trading writer and crash-safe recovery (ADR-017)
+
+Only one trusted execution instance may have real order authority for a given broker account. Local process locks do not provide cross-host exclusivity; during host migration, old execution authority must be demonstrably disabled before a replacement is enabled. Persist order intents/correlation IDs, submission uncertainty, broker fills, cash/positions, circuit breakers and Owner bans with crash-safe transaction discipline. On startup load and verify state and broker orders/fills/cash/positions before new risk; unknown/ambiguous states trigger ADR-003's account-wide freeze, with any later technical recovery controlled by ADR-004. Never blindly replay prior orders, treat a timeout as a rejection, clear loss breakers, or force-liquidate unknown positions. Backup/restore uses coherent validated snapshots rather than casual copies of a live SQLite database. M0 only requires paper-mode focused recovery testing.
+
 ## P0 scenario acceptance examples for later phases
 
 1. Timeout after possible broker acceptance: persist unknown outcome and block **all new account openings**, not only the affected symbol; no blind duplicate retry.
