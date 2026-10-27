@@ -9,7 +9,7 @@
 
 > **当前状态：M0 工程骨架，尚不是可用的交易系统。** 目前尚未实现行情接入、券商接口、下单执行、研究 Agent 或真实资金交易。**请勿使用当前代码管理真实资金。**
 
-人工成交先记入独立待归属账簿，不推断策略组归属。参见 [ADR-032](docs/adr/0032-manual-trades-suspense-ledger-unassigned-attribution.md)。
+人工成交先记入独立待归属账簿，不推断策略组归属，见 [ADR-032](docs/adr/0032-manual-trades-suspense-ledger-unassigned-attribution.md)；最终由 Owner 显式选择归属组别和数量，不允许自动按比例猜测或修改真实成交，见 [ADR-033](docs/adr/0033-owner-explicit-manual-fill-group-attribution.md)。
 
 ## 项目愿景
 
