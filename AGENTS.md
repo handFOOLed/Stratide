@@ -63,6 +63,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 33. **ADR-027: failed strategy findings are evidence, not permanent research blacklists.** Before costly near-duplicate research, use ADR-026 local authorized index, prior frozen hashes/lineage, data versions, failed evidence and a testable reason for renewed investigation. Cache equivalent verified runs and do not send full history to an LLM. Do not relabel exposed holdout data as newly independent evidence, erase unsuccessful trials or treat a new hash as an unrelated strategy. Research remains possible under ADR-012 costs; any live promotion still requires ADR-006/020 independent evaluation and never resets Owner veto, financial locks or account Risk Kernel rules. Group-private failure logs stay protected. M0 must not build a research agent, permanent blacklist or semantic search system.
 
+34. **ADR-028: dedicated first live broker account.** The initial real-money account belongs exclusively to Stratide operation, separate from Owner's routine manual brokerage activity; multiple internal groups share its one real cash/position/order ledger. Dedicated does not imply no reconciliation or technical broker-level exclusivity: unexplained external fills/orders/balance differences stop all new account exposure pending authoritative broker reconciliation. Never invent fill attribution or profits for deposits/corporate actions. Emergency manual intervention requires a later designed controlled pause/reconciliation process. Confirm that an actual broker permits a legally available separate account and necessary APIs before live integration. M0 has no live broker features.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
