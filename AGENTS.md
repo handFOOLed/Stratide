@@ -55,6 +55,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 29. **ADR-023: one trusted reference price for virtual group transfers.** For an eligible internal reallocation, both sides share one validated, fresh market-reference price and timestamp from trusted Data Manager. This is a virtual attribution event, never a real broker trade, taxable sale, actual commission or newly created account P&L. Group-level virtual P&L reclassification may occur but must reconcile to one physical account NAV/cash/holdings. Reject stale/conflicted quotes, ineligible holdings or attempts to bypass trade restrictions. Reference quote field and partial-fill allocation details remain unchosen. No internal transfer engine in M0.
 
+30. **ADR-024: deterministic pro-rata external partial fills.** Assign actual broker-confirmed partial fills across same-priority eligible group intents proportionally to their precommitted quantities, with trusted risk-reducing priority allowed only after independent verification. Allocate integer units and rounding residue deterministically and idempotently, never above a group's request or beyond real fills. Distribute only actual broker fees, reconcile prices/charges/group quantity to authoritative account totals, and prevent double allocation across duplicate fill events, cancellation and restart. This is distinct from virtual internal group reallocations (ADR-023). Do not implement multi-group fill allocation in M0.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
