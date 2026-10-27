@@ -28,6 +28,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 15. **ADR-008: dynamic allocation, hard research-principal cap.** A research/backtest/forward paper run's initial capital may not exceed explicit Owner-authorized account principal (do not treat approximate target CNY 100,000 as deposited funds). The Agent cannot raise it or invent deposits, borrowings or default leverage. Independent candidate tests can each use the capped capital for comparison; simultaneous strategies must share one real simulated cash/position ledger. Allocation changes cannot override Risk Kernel limits or grant live strategy promotion. Avoid building portfolio optimization machinery in M0.
 
+16. **ADR-009: default eventual autonomous promotion, Owner veto.** A separate trusted Promotion Gate may admit independently validated strategies without individual human approval **only after** the Owner has explicitly enabled live mode and authorized capital/risk limits. The Owner can veto/disable any strategy, for any reason; persist and enforce bans against fresh deployment and new risk, without unsafe forced liquidation. Agent/strategy cannot self-approve, rewrite vetoes or expand budget/limits. M0 remains paper-only.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
