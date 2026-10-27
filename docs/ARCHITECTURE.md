@@ -1,6 +1,6 @@
 # Architecture — draft for interrogation
 
-**Status: DRAFT.** This is the opening hypothesis for `grill-with-docs`; do not treat design options as settled ADRs.
+**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md).** Do not treat other design options as settled.
 
 ## Domains and trust boundaries
 
@@ -33,14 +33,21 @@ CLI now / private web dashboard later ---> Authenticated Control API
 
 The diagrams describe logical roles, not necessarily separate processes or servers. Cloud LLM inference is mandatory **only for AI tasks**; trading and risk enforcement must not depend on its availability.
 
+## Accepted decision: hybrid strategy execution (ADR-001)
+
+- **Local and remote strategy decisions are both allowed.** Each produces a versioned, authenticated, time-bounded proposal via one contract and a locally enforced Portfolio → Risk → Execution path. Remote compute has no brokerage or risk-config privileges.
+- **Cloud loss does not authorize stale trades.** Missing or expired proposals cannot add risk; local risk, ledger and reconciliation remain operational.
+- **No runtime format chosen yet.** WASM versus a restricted native worker versus declarative/remote computation is still open.
+- **Cross-platform direction:** Windows x64 for development; macOS ARM64 (Mac mini) or Linux x64/ARM64 as *possible future* low-power deployment hosts. Broker-specific compatibility remains unproven and may require a separate gateway.
+
 ## Likely implementation boundaries
 
 - **Production core:** lightweight Rust daemon, no GPU; data, risk, ledger, order state, broker abstraction.
 - **Research:** external model providers and isolated compute workers; no account credentials.
 - **Persistence:** SQLite for authoritative trading/operational state; Parquet possibly for research datasets. Need transaction/backup design.
-- **Strategy runtime:** prefer a bounded portable artifact (e.g. WASM) *if practical*. Must test compilation, mathematical parity, resource limits and portability. Do not freeze until evaluated.
+- **Strategy runtime:** local lightweight workers or remote compute behind a unified proposal boundary (ADR-001). Artifact format (WASM/native/other) is not selected.
 - **User interface:** CLI initially; authenticated Control API loopback-only; future standalone Web Dashboard for a private site.
-- **Deployment:** first Windows; perhaps Linux mini PC later. No dependence on Docker, Redis, Kafka, or Kubernetes in core.
+- **Deployment:** Windows now; macOS ARM64 Mac mini or Linux mini PC later if justified. No required Docker, Redis, Kafka, or Kubernetes in the core.
 
 ## Invariants worth protecting
 
@@ -55,13 +62,13 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 
 ## Open design questions (not decisions)
 
-- What is the least-complex acceptable **strategy artifact/runtime**, especially for unusual ML/AI strategies?
+- Which **local strategy runtime/artifact format** best enforces the hybrid proposal boundary while supporting unusual ML/AI strategies?
 - What is the minimum broker interface needed for authentic paper fills and later live A-share compliance?
 - How do we define and verify account-equity daily-loss and high-water-mark drawdown thresholds?
 - Is the independent risk authority a crate, a process, or an OS-isolated service, given low footprint?
 - Which parts of research can run with bounded CPU locally vs remote-only workers?
 - What constitutes strategy promotion and when is human authorization mandatory?
 - Which data can be stored/shipped to external providers under licenses and privacy expectations?
-- What is the resource budget and minimum uptime/recovery test for a mini PC deployment?
+- What is the resource budget and minimum uptime/recovery test for macOS/Linux mini PC deployment, considering broker compatibility?
 
 See `docs/GRILL_BRIEF.md` for a discussion-ready agenda.
