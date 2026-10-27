@@ -44,6 +44,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 23. **ADR-017: single authoritative execution instance and crash-safe recovery.** At most one trusted writer per broker account may submit real orders. Use same-host exclusion and an explicit authority handoff for host migration; a local lock never proves cross-machine exclusivity. Persist order intents/unknown outcomes, broker IDs, ledger, risk breakers and Owner veto state, with consistent snapshots/backups. On restart reconcile with authoritative broker orders/fills/positions/cash before authorizing new risk; ADR-003/004 apply. Never blindly resend or replay old signals, auto-liquidate unknown holdings, or clear loss breakers. Do not implement standby cluster/failover coordination in M0.
 
+24. **ADR-018: account-equity financial breakers.** Compute daily loss and high-water-mark drawdown from trusted whole-account cash-flow-adjusted NAV, including realized **and unrealized** P&L, fees and relevant account assets/liabilities. Never count deposits as profit or withdrawals as losses; keep valuation provenance and persistent breaker/baseline state. Material missing/contradictory portfolio marks or mismatched holdings prevent authorizing new account risk; do not bypass a global equity check via a local data-fault exception. Broker/order uncertainty remains governed by ADR-003. Loss/drawdown breakers bar new account risk, are not guaranteed loss limits and cannot be automatically cleared at midnight, quote recovery or ADR-004 technical recovery. Owner percentages are still undecided; test a narrow paper NAV/flow/restart path in M0.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
