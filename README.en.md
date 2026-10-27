@@ -9,6 +9,8 @@
 
 [ADR-026](docs/adr/0026-budgeted-shadow-observation-and-local-strategy-registry.md): bounded shadow observation, locally indexed strategy lookup and limited cloud-LLM context. [ADR-027](docs/adr/0027-historical-failure-as-evidence-not-permanent-ban.md): past failures are research evidence, not permanent research bans or permission to bypass live financial locks.
 
+**Current development priority:** deliver verifiable M0 paper trading core first, then M1 genuine forward paper observation on provenance-tagged market data with NAV/trade/fee/drawdown reports. GPT-6.1 Sol writes code; GPT-6.1 Terra independently tests and merges after ChatGPT PR review clears blockers; Owner evaluates observed results. See [ADR-037](docs/adr/0037-observable-paper-trading-first-and-independent-review-gates.md) and [the paper roadmap](docs/PAPER_TRADING_ROADMAP.md). Historical replays are not live observations.
+
 **Autonomous Quantitative Trading & Open-Ended Strategy Discovery**
 
 Status: **M0 scaffold — NOT a trading system**. No market-data provider, broker connection, order routing, research agent, or real-money execution is implemented. Do not use this repository to manage real funds.
