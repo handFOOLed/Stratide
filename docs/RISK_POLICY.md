@@ -30,6 +30,10 @@ An ambiguous broker submission halts **all new risk for the affected account** u
 
 Data with unverified historical availability may support exploration, **not** live-capital promotion. Formal historical evaluation uses independent point-in-time availability verification; historical publication/revision information must not leak backwards in decision time. Prospective shadow/paper observation can accumulate fresh evidence when trustworthy historical snapshots do not exist; independent review is still required before live promotion.
 
+## Independent evaluator and overfitting controls (ADR-006)
+
+The Agent must not control protected holdout evaluation, fabricate its own qualification, or selectively conceal trial history. Freeze and version submitted candidates; keep evaluation attempts, costs and holdout usage auditable. Repeated testing against the same history reduces its value as independent evidence. Use prospective forward observation on genuinely unseen data before any possible live-money promotion. The final promotion policy is separate and not yet determined.
+
 ## P0 scenario acceptance examples for later phases
 
 1. Timeout after possible broker acceptance: persist unknown outcome and block **all new account openings**, not only the affected symbol; no blind duplicate retry.
