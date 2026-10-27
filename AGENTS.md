@@ -26,6 +26,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 14. **ADR-007: pragmatic conservative paper fills.** Use an initial daily-bar simulator with traceable fill and cost assumptions; do not pretend OHLC price touches or same-bar closes guarantee execution. Apply instrument-specific trading rules, including T+1 only where applicable, applicable limit/lot/suspension rules, and fees. Allow higher-fidelity simulation later only for strategies that actually require it; no speculative exchange microstructure framework at M0.
 
+15. **ADR-008: dynamic allocation, hard research-principal cap.** A research/backtest/forward paper run's initial capital may not exceed explicit Owner-authorized account principal (do not treat approximate target CNY 100,000 as deposited funds). The Agent cannot raise it or invent deposits, borrowings or default leverage. Independent candidate tests can each use the capped capital for comparison; simultaneous strategies must share one real simulated cash/position ledger. Allocation changes cannot override Risk Kernel limits or grant live strategy promotion. Avoid building portfolio optimization machinery in M0.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
