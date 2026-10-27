@@ -17,12 +17,13 @@ Use this opening frame:
 - Low operating cost, low local resource requirements.
 - Future macOS ARM64 Mac mini or Linux mini PC and private Web Dashboard only after evidence of value.
 - **ADR-001 accepted:** hybrid local/remote strategy computation with unified proposals, always locally risk-gated. Do not re-litigate hybrid vs all-local vs all-cloud.
+- **ADR-002 accepted:** Risk Kernel and Execution Engine are separate modules inside one trusted Rust core process; one mandatory order gateway; untrusted strategy code stays outside it. Do not re-litigate the basic in-process vs separate-daemon choice without concrete financial risk evidence.
 - Financial-risk-driven testing; do not spend days on harmless malformed names.
 
 ## Decision tree — highest-value unresolved choices
 
 1. **Implementation of ADR-001 (still open)**: local strategy artifact/runtime choices (WASM, declarative, restricted child process) and minimal unified proposal contract; remote compute is allowed but must not bypass local risk.
-2. **Risk authority**: does a Rust module offer sufficient isolation from the research component? What prevents configuration writes and bypasses? How does manual risk unlock work?
+2. **Risk gateway implementation (ADR-002)**: how do private APIs and persisted breaker state prevent unchecked order emission; what minimal operator-unlock rule is needed?
 3. **Executable order semantics**: if a broker times out after accepting an order, which identifiers and persisted states prevent duplicate execution?
 4. **Market-data semantics**: can a daily strategy prove `available_at <= decision_time` for all inputs, and support price adjustments/corporate actions?
 5. **Backtesting promotion**: how to avoid evaluating thousands of models on recycled held-out data and overfitting selection to chance?
