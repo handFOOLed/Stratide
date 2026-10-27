@@ -38,6 +38,10 @@ The Agent must not control protected holdout evaluation, fabricate its own quali
 
 First-stage historical and paper execution uses **frequency-matched conservative assumptions**: treat day-bar data as insufficient to prove all limit fills or intrabar ordering, and never retroactively execute at the close used to generate the signal. Include realistic eligible-instrument trading constraints (T+1 where applicable, lots, halts, price limits), fees/taxes/slippage and execution uncertainty when measuring net performance. Strategies dependent on finer execution data cannot be promoted based on day-bar fills alone. Do not build a tick exchange simulator for M0.
 
+## Account-principal ceiling for research and portfolio allocation (ADR-008)
+
+The Owner sets the maximum authorized account principal used as starting capital for a research, backtest or paper account; it must not exceed a verifiable real-account capital basis when connected. The research Agent cannot raise that limit or invent deposits. Independent candidate comparisons may each run at the same capped capital; concurrent strategies must share one ledger and cannot double-spend cash. No default leverage or borrowed cash. Distinguish this **starting principal ceiling** from the independent Risk Kernel's potentially lower exposure/position limits; example percentages above remain drafts, not configured permissions. The dynamic allocator may rebalance qualified strategies but cannot approve novel ones for live deployment.
+
 ## P0 scenario acceptance examples for later phases
 
 1. Timeout after possible broker acceptance: persist unknown outcome and block **all new account openings**, not only the affected symbol; no blind duplicate retry.
