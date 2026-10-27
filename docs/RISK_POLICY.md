@@ -122,6 +122,10 @@ Confirmed Owner-manual fills change the physical account shares, cash, fees and 
 
 ADR-032 manual-trade suspense can be closed only by trusted, explicit Owner-directed assignment to eligible `group_id` entries and amounts, possibly split among groups. Do not compute an automatic percentage from the pre-takeover holdings or let research AI choose winners. Validate the current actual broker fill IDs, suspense remainder and verifiable group lots/available sell inventory, reject excessive, negative, stale or duplicate assignment, and allocate already-real costs and profit attribution without altering immutable exchange fills, physical account cash/positions or prior financial locks. Keep manual outcome reporting separate from autonomous strategy alpha. The allocation is necessary to reconcile affected group inventory but does not, on its own, return execution authority: Owner handback and all Risk Kernel gates under ADR-029 still apply. M0 excludes this future service.
 
+## Corporate actions and group entitlements (ADR-035)
+
+Use trusted eligible group ownership at the equity record-date cutoff to apportion passive dividends and share bonuses. Reconcile actual broker cash, shares, tax and withholding; a dividend receivable later settled in cash is not two profits, and split/bonus quantity is not new wealth. Cash dividends are investment returns, not Owner deposits. Use deterministic fixed-point attribution and preserve event IDs across restart/replays. Unknown settlement, tax or eligibility blocks affected new risk, never fabricates tradeable assets. Active subscription/rights elections involving spending are not approved. No production adapter in M0.
+
 ## P0 scenario acceptance examples for later phases
 
 1. Timeout after possible broker acceptance: persist unknown outcome and block **all new account openings**, not only the affected symbol; no blind duplicate retry.
