@@ -4,7 +4,7 @@
 - 日期：2026-10-27
 - Owner 选择：方案 A。策略组之间进行可信内部虚拟权益转移时，转出和转入两端按**同一个市场参考价格**记账，不虚拟制造买卖价差。
 - 关联：[ADR-021](0021-group-isolation-shared-instrument-attribution.md) 策略组归属、[ADR-022](0022-trusted-cross-group-intent-netting.md) 净额执行、[ADR-016](0016-verified-data-source-failover.md) 数据源质量、[ADR-019](0019-account-and-strategy-risk-layers.md) 双层风险。
-- 尚未决定：参考价格的具体市场字段（例如最新可成交参考、买卖盘中间价或适当成交价）、数据刷新/时效阈值、批量匹配时间窗口、真实外部订单部分成交时的分摊顺序。
+- 尚未决定：参考价格的具体市场字段（例如适当成交价或买卖盘中间价）、数据刷新/时效阈值、批量匹配时间窗口。外部订单部分成交同级按比例归属的方向已由 [ADR-024](0024-prorata-partial-fill-attribution.md) 确定。
 
 ## 问题
 
