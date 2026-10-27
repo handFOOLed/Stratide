@@ -1,6 +1,6 @@
 # Architecture — draft for interrogation
 
-**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), [ADR-009](adr/0009-auto-promotion-owner-veto.md), [ADR-011](adr/0011-immediate-promotion-nonblocking-notifications.md) [ADR-012](adr/0012-adaptive-research-daily-hard-budget.md), [ADR-013](adr/0013-one-time-cloud-data-consent.md), and [ADR-014](adr/0014-isolated-strategy-workers.md) (which supersedes [ADR-010](adr/0010-configurable-deployment-grace-period.md)).** Do not treat other design options as settled.
+**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md), [ADR-002](adr/0002-in-process-risk-gateway.md), [ADR-003](adr/0003-account-wide-order-uncertainty.md), [ADR-004](adr/0004-configurable-conditional-recovery.md), [ADR-005](adr/0005-tiered-data-evidence.md), [ADR-006](adr/0006-independent-validation-isolation.md), [ADR-007](adr/0007-conservative-frequency-matched-simulation.md), [ADR-008](adr/0008-dynamic-portfolio-capital-cap.md), [ADR-009](adr/0009-auto-promotion-owner-veto.md), [ADR-011](adr/0011-immediate-promotion-nonblocking-notifications.md), [ADR-012](adr/0012-adaptive-research-daily-hard-budget.md), [ADR-013](adr/0013-one-time-cloud-data-consent.md), [ADR-014](adr/0014-isolated-strategy-workers.md), and [ADR-015](adr/0015-automatic-data-manager-network-isolation.md) (which supersedes [ADR-010](adr/0010-configurable-deployment-grace-period.md)).** Do not treat other design options as settled.
 
 ## Domains and trust boundaries
 
@@ -133,7 +133,16 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - Python and practical scientific/ML ecosystems are permitted in Workers; **WASM is not mandatory**. Existing production strategy artifacts must be frozen and independently validated before eligibility (ADR-006/009).
 - Process separation alone **does not prove containment**. Limit access to filesystem, host environment/secrets, child processes, network, CPU/memory and wall-clock time using platform-verifiable restrictions. If a particular Windows/macOS/Linux host cannot enforce its required sandbox policy, place the workload in trusted isolated remote compute or reject it, not in the credential-bearing core.
 - Worker crash, misbehavior or disconnection must not bypass Portfolio/Risk/Execution or authorize stale proposals. Worker never owns broker keys, a brokerage API, production ledger writes or Owner risk-setting writes.
-- Worker egress/network design, sandbox implementation and concrete proposal serialization are still open. Avoid large plugin systems and speculative cross-OS sandbox matrices in M0.
+- **ADR-015 settles production Worker network posture:** deny arbitrary internet egress and obtain market/feature data through a trusted Data Manager; research Workers retain appropriately controlled external discovery. OS sandbox implementation and proposal serialization remain open. Avoid large plugin systems and speculative cross-OS sandbox matrices in M0.
+
+## Accepted decision: automated data discovery with a trusted Data Manager (ADR-015)
+
+- **Agent research can discover and test external sources** in isolated research environments, while production Strategy Workers have **no arbitrary internet access**. A trusted Data Manager feeds them normalized, permission-checked market and research inputs.
+- Automatically use legally accessible, trusted built-in public sources. Automatically discovering a new source does **not** permit Agent-written adapters to execute inside the trusted core: promote sources into production only after lightweight source, security, quality and licensing checks.
+- Trusted adapters own API keys, request limits, cache, provenance, source versions, `event_time` and `available_at` semantics. Never expose an arbitrary-URL proxy, broker interface or owner-risk writes to Workers.
+- First-time Owner authorization is needed for new billable services, API keys and previously unapproved sensitive account-data transfers; existing authorized use follows ADR-013 without repetitive prompts. Research spend remains bounded by ADR-012.
+- Production data uncertainty/staleness must not be silently treated as fresh execution evidence. Exactly when to fail closed versus use a verified fallback source remains an open decision.
+- Data Manager is a **logical trust boundary**, not a requirement for a new microservice. M0 remains paper-only and does not require real data subscriptions.
 
 ## Likely implementation boundaries
 
@@ -157,7 +166,7 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 
 ## Open design questions (not decisions)
 
-- How should an isolated strategy Worker obtain market/research data and network access without creating an exfiltration/broker bypass? Which minimal OS-specific sandbox is actually viable on Windows/macOS ARM64/Linux?
+- What is the minimal verifiable local OS sandbox and Data Manager interface for Worker read-only access under ADR-014/015 on Windows/macOS ARM64/Linux?
 - What is the minimum broker interface needed for authentic paper fills and later live A-share compliance?
 - How do we define and verify account-equity daily-loss and high-water-mark drawdown thresholds?
 - What is the minimal risk-gate API, and how should loss-breaker release differ from ADR-004's technical-only recovery?
