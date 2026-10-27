@@ -1,6 +1,6 @@
 # Architecture — draft for interrogation
 
-**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md).** Do not treat other design options as settled.
+**Status: DRAFT except accepted [ADR-001](adr/0001-hybrid-strategy-execution.md) and [ADR-002](adr/0002-in-process-risk-gateway.md).** Do not treat other design options as settled.
 
 ## Domains and trust boundaries
 
@@ -40,6 +40,13 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - **No runtime format chosen yet.** WASM versus a restricted native worker versus declarative/remote computation is still open.
 - **Cross-platform direction:** Windows x64 for development; macOS ARM64 (Mac mini) or Linux x64/ARM64 as *possible future* low-power deployment hosts. Broker-specific compatibility remains unproven and may require a separate gateway.
 
+## Accepted decision: in-process risk module and one order gateway (ADR-002)
+
+- **One trusted Rust core process:** Risk Kernel and Execution Engine are separate internal modules in the same `stratided` process. No independent risk daemon initially.
+- **Mandatory local gate:** strategies, research Agent and Web UI submit proposals only. Broker order emission is reachable only through a constrained Execution Engine path consuming valid, approved intents.
+- **Untrusted code is outside the trusted process.** Rust module separation is not OS process isolation, and cannot prevent all bugs inside the core itself; critical order/risk paths need focused financial-risk tests.
+- **Persistent halt state:** breaker and ambiguous-order state survive restarts; do not add risk while state is unknown. More detailed unlock/reconciliation policy is not decided yet.
+
 ## Likely implementation boundaries
 
 - **Production core:** lightweight Rust daemon, no GPU; data, risk, ledger, order state, broker abstraction.
@@ -65,7 +72,7 @@ The diagrams describe logical roles, not necessarily separate processes or serve
 - Which **local strategy runtime/artifact format** best enforces the hybrid proposal boundary while supporting unusual ML/AI strategies?
 - What is the minimum broker interface needed for authentic paper fills and later live A-share compliance?
 - How do we define and verify account-equity daily-loss and high-water-mark drawdown thresholds?
-- Is the independent risk authority a crate, a process, or an OS-isolated service, given low footprint?
+- What is the minimal risk-gate API and persistent breaker / operator-unlock state machine within the chosen in-process core (ADR-002)?
 - Which parts of research can run with bounded CPU locally vs remote-only workers?
 - What constitutes strategy promotion and when is human authorization mandatory?
 - Which data can be stored/shipped to external providers under licenses and privacy expectations?
