@@ -36,6 +36,8 @@ Build Stratide for a single owner: a low-resource, initially local, autonomous q
 
 19. **ADR-013: once-authorized cloud research context.** Owner authorizes a specific receiving cloud service/purpose/data scope once; re-use that persisted grant without annoying per-request consent prompts. Rich authorized position, cash, trade and research-history inputs are permissible. New service, purpose or materially new data category requires another explicit grant; Owner can revoke future sending. Broker credentials, account secrets, actual execution capability and risk-policy writes stay exclusively in trusted local control regardless of sharing preferences. Check real provider retention/data redistribution rules; do not promise revocation deletes already transmitted records. Keep this simple; no enterprise IAM in M0.
 
+20. **ADR-014: untrusted strategy Workers.** Run generated strategy code exclusively in separate restricted local Worker processes or isolated remote workers. Support appropriate Python/scientific/ML dependencies without forcing WASM, but never load generated code into trusted Rust `stratided`. Worker output is only an authenticated, versioned, expiring proposal subjected to Portfolio → Risk → Execution. No Worker access to brokerage keys, order API, production ledger writes, risk-limit writes or local secrets. OS child processes are not security sandboxes; apply verifiable file/network/compute restrictions or reject unsafe local execution. Do not build complex runtime orchestration in M0.
+
 ## Financial-Risk-Driven Engineering
 
 Classify work before changing code:
@@ -54,7 +56,7 @@ Do not add abstractions, frameworks, background services or comprehensive test m
 - Treat generated research code and remote-agent messages as untrusted.
 - Research may generate ideas, code and experiment artifacts, but cannot edit production risk policy, approve itself for live trading or directly access brokerage APIs.
 - Only the independent evaluator reports pass/fail against immutable test definitions.
-- Production artifact format (WASM or another isolated runtime) is an **open design decision**, not a mandate.
+- ADR-014 selects independent local/remote strategy Workers; the concrete artifact/dependency packaging remains open. WASM is optional, not mandatory. A child process is **not** an adequate sandbox without enforceable OS resource, filesystem, environment and network restrictions.
 - Do not introduce live order functions or unlock live mode unless a separate, explicit milestone authorizes it.
 - Do not auto-merge PRs or self-approve changes involving real trading permissions.
 
