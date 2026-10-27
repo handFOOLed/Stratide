@@ -10,6 +10,8 @@
 
 当 Owner 人工接管后实际成交使总持仓与组级历史份额不符时，不得自动按比例扣组别份额；先在可信待归属账簿记录差异并停用受影响的旧库存，参见 [ADR-032](0032-manual-trades-suspense-ledger-unassigned-attribution.md)。最终归属由 Owner 显式指定策略组及分配数量，可信核心核验而非自行按比例扣减，见 [ADR-033](0033-owner-explicit-manual-fill-group-attribution.md)。
 
+被动现金分红及送股采用可信登记日组别权益，详见 [ADR-035](0035-record-date-corporate-action-group-attribution.md)。
+
 ## 核心模型
 
 - `group_id` 是策略组的数据与运行归属边界；`family_id` 表示研究血缘，两者不自动等同。
