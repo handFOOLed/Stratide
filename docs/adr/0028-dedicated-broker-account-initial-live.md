@@ -6,6 +6,8 @@
 - 关联：[ADR-003](0003-account-wide-order-uncertainty.md) 券商状态不确定冻结、[ADR-004](0004-configurable-conditional-recovery.md) 技术恢复、[ADR-008](0008-dynamic-portfolio-capital-cap.md) 唯一账户真实资金池、[ADR-017](0017-single-writer-durable-recovery.md) 单一执行主体与对账、[ADR-019](0019-account-and-strategy-risk-layers.md) 账户/策略双层风险、[ADR-021](0021-group-isolation-shared-instrument-attribution.md) 虚拟组级归属。
 - 待决：具体支持的券商/账户类型及是否允许开立独立账户；Owner 临时紧急接管/人工操作流程；实际券商订单/成交/资金/持仓对账接口、时间窗口与异常恢复细节。没有券商条件验证不声称可开立额外账户。
 
+人工接管期间经券商确认的人工成交不应被自动分配给某个策略组；真实账户先更新，策略组归属独立挂账核验，详见 [ADR-032](0032-manual-trades-suspense-ledger-unassigned-attribution.md)。
+
 ## 背景
 
 Stratide 可以管理多策略组，但它们共享唯一的真实券商账户资金和证券持仓。若 Owner 同时在券商 App 人工买卖同一账户，策略虚拟归属、可卖数量、预算与账本可能瞬间失真。首个实盘版本优先减少资金归属与订单来源复杂度，而不是承诺自动适配任意人工交易。
