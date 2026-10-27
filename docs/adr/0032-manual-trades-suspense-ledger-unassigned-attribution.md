@@ -4,7 +4,7 @@
 - 日期：2026-10-27
 - Owner 对 Question 32 的选择：**B——人工成交先进入独立的人工调整/待归属账簿，不按照策略组持仓比例自动分摊。**
 - 关联：[ADR-028](0028-dedicated-broker-account-initial-live.md) 专用实盘账户、[ADR-029](0029-owner-manual-takeover-explicit-return.md) 人工接管/显式交还、[ADR-030](0030-owner-takeover-pending-order-choice.md) 保留或尝试撤单、[ADR-021](0021-group-isolation-shared-instrument-attribution.md) 多组同股独立归属、[ADR-019](0019-account-and-strategy-risk-layers.md) 统一实际账户及分组风险、[ADR-017](0017-single-writer-durable-recovery.md) 权威对账。
-- 后续待决：人工交易的待归属变化由谁、按什么界面或规则最终分配给具体组及成本基础；人工买入的后续持有/退出政策；会计成本方法与券商可验证明细。不能假定自动按比例、平均成本或自动选择收益最优组。
+- 后续待决：人工成交成本批次/税费精细分摊、人工买入后持有或退出政策及券商明细接口；**最终待归属变化必须由 Owner 显式选择具体组及数量（[ADR-033](0033-owner-explicit-manual-fill-group-attribution.md)），不自动按比例或选择收益最优组。**
 
 ## 背景和例子
 
