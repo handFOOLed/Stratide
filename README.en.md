@@ -2,6 +2,8 @@
 
 # Stratide
 
+[ADR-026](docs/adr/0026-budgeted-shadow-observation-and-local-strategy-registry.md): bounded shadow observation, locally indexed strategy lookup and limited cloud-LLM context.
+
 **Autonomous Quantitative Trading & Open-Ended Strategy Discovery**
 
 Status: **M0 scaffold — NOT a trading system**. No market-data provider, broker connection, order routing, research agent, or real-money execution is implemented. Do not use this repository to manage real funds.
