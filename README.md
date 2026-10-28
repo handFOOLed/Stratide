@@ -2,9 +2,9 @@
 
 # Stratide
 
-**PR #8 补测后进展（仍为 Draft）：** Owner 对本账户自动采集和本地原始响应保存作出明确声明后，新建 journal 已完成实际 HTTPS 入库、恢复及重复/晚到核对，当前为 1 个有效前向日、0 提案/成交。许可依据仍仅为 Owner 声明，非供应商书面或独立认证；待独立复验及许可门槛判定。见 [R1 证据](docs/evidence/m1-pr04a-r1/README.md)。以下首次提交的 blocked 记录保留。
+**PR #8 最新状态：P1 日报缺口已修复，待独立复验。** 日报同时保留当日漏采与次日晚到补录；JSON/CSV、重启回归和新路径真实 CLI smoke 已执行，见 [R2 证据](docs/evidence/m1-pr04a-r2/README.md)。本机真实观察仍只有 1 个有效前向日、0 提案/成交。Owner 已接受个人非商业本机用途；供应商正式许可未经独立核实作为限制披露，不自动阻断本轮开发/验收，也不扩展为行情分发。开发会话工具执行记录曾包含明文 Token，不得称为“零泄漏”；Token 未加入 Git/PR/应用输出或应用日志，不在文档重现值，是否轮换由 Owner 决定。下方 blocked 记录仅为历史，独立验收与最终审查仍待完成。
 
-**M1-PR04A 开发分支：Draft / BLOCKED。** 已增加只观察的独立 journal、单次盘后采集适配器及 CSV/JSON CLI；本机 Tushare HTTPS `daily`/`trade_cal` 实测可读，但自动采集/原始响应持久保存许可仍未确认，样例默认阻断。有效前向日数、策略提案、模拟成交均为 0；没有修改 v3 财务账本。见 [命令、实际输出和未验证范围](docs/M1_PR04A.md)及[来源核验](docs/M1_PR04A_SOURCE_FEASIBILITY.md)。此分支尚待 Terra 独立验收、小猫审查和 Owner 授权合并，不能视为整个 M1 已完成。
+**历史：M1-PR04A 首次提交时为 Draft / BLOCKED。** 已增加只观察的独立 journal、单次盘后采集适配器及 CSV/JSON CLI；本机 Tushare HTTPS `daily`/`trade_cal` 实测可读，但自动采集/原始响应持久保存许可仍未确认，样例默认阻断。有效前向日数、策略提案、模拟成交均为 0；没有修改 v3 财务账本。见 [命令、实际输出和未验证范围](docs/M1_PR04A.md)及[来源核验](docs/M1_PR04A_SOURCE_FEASIBILITY.md)。此分支尚待 Terra 独立验收、小猫审查和 Owner 授权合并，不能视为整个 M1 已完成。
 
 [ADR-026](docs/adr/0026-budgeted-shadow-observation-and-local-strategy-registry.md)：限额研究与策略索引。[ADR-027](docs/adr/0027-historical-failure-as-evidence-not-permanent-ban.md)：历史失败作为研究证据，而不是永久研究禁令；重新研究也不会解除真实资金风控。
 
@@ -19,11 +19,11 @@ PR-02 已合并；其 R2 修复要求订单有效期严格覆盖完整交易时�
 
 ## 当前优先任务：可观察的模拟交易
 
-根据 [ADR-037](docs/adr/0037-observable-paper-trading-first-and-independent-review-gates.md)，先实现可复现的单策略模拟交易内核（M0），再接入真实来源行情进行前向 Paper Trading 观察（M1），输出净值、持仓、成交、费用、回撤及风险拒单等可核实报告。**GPT-6.1 Sol 编码、GPT-6.1 Terra 独立测试/出具同 SHA 验收报告、ChatGPT（小猫）审查并在明确通过后用 HEAD SHA 锁定安全合并、Owner 观察结果及决定范围**。详细 PR 交付与验收标准见 [模拟交易路线图](docs/PAPER_TRADING_ROADMAP.md)。所有结果须区分合成、历史回放和前向模拟；当前只交付 M0 的窄范围模拟内核，仍不能用于真实资金。
+根据 [ADR-037](docs/adr/0037-observable-paper-trading-first-and-independent-review-gates.md)，先实现可复现的单策略模拟交易内核（M0），再接入真实来源行情进行前向 Paper Trading 观察（M1），输出净值、持仓、成交、费用、回撤及风险拒单等可核实报告。**GPT-6.1 Sol 编码、GPT-6.1 Terra 独立测试/出具同 SHA 验收报告、ChatGPT（小猫）审查并在明确通过后用 HEAD SHA 锁定安全合并、Owner 观察结果及决定范围**。详细 PR 交付与验收标准见 [模拟交易路线图](docs/PAPER_TRADING_ROADMAP.md)。所有结果须区分合成、历史回放和前向模拟；main 已交付 M0 的窄范围模拟内核；本分支新增 PR04A 只观察能力，仍不能用于真实资金。
 
 ## 项目愿景
 
-已合并的回放命令、实际导出文件和验证边界见 [M0-PR03 实现说明](docs/M0_PR03.md)及 [R1 中断恢复修复](docs/M0_PR03_R1.md)；基础账本见 [M0-PR02 实现说明](docs/M0_PR02.md)。PR #6 的 [Terra 独立 PASS 验收](https://github.com/handFOOLed/Stratide/pull/6#issuecomment-6465953588) 与 [ChatGPT 同 SHA 代码审查](https://github.com/handFOOLed/Stratide/pull/6#pullrequestreview-5680851123) 已完成。**下一里程碑为 M1 的真实来源前向 Paper 观察，尚未实现或验收。**
+已合并的回放命令、实际导出文件和验证边界见 [M0-PR03 实现说明](docs/M0_PR03.md)及 [R1 中断恢复修复](docs/M0_PR03_R1.md)；基础账本见 [M0-PR02 实现说明](docs/M0_PR02.md)。PR #6 的 [Terra 独立 PASS 验收](https://github.com/handFOOLed/Stratide/pull/6#issuecomment-6465953588) 与 [ChatGPT 同 SHA 代码审查](https://github.com/handFOOLed/Stratide/pull/6#pullrequestreview-5680851123) 已完成。**本分支已实现 M1-PR04A 单日真实 EOD 观察，待独立复验；整个 M1 与可信模拟买卖尚未完成。**
 
 Stratide 是面向个人用户的**低资源占用、本地优先**的自动化交易平台。它允许云端 AI Agent 自主探索新的交易策略，但所有实际交易必须受到**独立、不可绕过的风控系统**约束。
 
@@ -90,7 +90,7 @@ Cargo.toml             Rust Workspace
 README.en.md           English README
 ```
 
-真实数据接入、策略运行时、真实券商执行与控制 API **尚未实现**；后续只在真实开发任务需要时增加，不提前堆空目录和无意义的抽象。
+本分支已有真实 EOD 只观察接入；策略运行时、真实券商执行与控制 API **尚未实现**；后续只在真实开发任务需要时增加，不提前堆空目录和无意义的抽象。
 
 ## 本地运行
 

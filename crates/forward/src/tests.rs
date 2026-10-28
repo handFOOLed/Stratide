@@ -72,6 +72,174 @@ fn start(j: &mut Journal, id: &str, day: &str, time: i64) {
     )
     .unwrap();
 }
+
+// Synthetic response received on 10/28 for the missed 10/27 session.
+fn late_previous_day() -> Outcome {
+    let daily = raw(
+        "daily",
+        json!([
+            "ts_code",
+            "trade_date",
+            "open",
+            "high",
+            "low",
+            "close",
+            "vol"
+        ]),
+        json!([["600000.SH", "20261027", 10.01, 10.09, 9.99, 10.02, 100.01]]),
+    );
+    let calendar = raw(
+        "trade_cal",
+        json!(["exchange", "cal_date", "is_open"]),
+        json!([["SSE", "20261027", 1], ["SSE", "20261028", 1]]),
+    );
+    Outcome {
+        status: "valid_eod".into(),
+        bar: Some(parse_bar(&daily, &config(), "20261027").unwrap()),
+        calendar: parse_calendar(&calendar, &config(), "20261027", "20261028").unwrap(),
+        raw: vec![calendar, daily],
+        available_at: Some(at()),
+        provider_published_at: None,
+        duplicate_of: None,
+        revision_of: None,
+        late_backfill: false,
+    }
+}
+
+#[test]
+fn late_backfill_keeps_missed_day_gap_in_json_csv_and_after_restart() {
+    let temp = tempfile::tempdir().unwrap();
+    let path = temp.path().join("journal");
+    let mut j = create_at(&path, config(), at() - 86_400_000);
+    start(&mut j, "late", "20261027", at());
+    finish(
+        &mut j,
+        "late",
+        "20261027",
+        "20261028",
+        at(),
+        late_previous_day(),
+    )
+    .unwrap();
+    let head = j.head().to_owned();
+    let report = temp.path().join("report");
+    j.report(&report).unwrap();
+    let value: serde_json::Value =
+        serde_json::from_slice(&fs::read(report.join("report.json")).unwrap()).unwrap();
+    let rows = value["days_and_attempts"].as_array().unwrap();
+    let gap = rows
+        .iter()
+        .find(|r| r["calendar_day"] == "20261027" && r["status"] == "gap_no_collection_on_open_day")
+        .expect("late backfill must not hide the missed forward day");
+    assert!(gap["run_id"].is_null() && gap["observed_at"].is_null() && gap["close_fen"].is_null());
+    assert_eq!(gap["calendar_received_at"], local_time(at()).unwrap());
+    let late = rows.iter().find(|r| r["run_id"] == "late").unwrap();
+    assert_eq!(late["status"], "valid_eod");
+    assert_eq!(late["late_backfill"], true);
+    assert_eq!(late["observed_at"], local_time(at()).unwrap());
+    assert_eq!(late["received_at"], local_time(at()).unwrap());
+    assert_eq!(late["available_at"], local_time(at()).unwrap());
+    assert_eq!(value["status"]["actual_valid_forward_days"], 0);
+    let csv = fs::read(report.join("daily.csv")).unwrap();
+    let mut reader = csv::Reader::from_reader(csv.as_slice());
+    let headers = reader.headers().unwrap().clone();
+    let day = headers.iter().position(|h| h == "calendar_day").unwrap();
+    let status = headers.iter().position(|h| h == "status").unwrap();
+    let statuses: Vec<_> = reader
+        .records()
+        .map(|r| r.unwrap())
+        .filter(|r| &r[day] == "20261027")
+        .map(|r| r[status].to_string())
+        .collect();
+    assert_eq!(statuses, ["gap_no_collection_on_open_day", "valid_eod"]);
+    drop(j);
+    let j = Journal::open(&path).unwrap();
+    assert_eq!(j.head(), head);
+    let reopened = temp.path().join("reopened-report");
+    j.report(&reopened).unwrap();
+    for name in ["report.json", "daily.csv", "events.json"] {
+        assert_eq!(
+            fs::read(report.join(name)).unwrap(),
+            fs::read(reopened.join(name)).unwrap()
+        );
+    }
+    j.report(&report).unwrap();
+    // Optional artifact export belongs only to this synthetic test binary.
+    if let Ok(destination) = std::env::var("STRATIDE_SYNTHETIC_GAP_REPORT") {
+        j.report(destination).unwrap();
+    }
+}
+
+#[test]
+fn same_day_failure_remains_explicit_without_inventing_no_attempt_gap() {
+    let temp = tempfile::tempdir().unwrap();
+    let path = temp.path().join("journal");
+    let yesterday = at() - 86_400_000;
+    let mut j = create_at(&path, config(), yesterday);
+    start(&mut j, "failed-on-day", "20261027", yesterday);
+    finish(
+        &mut j,
+        "failed-on-day",
+        "20261027",
+        "20261027",
+        yesterday,
+        Outcome::gap("network_timeout_or_tls_error"),
+    )
+    .unwrap();
+    start(&mut j, "late", "20261027", at());
+    finish(
+        &mut j,
+        "late",
+        "20261027",
+        "20261028",
+        at(),
+        late_previous_day(),
+    )
+    .unwrap();
+    let report = temp.path().join("report");
+    j.report(&report).unwrap();
+    let value: serde_json::Value =
+        serde_json::from_slice(&fs::read(report.join("report.json")).unwrap()).unwrap();
+    let rows: Vec<_> = value["days_and_attempts"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|r| r["calendar_day"] == "20261027")
+        .collect();
+    assert_eq!(rows.len(), 2);
+    assert_eq!(rows[0]["status"], "network_timeout_or_tls_error");
+    assert_eq!(rows[1]["late_backfill"], true);
+}
+
+#[test]
+fn backfill_before_observation_start_does_not_invent_old_gap() {
+    let temp = tempfile::tempdir().unwrap();
+    let path = temp.path().join("journal");
+    let mut j = create_at(&path, config(), at());
+    start(&mut j, "before-start", "20261027", at());
+    finish(
+        &mut j,
+        "before-start",
+        "20261027",
+        "20261028",
+        at(),
+        late_previous_day(),
+    )
+    .unwrap();
+    let report = temp.path().join("report");
+    j.report(&report).unwrap();
+    let value: serde_json::Value =
+        serde_json::from_slice(&fs::read(report.join("report.json")).unwrap()).unwrap();
+    let rows: Vec<_> = value["days_and_attempts"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|r| r["calendar_day"] == "20261027")
+        .collect();
+    assert_eq!(rows.len(), 1);
+    assert_eq!(rows[0]["late_backfill"], true);
+    assert_eq!(value["status"]["actual_valid_forward_days"], 0);
+}
 #[test]
 fn exact_fen_and_volume_no_float_rounding() {
     let bar = parse_bar(&daily(), &config(), "20261028").unwrap();

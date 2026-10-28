@@ -1,0 +1,39 @@
+{
+  "evidence_kind": "actual_https_new_isolated_local_observer",
+  "journal_head": "dd145c62834bc68f2a16ed2c06a7f18a106a4550c37864f401b90f0a47f6d19a",
+  "events": 3,
+  "attempts": 1,
+  "actual_valid_forward_days": 1,
+  "strategy_proposals": 0,
+  "simulated_fills": 0,
+  "nav_fen": null,
+  "drawdown_bps": null,
+  "chain_checkpoint_raw_hashes_and_fixed_point_values_verified": true,
+  "previous_real_journal_head": "b7ba4a86e05c8ce3cf71c755afa8e7db2ff31fd3056b8b2ff6d12c610c084f52",
+  "previous_real_journal_events": 7,
+  "previous_real_journal_and_reports_preserved": true,
+  "original_blocked_journal_preserved": true,
+  "raw_responses": [
+    {
+      "api": "trade_cal",
+      "sha256": "c58a3f22477fcba061ab45ddb3bded36af9d318bc7b959e2e75505512348a6e1",
+      "received_at": 1793192837756,
+      "server_date": "Wed, 28 Oct 2026 13:06:54 GMT"
+    },
+    {
+      "api": "daily",
+      "sha256": "04994bab8f4b4e2140c75cb3d66e66de45dbc233c01268eb54214e09ef42306e",
+      "received_at": 1793192840090,
+      "server_date": "Wed, 28 Oct 2026 13:06:56 GMT"
+    }
+  ],
+  "report_hashes": {
+    "daily.csv": "0eb4f92e2600f06a5c3bf743648b31ef8e498b43a36b62a0db548d3335028223",
+    "events.json": "0a8a7c94963fa6c236d06b222b68fe001c4dd0f59d7bdde1e55afeaf8137d615",
+    "report.json": "5d9a9480d373d26b6142512a997ed7daac647827cadd926ea577ba642ae23d49"
+  },
+  "report_source_sha256": "6c4eae7cf9ac4e20c99df7ba585e85179d6a72808a52708b2d5b573db9d31859",
+  "raw_market_data_uploaded": false,
+  "credential_disclosure": "plaintext token occurred in development tool-execution records; not in Git/application logs/PR; value omitted",
+  "scope": "one actual date only; Owner accepts personal local use; no independent provider authorization certification"
+}

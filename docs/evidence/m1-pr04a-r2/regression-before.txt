@@ -1,0 +1,28 @@
+   Compiling ring v0.17.14
+   Compiling libsqlite3-sys v0.36.0
+   Compiling rustls v0.23.46
+   Compiling rusqlite v0.38.0
+   Compiling rustls-webpki v0.103.16
+   Compiling ureq v3.5.0
+   Compiling stratide-forward v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04a-worktree\crates\forward)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.56s
+     Running unittests src\lib.rs (target\debug\deps\stratide_forward-2871aec5ea900a9f.exe)
+
+running 1 test
+test tests::late_backfill_keeps_missed_day_gap_in_json_csv_and_after_restart ... FAILED
+
+failures:
+
+---- tests::late_backfill_keeps_missed_day_gap_in_json_csv_and_after_restart stdout ----
+
+thread 'tests::late_backfill_keeps_missed_day_gap_in_json_csv_and_after_restart' (22188) panicked at crates\forward\src\tests.rs:133:10:
+late backfill must not hide the missed forward day
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tests::late_backfill_keeps_missed_day_gap_in_json_csv_and_after_restart
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p stratide-forward --lib`

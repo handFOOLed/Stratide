@@ -9,6 +9,8 @@ use std::{
 
 #[derive(Serialize)]
 struct Daily {
+    #[serde(skip)]
+    on_day_attempt: bool,
     calendar_day: String,
     exchange: String,
     calendar_source: String,
@@ -45,6 +47,7 @@ struct Daily {
 }
 fn empty(day: &str, exchange: &str) -> Daily {
     Daily {
+        on_day_attempt: false,
         calendar_day: day.into(),
         exchange: exchange.into(),
         calendar_source: "unavailable".into(),
@@ -98,6 +101,7 @@ impl Journal {
                     let n = attempts.entry(trade_day.clone()).or_insert(0);
                     *n += 1;
                     let mut row = empty(trade_day, self.config().exchange());
+                    row.on_day_attempt = local_day(*observed_at)? == *trade_day;
                     row.run_id = Some(run_id.clone());
                     row.observed_at = Some(local_time(*observed_at)?);
                     row.status = "incomplete_collection_no_committed_response".into();
@@ -123,6 +127,7 @@ impl Journal {
                     row.duplicate_of = outcome.duplicate_of;
                     row.revision_of = outcome.revision_of;
                     row.late_backfill = outcome.late_backfill;
+                    row.on_day_attempt &= !outcome.late_backfill;
                     row.daily_raw_sha256 = outcome
                         .raw
                         .iter()
@@ -189,7 +194,12 @@ impl Journal {
         )?)?;
         while day <= last {
             let key = day.format("%Y%m%d").to_string();
-            if !rows.iter().any(|r| r.calendar_day == key) {
+            // A later receipt adds evidence, but cannot erase the missed day's gap.
+            // Keep on-day errors/incomplete attempts as their own explicit diagnostics.
+            if !rows
+                .iter()
+                .any(|r| r.calendar_day == key && r.on_day_attempt)
+            {
                 rows.push(empty(&key, self.config().exchange()));
             }
             day = day.succ_opt().ok_or("日期溢出")?;

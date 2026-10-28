@@ -1,12 +1,14 @@
 # M1-PR04A Sol 自测证据
 
+**历史记录：首次自测只描述当时提交。** 当前以 [R2](../m1-pr04a-r2/README.md) 和 Issue #7 的 Owner 更新为准：个人本机用途已由 Owner 接受，供应商独立授权未核实仅作限制披露，不自动要求书面证明或 Token 轮换。旧开发工具执行记录曾含明文 Token；“未进 Git/应用日志/报告”不能理解为零暴露，本文不重现值。旧 FAIL/BLOCKED 事实保留。
+
 日期：2026-10-28，Windows x64 / Asia/Taipei。**Sol 自测，非 Terra 独立验收。** 源码基于 `main` 的 `4b53cf8`，PR 头提交单独在 PR 描述中准确列明；文档和证据提交不改变已测试的代码。
 
 ## 真实来源探测
 
 先对现有 Tushare MCP 各执行一次 `daily(600000.SH,20261028)` 和 `trade_cal(SSE,20261028..20261028)`，均返回 1 行。这只证明该 MCP 通道，未保存包装响应、未当成本地 HTTP 原始字节证据，也没有把结果导入 journal。
 
-随后 Owner 为本任务提供凭证；未读取 Stockie 或其他项目配置。本地只在命令进程设置 `STRATIDE_TUSHARE_TOKEN`，通过 `try/finally` 清除；凭证未进入文件、日志、报告或 Git。本地 CLI `forward-source-check state/pr04a-owner-observer` 在开发中和最终代码上各进行一轮、每轮只有 daily/trade_cal 两个小请求，均成功，无购买、充值、重试循环。真正的 HTTP 原始响应只在内存解析后丢弃。`http-probe.json` 为最终一次的状态/哈希记录，不包含行情行或 Token。
+随后 Owner 为本任务提供凭证；未读取 Stockie 或其他项目配置。本地只在命令进程设置 `STRATIDE_TUSHARE_TOKEN`，通过 `try/finally` 清除；凭证未加入 Git、应用日志或报告；开发工具执行记录曾包含明文，不能称为零暴露。本地 CLI `forward-source-check state/pr04a-owner-observer` 在开发中和最终代码上各进行一轮、每轮只有 daily/trade_cal 两个小请求，均成功，无购买、充值、重试循环。真正的 HTTP 原始响应只在内存解析后丢弃。`http-probe.json` 为最终一次的状态/哈希记录，不包含行情行或 Token。
 
 最终 `provider.rs` SHA-256：`875d0111886afdb17b3ae81373d31ab5422cc5a099c6245931bfddcc048cb5ac`。`received_at` 为 UTC epoch 毫秒；最终探测 daily 为 2026-10-28 19:54:28.102 +08:00，trade_cal 为 19:54:28.973 +08:00。`clock_verified=true` 只表示 HTTPS Date 的粗粒度校验通过。实际账户积分总数、全部接口权限、长期稳定性未知；这两个端点在上述时刻的访问与关键字段可用已核验。
 

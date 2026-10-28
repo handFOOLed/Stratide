@@ -1,5 +1,7 @@
 # PR #8 补测后整改：Owner 声明确认与真实行情入 journal
 
+**历史记录：R1 实测只描述当时提交。** 当前以 [R2](../m1-pr04a-r2/README.md) 和 Issue #7 的 Owner 更新为准：个人本机用途已由 Owner 接受，供应商独立授权未核实仅作限制披露，不自动要求书面证明或 Token 轮换。旧开发工具执行记录曾含明文 Token；“未进 Git/应用日志/报告”不能理解为零暴露，本文不重现值。旧 FAIL/BLOCKED 事实保留。
+
 日期：2026-10-28（Asia/Taipei）。**Sol 配置与实测补充，不是独立验收 PASS。** 实测生产代码仍为 `f801dd57e3e8605d51404008dd229a221e11585c`；本次提交只更新文档和脱敏证据，未修改 Rust、Cargo、默认样例配置或既有账本。后续验收须绑定 PR 届时准确 HEAD。
 
 ## 补测意见如何处理
@@ -12,7 +14,7 @@ Owner 在本次整改对话回答了“本账户自动 daily/trade_cal 采集、
 
 ## 本机实际执行
 
-使用 Owner 先前明确为本任务提供的 Token，仅放在进程环境，finally 清除。没有将凭证落盘、复制其他项目配置、发给验收者或上传 GitHub。原始响应及带价格的报告只在本机，不提交云仓库。
+使用 Owner 先前明确为本任务提供的 Token，仅放在进程环境，finally 清除。没有建立凭据文件、复制其他项目配置、发给验收者或提交 GitHub；开发工具执行记录曾含明文 Token，这不同于应用环境变量入口或应用日志。原始响应及带价格的报告只在本机，不提交云仓库。
 
 ```text
 forward-init state/pr04a-owner-authorized-20261028 state/pr04a-owner-authorized-config.json

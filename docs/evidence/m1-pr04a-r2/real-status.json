@@ -1,0 +1,24 @@
+{
+  "mode": "forward_observation_only_v1",
+  "config": {
+    "observation_id": "owner-authorized-eod-20261028",
+    "instrument": "600000.SH",
+    "strategy_version": "none-observe-only-v1",
+    "source": "tushare_pro",
+    "license_note": "Owner confirmation in Stratide PR08 remediation chat, 2026-10-28: personal automated daily/trade_cal access and local raw-response retention for noncommercial paper observation are allowed within this account's 2000-point interface rights. Provenance: Owner declaration; not independent provider-written license certification. No raw-data redistribution or private-cloud raw storage granted.",
+    "local_automation_and_raw_storage_authorized": true
+  },
+  "started_at": "2026-10-28T21:07:07.808+08:00",
+  "head": "dd145c62834bc68f2a16ed2c06a7f18a106a4550c37864f401b90f0a47f6d19a",
+  "event_count": 3,
+  "actual_valid_forward_days": 1,
+  "collection_attempts": 1,
+  "pending_runs": 0,
+  "clock_halted": false,
+  "local_source_authorization_recorded": true,
+  "nav_fen": null,
+  "drawdown_bps": null,
+  "strategy_proposals": 0,
+  "simulated_fills": 0,
+  "pause_reason": "observe_only_no_independent_opening_rules_or_cost_evidence"
+}

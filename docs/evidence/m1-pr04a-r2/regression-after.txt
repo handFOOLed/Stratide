@@ -1,0 +1,7 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running unittests src\lib.rs (target\debug\deps\stratide_forward-2871aec5ea900a9f.exe)
+
+running 1 test
+test tests::late_backfill_keeps_missed_day_gap_in_json_csv_and_after_restart ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.03s
