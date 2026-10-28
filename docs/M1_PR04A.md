@@ -1,5 +1,7 @@
 # M1-PR04A：真实 EOD 来源探测与 observe-only 观察日志
 
+**最新状态（2026-10-28）：PR #8 已通过限定范围独立技术验收和 ChatGPT 同 SHA 源码审查，已合并到 main**。验收 HEAD `295751cf15bfaa68407dd243f45394b5147e1227`；merge `1ef06eb1d17f8796e3b43d2ad0a903382fa0fd23`。[Terra 独立报告](https://github.com/handFOOLed/Stratide/pull/8#issuecomment-6471878822) 记录 Windows 89 项测试 PASS、实际原始 journal 的独立离线复算及报告恢复；此次验收**未独立发出 HTTPS**。已交付真实 Tushare 单日盘后观察、独立 append-only journal、迟到与漏采并存的报告；当前**1 个有效前向日 / 0 提案 / 0 模拟成交 / NAV 和回撤不可用**。整个 M1、连续多日观察、独立开盘信息和可信 Paper 成交仍未完成。Owner 个人非商业用途接受范围、供应商授权尚未独立核实、旧开发工具记录曾包含明文 Token 等限制继续披露。**以下原先 BLOCKED / Draft 描述是当时历史状态，不应解读为当前合并状态。**
+
 **当前进展（2026-10-28，R2）：** 已修复晚到补录隐藏当日漏采的 P1，补充 JSON/CSV、重新打开日志后的报告回归和新路径真实 CLI smoke，见 [R2 修复记录](evidence/m1-pr04a-r2/README.md)。既有真实 EOD 已入本机 journal，仍只有 1 个有效前向日，0 提案/成交。按 Owner 最新决定，个人非商业本机研究可继续开发与验收，不额外强制供应商书面证明、旧 Token 轮换、密码库、迁移目录或虚拟机；Owner 用途声明与未经独立核实的供应商许可分别披露。开发工具执行记录曾含 Token 明文，不能把“未进 Git/应用日志”泛化为未暴露。Sol 不合并，等待最终 SHA 独立复验与小猫审查。
 
 **历史状态：首次提交 f801dd5 时为 Draft / BLOCKED。** 当时：**本机真实 HTTPS 接口访问及关键字段通过 Sol 自测；自动盘后采集与持久保存许可仍未核验。没有成功真实采集入 journal，不能宣称 PR04A 真实数据验收完成。** 任务 [Issue #7](https://github.com/handFOOLed/Stratide/issues/7)，基线为 fetch 后的 `main`：`4b53cf8`（完整基线见 PR）。Sol 不合并；Terra 对准确 HEAD 独立验收，小猫同 SHA 源码审查并经 Owner 授权后受控合并。
