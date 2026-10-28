@@ -1,6 +1,6 @@
 # Stratide 模拟交易优先路线图｜给 Sol / Terra / ChatGPT 的执行约定
 
-状态：**M0-PR01 [PR #2](https://github.com/handFOOLed/Stratide/pull/2)、PR-02 [PR #4](https://github.com/handFOOLed/Stratide/pull/4)、PR-03 [PR #6](https://github.com/handFOOLed/Stratide/pull/6) 已合并；M1-PR04A [PR #8](https://github.com/handFOOLed/Stratide/pull/8) 已实现本机真实 EOD 只观察日志（1 个有效前向日、0 提案/成交），P1 漏采显示修复与当前测试见 [R2](evidence/m1-pr04a-r2/README.md)，仍待最终 SHA 独立复验及小猫审查。** 多日持续观察和独立开盘成交留 PR04B，不能宣称整个 M1 已完成。Owner 接受个人非商业本机用途，供应商授权未独立核实作为限制披露；不强制书面证明或轮换作为本轮前置。开发执行记录曾含 Token 明文，Git/应用日志/PR 不含值，是否轮换由 Owner 决定。关联 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md)。
+状态：**M0-PR01 [PR #2](https://github.com/handFOOLed/Stratide/pull/2)、PR-02 [PR #4](https://github.com/handFOOLed/Stratide/pull/4)、PR-03 [PR #6](https://github.com/handFOOLed/Stratide/pull/6) 与 M1-PR04A [PR #8](https://github.com/handFOOLed/Stratide/pull/8) 均已合并。** PR04A 经 [Terra Windows 独立技术 PASS（89 测试、真实 journal 离线复验）](https://github.com/handFOOLed/Stratide/pull/8#issuecomment-6471878822) 和 [小猫源码审查 PASS](https://github.com/handFOOLed/Stratide/pull/8#pullrequestreview-5684495112)，以 HEAD `295751cf15bfaa68407dd243f45394b5147e1227` 合并，merge `1ef06eb1d17f8796e3b43d2ad0a903382fa0fd23`。当前仅 **1 个真实有效前向观察日、0 提案/成交，NAV/回撤不可用**；独立验收未重复 HTTP 实际联网，仅对 Sol 本机 raw/journal 复算。**M1 仍未完成，下一步 PR04B 需验证独立开盘证据、持续多日真实观察和可信 Paper 决策/成交。** Owner 接受个人非商业本机使用，供应商正式许可未获独立核实（仅作限制披露、不自动禁止个人开发）；历史执行记录曾包含明文 Token，不能改写为无暴露。禁止公开再分发行情或将观察日志当实盘/盈利证明。关联 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md)。
 
 ## 完成的样子
 
