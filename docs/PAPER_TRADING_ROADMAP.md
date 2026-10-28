@@ -1,6 +1,6 @@
 # Stratide 模拟交易优先路线图｜给 Sol / Terra / ChatGPT 的执行约定
 
-状态：**M0-PR01 [PR #2](https://github.com/handFOOLed/Stratide/pull/2)、M0-PR02 [PR #4](https://github.com/handFOOLed/Stratide/pull/4)、M0-PR03 [PR #6](https://github.com/handFOOLed/Stratide/pull/6) 均已完成 Windows Terra 独立验收、ChatGPT 源码审查并合并。PR-03 merge `13de8d43f663caa16c983609d2d5161ca497d123`：已交付合成数据驱动的确定性回放、可审计 CSV/JSON 报告与中断恢复。M1 真实来源前向 paper 观察尚未实现/验收；Linux/macOS、真实行情许可和物理断电均未验证。** 关联 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md)、[M0](M0.md)、[RISK_POLICY](RISK_POLICY.md)、[AGENTS](../AGENTS.md)。
+状态：**M0-PR01 [PR #2](https://github.com/handFOOLed/Stratide/pull/2)、M0-PR02 [PR #4](https://github.com/handFOOLed/Stratide/pull/4)、M0-PR03 [PR #6](https://github.com/handFOOLed/Stratide/pull/6) 均已完成 Windows Terra 独立验收、ChatGPT 源码审查并合并。PR-03 merge `13de8d43f663caa16c983609d2d5161ca497d123`：已交付合成数据驱动的确定性回放、可审计 CSV/JSON 报告与中断恢复。下一任务：[M1-PR04A Issue #7](https://github.com/handFOOLed/Stratide/issues/7) 已创建（真实 A 股盘后来源核验、只观察且不可回写的前向 journal）；Sol 尚未完成开发，Terra 尚未验收。M1 真实数据前向观察、独立开盘证据与模拟交易尚未实现/验收；Linux/macOS、行情使用许可和物理断电均未验证。** 关联 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md)、[M0](M0.md)、[RISK_POLICY](RISK_POLICY.md)、[AGENTS](../AGENTS.md)。
 
 ## 完成的样子
 
