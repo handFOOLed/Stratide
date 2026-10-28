@@ -1,6 +1,6 @@
 # Stratide 模拟交易优先路线图｜给 Sol / Terra / ChatGPT 的执行约定
 
-状态：**M0-PR01 已通过验收并合并（[PR #2](https://github.com/handFOOLed/Stratide/pull/2)）；M0-PR02 模拟成交、原子预留与单写入者 SQLite 账本已由 Terra 在 Windows 独立 PASS、ChatGPT 审查放行并合并（[PR #4](https://github.com/handFOOLed/Stratide/pull/4)，merge `ed36f8328353fa63941a28b7df7224d02247708a`）。当前下一任务为 [M0-PR03 Issue #5](https://github.com/handFOOLed/Stratide/issues/5)：可复现历史回放与报告。前向 paper 观察、真实行情与真实券商仍未实现或验收。** 关联 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md)、[M0](M0.md)、[RISK_POLICY](RISK_POLICY.md)、[AGENTS](../AGENTS.md)。
+状态：**M0-PR01 [PR #2](https://github.com/handFOOLed/Stratide/pull/2)、M0-PR02 [PR #4](https://github.com/handFOOLed/Stratide/pull/4)、M0-PR03 [PR #6](https://github.com/handFOOLed/Stratide/pull/6) 均已完成 Windows Terra 独立验收、ChatGPT 源码审查并合并。PR-03 merge `13de8d43f663caa16c983609d2d5161ca497d123`：已交付合成数据驱动的确定性回放、可审计 CSV/JSON 报告与中断恢复。M1 真实来源前向 paper 观察尚未实现/验收；Linux/macOS、真实行情许可和物理断电均未验证。** 关联 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md)、[M0](M0.md)、[RISK_POLICY](RISK_POLICY.md)、[AGENTS](../AGENTS.md)。
 
 ## 完成的样子
 
@@ -52,9 +52,9 @@ Owner 在 Windows 本地能用 CLI 启动一个 paper-only 模拟账户，看到
 
 **Sol — 写生产代码与自测：** 每个 PR 聚焦单个可审查增量；提供设计取舍、可运行命令、数据来源/假设、变更文件、复现样例、已知限制。Sol 不自行 merge，不通过删测试或伪造行情解释错误。
 
-**Terra — 独立测试、验收与合并：** 在 PR 指定提交 SHA 下，从干净环境执行或明确记录不能执行的平台测试；复算资金与持仓守恒，验证单次成交/拒单、持久化重启、费用、交易日、数据延迟、时间穿越、指标与导出完整性。写独立验收结果（实际命令、环境、输出摘要、失败/未验证），若测试需补充交给 Sol 修复；不能把 Sol 的自测宣称为独立结果。只有在小猫审查无开放阻断项后 Terra 才可合并。
+**Terra — 独立测试、验收（不再负责最终合并）：** 在 PR 指定提交 SHA 下，从干净环境执行或明确记录不能执行的平台测试；复算资金与持仓守恒，验证单次成交/拒单、持久化重启、费用、交易日、数据延迟、时间穿越、指标与导出完整性。写独立验收结果（实际命令、环境、输出摘要、失败/未验证），若测试需补充交给 Sol 修复；不能把 Sol 的自测宣称为独立结果。Terra 将准确 SHA 对应的独立 PASS/FAIL 和证据发布到 PR；未经复验不得替代。最终合并由小猫在审查通过后执行。
 
-**ChatGPT（小猫）— 独立代码审查：** Owner 将 PR 链接发送至会话后，我核对 PR diff、对应 ADR、已知风险、测试覆盖和 Terra 证据，按 **Blocker / Major / Minor** 出具审查结果；只有 Blocker 与 Major 全部解决或 Owner 认可有据记录为不阻断的风险，才建议 Terra 合并。我不会声称能在聊天之外自动监听全部 PR。
+**ChatGPT（小猫）— 代码审查与精确 SHA 合并：** Owner 将 PR 链接发送至会话后，我核对 PR diff、对应 ADR、已知风险、测试覆盖和 Terra 证据，按 **Blocker / Major / Minor** 出具审查结果；只有 Blocker 与 Major 全部解决或 Owner 认可有据记录为不阻断的风险，才经 Owner 授权，在最终核对 HEAD、验收 SHA、无新阻断项及 GitHub 实际合并条件后，使用 `expected_head_sha` 执行合并并记录 merge SHA。我不会声称能在聊天之外自动监听全部 PR。
 
 **Owner — 决定范围与观察：** 定期运行或查阅真实导出的 paper 报告，按实际观察结果决定数据源、策略、下一阶段。任何实盘资金/券商接入必须再得到单独授权和合规/风控验收。
 
@@ -67,7 +67,7 @@ Owner 在 Windows 本地能用 CLI 启动一个 paper-only 模拟账户，看到
 - [ ] 模拟异常/重启/重复事件不导致双重成交、负现金或自动解开熔断
 - [ ] 历史/合成/前向证据标签准确，没有任何未来函数或模拟变实盘的暗示
 - [ ] 小猫已审查完整 diff 与 Terra 验收证据，无未解决的 Blocker/Major
-- [ ] Terra 在对应审查 SHA 上执行 merge，并记录合并提交与尚未覆盖的限制
+- [ ] ChatGPT 经 Owner 授权在对应审查 SHA 上执行 merge，并记录合并提交与尚未覆盖的限制
 
 ## 非目标
 
