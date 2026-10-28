@@ -7,17 +7,19 @@
 **自主量化交易与开放式策略发现平台**  
 *Autonomous Quantitative Trading & Open-Ended Strategy Discovery*
 
-> **当前状态：M0-PR01 内存风控切片，尚不是可用的交易系统。** 已实现交易提案契约、独立风险审查和合成 CLI 示例；尚未实现模拟成交、持久账本、行情接入或持续模拟交易。**请勿使用当前代码管理真实资金。**
+> **当前状态：M0-PR02 paper-only 开发实现，等待独立验收。** 已实现单写入者持久化 Paper Ledger、原子预留、执行前再风控、保守日线模拟成交和重启恢复。内置样例仅为 `synthetic_test` 人工行情与费率；未接入真实行情、券商或持续前向模拟。**请勿使用当前代码管理真实资金。**
 
 人工成交先记入独立待归属账簿，不推断策略组归属，见 [ADR-032](docs/adr/0032-manual-trades-suspense-ledger-unassigned-attribution.md)；最终由 Owner 显式选择归属组别和数量，不允许自动按比例猜测或修改真实成交，见 [ADR-033](docs/adr/0033-owner-explicit-manual-fill-group-attribution.md)。
 
+R2 修复已自测，等待新 SHA 重新独立验收；原提交和 R1 均未通过验收。日线成交要求订单有效期严格覆盖完整交易时段，开盘资格不代表确定成交时刻；缺行情仍可补数重试。v1／v2 账本保留且拒绝自动迁移，新模型为 v3。详见 [R2 修复说明](docs/M0_PR02_R2.md)。
+
 ## 当前优先任务：可观察的模拟交易
 
-根据 [ADR-037](docs/adr/0037-observable-paper-trading-first-and-independent-review-gates.md)，先实现可复现的单策略模拟交易内核（M0），再接入真实来源行情进行前向 Paper Trading 观察（M1），输出净值、持仓、成交、费用、回撤及风险拒单等可核实报告。**GPT-6.1 Sol 编码、GPT-6.1 Terra 独立测试和验收并在审查通过后合并、ChatGPT 审查 PR、Owner 观察效果及决定范围**。详细 PR 交付与验收标准见 [模拟交易路线图](docs/PAPER_TRADING_ROADMAP.md)。所有结果须区分合成、历史回放和前向模拟；当前未交付这些能力，仍不能用于真实资金。
+根据 [ADR-037](docs/adr/0037-observable-paper-trading-first-and-independent-review-gates.md)，先实现可复现的单策略模拟交易内核（M0），再接入真实来源行情进行前向 Paper Trading 观察（M1），输出净值、持仓、成交、费用、回撤及风险拒单等可核实报告。**GPT-6.1 Sol 编码、GPT-6.1 Terra 独立测试和验收并在审查通过后合并、ChatGPT 审查 PR、Owner 观察效果及决定范围**。详细 PR 交付与验收标准见 [模拟交易路线图](docs/PAPER_TRADING_ROADMAP.md)。所有结果须区分合成、历史回放和前向模拟；当前只交付 M0 的窄范围模拟内核，仍不能用于真实资金。
 
 ## 项目愿景
 
-PR-01 的实际功能、运行方式、自测记录及 PR-02 依赖见 [M0-PR01 实现说明](docs/M0_PR01.md)。本轮自测不代替 Terra 独立验收与 ChatGPT 审查；本轮不合并 PR。
+本轮功能、运行示例、自测与未验证范围见 [M0-PR02 实现说明](docs/M0_PR02.md)。PR-01 的历史功能和自测见 [M0-PR01 实现说明](docs/M0_PR01.md)。本轮自测不代替 Terra 独立验收与 ChatGPT 审查；本轮不合并 PR。
 
 Stratide 是面向个人用户的**低资源占用、本地优先**的自动化交易平台。它允许云端 AI Agent 自主探索新的交易策略，但所有实际交易必须受到**独立、不可绕过的风控系统**约束。
 
@@ -62,11 +64,12 @@ Stratide 是面向个人用户的**低资源占用、本地优先**的自动化�
 ```text
 apps/
   stratided/           Rust 后台服务占位程序
-  stratide-cli/        本地状态与 synthetic_test 风控示例
+  stratide-cli/        本地风险示例与持久 Paper CLI
   dashboard/           未来的私有 Web 控制台（未实现）
 crates/
   contracts/           Paper 账户、提案与可信快照契约
   risk/                独立 Paper 风险审查（无下单/成交）
+  ledger/              Paper 撮合、原子预留与 SQLite 事件账本
 research/              云端 Agent / 远程计算的设计说明
 config/                配置与部署说明
 scripts/               本地辅助工具说明
@@ -83,7 +86,7 @@ Cargo.toml             Rust Workspace
 README.en.md           English README
 ```
 
-数据、策略运行时、执行、持久账本、控制 API 等模块**尚未实现**；后续只在真实开发任务需要时增加，不提前堆空目录和无意义的抽象。
+真实数据接入、策略运行时、真实券商执行与控制 API **尚未实现**；后续只在真实开发任务需要时增加，不提前堆空目录和无意义的抽象。
 
 ## 本地运行
 
@@ -95,9 +98,16 @@ cargo test --workspace
 cargo run -p stratide-cli -- status
 cargo run -p stratide-cli -- risk-demo --initial-cash-fen 1000000 --max-order-fen 500000 --account-cap-fen 800000 --strategy-cap-fen 500000 --daily-loss-fen 100000 --drawdown-fen 200000
 cargo run -p stratided
+
+# state/ 是运行数据目录；仅创建父目录，不覆盖任何已有账户。
+New-Item -ItemType Directory -Force state | Out-Null
+cargo run -p stratide-cli -- paper-create state/paper-demo-r2 --initial-cash-fen 1000000 --max-order-fen 500000 --account-cap-fen 800000 --strategy-cap-fen 500000 --daily-loss-fen 100000 --drawdown-fen 200000
+cargo run -p stratide-cli -- paper-submit-synthetic state/paper-demo-r2
+cargo run -p stratide-cli -- paper-match-synthetic state/paper-demo-r2
+cargo run -p stratide-cli -- paper-status state/paper-demo-r2
 ```
 
-`risk-demo` 的价格、规则、费用与时间均为固定 `synthetic_test` 输入，金额参数以整数分显式传入，无默认本金；接受提案不代表成交，也不改变现金或持仓。`stratided` 仍是占位程序。**编译成功不代表能够安全交易**；实际 Windows 自测及未验证项见 [实现说明](docs/M0_PR01.md)。
+`risk-demo` 的价格、规则、费用与时间均为固定 `synthetic_test` 输入，金额参数以整数分显式传入，无默认本金；接受提案不代表成交，也不改变现金或持仓。`stratided` 仍是占位程序。**编译成功不代表能够安全交易**；Windows 若未加载 MSVC 开发环境，可用 `./scripts/with-msvc.ps1` 代替 `cargo`。实际自测和未验证项见 [本轮实现说明](docs/M0_PR02.md)。
 
 仓库：[handFOOLed/Stratide](https://github.com/handFOOLed/Stratide)（Private）。请使用正常的 GitHub 身份认证拉取，不要将 API Key、券商凭据或个人账户数据提交到仓库。
 

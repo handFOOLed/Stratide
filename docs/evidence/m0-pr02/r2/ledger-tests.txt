@@ -1,0 +1,41 @@
+   Compiling stratide-ledger v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m0-pr02\crates\ledger)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.15s
+     Running unittests src\lib.rs (target\debug\deps\stratide_ledger-614a10d826bfcbf1.exe)
+
+running 28 tests
+test store::tests::crash_child ... ok
+test store::tests::failed_storage_write_poisons_handle_and_preserves_committed_locks ... ok
+test store::tests::acceptance_intraday_expiry_cannot_use_unordered_full_day_crossing ... ok
+test store::tests::expiry_releases_reservations_but_never_clears_uncertainty_or_loss_locks ... ok
+test store::tests::acceptance_missing_bar_can_be_retried_after_evidence_arrives ... ok
+test store::tests::acceptance_closing_mark_cannot_retroactively_block_intraday_fill ... ok
+test store::tests::r1::genuine_opening_loss_blocks_buy_even_when_close_recovers ... ok
+test store::tests::r1::committed_close_observation_cannot_be_rolled_back_to_replay_opening_risk ... ok
+test store::tests::opening_nav_overflow_blocks_fill_without_discarding_closing_loss_lock ... ok
+test store::tests::partial_fills_event_order_idempotency_restart_and_exact_accounting ... ok
+test store::tests::independent_observation_rejection_peak_flows_and_financial_locks_survive_disk ... ok
+test store::tests::fee_expiry_and_updated_risk_block_previously_accepted_buy ... ok
+test store::tests::r2::intraday_expiry_reservation_cannot_be_released_for_other_opening_reviews ... ok
+test store::tests::r1::closing_price_only_changes_post_execution_nav_not_fill_eligibility ... ok
+test store::tests::stale_approvals_cannot_double_reserve_cash_or_sellable_shares ... ok
+test store::tests::r1::legacy_v1_and_v2_ledgers_are_preserved_without_automatic_reinterpretation ... ok
+test store::tests::r2::partial_fill_remaining_expiry_never_adds_later_fills_or_fees_after_restart ... ok
+test store::tests::writer_exclusion_is_real_process_and_lock_releases_on_exit ... ok
+test store::tests::r2::delayed_receipt_uses_market_window_not_receipt_time_for_expiry ... ok
+test store::tests::r2::favorable_open_is_not_an_exception_for_short_validity ... ok
+test store::tests::suspended_or_single_price_session_still_observes_unrealized_loss ... ok
+test store::tests::r1::incomplete_bar_or_rules_retry_survives_restart_without_reusing_valid_capacity ... ok
+test store::tests::t_plus_one_lots_sell_costs_and_shared_liquidity ... ok
+test store::tests::r1::missing_future_or_stale_opening_evidence_never_gets_invented_from_daily_bar ... ok
+test store::tests::corrupted_empty_old_or_missing_ledger_never_initializes ... ok
+test store::tests::no_same_day_future_stale_unverified_suspended_limit_touch_or_missing_data_fills ... ok
+test store::tests::r2::full_day_evidence_requires_exclusive_expiry_after_close_for_buys_and_sells ... ok
+test store::tests::process_death_before_after_reservation_fill_expiry_and_lock_commits_is_atomic ... ok
+
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.53s
+
+   Doc-tests stratide_ledger
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

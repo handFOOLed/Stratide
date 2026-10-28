@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running unittests src\lib.rs (target\debug\deps\stratide_ledger-614a10d826bfcbf1.exe)
+
+running 3 tests
+test store::tests::acceptance_intraday_expiry_cannot_use_unordered_full_day_crossing ... ok
+test store::tests::acceptance_closing_mark_cannot_retroactively_block_intraday_fill ... ok
+test store::tests::acceptance_missing_bar_can_be_retried_after_evidence_arrives ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.02s

@@ -1,0 +1,292 @@
+use std::process::Command as Process;
+use stratide_contracts::{Cny, PositionMark, Timestamp, TradingDay};
+use stratide_ledger::{synthetic as fixture, Command, OrderStatus, State};
+use stratide_risk::{FreezeReason, RiskScope};
+
+fn cli(args: &[&str]) -> std::process::Output {
+    Process::new(env!("CARGO_BIN_EXE_stratide-cli"))
+        .args(args)
+        .output()
+        .unwrap()
+}
+fn success(args: &[&str]) -> State {
+    let out = cli(args);
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    serde_json::from_slice(&out.stdout).unwrap()
+}
+fn create(path: &str) -> State {
+    success(&[
+        "paper-create",
+        path,
+        "--initial-cash-fen",
+        "1000000",
+        "--max-order-fen",
+        "500000",
+        "--account-cap-fen",
+        "800000",
+        "--strategy-cap-fen",
+        "500000",
+        "--daily-loss-fen",
+        "10000",
+        "--drawdown-fen",
+        "15000",
+    ])
+}
+fn apply(path: &str, file: &std::path::Path, id: &str, cmd: Command) -> State {
+    std::fs::write(file, serde_json::to_vec(&cmd).unwrap()).unwrap();
+    success(&["paper-apply", path, id, file.to_str().unwrap()])
+}
+fn observation(price: i64, now: i64, day: u32, flow: i64) -> Command {
+    Command::Observe {
+        now: Timestamp(now),
+        day: TradingDay(day),
+        external_flow_fen: flow,
+        marks: vec![PositionMark {
+            instrument: fixture::instrument(),
+            price: Cny::from_fen(price).unwrap(),
+            as_of: Timestamp(now),
+            available_at: Timestamp(now),
+            source: "synthetic_test/CLI-mark-v1".into(),
+        }],
+    }
+}
+
+#[test]
+fn actual_cli_create_submit_fill_reopen_retry_and_deterministic_second_run() {
+    let temp = tempfile::tempdir().unwrap();
+    let mut results = vec![];
+    for name in ["a", "b"] {
+        let path = temp.path().join(name);
+        let path = path.to_str().unwrap();
+        let initial = create(path);
+        assert_eq!(initial.snapshot.cash.fen(), 1_000_000);
+        let submitted = success(&["paper-submit-synthetic", path]);
+        assert_eq!(submitted.snapshot.pending_orders.len(), 1);
+        assert_eq!(
+            submitted.snapshot.pending_orders[0].reserved_cash.fen(),
+            100_200
+        );
+        let filled = success(&["paper-match-synthetic", path]);
+        assert_eq!(filled.snapshot.cash.fen(), 899_969);
+        assert_eq!(filled.snapshot.positions[0].quantity, 100);
+        assert_eq!(filled.fills[0].fees.total().unwrap().fen(), 31);
+        assert_eq!(filled.orders[0].status, OrderStatus::Filled);
+        // Every call above exited. Production library recovers from disk anew.
+        let recovered = success(&["paper-status", path]);
+        assert_eq!(filled, recovered);
+        assert_eq!(success(&["paper-submit-synthetic", path]), filled);
+        assert_eq!(success(&["paper-match-synthetic", path]), filled);
+        assert_eq!(cli(&["paper-create", path]).status.code(), Some(2));
+        results.push(filled);
+    }
+    assert_eq!(results[0], results[1]);
+}
+
+#[test]
+fn real_process_restarts_preserve_peak_flow_rejected_order_locks_and_missing_valuation() {
+    let temp = tempfile::tempdir().unwrap();
+    let path = temp.path().join("account");
+    let path = path.to_str().unwrap();
+    let file = temp.path().join("trusted-command.json");
+    create(path);
+    success(&["paper-submit-synthetic", path]);
+    success(&["paper-match-synthetic", path]);
+    let t = fixture::T0 + fixture::DAY;
+    let peak = apply(path, &file, "peak", observation(1200, t + 1, 20261029, 0));
+    assert_eq!(peak.risk.peak().fen(), 1_019_969);
+    let withdrawn = apply(
+        path,
+        &file,
+        "withdraw",
+        observation(1200, t + 2, 20261029, -10000),
+    );
+    assert_eq!(withdrawn.risk.peak(), peak.risk.peak());
+    let deposited = apply(
+        path,
+        &file,
+        "deposit",
+        observation(1200, t + 3, 20261029, 10000),
+    );
+    assert_eq!(deposited.risk.peak(), peak.risk.peak());
+    let loss = apply(
+        path,
+        &file,
+        "loss-without-proposal",
+        observation(800, t + 4, 20261029, 0),
+    );
+    for scope in [RiskScope::Account, RiskScope::Strategy] {
+        assert!(loss.risk.freezes(scope).contains(&FreezeReason::DailyLoss));
+        assert!(loss.risk.freezes(scope).contains(&FreezeReason::Drawdown));
+    }
+    let mut p = fixture::proposal(&loss.config, 2);
+    p.decision_at = Timestamp(t + 4);
+    p.data_available_at = p.decision_at;
+    p.earliest_execution_at = Timestamp(t + 5);
+    let rejected = apply(
+        path,
+        &file,
+        "reject-no-cost",
+        Command::Submit {
+            proposal: p,
+            now: Timestamp(t + 4),
+            day: TradingDay(20261029),
+            rules: None,
+            fees: None,
+        },
+    );
+    assert_eq!(rejected.orders[1].status, OrderStatus::Rejected);
+    assert_eq!(rejected.risk, loss.risk);
+    let missing = apply(
+        path,
+        &file,
+        "missing-marks",
+        Command::Observe {
+            now: Timestamp(t + 5),
+            day: TradingDay(20261029),
+            marks: vec![],
+            external_flow_fen: 0,
+        },
+    );
+    assert!(missing.valuation_error.is_some());
+    assert_eq!(success(&["paper-status", path]), missing);
+    let recovered = apply(
+        path,
+        &file,
+        "marks-return",
+        observation(1000, t + 6, 20261029, 0),
+    );
+    assert!(recovered.valuation_error.is_none());
+    assert_eq!(recovered.risk, loss.risk);
+    let next = apply(
+        path,
+        &file,
+        "next-day",
+        observation(1000, t + fixture::DAY, 20261030, 0),
+    );
+    assert_eq!(next.risk, loss.risk);
+}
+
+#[test]
+fn missing_session_retry_and_open_then_close_order_survive_real_cli_processes() {
+    let temp = tempfile::tempdir().unwrap();
+    let path = temp.path().join("account");
+    let path = path.to_str().unwrap();
+    let file = temp.path().join("command.json");
+    create(path);
+    success(&["paper-submit-synthetic", path]);
+    let first = success(&["paper-match-synthetic", path]);
+    let mut p = fixture::proposal(&first.config, 2);
+    p.decision_at = Timestamp(fixture::T0 + fixture::DAY);
+    p.data_available_at = p.decision_at;
+    p.earliest_execution_at = Timestamp(p.decision_at.0 + 1);
+    let submitted = apply(
+        path,
+        &file,
+        "second-buy",
+        fixture::submit(
+            p,
+            TradingDay(20261029),
+            Timestamp(fixture::T0 + fixture::DAY),
+        ),
+    );
+    let mut b = fixture::bar(TradingDay(20261030), 2);
+    b.low = Cny::from_fen(800).unwrap();
+    b.close = b.low;
+    let opening = b.opens_at;
+    let closing = b.available_at;
+    let good = fixture::session(b);
+    let mut missing = good.clone();
+    if let Command::Match { bar, .. } = &mut missing {
+        *bar = None;
+    }
+    let failed = apply(path, &file, "missing", missing.clone());
+    assert_eq!(failed.snapshot.as_of, submitted.snapshot.as_of);
+    assert_eq!(
+        failed.snapshot.pending_orders,
+        submitted.snapshot.pending_orders
+    );
+    assert_eq!(success(&["paper-status", path]), failed);
+    let filled = apply(path, &file, "corrected", good.clone());
+    assert_eq!(filled.fills.len(), 2);
+    assert_eq!(filled.orders[1].status, OrderStatus::Filled);
+    assert_eq!(filled.snapshot.cash.fen(), 799938);
+    assert_eq!(filled.equity.unwrap().fen(), 959938);
+    assert_eq!(filled.fills[1].risk_checked_at, opening);
+    assert_eq!(filled.fills[1].simulated_at, closing);
+    assert!(filled
+        .risk
+        .freezes(RiskScope::Account)
+        .contains(&FreezeReason::DailyLoss));
+    assert_eq!(success(&["paper-status", path]), filled);
+    assert_eq!(apply(path, &file, "missing", missing), filled);
+    assert_eq!(apply(path, &file, "corrected", good.clone()), filled);
+    std::fs::write(&file, serde_json::to_vec(&good).unwrap()).unwrap();
+    assert_eq!(
+        cli(&[
+            "paper-apply",
+            path,
+            "repeat-with-new-id",
+            file.to_str().unwrap()
+        ])
+        .status
+        .code(),
+        Some(2)
+    );
+    assert_eq!(success(&["paper-status", path]), filled);
+}
+
+#[test]
+fn expiry_window_is_persisted_across_real_cli_processes_without_replayed_fills() {
+    let temp = tempfile::tempdir().unwrap();
+    let file = temp.path().join("expiry-command.json");
+    let b = fixture::bar(TradingDay(20261029), 1);
+    for (name, expiry) in [
+        ("open", b.opens_at.0),
+        ("intraday", b.opens_at.0 + 1),
+        ("close", b.closes_at.0),
+        ("after-close", b.closes_at.0 + 1),
+    ] {
+        let directory = temp.path().join(name);
+        let path = directory.to_str().unwrap();
+        let initial = create(path);
+        let mut p = fixture::proposal(&initial.config, 9901);
+        p.expires_at = Timestamp(expiry);
+        let submit = fixture::submit(p, TradingDay(20261028), Timestamp(fixture::T0));
+        let submitted = apply(path, &file, "expiry-submit", submit.clone());
+        assert_eq!(submitted.orders[0].status, OrderStatus::Open);
+        assert_eq!(success(&["paper-status", path]), submitted);
+        let cmd = fixture::session(b.clone());
+        let final_state = apply(path, &file, "expiry-match", cmd.clone());
+        if expiry <= b.closes_at.0 {
+            assert_eq!(final_state.orders[0].status, OrderStatus::Expired);
+            assert!(final_state.fills.is_empty());
+            assert!(final_state.snapshot.positions.is_empty());
+            assert_eq!(final_state.snapshot.cash.fen(), 1000000);
+        } else {
+            assert_eq!(final_state.orders[0].status, OrderStatus::Filled);
+            assert_eq!(final_state.fills.len(), 1);
+            assert_eq!(final_state.snapshot.cash.fen(), 899969);
+        }
+        assert!(final_state.snapshot.pending_orders.is_empty());
+        assert_eq!(success(&["paper-status", path]), final_state);
+        assert_eq!(apply(path, &file, "expiry-submit", submit), final_state);
+        assert_eq!(apply(path, &file, "expiry-match", cmd.clone()), final_state);
+        std::fs::write(&file, serde_json::to_vec(&cmd).unwrap()).unwrap();
+        assert_eq!(
+            cli(&[
+                "paper-apply",
+                path,
+                "new-id-same-session",
+                file.to_str().unwrap()
+            ])
+            .status
+            .code(),
+            Some(2)
+        );
+        assert_eq!(success(&["paper-status", path]), final_state);
+    }
+}

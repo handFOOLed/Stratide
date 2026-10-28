@@ -1,0 +1,23 @@
+   Compiling libsqlite3-sys v0.36.0
+   Compiling rusqlite v0.38.0
+   Compiling stratide-ledger v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m0-pr02\crates\ledger)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.69s
+     Running unittests src\lib.rs (target\debug\deps\stratide_ledger-614a10d826bfcbf1.exe)
+
+running 3 tests
+
+thread 'store::tests::acceptance_intraday_expiry_cannot_use_unordered_full_day_crossing' (23648) panicked at crates\ledger\src\store\tests.rs:84:5:
+full-day high/low cannot prove a crossing before expiry
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test store::tests::acceptance_intraday_expiry_cannot_use_unordered_full_day_crossing ... FAILED
+test store::tests::acceptance_closing_mark_cannot_retroactively_block_intraday_fill ... ok
+test store::tests::acceptance_missing_bar_can_be_retried_after_evidence_arrives ... ok
+
+failures:
+
+failures:
+    store::tests::acceptance_intraday_expiry_cannot_use_unordered_full_day_crossing
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 20 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p stratide-ledger --lib`

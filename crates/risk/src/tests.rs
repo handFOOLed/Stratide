@@ -56,7 +56,7 @@ fn fixture() -> (
         earliest_execution_at: Timestamp(now.0 + 1),
         expires_at: Timestamp(now.0 + 60_000),
     };
-    let context = ReviewContext {
+    let mut context = ReviewContext {
         now,
         trading_day: day,
         rules: Some(TradingRules {
@@ -73,12 +73,16 @@ fn fixture() -> (
             min_price: money(900),
             max_price: money(1_100),
         }),
-        cost: Some(CostEstimate {
-            proposal_id: proposal.proposal_id,
-            maximum_fee: money(500),
-            source: "synthetic_test/cost-bound-v1".into(),
-        }),
+        cost: None,
     };
+    context.cost = Some(CostEstimate {
+        proposal: proposal.clone(),
+        rules: context.rules.clone().unwrap(),
+        valid_until: proposal.expires_at,
+        proposal_id: proposal.proposal_id,
+        maximum_fee: money(500),
+        source: "synthetic_test/cost-bound-v1".into(),
+    });
     (config, snapshot, proposal, context)
 }
 
@@ -111,7 +115,7 @@ fn rejection(
     p: &OrderProposal,
     c: &ReviewContext,
 ) -> RejectionReason {
-    match RiskKernel::new(config).unwrap().review(s, p, c) {
+    match RiskKernel::new(config).unwrap().review_fixture(s, p, c) {
         RiskDecision::Rejected {
             proposal_id,
             reason,
@@ -142,8 +146,8 @@ fn normal_buy_is_bound_repeatable_and_does_not_fill_or_reserve() {
     let (config, snapshot, proposal, context) = fixture();
     let original = snapshot.clone();
     let mut kernel = RiskKernel::new(config).unwrap();
-    let first = kernel.review(&snapshot, &proposal, &context);
-    assert_eq!(first, kernel.review(&snapshot, &proposal, &context));
+    let first = kernel.review_fixture(&snapshot, &proposal, &context);
+    assert_eq!(first, kernel.review_fixture(&snapshot, &proposal, &context));
     let RiskDecision::Accepted(approval) = first else {
         panic!("buy rejected")
     };
@@ -164,7 +168,7 @@ fn buys_include_fees_and_cash_boundary_is_exact() {
     config.initial_capital = s.cash;
     let mut kernel = RiskKernel::new(config.clone()).unwrap();
     assert_eq!(
-        kernel.review(&s, &p, &c),
+        kernel.review_fixture(&s, &p, &c),
         RiskDecision::Rejected {
             proposal_id: p.proposal_id,
             reason: RejectionReason::InsufficientCash {
@@ -175,7 +179,7 @@ fn buys_include_fees_and_cash_boundary_is_exact() {
     );
     s.cash = money(100_500);
     assert!(matches!(
-        kernel.review(&s, &p, &c),
+        kernel.review_fixture(&s, &p, &c),
         RiskDecision::Accepted(_)
     ));
 }
@@ -217,7 +221,9 @@ fn t_plus_one_only_releases_earlier_day_lots() {
     );
     add_position(&mut s, &p, 100, TradingDay(20261027));
     assert!(matches!(
-        RiskKernel::new(config.clone()).unwrap().review(&s, &p, &c),
+        RiskKernel::new(config.clone())
+            .unwrap()
+            .review_fixture(&s, &p, &c),
         RiskDecision::Accepted(_)
     ));
     p.quantity = 200;
@@ -238,7 +244,9 @@ fn settlement_is_instrument_specific_and_unknown_rules_fail_closed() {
     add_position(&mut s, &p, 100, day);
     c.rules.as_mut().unwrap().settlement = SettlementRule::SameDay;
     assert!(matches!(
-        RiskKernel::new(config.clone()).unwrap().review(&s, &p, &c),
+        RiskKernel::new(config.clone())
+            .unwrap()
+            .review_fixture(&s, &p, &c),
         RiskDecision::Accepted(_)
     ));
     c.rules.as_mut().unwrap().settlement = SettlementRule::Unknown;
@@ -469,7 +477,7 @@ fn financial_freezes_deny_buys_but_allow_verified_settled_reduction() {
         let mut kernel = RiskKernel::new(config.clone()).unwrap();
         kernel.freeze(scope, FreezeReason::DailyLoss);
         assert_eq!(
-            kernel.review(&s, &p, &c),
+            kernel.review_fixture(&s, &p, &c),
             RiskDecision::Rejected {
                 proposal_id: p.proposal_id,
                 reason: RejectionReason::Frozen {
@@ -480,7 +488,7 @@ fn financial_freezes_deny_buys_but_allow_verified_settled_reduction() {
         );
         p.side = Side::Sell;
         assert!(matches!(
-            kernel.review(&s, &p, &c),
+            kernel.review_fixture(&s, &p, &c),
             RiskDecision::Accepted(_)
         ));
         p.side = Side::Buy;
@@ -497,7 +505,7 @@ fn uncertainty_and_manual_freezes_deny_both_sides() {
         for side in [Side::Buy, Side::Sell] {
             p.side = side;
             assert!(matches!(
-                kernel.review(&s, &p, &c),
+                kernel.review_fixture(&s, &p, &c),
                 RiskDecision::Rejected {
                     reason: RejectionReason::Frozen { .. },
                     ..
@@ -530,7 +538,7 @@ fn unrealized_nav_loss_latches_at_threshold_and_memory_restore_retains_it() {
     s.marks[0].price = money(800);
     let original = s.clone();
     let mut kernel = RiskKernel::new(config.clone()).unwrap();
-    let first = kernel.review(&s, &p, &c);
+    let first = kernel.review_fixture(&s, &p, &c);
     assert!(matches!(
         first,
         RiskDecision::Rejected {
@@ -541,12 +549,12 @@ fn unrealized_nav_loss_latches_at_threshold_and_memory_restore_retains_it() {
             ..
         }
     ));
-    assert_eq!(first, kernel.review(&s, &p, &c));
+    assert_eq!(first, kernel.review_fixture(&s, &p, &c));
     assert_eq!(s, original);
     let mut restored = RiskKernel::restore(config, kernel.state().clone()).unwrap();
     s.marks[0].price = money(1_000);
     assert!(matches!(
-        restored.review(&s, &p, &c),
+        restored.review_fixture(&s, &p, &c),
         RiskDecision::Rejected {
             reason: RejectionReason::Frozen { .. },
             ..
@@ -565,7 +573,7 @@ fn unrealized_nav_loss_latches_at_threshold_and_memory_restore_retains_it() {
     p.earliest_execution_at = Timestamp(s.as_of.0 + 1);
     p.expires_at = Timestamp(s.as_of.0 + 60_000);
     assert!(matches!(
-        restored.review(&s, &p, &c),
+        restored.review_fixture(&s, &p, &c),
         RiskDecision::Rejected {
             reason: RejectionReason::Frozen {
                 scope: RiskScope::Account,
@@ -610,7 +618,7 @@ fn deposits_and_withdrawals_are_not_trading_profit_or_loss() {
         s.equity_basis.net_external_flow_total_fen = flow;
         let mut kernel = RiskKernel::new(config.clone()).unwrap();
         assert!(matches!(
-            kernel.review(&s, &p, &c),
+            kernel.review_fixture(&s, &p, &c),
             RiskDecision::Accepted(_)
         ));
         assert!(kernel.state().freezes(RiskScope::Account).is_empty());
@@ -635,13 +643,13 @@ fn deposits_cannot_hide_losses_and_observed_peak_cannot_be_lowered() {
     s.cash = money(1_200_000);
     let mut kernel = RiskKernel::new(config).unwrap();
     assert!(matches!(
-        kernel.review(&s, &p, &c),
+        kernel.review_fixture(&s, &p, &c),
         RiskDecision::Accepted(_)
     ));
     // Even though supplied historical peak is still initial capital, observed peak stays.
     s.cash = money(1_000_000);
     assert!(matches!(
-        kernel.review(&s, &p, &c),
+        kernel.review_fixture(&s, &p, &c),
         RiskDecision::Rejected {
             reason: RejectionReason::Frozen {
                 scope: RiskScope::Account,
@@ -749,5 +757,85 @@ fn invalid_positions_and_overreservations_fail_closed() {
     assert!(matches!(
         rejection(config, &bad, &p, &c),
         RejectionReason::InvalidSnapshot(_)
+    ));
+}
+
+// Existing financial scenarios use a newly issued trusted estimate for their
+// intentionally edited proposal/rules. Binding attacks below call review directly.
+trait FixtureReview {
+    fn review_fixture(
+        &mut self,
+        s: &AccountSnapshot,
+        p: &OrderProposal,
+        c: &ReviewContext,
+    ) -> RiskDecision;
+}
+impl FixtureReview for RiskKernel {
+    fn review_fixture(
+        &mut self,
+        s: &AccountSnapshot,
+        p: &OrderProposal,
+        c: &ReviewContext,
+    ) -> RiskDecision {
+        let mut c = c.clone();
+        if let (Some(cost), Some(rules)) = (&mut c.cost, &c.rules) {
+            cost.proposal = p.clone();
+            cost.rules = rules.clone();
+            cost.valid_until = p.expires_at;
+        }
+        self.review(s, p, &c)
+    }
+}
+
+#[test]
+fn cost_is_bound_to_every_proposal_and_rule_field_and_expiry() {
+    let (config, snapshot, p, c) = fixture();
+    let mut variants = vec![];
+    let mut q = p.clone();
+    q.quantity += 100;
+    variants.push(q);
+    let mut q = p.clone();
+    q.side = Side::Sell;
+    variants.push(q);
+    let mut q = p.clone();
+    q.limit_price = money(1001);
+    variants.push(q);
+    let mut q = p.clone();
+    q.instrument.code = "600001".into();
+    variants.push(q);
+    for q in variants {
+        let mut context = c.clone();
+        context.rules.as_mut().unwrap().instrument = q.instrument.clone();
+        assert!(matches!(
+            RiskKernel::new(config.clone())
+                .unwrap()
+                .review(&snapshot, &q, &context),
+            RiskDecision::Rejected {
+                reason: RejectionReason::MissingCostEvidence,
+                ..
+            }
+        ));
+    }
+    let mut context = c.clone();
+    context.rules.as_mut().unwrap().buy_lot = 200;
+    assert!(matches!(
+        RiskKernel::new(config.clone())
+            .unwrap()
+            .review(&snapshot, &p, &context),
+        RiskDecision::Rejected {
+            reason: RejectionReason::MissingCostEvidence,
+            ..
+        }
+    ));
+    let mut context = c;
+    context.cost.as_mut().unwrap().valid_until = context.now;
+    assert!(matches!(
+        RiskKernel::new(config)
+            .unwrap()
+            .review(&snapshot, &p, &context),
+        RiskDecision::Rejected {
+            reason: RejectionReason::MissingCostEvidence,
+            ..
+        }
     ));
 }

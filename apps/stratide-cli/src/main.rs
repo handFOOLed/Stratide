@@ -1,3 +1,4 @@
+mod paper;
 use std::{collections::BTreeMap, env, process::ExitCode};
 use stratide_contracts::*;
 use stratide_risk::{FreezeReason, RiskDecision, RiskKernel, RiskScope};
@@ -15,22 +16,35 @@ fn main() -> ExitCode {
 fn run(args: Vec<String>) -> Result<(), String> {
     match args.first().map(String::as_str).unwrap_or("help") {
         "status" => {
-            println!("Stratide M0-PR01 — NOT RUNNING；可运行内存风控示例，尚无成交/持久账本")
+            println!("Stratide M0-PR02 — paper-only；使用 paper-create / paper-submit-synthetic / paper-match-synthetic / paper-status")
         }
         "risk-demo" => demo(&args[1..])?,
+        command if command.starts_with("paper-") => paper::run(command, &args[1..])?,
         "help" | "--help" | "-h" => println!(
             "stratide-cli status\nstratide-cli risk-demo\n\
   --initial-cash-fen <正整数分> --max-order-fen <分>\n\
   --account-cap-fen <分> --strategy-cap-fen <分>\n\
   --daily-loss-fen <正整数分> --drawdown-fen <正整数分>\n\n\
-所有资金与风险参数均需显式传入；示例只使用 synthetic_test 数据，不产生成交。"
+所有资金与风险参数均需显式传入；risk-demo 仅审查。
+\
+paper-create <目录> <上述全部六项参数>
+\
+paper-submit-synthetic <目录>
+\
+paper-match-synthetic <目录>
+\
+paper-status <目录>
+\
+paper-apply <目录> <唯一事件ID> <可信命令JSON文件>
+\
+Paper 演示使用 synthetic_test 人工行情/费率，绝非真实市场数据。"
         ),
         other => return Err(format!("未知命令 {other}；使用 --help 查看用法")),
     }
     Ok(())
 }
 
-fn demo(args: &[String]) -> Result<(), String> {
+fn config(args: &[String]) -> Result<PaperAccountConfig, String> {
     let names = [
         "--initial-cash-fen",
         "--max-order-fen",
@@ -87,6 +101,13 @@ fn demo(args: &[String]) -> Result<(), String> {
         max_snapshot_age_ms: 60_000,
         max_mark_age_ms: 60_000,
     };
+    config.validate()?;
+    Ok(config)
+}
+
+fn demo(args: &[String]) -> Result<(), String> {
+    let config = config(args)?;
+    let initial = config.initial_capital;
     let now = Timestamp(1_793_152_800_000); // fixed synthetic input, not wall-clock observation
     let day = TradingDay(20261028);
     let snapshot = config.initialize(now, day)?;
@@ -128,12 +149,16 @@ fn demo(args: &[String]) -> Result<(), String> {
             min_price: Cny::from_fen(900).map_err(|e| e.to_string())?,
             max_price: Cny::from_fen(1_100).map_err(|e| e.to_string())?,
         }),
-        cost: Some(CostEstimate {
-            proposal_id: p.proposal_id,
-            maximum_fee: Cny::from_fen(500).map_err(|e| e.to_string())?,
-            source: "synthetic_test/cost-bound-v1 (非真实费率)".into(),
-        }),
+        cost: None,
     };
+    c.cost = Some(CostEstimate {
+        proposal: p.clone(),
+        rules: c.rules.clone().unwrap(),
+        valid_until: p.expires_at,
+        proposal_id: p.proposal_id,
+        maximum_fee: Cny::from_fen(500).map_err(|e| e.to_string())?,
+        source: "synthetic_test/cost-bound-v1 (非真实费率)".into(),
+    });
     println!("模式：synthetic_test；固定人工价格/规则/费用；无行情抓取、无成交、无磁盘账本");
     println!(
         "显式本金：{initial}；初始 NAV：{}；持仓：0 股",
@@ -150,16 +175,19 @@ fn demo(args: &[String]) -> Result<(), String> {
     p.proposal_id = ProposalId(2);
     c.cost.as_mut().unwrap().proposal_id = p.proposal_id;
     p.quantity = (initial.fen() / 100_000 + 1) * 100;
+    c.cost.as_mut().unwrap().proposal = p.clone();
     show("超现金买入", &kernel.review(&snapshot, &p, &c));
     p.proposal_id = ProposalId(3);
     c.cost.as_mut().unwrap().proposal_id = p.proposal_id;
     p.side = Side::Sell;
     p.quantity = 100;
+    c.cost.as_mut().unwrap().proposal = p.clone();
     show("无持仓卖出", &kernel.review(&snapshot, &p, &c));
     kernel.freeze(RiskScope::Account, FreezeReason::Manual);
     p.proposal_id = ProposalId(4);
     c.cost.as_mut().unwrap().proposal_id = p.proposal_id;
     p.side = Side::Buy;
+    c.cost.as_mut().unwrap().proposal = p.clone();
     show("冻结后买入", &kernel.review(&snapshot, &p, &c));
     if snapshot != before {
         return Err("审查意外改变了账户状态".into());

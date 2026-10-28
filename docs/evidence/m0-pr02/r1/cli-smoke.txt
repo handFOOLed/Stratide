@@ -1,0 +1,13 @@
+PR #4 R1 Sol production CLI proof; pending new Terra independent acceptance.
+Client date: 2026-10-28 Asia/Taipei; Windows x64; every CLI call exits before the next call.
+Retained local v2 ledger: state/pr04-r1-4a8eca52bbff41e48a99e44c7834d2c1
+Explicit initial principal=1000000 fen; max_order=500000; account_cap=800000; strategy_cap=500000; daily_loss=10000; drawdown=15000.
+paper-create -> paper-submit-synthetic -> paper-match-synthetic -> paper-status -> same match retry: PASS.
+Single fill: quantity=100; fee=31; cash=899969; equity=999969; risk_checked_at<simulated_at; exact reopen/retry JSON equality.
+paper-apply second-buy -> paper-apply missing-bar -> exit/reopen: economic as_of unchanged, reservations preserved.
+paper-apply valid-bar with separate synthetic opening evidence and closing price=800: second fill quantity=100; cash=799938; equity=959938; DailyLoss persisted.
+Exit/reopen and repeat valid-bar ID: complete JSON identical; exactly two total fills, no third fill.
+All commands exited 0; JSON contains explicit synthetic_test inputs, not real market data/rates/fills.
+Evidence hashes refer to LF-normalized UTF-8 files.
+sample-state.json SHA-256: dae0d11e19329e921b9c11ac243c111db80360a345b9dc32475d54dd480fcc18
+adversarial-state.json SHA-256: 74f9935a12c5f6f8f583f4dcdbd0c969b04ee89da48f1d6c14cfbddf65c54582

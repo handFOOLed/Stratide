@@ -1,10 +1,24 @@
+use serde::{Deserialize, Serialize};
 use std::fmt;
 
 /// Nonnegative CNY in integer fen (CNY 0.01). No rounding or floating point.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(try_from = "i64", into = "i64")]
 pub struct Cny(i64);
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+impl TryFrom<i64> for Cny {
+    type Error = InvalidMoney;
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        Self::from_fen(value)
+    }
+}
+impl From<Cny> for i64 {
+    fn from(value: Cny) -> Self {
+        value.fen()
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct InvalidMoney;
 
 impl fmt::Display for InvalidMoney {
@@ -44,11 +58,11 @@ impl fmt::Display for Cny {
 }
 
 /// UTC milliseconds since Unix epoch; negative values are rejected by the kernel.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Timestamp(pub i64);
 
 /// Exchange-local Gregorian YYYYMMDD, supplied by the trusted session/calendar owner.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TradingDay(pub u32);
 
 impl TradingDay {
@@ -69,7 +83,7 @@ impl TradingDay {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct DeploymentIdentity {
     pub group_id: String,
     pub strategy_id: String,
@@ -92,18 +106,18 @@ impl DeploymentIdentity {
 }
 
 /// Unique within an account for its entire eventual ledger lifetime. Zero is invalid.
-/// PR-02 must durably allocate/deduplicate IDs; reviewing an ID does not consume it.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+/// The ledger durably deduplicates IDs; reviewing an ID alone does not consume it.
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct ProposalId(pub u128);
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Market {
     Shanghai,
     Shenzhen,
     Beijing,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct Instrument {
     pub market: Market,
     pub code: String,
@@ -116,13 +130,13 @@ impl Instrument {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Side {
     Buy,
     Sell,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct OrderProposal {
     pub proposal_id: ProposalId,
     pub account_id: String,
@@ -139,7 +153,7 @@ pub struct OrderProposal {
     pub expires_at: Timestamp,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RiskLimits {
     /// Fee-inclusive commitment per proposal, including sells.
     pub max_order_commitment: Cny,
@@ -150,7 +164,7 @@ pub struct RiskLimits {
     pub drawdown: Cny,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct PaperAccountConfig {
     pub account_id: String,
     pub authorized_principal: Cny,
@@ -216,7 +230,7 @@ impl PaperAccountConfig {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct PositionLot {
     pub instrument: Instrument,
     pub quantity: i64,
@@ -224,7 +238,7 @@ pub struct PositionLot {
 }
 
 /// Trusted existing commitments, not inferred from earlier review results.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct PendingOrder {
     pub proposal_id: ProposalId,
     pub instrument: Instrument,
@@ -235,7 +249,7 @@ pub struct PendingOrder {
     pub reserved_cash: Cny,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct PositionMark {
     pub instrument: Instrument,
     pub price: Cny,
@@ -244,7 +258,7 @@ pub struct PositionMark {
     pub source: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct EquityBasis {
     pub day_start_equity: Cny,
     /// Historical maximum of NAV minus cumulative external flows since initialization.
@@ -255,8 +269,8 @@ pub struct EquityBasis {
 }
 
 /// Trusted single-account/single-strategy ledger projection. Not a Worker request.
-/// PR-02 owns authority, atomic reservations, cash-flow baselines and persistence.
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// The ledger owns authority, atomic reservations, cash-flow baselines and persistence.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct AccountSnapshot {
     pub account_id: String,
     pub deployment: DeploymentIdentity,
@@ -270,7 +284,7 @@ pub struct AccountSnapshot {
     pub equity_basis: EquityBasis,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SettlementRule {
     SameDay,
     TPlusOne,
@@ -279,7 +293,7 @@ pub enum SettlementRule {
 
 /// Explicit trusted per-instrument/session evidence, not exchange rules guessed by code.
 /// source must identify a versioned rule/market-status/price-band input.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct TradingRules {
     pub instrument: Instrument,
     pub trading_day: TradingDay,
@@ -295,8 +309,12 @@ pub struct TradingRules {
     pub max_price: Cny,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct CostEstimate {
+    /// Complete trusted binding; reusing an ID cannot authorize changed fields.
+    pub proposal: OrderProposal,
+    pub rules: TradingRules,
+    pub valid_until: Timestamp,
     pub proposal_id: ProposalId,
     /// Conservative upper bound for this entire proposal, including all costs/taxes.
     pub maximum_fee: Cny,
@@ -304,7 +322,7 @@ pub struct CostEstimate {
 }
 
 /// Supplied by trusted core, separately from the proposal. No fetching/real feed in PR-01.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct ReviewContext {
     pub now: Timestamp,
     pub trading_day: TradingDay,

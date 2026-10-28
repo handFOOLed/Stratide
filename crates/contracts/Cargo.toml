@@ -3,3 +3,6 @@ name = "stratide-contracts"
 version.workspace = true
 edition.workspace = true
 publish = false
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }

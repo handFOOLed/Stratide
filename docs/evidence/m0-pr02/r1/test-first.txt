@@ -1,0 +1,67 @@
+   Compiling stratide-ledger v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m0-pr02\crates\ledger)
+   Compiling stratide-cli v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m0-pr02\apps\stratide-cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.09s
+     Running unittests src\main.rs (target\debug\deps\stratide_cli-b923d84929f032ad.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\paper_ledger.rs (target\debug\deps\paper_ledger-48c13a4090af7072.exe)
+
+running 2 tests
+test actual_cli_create_submit_fill_reopen_retry_and_deterministic_second_run ... ok
+test real_process_restarts_preserve_peak_flow_rejected_order_locks_and_missing_valuation ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running tests\risk_demo.rs (target\debug\deps\risk_demo-9283e734ed381ed5.exe)
+
+running 2 tests
+test synthetic_demo_is_deterministic_and_does_not_claim_fills ... ok
+test missing_negative_fractional_or_overflowing_principal_is_not_defaulted ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src\lib.rs (target\debug\deps\stratide_contracts-2ba4ba78fb83709a.exe)
+
+running 1 test
+test tests::scaffold_does_not_claim_trading_readiness ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\stratide_ledger-614a10d826bfcbf1.exe)
+
+running 16 tests
+test store::tests::crash_child ... ok
+test store::tests::failed_storage_write_poisons_handle_and_preserves_committed_locks ... ok
+test store::tests::writer_exclusion_is_real_process_and_lock_releases_on_exit ... ok
+test store::tests::expiry_releases_reservations_but_never_clears_uncertainty_or_loss_locks ... ok
+test store::tests::acceptance_missing_bar_can_be_retried_after_evidence_arrives ... ok
+test store::tests::acceptance_closing_mark_cannot_retroactively_block_intraday_fill ... ok
+test store::tests::sell_cash_overflow_rolls_back_fill_without_discarding_observed_loss_lock ... FAILED
+test store::tests::stale_approvals_cannot_double_reserve_cash_or_sellable_shares ... ok
+test store::tests::partial_fills_event_order_idempotency_restart_and_exact_accounting ... ok
+test store::tests::independent_observation_rejection_peak_flows_and_financial_locks_survive_disk ... ok
+test store::tests::fee_expiry_and_updated_risk_block_previously_accepted_buy ... ok
+test store::tests::t_plus_one_lots_sell_costs_and_shared_liquidity ... ok
+test store::tests::suspended_or_single_price_session_still_observes_unrealized_loss ... ok
+test store::tests::no_same_day_future_stale_unverified_suspended_limit_touch_or_missing_data_fills ... ok
+test store::tests::corrupted_empty_old_or_missing_ledger_never_initializes ... ok
+test store::tests::process_death_before_after_reservation_fill_and_lock_commits_is_atomic ... ok
+
+failures:
+
+---- store::tests::sell_cash_overflow_rolls_back_fill_without_discarding_observed_loss_lock stdout ----
+
+thread 'store::tests::sell_cash_overflow_rolls_back_fill_without_discarding_observed_loss_lock' (8952) panicked at crates\ledger\src\store\tests.rs:579:5:
+assertion failed: l.state.orders[1].reason.contains("会计失败")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    store::tests::sell_cash_overflow_rolls_back_fill_without_discarding_observed_loss_lock
+
+test result: FAILED. 15 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+error: test failed, to rerun pass `-p stratide-ledger --lib`
