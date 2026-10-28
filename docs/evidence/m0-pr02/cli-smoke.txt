@@ -1,0 +1,18 @@
+M0-PR02 Sol CLI self-test; independent Terra acceptance pending.
+Client date: 2026-10-28 Asia/Taipei
+Base: 98317a9f1cd7e265c2085e5ff24f76cf3cd274aa
+OS: Microsoft Windows NT 10.0.26300.0
+Account directory (retained locally, ignored by Git): state/pr02-selftest-ee23f2802c6e46ef864dc2f79fb3768f
+Binary: F:\Desktop\Documents\Codex\Stratide\m0-pr02\target\debug\stratide-cli.exe
+Each command below ran in a fresh process and exited 0.
+paper-create <directory> --initial-cash-fen 1000000 --max-order-fen 500000 --account-cap-fen 800000 --strategy-cap-fen 500000 --daily-loss-fen 100000 --drawdown-fen 200000
+paper-submit-synthetic <directory>: cash=1000000, pending_cash=100200, fills=0
+paper-match-synthetic <directory>: cash=899969, shares=100, fee=31, equity=999969, pending=0, fills=1
+paper-status <directory>: byte-identical JSON after process exit/reopen
+paper-submit-synthetic <directory>: byte-identical JSON; no second reservation
+paper-match-synthetic <directory>: byte-identical JSON; no second fill/charge
+Mode: synthetic_test; no real market data or exchange fills.
+Dataset recipe SHA-256: b42c29048345906f81396e09f73a6b270c82801f070709f6550231cd2e984a69
+sample-state.json SHA-256 (LF-normalized UTF-8): 003a20a20e721d41165ae5af7455d013d217815e8ee4a610d62de68d659d784e
+PASS: real process reopen/retry and exact financial assertions.
+NOT VERIFIED: Linux/macOS, physical power failure, disk-full hardware behavior, real data/rates, brokerage, forward paper observation.

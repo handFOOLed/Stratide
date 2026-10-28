@@ -17,7 +17,7 @@ fn regression_invalid_proposals_cannot_skip_trusted_loss_observation() {
         }
         let mut kernel = RiskKernel::new(config.clone()).unwrap();
         assert!(matches!(
-            kernel.review(&snapshot, &invalid, &context),
+            kernel.review_fixture(&snapshot, &invalid, &context),
             RiskDecision::Rejected { .. }
         ));
         for scope in [RiskScope::Account, RiskScope::Strategy] {
@@ -85,7 +85,7 @@ fn assert_observation_rejected_unchanged(
     );
     assert_eq!(kernel.state(), &before);
     assert_eq!(
-        kernel.review(snapshot, proposal, context),
+        kernel.review_fixture(snapshot, proposal, context),
         RiskDecision::Rejected {
             proposal_id: proposal.proposal_id,
             reason: expected,
@@ -252,7 +252,7 @@ fn regression_restore_repeat_and_next_day_observation_preserve_locks_and_peak() 
     context.rules.as_mut().unwrap().available_at = context.now;
     context.cost.as_mut().unwrap().proposal_id = proposal.proposal_id;
     assert!(matches!(
-        restored.review(&snapshot, &proposal, &context),
+        restored.review_fixture(&snapshot, &proposal, &context),
         RiskDecision::Rejected {
             reason: RejectionReason::Frozen {
                 scope: RiskScope::Account,
@@ -272,7 +272,7 @@ fn regression_missing_market_evidence_still_latches_trusted_loss() {
     snapshot.cash = money(900_000);
     context.rules = None;
     assert!(matches!(
-        kernel.review(&snapshot, &proposal, &context),
+        kernel.review_fixture(&snapshot, &proposal, &context),
         RiskDecision::Rejected {
             reason: RejectionReason::MissingMarketEvidence,
             ..
@@ -290,7 +290,7 @@ fn regression_missing_market_evidence_still_latches_trusted_loss() {
     snapshot.cash = money(1_000_000);
     let (_, _, _, valid_context) = fixture();
     assert!(matches!(
-        kernel.review(&snapshot, &proposal, &valid_context),
+        kernel.review_fixture(&snapshot, &proposal, &valid_context),
         RiskDecision::Rejected {
             reason: RejectionReason::Frozen {
                 scope: RiskScope::Account,
@@ -308,7 +308,7 @@ fn regression_missing_cost_evidence_still_records_trusted_peak() {
     snapshot.cash = money(1_300_000);
     context.cost = None;
     assert!(matches!(
-        kernel.review(&snapshot, &proposal, &context),
+        kernel.review_fixture(&snapshot, &proposal, &context),
         RiskDecision::Rejected {
             reason: RejectionReason::MissingCostEvidence,
             ..
@@ -317,7 +317,7 @@ fn regression_missing_cost_evidence_still_records_trusted_peak() {
     snapshot.cash = money(1_000_000);
     let (_, _, _, valid_context) = fixture();
     assert!(matches!(
-        kernel.review(&snapshot, &proposal, &valid_context),
+        kernel.review_fixture(&snapshot, &proposal, &valid_context),
         RiskDecision::Rejected {
             reason: RejectionReason::Frozen {
                 scope: RiskScope::Account,

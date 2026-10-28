@@ -1,0 +1,3 @@
+    Checking stratide-ledger v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m0-pr02\crates\ledger)
+    Checking stratide-cli v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m0-pr02\apps\stratide-cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.41s

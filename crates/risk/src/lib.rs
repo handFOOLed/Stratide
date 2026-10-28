@@ -2,11 +2,12 @@
 //! No order submission, fill, ledger write or unlock API.
 //! The caller is trusted Rust core; strategy Workers may supply only OrderProposal.
 
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 use std::fmt;
 use stratide_contracts::*;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum FreezeReason {
     DailyLoss,
     Drawdown,
@@ -14,7 +15,7 @@ pub enum FreezeReason {
     Manual,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RiskScope {
     Account,
     Strategy,
@@ -40,9 +41,9 @@ impl fmt::Display for FreezeReason {
     }
 }
 
-/// In-memory checkpoint contract. PR-02 must persist this alongside the ledger before
-/// execution and fail closed on missing/corrupt state. Clone/restore is NOT disk recovery.
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// Checkpoint persisted with the paper ledger by stratide-ledger. Calling
+/// clone/restore alone is NOT disk recovery and confers no execution authority.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct RiskState {
     account_id: String,
     deployment: DeploymentIdentity,
@@ -52,6 +53,9 @@ pub struct RiskState {
 }
 
 impl RiskState {
+    pub fn peak(&self) -> Cny {
+        self.cash_flow_adjusted_peak
+    }
     pub fn freezes(&self, scope: RiskScope) -> &BTreeSet<FreezeReason> {
         match scope {
             RiskScope::Account => &self.account_freezes,
@@ -171,7 +175,7 @@ impl From<InvalidMoney> for RejectionReason {
 }
 
 /// Only RiskKernel can construct this. It is neither Clone nor a spend/fill authority.
-/// A future executor must re-review current state and atomically reserve in PR-02;
+/// The ledger must re-review current state and atomically reserve;
 /// snapshot revision/expiry alone do not prevent two approvals double-spending cash.
 #[derive(Debug, PartialEq, Eq)]
 pub struct Approval {
@@ -465,7 +469,13 @@ impl RiskKernel {
         let cost = c
             .cost
             .as_ref()
-            .filter(|cost| cost.proposal_id == p.proposal_id && !cost.source.trim().is_empty())
+            .filter(|cost| {
+                cost.proposal_id == p.proposal_id
+                    && cost.proposal == *p
+                    && cost.rules == *rules
+                    && cost.valid_until > c.now
+                    && !cost.source.trim().is_empty()
+            })
             .ok_or(MissingCostEvidence)?;
         let gross = p.limit_price.checked_mul(p.quantity)?;
         let commitment = gross.checked_add(cost.maximum_fee)?;
