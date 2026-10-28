@@ -1,0 +1,3 @@
+fill_id,order_id,day,side,quantity,price_fen,commission_fen,transfer_fen,tax_fen,total_fee_fen,simulated_at,risk_checked_at,market_opens_at,market_closes_at,bar_available_at,source_version,input_sha256
+"20261029:1",1,20261029,Buy,100,1000,30,1,0,31,1793257201000,1793237400000,1793237400000,1793257200000,1793257201000,"synthetic_test/hand-authored | fixture-v1 | generated-in-repository-no-market-data",e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe
+"20261102:2",2,20261102,Sell,100,930,28,1,47,76,1793602801000,1793583000000,1793583000000,1793602800000,1793602801000,"synthetic_test/hand-authored | fixture-v1 | generated-in-repository-no-market-data",e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe

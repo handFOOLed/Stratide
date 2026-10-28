@@ -1,0 +1,5 @@
+day,nav_fen,cash_fen,available_cash_fen,reserved_cash_fen,held_shares,sellable_shares,unsettled_shares,reserved_sell_shares,pending_orders,cumulative_fee_fen,realized_pnl_fen,unrealized_pnl_fen,remaining_cost_basis_fen,external_flow_total_fen,valuation_error
+20261028,1000000,1000000,899800,100200,0,0,0,0,1,0,0,0,0,0,""
+20261029,997969,899969,899969,0,100,0,100,0,0,31,0,-2031,100031,0,""
+20261030,992969,899969,899969,0,100,0,0,100,1,31,0,-7031,100031,0,""
+20261102,992893,992893,992893,0,0,0,0,0,0,107,-7107,0,0,0,""

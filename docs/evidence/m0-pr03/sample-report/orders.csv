@@ -1,0 +1,4 @@
+proposal_id,day,side,quantity,limit_fen,status,remaining,reason
+1,20261028,Buy,100,1000,Filled,0,"保守日线限价穿越模型模拟成交；不是交易所成交"
+2,20261030,Sell,100,930,Filled,0,"保守日线限价穿越模型模拟成交；不是交易所成交"
+3,20261102,Buy,10000,970,Rejected,10000,"可用资金不足：需要 97200.00 元，扣除预留后仅有 9928.93 元"

@@ -1,0 +1,1415 @@
+{
+  "buy_hold_benchmark_nav_fen": 996969,
+  "buy_hold_benchmark_note": "仅在本策略首笔模拟买入确已成交时，以相同股数/入场价/买入费用持有至末日收盘；不估算离场费，不代表可执行独立策略",
+  "cash_benchmark_nav_fen": 1000000,
+  "config": {
+    "account_id": "replay-account",
+    "account_limits": {
+      "daily_loss": 100000,
+      "drawdown": 200000,
+      "max_exposure": 800000,
+      "max_order_commitment": 500000
+    },
+    "authorized_principal": 1000000,
+    "deployment": {
+      "deployment_id": "replay-v1",
+      "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+      "group_id": "replay-group",
+      "strategy_id": "two-signal-example"
+    },
+    "initial_capital": 1000000,
+    "max_mark_age_ms": 604800000,
+    "max_snapshot_age_ms": 604800000,
+    "strategy_limits": {
+      "daily_loss": 100000,
+      "drawdown": 200000,
+      "max_exposure": 500000,
+      "max_order_commitment": 500000
+    }
+  },
+  "config_sha256": "4ae2eb6e6653d29504790803ef3ddfdc2b2c921a9ba5c57629f049c3fc0821d4",
+  "daily": [
+    {
+      "available_cash_fen": 899800,
+      "cash_fen": 1000000,
+      "cumulative_fee_fen": 0,
+      "day": 20261028,
+      "external_flow_total_fen": 0,
+      "held_shares": 0,
+      "nav_fen": 1000000,
+      "pending_orders": 1,
+      "realized_pnl_fen": 0,
+      "remaining_cost_basis_fen": 0,
+      "reserved_cash_fen": 100200,
+      "reserved_sell_shares": 0,
+      "sellable_shares": 0,
+      "unrealized_pnl_fen": 0,
+      "unsettled_shares": 0,
+      "valuation_error": null
+    },
+    {
+      "available_cash_fen": 899969,
+      "cash_fen": 899969,
+      "cumulative_fee_fen": 31,
+      "day": 20261029,
+      "external_flow_total_fen": 0,
+      "held_shares": 100,
+      "nav_fen": 997969,
+      "pending_orders": 0,
+      "realized_pnl_fen": 0,
+      "remaining_cost_basis_fen": 100031,
+      "reserved_cash_fen": 0,
+      "reserved_sell_shares": 0,
+      "sellable_shares": 0,
+      "unrealized_pnl_fen": -2031,
+      "unsettled_shares": 100,
+      "valuation_error": null
+    },
+    {
+      "available_cash_fen": 899969,
+      "cash_fen": 899969,
+      "cumulative_fee_fen": 31,
+      "day": 20261030,
+      "external_flow_total_fen": 0,
+      "held_shares": 100,
+      "nav_fen": 992969,
+      "pending_orders": 1,
+      "realized_pnl_fen": 0,
+      "remaining_cost_basis_fen": 100031,
+      "reserved_cash_fen": 0,
+      "reserved_sell_shares": 100,
+      "sellable_shares": 0,
+      "unrealized_pnl_fen": -7031,
+      "unsettled_shares": 0,
+      "valuation_error": null
+    },
+    {
+      "available_cash_fen": 992893,
+      "cash_fen": 992893,
+      "cumulative_fee_fen": 107,
+      "day": 20261102,
+      "external_flow_total_fen": 0,
+      "held_shares": 0,
+      "nav_fen": 992893,
+      "pending_orders": 0,
+      "realized_pnl_fen": -7107,
+      "remaining_cost_basis_fen": 0,
+      "reserved_cash_fen": 0,
+      "reserved_sell_shares": 0,
+      "sellable_shares": 0,
+      "unrealized_pnl_fen": 0,
+      "unsettled_shares": 0,
+      "valuation_error": null
+    }
+  ],
+  "ending_available_cash_fen": 992893,
+  "ending_cash_fen": 992893,
+  "ending_held_shares": 0,
+  "ending_nav_fen": 992893,
+  "ending_pending_orders": 0,
+  "ending_sellable_shares": 0,
+  "ending_unsettled_shares": 0,
+  "events": [
+    {
+      "account_as_of": 1793170801000,
+      "cash_fen": 1000000,
+      "command": {
+        "Match": {
+          "bar": {
+            "available_at": 1793170801000,
+            "capacity_shares": 100,
+            "close": 1000,
+            "closes_at": 1793170800000,
+            "day": 20261028,
+            "high": 1050,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "low": 950,
+            "open": 1000,
+            "opens_at": 1793151000000,
+            "provenance": {
+              "dataset_hash": "e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe",
+              "mode": "synthetic_test",
+              "price_semantics": "unadjusted_cny_fen",
+              "source_version": "synthetic_test/hand-authored | fixture-v1 | generated-in-repository-no-market-data",
+              "timezone": "Asia/Shanghai"
+            },
+            "status_verified": true,
+            "volume_shares": 10000
+          },
+          "day": 20261028,
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "now": 1793170801000,
+          "opening": {
+            "marks": [
+              {
+                "as_of": 1793151000000,
+                "available_at": 1793151000000,
+                "instrument": {
+                  "code": "600000",
+                  "market": "Shanghai"
+                },
+                "price": 1000,
+                "source": "synthetic_test/independent-opening-v1"
+              }
+            ],
+            "rules": {
+              "allow_odd_lot_liquidation": true,
+              "available_at": 1793151000000,
+              "buy_lot": 100,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "max_price": 1200,
+              "min_price": 800,
+              "sell_lot": 100,
+              "settlement": "TPlusOne",
+              "source": "synthetic_test/explicit-rules-v1",
+              "tick_size": 1,
+              "tradable": true,
+              "trading_day": 20261028
+            }
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1793151000000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20261028
+          }
+        }
+      },
+      "event_id": "replay-session-20261028",
+      "ledger_digest": "8480a993d44bb925b973e684a0b036e601e955cc069b5f4d8375a1bcfeec9a9c",
+      "nav_fen": 1000000,
+      "new_fills": [],
+      "new_orders": [],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "replay-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "replay-v1",
+          "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+          "group_id": "replay-group",
+          "strategy_id": "two-signal-example"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 1,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1793170801000,
+      "cash_fen": 1000000,
+      "command": {
+        "Submit": {
+          "day": 20261028,
+          "fees": {
+            "commission_ppm": 300,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "minimum_commission": 1,
+            "sell_tax_ppm": 500,
+            "source": "synthetic_test/not-a-real-tariff",
+            "transfer_ppm": 10,
+            "valid_from": 20261028,
+            "valid_through": 20261130,
+            "version": "artificial-fees-v1"
+          },
+          "now": 1793170801000,
+          "proposal": {
+            "account_id": "replay-account",
+            "data_available_at": 1793170801000,
+            "decision_at": 1793170801000,
+            "deployment": {
+              "deployment_id": "replay-v1",
+              "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+              "group_id": "replay-group",
+              "strategy_id": "two-signal-example"
+            },
+            "earliest_execution_at": 1793170801001,
+            "expires_at": 1793775601000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "limit_price": 1000,
+            "proposal_id": 1,
+            "quantity": 100,
+            "side": "Buy"
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1793151000000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20261028
+          }
+        }
+      },
+      "event_id": "replay-signal-20261028",
+      "ledger_digest": "93d9ae9201107c5f11d4ffc900de5b43a40eef76e3540b9cb6dc1d71b63651fa",
+      "nav_fen": 1000000,
+      "new_fills": [],
+      "new_orders": [
+        {
+          "accepted_on": 20261028,
+          "fee_schedule": {
+            "commission_ppm": 300,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "minimum_commission": 1,
+            "sell_tax_ppm": 500,
+            "source": "synthetic_test/not-a-real-tariff",
+            "transfer_ppm": 10,
+            "valid_from": 20261028,
+            "valid_through": 20261130,
+            "version": "artificial-fees-v1"
+          },
+          "proposal": {
+            "account_id": "replay-account",
+            "data_available_at": 1793170801000,
+            "decision_at": 1793170801000,
+            "deployment": {
+              "deployment_id": "replay-v1",
+              "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+              "group_id": "replay-group",
+              "strategy_id": "two-signal-example"
+            },
+            "earliest_execution_at": 1793170801001,
+            "expires_at": 1793775601000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "limit_price": 1000,
+            "proposal_id": 1,
+            "quantity": 100,
+            "side": "Buy"
+          },
+          "reason": "最新权威状态通过风控并原子预留",
+          "remaining": 100,
+          "reserved_fee": 200,
+          "status": "Open"
+        }
+      ],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "replay-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "replay-v1",
+          "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+          "group_id": "replay-group",
+          "strategy_id": "two-signal-example"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 2,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1793257201000,
+      "cash_fen": 899969,
+      "command": {
+        "Match": {
+          "bar": {
+            "available_at": 1793257201000,
+            "capacity_shares": 100,
+            "close": 980,
+            "closes_at": 1793257200000,
+            "day": 20261029,
+            "high": 1050,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "low": 950,
+            "open": 1000,
+            "opens_at": 1793237400000,
+            "provenance": {
+              "dataset_hash": "e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe",
+              "mode": "synthetic_test",
+              "price_semantics": "unadjusted_cny_fen",
+              "source_version": "synthetic_test/hand-authored | fixture-v1 | generated-in-repository-no-market-data",
+              "timezone": "Asia/Shanghai"
+            },
+            "status_verified": true,
+            "volume_shares": 10000
+          },
+          "day": 20261029,
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "now": 1793257201000,
+          "opening": {
+            "marks": [
+              {
+                "as_of": 1793237400000,
+                "available_at": 1793237400000,
+                "instrument": {
+                  "code": "600000",
+                  "market": "Shanghai"
+                },
+                "price": 1000,
+                "source": "synthetic_test/independent-opening-v1"
+              }
+            ],
+            "rules": {
+              "allow_odd_lot_liquidation": true,
+              "available_at": 1793237400000,
+              "buy_lot": 100,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "max_price": 1200,
+              "min_price": 800,
+              "sell_lot": 100,
+              "settlement": "TPlusOne",
+              "source": "synthetic_test/explicit-rules-v1",
+              "tick_size": 1,
+              "tradable": true,
+              "trading_day": 20261029
+            }
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1793237400000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20261029
+          }
+        }
+      },
+      "event_id": "replay-session-20261029",
+      "ledger_digest": "6dbcfa429fb6309cd634729e1ed04c8759d4e0da431e7418aba5a1be9642503a",
+      "nav_fen": 997969,
+      "new_fills": [
+        {
+          "day": 20261029,
+          "event_id": "20261029:1",
+          "evidence": {
+            "available_at": 1793257201000,
+            "capacity_shares": 100,
+            "close": 980,
+            "closes_at": 1793257200000,
+            "day": 20261029,
+            "high": 1050,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "low": 950,
+            "open": 1000,
+            "opens_at": 1793237400000,
+            "provenance": {
+              "dataset_hash": "e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe",
+              "mode": "synthetic_test",
+              "price_semantics": "unadjusted_cny_fen",
+              "source_version": "synthetic_test/hand-authored | fixture-v1 | generated-in-repository-no-market-data",
+              "timezone": "Asia/Shanghai"
+            },
+            "status_verified": true,
+            "volume_shares": 10000
+          },
+          "fee_version": "artificial-fees-v1",
+          "fees": {
+            "commission": 30,
+            "tax": 0,
+            "transfer": 1
+          },
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "opening_evidence": {
+            "marks": [
+              {
+                "as_of": 1793237400000,
+                "available_at": 1793237400000,
+                "instrument": {
+                  "code": "600000",
+                  "market": "Shanghai"
+                },
+                "price": 1000,
+                "source": "synthetic_test/independent-opening-v1"
+              }
+            ],
+            "rules": {
+              "allow_odd_lot_liquidation": true,
+              "available_at": 1793237400000,
+              "buy_lot": 100,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "max_price": 1200,
+              "min_price": 800,
+              "sell_lot": 100,
+              "settlement": "TPlusOne",
+              "source": "synthetic_test/explicit-rules-v1",
+              "tick_size": 1,
+              "tradable": true,
+              "trading_day": 20261029
+            }
+          },
+          "order_id": 1,
+          "price": 1000,
+          "quantity": 100,
+          "risk_checked_at": 1793237400000,
+          "side": "Buy",
+          "simulated_at": 1793257201000
+        }
+      ],
+      "new_orders": [],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "replay-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "replay-v1",
+          "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+          "group_id": "replay-group",
+          "strategy_id": "two-signal-example"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 3,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1793343601000,
+      "cash_fen": 899969,
+      "command": {
+        "Match": {
+          "bar": {
+            "available_at": 1793343601000,
+            "capacity_shares": 100,
+            "close": 930,
+            "closes_at": 1793343600000,
+            "day": 20261030,
+            "high": 1010,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "low": 900,
+            "open": 980,
+            "opens_at": 1793323800000,
+            "provenance": {
+              "dataset_hash": "e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe",
+              "mode": "synthetic_test",
+              "price_semantics": "unadjusted_cny_fen",
+              "source_version": "synthetic_test/hand-authored | fixture-v1 | generated-in-repository-no-market-data",
+              "timezone": "Asia/Shanghai"
+            },
+            "status_verified": true,
+            "volume_shares": 10000
+          },
+          "day": 20261030,
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "now": 1793343601000,
+          "opening": {
+            "marks": [
+              {
+                "as_of": 1793323800000,
+                "available_at": 1793323800000,
+                "instrument": {
+                  "code": "600000",
+                  "market": "Shanghai"
+                },
+                "price": 980,
+                "source": "synthetic_test/independent-opening-v1"
+              }
+            ],
+            "rules": {
+              "allow_odd_lot_liquidation": true,
+              "available_at": 1793323800000,
+              "buy_lot": 100,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "max_price": 1200,
+              "min_price": 800,
+              "sell_lot": 100,
+              "settlement": "TPlusOne",
+              "source": "synthetic_test/explicit-rules-v1",
+              "tick_size": 1,
+              "tradable": true,
+              "trading_day": 20261030
+            }
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1793323800000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20261030
+          }
+        }
+      },
+      "event_id": "replay-session-20261030",
+      "ledger_digest": "ade3d926ff22e462aa61ca0393f468a763f4697764646c8ce9308a430b12d942",
+      "nav_fen": 992969,
+      "new_fills": [],
+      "new_orders": [],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "replay-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "replay-v1",
+          "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+          "group_id": "replay-group",
+          "strategy_id": "two-signal-example"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 4,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1793343601000,
+      "cash_fen": 899969,
+      "command": {
+        "Submit": {
+          "day": 20261030,
+          "fees": {
+            "commission_ppm": 300,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "minimum_commission": 1,
+            "sell_tax_ppm": 500,
+            "source": "synthetic_test/not-a-real-tariff",
+            "transfer_ppm": 10,
+            "valid_from": 20261028,
+            "valid_through": 20261130,
+            "version": "artificial-fees-v1"
+          },
+          "now": 1793343601000,
+          "proposal": {
+            "account_id": "replay-account",
+            "data_available_at": 1793343601000,
+            "decision_at": 1793343601000,
+            "deployment": {
+              "deployment_id": "replay-v1",
+              "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+              "group_id": "replay-group",
+              "strategy_id": "two-signal-example"
+            },
+            "earliest_execution_at": 1793343601001,
+            "expires_at": 1793948401000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "limit_price": 930,
+            "proposal_id": 2,
+            "quantity": 100,
+            "side": "Sell"
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1793323800000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20261030
+          }
+        }
+      },
+      "event_id": "replay-signal-20261030",
+      "ledger_digest": "b447d8069abd92bcbc64f31fedda0567faf13a51801cd137b688cfad1a70322e",
+      "nav_fen": 992969,
+      "new_fills": [],
+      "new_orders": [
+        {
+          "accepted_on": 20261030,
+          "fee_schedule": {
+            "commission_ppm": 300,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "minimum_commission": 1,
+            "sell_tax_ppm": 500,
+            "source": "synthetic_test/not-a-real-tariff",
+            "transfer_ppm": 10,
+            "valid_from": 20261028,
+            "valid_through": 20261130,
+            "version": "artificial-fees-v1"
+          },
+          "proposal": {
+            "account_id": "replay-account",
+            "data_available_at": 1793343601000,
+            "decision_at": 1793343601000,
+            "deployment": {
+              "deployment_id": "replay-v1",
+              "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+              "group_id": "replay-group",
+              "strategy_id": "two-signal-example"
+            },
+            "earliest_execution_at": 1793343601001,
+            "expires_at": 1793948401000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "limit_price": 930,
+            "proposal_id": 2,
+            "quantity": 100,
+            "side": "Sell"
+          },
+          "reason": "最新权威状态通过风控并原子预留",
+          "remaining": 100,
+          "reserved_fee": 300,
+          "status": "Open"
+        }
+      ],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "replay-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "replay-v1",
+          "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+          "group_id": "replay-group",
+          "strategy_id": "two-signal-example"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 5,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1793602801000,
+      "cash_fen": 992893,
+      "command": {
+        "Match": {
+          "bar": {
+            "available_at": 1793602801000,
+            "capacity_shares": 100,
+            "close": 970,
+            "closes_at": 1793602800000,
+            "day": 20261102,
+            "high": 1000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "low": 900,
+            "open": 930,
+            "opens_at": 1793583000000,
+            "provenance": {
+              "dataset_hash": "e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe",
+              "mode": "synthetic_test",
+              "price_semantics": "unadjusted_cny_fen",
+              "source_version": "synthetic_test/hand-authored | fixture-v1 | generated-in-repository-no-market-data",
+              "timezone": "Asia/Shanghai"
+            },
+            "status_verified": true,
+            "volume_shares": 10000
+          },
+          "day": 20261102,
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "now": 1793602801000,
+          "opening": {
+            "marks": [
+              {
+                "as_of": 1793583000000,
+                "available_at": 1793583000000,
+                "instrument": {
+                  "code": "600000",
+                  "market": "Shanghai"
+                },
+                "price": 930,
+                "source": "synthetic_test/independent-opening-v1"
+              }
+            ],
+            "rules": {
+              "allow_odd_lot_liquidation": true,
+              "available_at": 1793583000000,
+              "buy_lot": 100,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "max_price": 1200,
+              "min_price": 800,
+              "sell_lot": 100,
+              "settlement": "TPlusOne",
+              "source": "synthetic_test/explicit-rules-v1",
+              "tick_size": 1,
+              "tradable": true,
+              "trading_day": 20261102
+            }
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1793583000000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20261102
+          }
+        }
+      },
+      "event_id": "replay-session-20261102",
+      "ledger_digest": "8102e482727cb4a15598335521e9a1865a5615a20b655809af32c299ca659ee3",
+      "nav_fen": 992893,
+      "new_fills": [
+        {
+          "day": 20261102,
+          "event_id": "20261102:2",
+          "evidence": {
+            "available_at": 1793602801000,
+            "capacity_shares": 100,
+            "close": 970,
+            "closes_at": 1793602800000,
+            "day": 20261102,
+            "high": 1000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "low": 900,
+            "open": 930,
+            "opens_at": 1793583000000,
+            "provenance": {
+              "dataset_hash": "e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe",
+              "mode": "synthetic_test",
+              "price_semantics": "unadjusted_cny_fen",
+              "source_version": "synthetic_test/hand-authored | fixture-v1 | generated-in-repository-no-market-data",
+              "timezone": "Asia/Shanghai"
+            },
+            "status_verified": true,
+            "volume_shares": 10000
+          },
+          "fee_version": "artificial-fees-v1",
+          "fees": {
+            "commission": 28,
+            "tax": 47,
+            "transfer": 1
+          },
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "opening_evidence": {
+            "marks": [
+              {
+                "as_of": 1793583000000,
+                "available_at": 1793583000000,
+                "instrument": {
+                  "code": "600000",
+                  "market": "Shanghai"
+                },
+                "price": 930,
+                "source": "synthetic_test/independent-opening-v1"
+              }
+            ],
+            "rules": {
+              "allow_odd_lot_liquidation": true,
+              "available_at": 1793583000000,
+              "buy_lot": 100,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "max_price": 1200,
+              "min_price": 800,
+              "sell_lot": 100,
+              "settlement": "TPlusOne",
+              "source": "synthetic_test/explicit-rules-v1",
+              "tick_size": 1,
+              "tradable": true,
+              "trading_day": 20261102
+            }
+          },
+          "order_id": 2,
+          "price": 930,
+          "quantity": 100,
+          "risk_checked_at": 1793583000000,
+          "side": "Sell",
+          "simulated_at": 1793602801000
+        }
+      ],
+      "new_orders": [],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "replay-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "replay-v1",
+          "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+          "group_id": "replay-group",
+          "strategy_id": "two-signal-example"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 6,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1793602801000,
+      "cash_fen": 992893,
+      "command": {
+        "Submit": {
+          "day": 20261102,
+          "fees": {
+            "commission_ppm": 300,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "minimum_commission": 1,
+            "sell_tax_ppm": 500,
+            "source": "synthetic_test/not-a-real-tariff",
+            "transfer_ppm": 10,
+            "valid_from": 20261028,
+            "valid_through": 20261130,
+            "version": "artificial-fees-v1"
+          },
+          "now": 1793602801000,
+          "proposal": {
+            "account_id": "replay-account",
+            "data_available_at": 1793602801000,
+            "decision_at": 1793602801000,
+            "deployment": {
+              "deployment_id": "replay-v1",
+              "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+              "group_id": "replay-group",
+              "strategy_id": "two-signal-example"
+            },
+            "earliest_execution_at": 1793602801001,
+            "expires_at": 1794207601000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "limit_price": 970,
+            "proposal_id": 3,
+            "quantity": 10000,
+            "side": "Buy"
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1793583000000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20261102
+          }
+        }
+      },
+      "event_id": "replay-signal-20261102",
+      "ledger_digest": "2df95c387f82ec0399537ee7cd43e0abe06208a6c5c7aba08f1484c6ff458740",
+      "nav_fen": 992893,
+      "new_fills": [],
+      "new_orders": [
+        {
+          "accepted_on": 20261102,
+          "fee_schedule": {
+            "commission_ppm": 300,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "minimum_commission": 1,
+            "sell_tax_ppm": 500,
+            "source": "synthetic_test/not-a-real-tariff",
+            "transfer_ppm": 10,
+            "valid_from": 20261028,
+            "valid_through": 20261130,
+            "version": "artificial-fees-v1"
+          },
+          "proposal": {
+            "account_id": "replay-account",
+            "data_available_at": 1793602801000,
+            "decision_at": 1793602801000,
+            "deployment": {
+              "deployment_id": "replay-v1",
+              "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+              "group_id": "replay-group",
+              "strategy_id": "two-signal-example"
+            },
+            "earliest_execution_at": 1793602801001,
+            "expires_at": 1794207601000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "limit_price": 970,
+            "proposal_id": 3,
+            "quantity": 10000,
+            "side": "Buy"
+          },
+          "reason": "可用资金不足：需要 97200.00 元，扣除预留后仅有 9928.93 元",
+          "remaining": 10000,
+          "reserved_fee": 0,
+          "status": "Rejected"
+        }
+      ],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "replay-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "replay-v1",
+          "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+          "group_id": "replay-group",
+          "strategy_id": "two-signal-example"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 7,
+      "valuation_error": null
+    }
+  ],
+  "evidence_class": "engine_test_only",
+  "external_flow_total_fen": 0,
+  "fills": [
+    {
+      "day": 20261029,
+      "event_id": "20261029:1",
+      "evidence": {
+        "available_at": 1793257201000,
+        "capacity_shares": 100,
+        "close": 980,
+        "closes_at": 1793257200000,
+        "day": 20261029,
+        "high": 1050,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "low": 950,
+        "open": 1000,
+        "opens_at": 1793237400000,
+        "provenance": {
+          "dataset_hash": "e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe",
+          "mode": "synthetic_test",
+          "price_semantics": "unadjusted_cny_fen",
+          "source_version": "synthetic_test/hand-authored | fixture-v1 | generated-in-repository-no-market-data",
+          "timezone": "Asia/Shanghai"
+        },
+        "status_verified": true,
+        "volume_shares": 10000
+      },
+      "fee_version": "artificial-fees-v1",
+      "fees": {
+        "commission": 30,
+        "tax": 0,
+        "transfer": 1
+      },
+      "instrument": {
+        "code": "600000",
+        "market": "Shanghai"
+      },
+      "opening_evidence": {
+        "marks": [
+          {
+            "as_of": 1793237400000,
+            "available_at": 1793237400000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "price": 1000,
+            "source": "synthetic_test/independent-opening-v1"
+          }
+        ],
+        "rules": {
+          "allow_odd_lot_liquidation": true,
+          "available_at": 1793237400000,
+          "buy_lot": 100,
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "max_price": 1200,
+          "min_price": 800,
+          "sell_lot": 100,
+          "settlement": "TPlusOne",
+          "source": "synthetic_test/explicit-rules-v1",
+          "tick_size": 1,
+          "tradable": true,
+          "trading_day": 20261029
+        }
+      },
+      "order_id": 1,
+      "price": 1000,
+      "quantity": 100,
+      "risk_checked_at": 1793237400000,
+      "side": "Buy",
+      "simulated_at": 1793257201000
+    },
+    {
+      "day": 20261102,
+      "event_id": "20261102:2",
+      "evidence": {
+        "available_at": 1793602801000,
+        "capacity_shares": 100,
+        "close": 970,
+        "closes_at": 1793602800000,
+        "day": 20261102,
+        "high": 1000,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "low": 900,
+        "open": 930,
+        "opens_at": 1793583000000,
+        "provenance": {
+          "dataset_hash": "e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe",
+          "mode": "synthetic_test",
+          "price_semantics": "unadjusted_cny_fen",
+          "source_version": "synthetic_test/hand-authored | fixture-v1 | generated-in-repository-no-market-data",
+          "timezone": "Asia/Shanghai"
+        },
+        "status_verified": true,
+        "volume_shares": 10000
+      },
+      "fee_version": "artificial-fees-v1",
+      "fees": {
+        "commission": 28,
+        "tax": 47,
+        "transfer": 1
+      },
+      "instrument": {
+        "code": "600000",
+        "market": "Shanghai"
+      },
+      "opening_evidence": {
+        "marks": [
+          {
+            "as_of": 1793583000000,
+            "available_at": 1793583000000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "price": 930,
+            "source": "synthetic_test/independent-opening-v1"
+          }
+        ],
+        "rules": {
+          "allow_odd_lot_liquidation": true,
+          "available_at": 1793583000000,
+          "buy_lot": 100,
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "max_price": 1200,
+          "min_price": 800,
+          "sell_lot": 100,
+          "settlement": "TPlusOne",
+          "source": "synthetic_test/explicit-rules-v1",
+          "tick_size": 1,
+          "tradable": true,
+          "trading_day": 20261102
+        }
+      },
+      "order_id": 2,
+      "price": 930,
+      "quantity": 100,
+      "risk_checked_at": 1793583000000,
+      "side": "Sell",
+      "simulated_at": 1793602801000
+    }
+  ],
+  "first_day": 20261028,
+  "initial_nav_fen": 1000000,
+  "input_sha256": "e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe",
+  "instrument": {
+    "code": "600000",
+    "market": "Shanghai"
+  },
+  "last_day": 20261102,
+  "ledger_head": "2df95c387f82ec0399537ee7cd43e0abe06208a6c5c7aba08f1484c6ff458740",
+  "ledger_schema": 3,
+  "license": "generated-in-repository-no-market-data",
+  "max_daily_observation_drawdown_bps": 71,
+  "missing_opening_evidence_sessions": 0,
+  "mode": "synthetic_test",
+  "no_fill_sessions": 2,
+  "orders": [
+    {
+      "accepted_on": 20261028,
+      "fee_schedule": {
+        "commission_ppm": 300,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "minimum_commission": 1,
+        "sell_tax_ppm": 500,
+        "source": "synthetic_test/not-a-real-tariff",
+        "transfer_ppm": 10,
+        "valid_from": 20261028,
+        "valid_through": 20261130,
+        "version": "artificial-fees-v1"
+      },
+      "proposal": {
+        "account_id": "replay-account",
+        "data_available_at": 1793170801000,
+        "decision_at": 1793170801000,
+        "deployment": {
+          "deployment_id": "replay-v1",
+          "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+          "group_id": "replay-group",
+          "strategy_id": "two-signal-example"
+        },
+        "earliest_execution_at": 1793170801001,
+        "expires_at": 1793775601000,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "limit_price": 1000,
+        "proposal_id": 1,
+        "quantity": 100,
+        "side": "Buy"
+      },
+      "reason": "保守日线限价穿越模型模拟成交；不是交易所成交",
+      "remaining": 0,
+      "reserved_fee": 0,
+      "status": "Filled"
+    },
+    {
+      "accepted_on": 20261030,
+      "fee_schedule": {
+        "commission_ppm": 300,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "minimum_commission": 1,
+        "sell_tax_ppm": 500,
+        "source": "synthetic_test/not-a-real-tariff",
+        "transfer_ppm": 10,
+        "valid_from": 20261028,
+        "valid_through": 20261130,
+        "version": "artificial-fees-v1"
+      },
+      "proposal": {
+        "account_id": "replay-account",
+        "data_available_at": 1793343601000,
+        "decision_at": 1793343601000,
+        "deployment": {
+          "deployment_id": "replay-v1",
+          "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+          "group_id": "replay-group",
+          "strategy_id": "two-signal-example"
+        },
+        "earliest_execution_at": 1793343601001,
+        "expires_at": 1793948401000,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "limit_price": 930,
+        "proposal_id": 2,
+        "quantity": 100,
+        "side": "Sell"
+      },
+      "reason": "保守日线限价穿越模型模拟成交；不是交易所成交",
+      "remaining": 0,
+      "reserved_fee": 0,
+      "status": "Filled"
+    },
+    {
+      "accepted_on": 20261102,
+      "fee_schedule": {
+        "commission_ppm": 300,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "minimum_commission": 1,
+        "sell_tax_ppm": 500,
+        "source": "synthetic_test/not-a-real-tariff",
+        "transfer_ppm": 10,
+        "valid_from": 20261028,
+        "valid_through": 20261130,
+        "version": "artificial-fees-v1"
+      },
+      "proposal": {
+        "account_id": "replay-account",
+        "data_available_at": 1793602801000,
+        "decision_at": 1793602801000,
+        "deployment": {
+          "deployment_id": "replay-v1",
+          "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+          "group_id": "replay-group",
+          "strategy_id": "two-signal-example"
+        },
+        "earliest_execution_at": 1793602801001,
+        "expires_at": 1794207601000,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "limit_price": 970,
+        "proposal_id": 3,
+        "quantity": 10000,
+        "side": "Buy"
+      },
+      "reason": "可用资金不足：需要 97200.00 元，扣除预留后仅有 9928.93 元",
+      "remaining": 10000,
+      "reserved_fee": 0,
+      "status": "Rejected"
+    }
+  ],
+  "paper_only": true,
+  "positions": [],
+  "price_semantics": "unadjusted_cny_fen",
+  "realized_pnl_fen": -7107,
+  "remaining_cost_basis_fen": 0,
+  "report_schema": 1,
+  "risk_rejections": [
+    {
+      "accepted_on": 20261102,
+      "fee_schedule": {
+        "commission_ppm": 300,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "minimum_commission": 1,
+        "sell_tax_ppm": 500,
+        "source": "synthetic_test/not-a-real-tariff",
+        "transfer_ppm": 10,
+        "valid_from": 20261028,
+        "valid_through": 20261130,
+        "version": "artificial-fees-v1"
+      },
+      "proposal": {
+        "account_id": "replay-account",
+        "data_available_at": 1793602801000,
+        "decision_at": 1793602801000,
+        "deployment": {
+          "deployment_id": "replay-v1",
+          "frozen_version": "first-buy-second-sell-third-risk-probe-v1",
+          "group_id": "replay-group",
+          "strategy_id": "two-signal-example"
+        },
+        "earliest_execution_at": 1793602801001,
+        "expires_at": 1794207601000,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "limit_price": 970,
+        "proposal_id": 3,
+        "quantity": 10000,
+        "side": "Buy"
+      },
+      "reason": "可用资金不足：需要 97200.00 元，扣除预留后仅有 9928.93 元",
+      "remaining": 10000,
+      "reserved_fee": 0,
+      "status": "Rejected"
+    }
+  ],
+  "source": "synthetic_test/hand-authored",
+  "source_version": "fixture-v1",
+  "strategy_spec_sha256": "19efe397349ed7240dbe3960695c517baa055dde3e97b4ec72eafd5088fb3c0c",
+  "strategy_version": "first-buy-second-sell-third-risk-probe-v1",
+  "timezone": "Asia/Shanghai",
+  "total_fee_fen": 107,
+  "total_return_bps": -71,
+  "unobserved_calendar_days_including_weekends": 2,
+  "unrealized_pnl_fen": 0,
+  "unverified_status_sessions": 0
+}

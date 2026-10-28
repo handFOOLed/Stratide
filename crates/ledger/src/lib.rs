@@ -3,5 +3,5 @@ mod engine;
 mod model;
 mod store;
 pub use model::*;
-pub use store::Ledger;
+pub use store::{AuditEntry, Ledger};
 pub mod synthetic;

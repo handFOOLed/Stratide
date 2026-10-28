@@ -1,4 +1,6 @@
+#![recursion_limit = "256"]
 mod paper;
+mod replay;
 use std::{collections::BTreeMap, env, process::ExitCode};
 use stratide_contracts::*;
 use stratide_risk::{FreezeReason, RiskDecision, RiskKernel, RiskScope};
@@ -16,9 +18,12 @@ fn main() -> ExitCode {
 fn run(args: Vec<String>) -> Result<(), String> {
     match args.first().map(String::as_str).unwrap_or("help") {
         "status" => {
-            println!("Stratide M0-PR02 — paper-only；使用 paper-create / paper-submit-synthetic / paper-match-synthetic / paper-status")
+            println!(
+                "Stratide M0-PR03 — paper-only；使用 paper-replay / paper-report / paper-status"
+            )
         }
         "risk-demo" => demo(&args[1..])?,
+        "paper-replay" | "paper-report" => replay::run(&args)?,
         command if command.starts_with("paper-") => paper::run(command, &args[1..])?,
         "help" | "--help" | "-h" => println!(
             "stratide-cli status\nstratide-cli risk-demo\n\
@@ -36,6 +41,8 @@ paper-match-synthetic <目录>
 paper-status <目录>
 \
 paper-apply <目录> <唯一事件ID> <可信命令JSON文件>
+paper-replay <输入JSON> <账本目录> <报表目录> --sha256 <输入文件SHA256> <上述全部六项参数>
+paper-report <输入JSON> <账本目录> <报表目录> --sha256 <输入文件SHA256>
 \
 Paper 演示使用 synthetic_test 人工行情/费率，绝非真实市场数据。"
         ),

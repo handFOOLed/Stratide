@@ -1,0 +1,3 @@
+# The replay input hash is over raw bytes and must survive Windows checkout.
+samples/m0-pr03-synthetic.json text eol=lf
+docs/evidence/m0-pr03/sample-report/* text eol=lf
