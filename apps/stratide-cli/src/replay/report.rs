@@ -4,11 +4,12 @@ use serde_json::json;
 use sha2::{Digest, Sha256};
 use std::{
     collections::{BTreeMap, VecDeque},
-    fs,
     path::Path,
 };
 use stratide_contracts::{Cny, Side, TradingDay};
 use stratide_ledger::{Command, Fill, Ledger, OrderStatus, State};
+
+mod publish;
 
 #[derive(Serialize)]
 struct Daily {
@@ -193,9 +194,6 @@ fn csv_cell(s: &str) -> String {
 }
 fn opt<T: ToString>(v: Option<T>) -> String {
     v.map(|x| x.to_string()).unwrap_or_default()
-}
-fn write(path: &Path, name: &str, bytes: &[u8]) -> Result<(), String> {
-    fs::write(path.join(name), bytes).map_err(|e| format!("写入 {name} 失败：{e}"))
 }
 
 pub(super) fn export(
@@ -438,22 +436,5 @@ pub(super) fn export(
         ("positions.csv", positions_csv.into_bytes()),
         ("report.json", report_json),
     ];
-    if out.exists() {
-        for (name, bytes) in &files {
-            if fs::read(out.join(name)).map_err(|e| e.to_string())? != *bytes {
-                return Err(format!(
-                    "既有报表 {name} 与本次账本不一致；请指定新目录，不覆盖旧证据"
-                ));
-            }
-        }
-    } else {
-        if let Some(parent) = out.parent() {
-            fs::create_dir_all(parent).map_err(|e| e.to_string())?;
-        }
-        fs::create_dir(out).map_err(|e| e.to_string())?;
-        for (name, bytes) in &files {
-            write(out, name, bytes)?;
-        }
-    }
-    Ok(())
+    publish::publish(out, &files)
 }

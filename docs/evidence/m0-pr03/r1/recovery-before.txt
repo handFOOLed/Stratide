@@ -1,0 +1,16 @@
+Sol regression before fix; candidate 730bfcf6c912ceaacafa3d6dee25f06e9178ac80
+Command:
+./scripts/with-msvc.ps1 test -p stratide-cli --test replay interrupted_export_resumes --locked
+
+running 1 test
+test interrupted_export_resumes_in_same_directory_and_preserves_partial_evidence ... FAILED
+
+thread 'interrupted_export_resumes_in_same_directory_and_preserves_partial_evidence' panicked:
+错误：既有报表 daily.csv 与本次账本不一致；请指定新目录，不覆盖旧证据
+
+test result: FAILED. 0 passed; 1 failed; 4 filtered out
+Exit code: 1
+
+The test creates the reported exact partial output: a complete events.json and
+zero-byte daily.csv. It invokes the real CLI again with the same ledger, input,
+parameters and report path, then asserts success and preserved partial evidence.

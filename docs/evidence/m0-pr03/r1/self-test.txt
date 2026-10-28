@@ -1,0 +1,50 @@
+PR #6 R1 Sol self-test (not Terra independent acceptance)
+Fix parent: 730bfcf6c912ceaacafa3d6dee25f06e9178ac80
+Windows x64, Rust/Cargo 1.98.1, existing MSVC and dependency cache.
+
+Before fix:
+./scripts/with-msvc.ps1 test -p stratide-cli --test replay interrupted_export_resumes --locked
+Exit 1; real CLI retry rejected complete events.json + empty daily.csv.
+See recovery-before.txt. Terra's original evidence directory was not changed.
+
+After fix:
+cargo fmt --all -- --check                                      exit 0
+./scripts/with-msvc.ps1 check --workspace --locked               exit 0
+./scripts/with-msvc.ps1 test --workspace --locked                exit 0
+  76 passed: CLI unit 3 (including crash-child helper),
+  CLI paper_ledger 4, replay 5, risk_demo 2, contracts 1,
+  ledger 28, risk 33. Four publication crash points covered.
+  Full output in test.txt.
+./scripts/with-msvc.ps1 clippy --workspace --all-targets --locked '--' -D warnings
+                                                               exit 0
+git diff --check                                               exit 0
+
+The sandbox initially denied rename of directories in the system temporary
+folder (Access denied, os error 5). The identical CLI tests and full workspace
+tests passed outside the sandbox. Real CLI publication/kill/recovery below ran
+successfully in the writable workspace. Rust incremental hard links also fell
+back to copying in some checks; all final commands above exited 0.
+
+Actual real-process kill (no production fault hook):
+python scripts/test-pr03-export-recovery.py --exe target/debug/stratide-cli.exe --output state/pr03-r1-recovery
+Exit 0. Killed attempt 0, child exit 1. The temporary report directory contained
+only events.json with 815187 bytes; the final output path did not exist.
+Same replay command and SAME output path resumed successfully, all ledger events
+and six files equal the uninterrupted padded-synthetic baseline. Repeated again
+successfully. Existing conflict content was refused and preserved unchanged.
+See recovery-results.json for actual input/ledger/report SHA-256 values.
+
+Original Terra partial-output copy:
+Source (read only): F:/Desktop/Documents/Codex/Stratide/terra-pr06-730bfcf/audit/export-kill-report-0
+Copied its events.json (28641 bytes) and daily.csv (0 bytes) to
+state/pr03-r1-terra-partial-copy, then ran:
+./target/debug/stratide-cli.exe paper-replay samples/m0-pr03-synthetic.json state/pr03-r1-recovery/ledger state/pr03-r1-terra-partial-copy --sha256 e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe --initial-cash-fen 1000000 --max-order-fen 500000 --account-cap-fen 800000 --strategy-cap-fen 500000 --daily-loss-fen 100000 --drawdown-fen 200000
+Exit 0; partial copy archived as a sibling *.interrupted directory, original
+two files preserved; six recovered report SHA-256 values equal baseline.
+Ledger head: 2df95c387f82ec0399537ee7cd43e0abe06208a6c5c7aba08f1484c6ff458740
+
+All market inputs here are synthetic_test. No claim of real historical evidence,
+PIT qualification, actual market fills or forward-paper observation.
+Linux/macOS, another physical host, power failure/disk full and end-to-end
+missing-cost-basis cases remain unverified. New SHA needs Terra reacceptance and
+ChatGPT code review; original candidate's FAIL is retained. No merge performed.

@@ -204,3 +204,57 @@ fn legacy_v3_synthetic_demo_cannot_be_relabelled_as_replay_report() {
     assert!(!report.exists());
     assert!(String::from_utf8_lossy(&out.stderr).contains("不匹配"));
 }
+
+#[test]
+fn interrupted_export_resumes_in_same_directory_and_preserves_partial_evidence() {
+    let temp = tempfile::tempdir().unwrap();
+    let ledger = temp.path().join("ledger");
+    let baseline = temp.path().join("baseline");
+    let interrupted = temp.path().join("interrupted");
+    assert_ok(&replay(&input(), &ledger, &baseline, HASH));
+    let state_before = cli(&["paper-status", ledger.to_str().unwrap()]).stdout;
+    fs::create_dir(&interrupted).unwrap();
+    fs::copy(
+        baseline.join("events.json"),
+        interrupted.join("events.json"),
+    )
+    .unwrap();
+    fs::write(interrupted.join("daily.csv"), []).unwrap();
+    assert_ok(&replay(&input(), &ledger, &interrupted, HASH));
+    for name in [
+        "events.json",
+        "daily.csv",
+        "orders.csv",
+        "fills.csv",
+        "positions.csv",
+        "report.json",
+    ] {
+        assert_eq!(
+            fs::read(interrupted.join(name)).unwrap(),
+            fs::read(baseline.join(name)).unwrap()
+        );
+    }
+    assert_eq!(
+        cli(&["paper-status", ledger.to_str().unwrap()]).stdout,
+        state_before
+    );
+    let archives: Vec<_> = fs::read_dir(temp.path())
+        .unwrap()
+        .map(|e| e.unwrap().path())
+        .filter(|p| {
+            p.file_name()
+                .unwrap()
+                .to_string_lossy()
+                .ends_with(".interrupted")
+        })
+        .collect();
+    assert_eq!(archives.len(), 1);
+    assert_eq!(
+        fs::read(archives[0].join("events.json")).unwrap(),
+        fs::read(baseline.join("events.json")).unwrap()
+    );
+    assert_eq!(
+        fs::metadata(archives[0].join("daily.csv")).unwrap().len(),
+        0
+    );
+}
