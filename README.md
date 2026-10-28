@@ -7,7 +7,7 @@
 **自主量化交易与开放式策略发现平台**  
 *Autonomous Quantitative Trading & Open-Ended Strategy Discovery*
 
-> **当前状态：M0-PR03 paper-only 开发与自测，等待独立验收。** 已合并的 PR-02 提供单写入者持久化 Paper Ledger、风控与保守日线模拟成交；本轮增加冻结 JSON 输入的确定性历史回放与 CSV/JSON 报告。随仓样例仅为 `synthetic_test` 人工行情与费率；没有经过核验的真实历史样例，也没有持续前向模拟或券商接口。**请勿使用当前代码管理真实资金。**
+> **当前状态：M0-PR01、PR-02、PR-03 已合并，Windows 上完成 Terra 独立验收与 ChatGPT 源码审查。** 现有 **paper-only** 能力包括独立风控、单写入者 SQLite 持久账本、原子预留、保守日线模拟成交、冻结输入的确定性回放，以及六份可审计 CSV/JSON 报表；PR-03 见 [PR #6](https://github.com/handFOOLed/Stratide/pull/6)，合并提交 `13de8d43f663caa16c983609d2d5161ca497d123`。随仓样例仅为 `synthetic_test` **合成人工数据/费率**，没有经过核验的真实历史行情或长期前向模拟，也没有真实券商接口。Linux/macOS、物理断电及实际行情许可/可得性未验证。**不得使用当前代码管理真实资金或以示例数据声称盈利能力。**
 
 人工成交先记入独立待归属账簿，不推断策略组归属，见 [ADR-032](docs/adr/0032-manual-trades-suspense-ledger-unassigned-attribution.md)；最终由 Owner 显式选择归属组别和数量，不允许自动按比例猜测或修改真实成交，见 [ADR-033](docs/adr/0033-owner-explicit-manual-fill-group-attribution.md)。
 
@@ -15,11 +15,11 @@ PR-02 已合并；其 R2 修复要求订单有效期严格覆盖完整交易时�
 
 ## 当前优先任务：可观察的模拟交易
 
-根据 [ADR-037](docs/adr/0037-observable-paper-trading-first-and-independent-review-gates.md)，先实现可复现的单策略模拟交易内核（M0），再接入真实来源行情进行前向 Paper Trading 观察（M1），输出净值、持仓、成交、费用、回撤及风险拒单等可核实报告。**GPT-6.1 Sol 编码、GPT-6.1 Terra 独立测试和验收并在审查通过后合并、ChatGPT 审查 PR、Owner 观察效果及决定范围**。详细 PR 交付与验收标准见 [模拟交易路线图](docs/PAPER_TRADING_ROADMAP.md)。所有结果须区分合成、历史回放和前向模拟；当前只交付 M0 的窄范围模拟内核，仍不能用于真实资金。
+根据 [ADR-037](docs/adr/0037-observable-paper-trading-first-and-independent-review-gates.md)，先实现可复现的单策略模拟交易内核（M0），再接入真实来源行情进行前向 Paper Trading 观察（M1），输出净值、持仓、成交、费用、回撤及风险拒单等可核实报告。**GPT-6.1 Sol 编码、GPT-6.1 Terra 独立测试/出具同 SHA 验收报告、ChatGPT（小猫）审查并在明确通过后用 HEAD SHA 锁定安全合并、Owner 观察结果及决定范围**。详细 PR 交付与验收标准见 [模拟交易路线图](docs/PAPER_TRADING_ROADMAP.md)。所有结果须区分合成、历史回放和前向模拟；当前只交付 M0 的窄范围模拟内核，仍不能用于真实资金。
 
 ## 项目愿景
 
-本轮回放命令、真实导出文件、自测与未验证范围见 [M0-PR03 实现说明](docs/M0_PR03.md)。既有账本见 [M0-PR02 实现说明](docs/M0_PR02.md)。本轮自测不代替 Terra 独立验收与 ChatGPT 审查；本轮不合并 PR。
+已合并的回放命令、实际导出文件和验证边界见 [M0-PR03 实现说明](docs/M0_PR03.md)及 [R1 中断恢复修复](docs/M0_PR03_R1.md)；基础账本见 [M0-PR02 实现说明](docs/M0_PR02.md)。PR #6 的 [Terra 独立 PASS 验收](https://github.com/handFOOLed/Stratide/pull/6#issuecomment-6465953588) 与 [ChatGPT 同 SHA 代码审查](https://github.com/handFOOLed/Stratide/pull/6#pullrequestreview-5680851123) 已完成。**下一里程碑为 M1 的真实来源前向 Paper 观察，尚未实现或验收。**
 
 Stratide 是面向个人用户的**低资源占用、本地优先**的自动化交易平台。它允许云端 AI Agent 自主探索新的交易策略，但所有实际交易必须受到**独立、不可绕过的风控系统**约束。
 
@@ -64,7 +64,7 @@ Stratide 是面向个人用户的**低资源占用、本地优先**的自动化�
 ```text
 apps/
   stratided/           Rust 后台服务占位程序
-  stratide-cli/        本地风险示例与持久 Paper CLI
+  stratide-cli/        风险示例、持久 Paper CLI、确定性回放与 CSV/JSON 报表
   dashboard/           未来的私有 Web 控制台（未实现）
 crates/
   contracts/           Paper 账户、提案与可信快照契约
@@ -107,7 +107,24 @@ cargo run -p stratide-cli -- paper-match-synthetic state/paper-demo-r2
 cargo run -p stratide-cli -- paper-status state/paper-demo-r2
 ```
 
-`risk-demo` 的价格、规则、费用与时间均为固定 `synthetic_test` 输入，金额参数以整数分显式传入，无默认本金；接受提案不代表成交，也不改变现金或持仓。`stratided` 仍是占位程序。**编译成功不代表能够安全交易**；Windows 若未加载 MSVC 开发环境，可用 `./scripts/with-msvc.ps1` 代替 `cargo`。实际自测和未验证项见 [本轮实现说明](docs/M0_PR02.md)。
+### 已合并 PR-03：运行合成回放与生成六份报告
+
+下面的路径是**新建**示例路径，勿覆盖已有账户/报表；参数是人民币整数分，均需用户显式设置。
+
+```powershell
+$input = 'samples/m0-pr03-synthetic.json'
+$sha = (Get-FileHash $input -Algorithm SHA256).Hash.ToLowerInvariant()
+cargo run --locked -p stratide-cli -- paper-replay $input state/pr03-ledger state/pr03-report --sha256 $sha --initial-cash-fen 1000000 --max-order-fen 500000 --account-cap-fen 800000 --strategy-cap-fen 500000 --daily-loss-fen 100000 --drawdown-fen 200000
+cargo run --locked -p stratide-cli -- paper-status state/pr03-ledger
+cargo run --locked -p stratide-cli -- paper-report $input state/pr03-ledger state/pr03-report --sha256 $sha
+Import-Csv state/pr03-report/daily.csv | Format-Table
+Import-Csv state/pr03-report/orders.csv | Format-Table
+Import-Csv state/pr03-report/fills.csv | Format-Table
+```
+
+六份报告为 `report.json`、`events.json`、`daily.csv`、`orders.csv`、`fills.csv`、`positions.csv`。同一冻结输入重跑会检查账本事件和报表内容；意外中断的可识别残缺旧报表先归档，再以同路径恢复。**这些仅是合成数据的模拟账簿与计算演示，不是已验证的真实历史收益。**
+
+`risk-demo` 的价格、规则、费用与时间均为固定 `synthetic_test` 输入，金额参数以整数分显式传入，无默认本金；接受提案不代表成交，也不改变现金或持仓。`stratided` 仍是占位程序。**编译成功不代表能够安全交易**；Windows 若未加载 MSVC 开发环境，可用 `./scripts/with-msvc.ps1` 代替 `cargo`。回放的实际 Windows 独立验收、报表及未验证项见 [M0-PR03](docs/M0_PR03.md) 和 [PR #6](https://github.com/handFOOLed/Stratide/pull/6)。
 
 仓库：[handFOOLed/Stratide](https://github.com/handFOOLed/Stratide)（Private）。请使用正常的 GitHub 身份认证拉取，不要将 API Key、券商凭据或个人账户数据提交到仓库。
 
