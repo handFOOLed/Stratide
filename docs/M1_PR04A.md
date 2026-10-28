@@ -1,5 +1,7 @@
 # M1-PR04A：真实 EOD 来源探测与 observe-only 观察日志
 
+**2026-10-28 补测后进展：** Owner 已明确确认本账户自动采集及本地原始响应保存范围，并说明可调用 2000 积分接口；按此 Owner 声明新建的观察 journal 已实际写入 HTTPS 响应，通过恢复、重复与昨日晚到核对，当前为 **1 个有效前向日、0 提案/成交**。许可依据为 Owner 声明，未升级为供应商书面或独立合规认证；PR 继续 Draft，待独立复验及许可门槛判定。详见 [R1 实际入库证据](evidence/m1-pr04a-r1/README.md)。下文保留首次提交时的 blocked 状态和原证据，不能抹去失败历史。
+
 状态：**Draft / BLOCKED：本机真实 HTTPS 接口访问及关键字段通过 Sol 自测；自动盘后采集与持久保存许可仍未核验。没有成功真实采集入 journal，不能宣称 PR04A 真实数据验收完成。** 任务 [Issue #7](https://github.com/handFOOLed/Stratide/issues/7)，基线为 fetch 后的 `main`：`4b53cf8`（完整基线见 PR）。Sol 不合并；Terra 对准确 HEAD 独立验收，小猫同 SHA 源码审查并经 Owner 授权后受控合并。
 
 ## 已交付边界

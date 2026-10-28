@@ -2,6 +2,8 @@
 
 # Stratide
 
+**PR #8 follow-up (still Draft):** After the Owner explicitly attested to account permission for automated access and local raw-response retention, a new journal received actual HTTPS data and passed local restart, duplicate and late-backfill checks: one valid forward day, zero proposals/fills. The license basis remains an Owner declaration, not provider-written or independent certification; independent retesting and the formal source-license gate remain pending. See [R1 evidence](docs/evidence/m1-pr04a-r1/README.md). The original blocked record below is preserved.
+
 **M1-PR04A development branch: Draft / BLOCKED.** Adds a separate observe-only journal, single-shot EOD adapter and CSV/JSON CLI. Actual local Tushare HTTPS `daily`/`trade_cal` probes succeeded, but permission for automated collection and raw-response retention remains unverified; the sample blocks collection. Valid forward days, strategy proposals and simulated fills remain zero. The v3 financial ledger is unchanged. See [commands, actual outputs and limits](docs/M1_PR04A.md) and [source feasibility](docs/M1_PR04A_SOURCE_FEASIBILITY.md) (Chinese). Terra's independent acceptance, ChatGPT review and Owner-authorized merge are still pending; M1 is not complete.
 
 [ADR-035](docs/adr/0035-record-date-corporate-action-group-attribution.md): record-date dividends and bonus shares are attributed automatically to eligible groups.
