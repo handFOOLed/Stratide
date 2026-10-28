@@ -9,11 +9,11 @@
 
 [ADR-026](docs/adr/0026-budgeted-shadow-observation-and-local-strategy-registry.md): bounded shadow observation, locally indexed strategy lookup and limited cloud-LLM context. [ADR-027](docs/adr/0027-historical-failure-as-evidence-not-permanent-ban.md): past failures are research evidence, not permanent research bans or permission to bypass live financial locks.
 
-**Current development priority:** deliver verifiable M0 paper trading core first, then M1 genuine forward paper observation on provenance-tagged market data with NAV/trade/fee/drawdown reports. GPT-6.1 Sol writes code; GPT-6.1 Terra independently tests and merges after ChatGPT PR review clears blockers; Owner evaluates observed results. See [ADR-037](docs/adr/0037-observable-paper-trading-first-and-independent-review-gates.md) and [the paper roadmap](docs/PAPER_TRADING_ROADMAP.md). Historical replays are not live observations.
+**Current development priority:** deliver verifiable M0 paper trading core first, then M1 genuine forward paper observation on provenance-tagged market data with NAV/trade/fee/drawdown reports. GPT-6.1 Sol implements; GPT-6.1 Terra independently tests and publishes SHA-specific acceptance evidence; ChatGPT reviews source and evidence, then performs the SHA-guarded merge after clearance; the Owner sets scope and evaluates results. See [ADR-037](docs/adr/0037-observable-paper-trading-first-and-independent-review-gates.md) and [the paper roadmap](docs/PAPER_TRADING_ROADMAP.md). Historical replays are not live observations.
 
 **Autonomous Quantitative Trading & Open-Ended Strategy Discovery**
 
-Status: **M0-PR03 paper-only development and self-testing, independent acceptance pending**. The merged PR-02 supplies the single-writer Paper Ledger, risk checks and conservative daily-bar simulated fills; this PR adds deterministic replay of frozen local JSON input and CSV/JSON reports. The committed example is artificial `synthetic_test` data and rates. No verified real historical sample, continuous forward paper observation or broker interface is included. Do not use this repository to manage real funds. See [replay commands, exported reports and verification limits](docs/M0_PR03.md) (Chinese). Sol's self-tests do not replace Terra's independent acceptance or ChatGPT review; Sol does not merge.
+Status: **M0-PR01, PR-02 and PR-03 merged**, with independent Windows acceptance by Terra and source/evidence review by ChatGPT. The paper-only system now includes a Risk Kernel, a single-writer durable SQLite ledger, atomic cash/share reservations, conservative daily-bar simulated fills, deterministic replay of frozen JSON input, and six inspectable CSV/JSON reports. [PR #6](https://github.com/handFOOLed/Stratide/pull/6) was merged at `13de8d43f663caa16c983609d2d5161ca497d123`, after [Terra's R1 independent PASS](https://github.com/handFOOLed/Stratide/pull/6#issuecomment-6465953588) and [ChatGPT's SHA-specific code review](https://github.com/handFOOLed/Stratide/pull/6#pullrequestreview-5680851123). The committed example is strictly artificial `synthetic_test` market data and fees, **not verified historical performance or forward observation**. Real-data provenance/licensing, Linux/macOS, physical power-loss and live brokerage are not verified or implemented. Do not use this repository to manage real funds. See [replay commands, exported reports and limits](docs/M0_PR03.md) (Chinese).
 
 - **ADR-020/021/022:** New versions require independent requalification. Strategy groups can hold the same instrument with separate internal data/P&L but one real account ledger. Trusted portfolio allocation nets compatible opposing group intents before actual broker orders; internal virtual transfers are not exchange fills. See [ADR-020](docs/adr/0020-versioned-requalification-auto-promotion.md), [ADR-021](docs/adr/0021-group-isolation-shared-instrument-attribution.md), and [ADR-022](docs/adr/0022-trusted-cross-group-intent-netting.md).
 - **ADR-023:** Both sides of an internal group-to-group virtual allocation use the same trusted market-reference price. Internal reallocation is not a broker fill and adds no actual spread, fees, account equity or real trading P&L ([ADR-023](docs/adr/0023-single-market-reference-internal-transfer.md)).
@@ -50,7 +50,7 @@ Stratide is a resource-light, local-first automated trading system with open-end
 ```text
 apps/
   stratided/           tiny placeholder for future background service
-  stratide-cli/        local risk example and durable paper CLI
+  stratide-cli/        local risk demo, durable paper CLI, deterministic replay and reports
   dashboard/           future private Web UI (not implemented)
 crates/
   contracts/           paper account, proposal and trusted snapshot contracts
@@ -92,7 +92,24 @@ cargo run -p stratide-cli -- paper-match-synthetic state/paper-demo-r2
 cargo run -p stratide-cli -- paper-status state/paper-demo-r2
 ```
 
-`risk-demo` uses fixed `synthetic_test` prices, rules, costs and timestamps. Pass all principal/risk settings explicitly in integer CNY fen; there is no default capital. Acceptance never means a fill or changes cash/positions. `stratided` remains a placeholder. A successful build **does not** mean it is safe to trade. Actual Windows verification and unverified scope are recorded in [M0_PR02](docs/M0_PR02.md).
+### Synthetic replay and reports (merged PR-03)
+
+Use **new, unused** ledger and report directories. All account limits and principal are explicit integer CNY fen. The committed input is fully artificial; this is not a claim of real-world strategy performance.
+
+```powershell
+$input = 'samples/m0-pr03-synthetic.json'
+$sha = (Get-FileHash $input -Algorithm SHA256).Hash.ToLowerInvariant()
+cargo run --locked -p stratide-cli -- paper-replay $input state/pr03-ledger state/pr03-report --sha256 $sha --initial-cash-fen 1000000 --max-order-fen 500000 --account-cap-fen 800000 --strategy-cap-fen 500000 --daily-loss-fen 100000 --drawdown-fen 200000
+cargo run --locked -p stratide-cli -- paper-status state/pr03-ledger
+cargo run --locked -p stratide-cli -- paper-report $input state/pr03-ledger state/pr03-report --sha256 $sha
+Import-Csv state/pr03-report/daily.csv | Format-Table
+Import-Csv state/pr03-report/orders.csv | Format-Table
+Import-Csv state/pr03-report/fills.csv | Format-Table
+```
+
+The six exports are `report.json`, `events.json`, `daily.csv`, `orders.csv`, `fills.csv` and `positions.csv`. Re-running verifies the frozen input, ledger events and derived output. Recognized incomplete exports are preserved as archives before recovery to the original path. See [M0-PR03](docs/M0_PR03.md) and [R1 recovery notes](docs/M0_PR03_R1.md).
+
+`risk-demo` uses fixed `synthetic_test` prices, rules, costs and timestamps. Pass all principal/risk settings explicitly in integer CNY fen; there is no default capital. Acceptance never means a fill or changes cash/positions. `stratided` remains a placeholder. A successful build **does not** mean it is safe to trade. The paper ledger's Windows acceptance and replay reporting limits are recorded in [M0-PR02](docs/M0_PR02.md), [M0-PR03](docs/M0_PR03.md) and [PR #6](https://github.com/handFOOLed/Stratide/pull/6).
 
 ## GitHub repository
 
