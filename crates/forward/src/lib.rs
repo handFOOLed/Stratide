@@ -1,8 +1,10 @@
 //! A separate observe-only journal. No dependency on risk, execution or money ledgers.
+mod continuity;
 mod model;
 mod provider;
 mod report;
 mod store;
+pub use continuity::{EodStep, EodView};
 pub use model::*;
 pub use provider::source_check;
 pub use store::Journal;

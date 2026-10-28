@@ -1,0 +1,48 @@
+{
+  "evidence_kind": "actual_pr04a_journal_read_reuse_no_new_http",
+  "checked_at": "2026-10-29T07:38:06.2890132+08:00",
+  "journal_head": "dd145c62834bc68f2a16ed2c06a7f18a106a4550c37864f401b90f0a47f6d19a",
+  "step_status": "waiting_eod_publication_window",
+  "step_trade_day": "20261029",
+  "collected": false,
+  "actual_valid_forward_days": 1,
+  "event_count": 3,
+  "existing_journal_and_report_bytes_unchanged": true,
+  "actual_available_at_epoch_ms": 1793192840090,
+  "view_before_actual_available_is_null": true,
+  "view_at_actual_available_present": true,
+  "opening_execution_eligible": false,
+  "report_schema_version": 2,
+  "continuity": {
+    "as_of_journal_event_at": "2026-10-28T21:07:20.09+08:00",
+    "awaiting_eod_days": 0,
+    "calendar_conflict_days": 0,
+    "calendar_unknown_days": 0,
+    "closed_days": 0,
+    "days": [
+      {
+        "calendar_day": "20261028",
+        "calendar_received_at": "2026-10-28T21:07:17.756+08:00",
+        "late_attempts": 0,
+        "on_day_attempts": 1,
+        "state": "valid_eod"
+      }
+    ],
+    "first_day": "20261028",
+    "gap_streak_semantics": "closed days do not break a streak; unknown/conflict days break certainty; later backfill never repairs on-day coverage",
+    "longest_known_open_day_gap": 0,
+    "missing_valid_eod_days": 0,
+    "through_day": "20261028",
+    "valid_eod_days": 1
+  },
+  "simulated_fills": 0,
+  "nav_fen": null,
+  "new_http_calls": 0,
+  "raw_market_data_uploaded": false,
+  "preserved_files": {
+    "F:\\Desktop\\Documents\\Codex\\Stratide\\m1-pr04a-worktree\\state\\pr04a-r2-smoke-20261028\\observer\\forward.sqlite": "C86536EEE8BCDC2DD0D22CC7505D5FB9D5E8569C3E288BF6B7A79E2F796762F8",
+    "F:\\Desktop\\Documents\\Codex\\Stratide\\m1-pr04a-worktree\\state\\pr04a-r2-smoke-20261028\\report\\report.json": "5D9A9480D373D26B6142512A997ED7DAAC647827CADD926EA577BA642AE23D49",
+    "F:\\Desktop\\Documents\\Codex\\Stratide\\m1-pr04a-worktree\\state\\pr04a-r2-smoke-20261028\\report\\daily.csv": "0EB4F92E2600F06A5C3BF743648B31EF8E498B43A36B62A0DB548D3335028223",
+    "F:\\Desktop\\Documents\\Codex\\Stratide\\m1-pr04a-worktree\\state\\pr04a-r2-smoke-20261028\\report\\events.json": "0A8A7C94963FA6C236D06B222B68FE001C4DD0F59D7BDDE1E55AFEAF8137D615"
+  }
+}

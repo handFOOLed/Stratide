@@ -2,6 +2,7 @@
 use crate::{provider::*, store::test_access::*, *};
 use serde_json::json;
 use std::fs;
+mod continuity;
 
 fn config() -> Config {
     Config {
@@ -413,6 +414,10 @@ fn crash_child() {
         return;
     };
     let mut j = Journal::open(path).unwrap();
+    if std::env::var("STRATIDE_FORWARD_TEST_FINISH").is_ok() {
+        let _ = finish(&mut j, "pending", "20261028", "20261028", at(), outcome());
+        return;
+    }
     let _ = j.collect_once(None);
 }
 

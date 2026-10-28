@@ -1,0 +1,11 @@
+2026-10-28 initial sandbox run; excerpt preserved from actual tool output.
+Command: ./scripts/with-msvc.ps1 test -p stratide-forward -p stratide-cli --locked --offline
+Exit: 1
+
+replay::report::publish::tests::process_death_during_write_archive_and_publish_can_resume_same_path ... FAILED
+called `Result::unwrap()` on an `Err` value: "报表发布未完成，可用原命令重试：Access is denied. (os error 5)"
+Location: apps/stratide-cli/src/replay/report/publish.rs:184:37
+test result: FAILED. 2 passed; 1 failed
+
+The same code subsequently passed outside the sandbox. No test was deleted or ignored.
+This was an existing report-directory rename test, before the forward suite ran.
