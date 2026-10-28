@@ -92,6 +92,9 @@ fn demo(args: &[String]) -> Result<(), String> {
     let snapshot = config.initialize(now, day)?;
     let before = snapshot.clone();
     let mut kernel = RiskKernel::new(config.clone())?;
+    let initial_equity = kernel
+        .observe_account(&snapshot, now, day)
+        .map_err(|error| error.to_string())?;
     let mut p = OrderProposal {
         proposal_id: ProposalId(1),
         account_id: config.account_id,
@@ -134,7 +137,7 @@ fn demo(args: &[String]) -> Result<(), String> {
     println!("模式：synthetic_test；固定人工价格/规则/费用；无行情抓取、无成交、无磁盘账本");
     println!(
         "显式本金：{initial}；初始 NAV：{}；持仓：0 股",
-        snapshot.cash
+        initial_equity
     );
     let first = kernel.review(&snapshot, &p, &c);
     let repeated = kernel.review(&snapshot, &p, &c);

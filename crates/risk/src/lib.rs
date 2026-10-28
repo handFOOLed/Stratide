@@ -1,4 +1,5 @@
-//! Mandatory paper proposal review. No order submission, fill, ledger write or unlock API.
+//! Trusted paper account observation and mandatory proposal review.
+//! No order submission, fill, ledger write or unlock API.
 //! The caller is trusted Rust core; strategy Workers may supply only OrderProposal.
 
 use std::collections::BTreeSet;
@@ -213,6 +214,15 @@ pub struct RiskKernel {
     state: RiskState,
 }
 
+/// Private result of complete account validation and financial-state observation.
+/// It is only passed to the private proposal checker, never an execution authority.
+struct ObservedAccount {
+    equity: Cny,
+    exposure: Cny,
+    reserved_cash: Cny,
+    available_cash: i64,
+}
+
 impl RiskKernel {
     /// Only for a NEW explicitly funded in-memory paper run, never recovery.
     pub fn new(config: PaperAccountConfig) -> Result<Self, &'static str> {
@@ -248,15 +258,136 @@ impl RiskKernel {
         .insert(reason);
     }
 
-    /// The sole review entry point. May latch financial locks/observed high-water mark;
-    /// never changes cash, holdings or pending commitments in the immutable snapshot.
+    /// Observe trusted account NAV even when no proposal exists. Only trusted core
+    /// supplies the snapshot, current UTC time and exchange-local trading day.
+    /// Validate the complete account/valuation/basis before changing any risk state.
+    /// Errors leave RiskState unchanged; Ok reports NAV even when financial locks latch.
+    /// PR-02 must persist these updates independently of any later proposal decision.
+    pub fn observe_account(
+        &mut self,
+        snapshot: &AccountSnapshot,
+        now: Timestamp,
+        day: TradingDay,
+    ) -> Result<Cny, RejectionReason> {
+        self.observe_snapshot(snapshot, now, day)
+            .map(|observed| observed.equity)
+    }
+
+    fn observe_snapshot(
+        &mut self,
+        s: &AccountSnapshot,
+        now: Timestamp,
+        day: TradingDay,
+    ) -> Result<ObservedAccount, RejectionReason> {
+        use RejectionReason::*;
+        if s.account_id != self.config.account_id || s.deployment != self.config.deployment {
+            return Err(IdentityMismatch);
+        }
+        if now.0 < 0
+            || !day.is_valid()
+            || s.trading_day != day
+            || s.as_of.0 < 0
+            || s.as_of > now
+            || now.0 - s.as_of.0 > self.config.max_snapshot_age_ms
+        {
+            return Err(InvalidSnapshot("快照时间/交易日无效或已过期"));
+        }
+        let mut reserved_cash = Cny::ZERO;
+        let mut pending_ids = BTreeSet::new();
+        for pending in &s.pending_orders {
+            if pending.proposal_id.0 == 0
+                || !pending_ids.insert(pending.proposal_id.0)
+                || !pending.instrument.is_valid()
+                || pending.quantity <= 0
+                || (pending.side == Side::Buy && pending.reserved_cash == Cny::ZERO)
+                || (pending.side == Side::Sell && pending.reserved_cash != Cny::ZERO)
+            {
+                return Err(InvalidSnapshot("未完成订单无效或重复"));
+            }
+            reserved_cash = reserved_cash.checked_add(pending.reserved_cash)?;
+        }
+        let available_cash = s
+            .cash
+            .fen()
+            .checked_sub(reserved_cash.fen())
+            .filter(|v| *v >= 0)
+            .ok_or(InvalidSnapshot("现金预留超过账户现金"))?;
+
+        let mut exposure = Cny::ZERO;
+        for lot in &s.positions {
+            if !lot.instrument.is_valid()
+                || lot.quantity <= 0
+                || !lot.acquired_on.is_valid()
+                || lot.acquired_on > day
+            {
+                return Err(InvalidSnapshot("持仓数量、身份或取得日期无效"));
+            }
+            let mark = s
+                .marks
+                .iter()
+                .find(|m| m.instrument == lot.instrument)
+                .ok_or(ValuationUnavailable)?;
+            if mark.price == Cny::ZERO
+                || mark.source.trim().is_empty()
+                || mark.as_of.0 < 0
+                || mark.as_of > mark.available_at
+                || mark.available_at > s.as_of
+                || now.0 - mark.as_of.0 > self.config.max_mark_age_ms
+            {
+                return Err(ValuationUnavailable);
+            }
+            exposure = exposure.checked_add(mark.price.checked_mul(lot.quantity)?)?;
+        }
+        for (index, mark) in s.marks.iter().enumerate() {
+            if s.marks[..index]
+                .iter()
+                .any(|m| m.instrument == mark.instrument)
+            {
+                return Err(ValuationUnavailable);
+            }
+        }
+        // Reject over-reserved inventory anywhere in the one trusted account.
+        for pending in s.pending_orders.iter().filter(|o| o.side == Side::Sell) {
+            let owned = sum_shares(
+                s.positions
+                    .iter()
+                    .filter(|l| l.instrument == pending.instrument)
+                    .map(|l| l.quantity),
+            )?;
+            let reserved = sum_shares(
+                s.pending_orders
+                    .iter()
+                    .filter(|o| o.side == Side::Sell && o.instrument == pending.instrument)
+                    .map(|o| o.quantity),
+            )?;
+            if reserved > owned {
+                return Err(InvalidSnapshot("卖出预留超过实际持仓"));
+            }
+        }
+        let equity = s.cash.checked_add(exposure)?;
+        self.observe_equity(equity, &s.equity_basis)?;
+
+        Ok(ObservedAccount {
+            equity,
+            exposure,
+            reserved_cash,
+            available_cash,
+        })
+    }
+
+    /// The sole proposal review entry point. Account validation/observation always runs
+    /// before any proposal rejection; callers cannot skip it to obtain an Approval.
+    /// Never changes cash, holdings or pending commitments in the immutable snapshot.
     pub fn review(
         &mut self,
         snapshot: &AccountSnapshot,
         proposal: &OrderProposal,
         context: &ReviewContext,
     ) -> RiskDecision {
-        match self.check(snapshot, proposal, context) {
+        let result = self
+            .observe_snapshot(snapshot, context.now, context.trading_day)
+            .and_then(|observed| self.check(snapshot, proposal, context, observed));
+        match result {
             Ok(approval) => RiskDecision::Accepted(Box::new(approval)),
             Err(reason) => RiskDecision::Rejected {
                 proposal_id: proposal.proposal_id,
@@ -266,17 +397,20 @@ impl RiskKernel {
     }
 
     fn check(
-        &mut self,
+        &self,
         s: &AccountSnapshot,
         p: &OrderProposal,
         c: &ReviewContext,
+        observed: ObservedAccount,
     ) -> Result<Approval, RejectionReason> {
         use RejectionReason::*;
-        if p.account_id != self.config.account_id
-            || p.deployment != self.config.deployment
-            || s.account_id != self.config.account_id
-            || s.deployment != self.config.deployment
-        {
+        let ObservedAccount {
+            equity,
+            exposure,
+            reserved_cash,
+            available_cash,
+        } = observed;
+        if p.account_id != self.config.account_id || p.deployment != self.config.deployment {
             return Err(IdentityMismatch);
         }
         if p.proposal_id.0 == 0
@@ -301,15 +435,6 @@ impl RiskKernel {
         if c.now >= p.expires_at {
             return Err(ProposalExpired);
         }
-        if !c.trading_day.is_valid()
-            || s.trading_day != c.trading_day
-            || s.as_of.0 < 0
-            || s.as_of > c.now
-            || c.now.0 - s.as_of.0 > self.config.max_snapshot_age_ms
-        {
-            return Err(InvalidSnapshot("快照时间/交易日无效或已过期"));
-        }
-
         let rules = c.rules.as_ref().ok_or(MissingMarketEvidence)?;
         if rules.instrument != p.instrument
             || rules.trading_day != c.trading_day
@@ -345,83 +470,12 @@ impl RiskKernel {
         let gross = p.limit_price.checked_mul(p.quantity)?;
         let commitment = gross.checked_add(cost.maximum_fee)?;
 
-        let mut reserved_cash = Cny::ZERO;
-        let mut pending_ids = BTreeSet::new();
-        for pending in &s.pending_orders {
-            if pending.proposal_id.0 == 0
-                || !pending_ids.insert(pending.proposal_id.0)
-                || !pending.instrument.is_valid()
-                || pending.quantity <= 0
-                || (pending.side == Side::Buy && pending.reserved_cash == Cny::ZERO)
-                || (pending.side == Side::Sell && pending.reserved_cash != Cny::ZERO)
-            {
-                return Err(InvalidSnapshot("未完成订单无效或重复"));
-            }
-            reserved_cash = reserved_cash.checked_add(pending.reserved_cash)?;
-        }
-        if pending_ids.contains(&p.proposal_id.0) {
+        if s.pending_orders
+            .iter()
+            .any(|order| order.proposal_id == p.proposal_id)
+        {
             return Err(AlreadyPending);
         }
-        let available_cash = s
-            .cash
-            .fen()
-            .checked_sub(reserved_cash.fen())
-            .filter(|v| *v >= 0)
-            .ok_or(InvalidSnapshot("现金预留超过账户现金"))?;
-
-        let mut exposure = Cny::ZERO;
-        for lot in &s.positions {
-            if !lot.instrument.is_valid()
-                || lot.quantity <= 0
-                || !lot.acquired_on.is_valid()
-                || lot.acquired_on > c.trading_day
-            {
-                return Err(InvalidSnapshot("持仓数量、身份或取得日期无效"));
-            }
-            let mark = s
-                .marks
-                .iter()
-                .find(|m| m.instrument == lot.instrument)
-                .ok_or(ValuationUnavailable)?;
-            if mark.price == Cny::ZERO
-                || mark.source.trim().is_empty()
-                || mark.as_of.0 < 0
-                || mark.as_of > mark.available_at
-                || mark.available_at > s.as_of
-                || c.now.0 - mark.as_of.0 > self.config.max_mark_age_ms
-            {
-                return Err(ValuationUnavailable);
-            }
-            exposure = exposure.checked_add(mark.price.checked_mul(lot.quantity)?)?;
-        }
-        for (index, mark) in s.marks.iter().enumerate() {
-            if s.marks[..index]
-                .iter()
-                .any(|m| m.instrument == mark.instrument)
-            {
-                return Err(ValuationUnavailable);
-            }
-        }
-        // Reject over-reserved inventory anywhere in the one trusted account.
-        for pending in s.pending_orders.iter().filter(|o| o.side == Side::Sell) {
-            let owned = sum_shares(
-                s.positions
-                    .iter()
-                    .filter(|l| l.instrument == pending.instrument)
-                    .map(|l| l.quantity),
-            )?;
-            let reserved = sum_shares(
-                s.pending_orders
-                    .iter()
-                    .filter(|o| o.side == Side::Sell && o.instrument == pending.instrument)
-                    .map(|o| o.quantity),
-            )?;
-            if reserved > owned {
-                return Err(InvalidSnapshot("卖出预留超过实际持仓"));
-            }
-        }
-        let equity = s.cash.checked_add(exposure)?;
-        self.observe_equity(equity, &s.equity_basis)?;
 
         // Uncertainty/manual locks deny both sides. Financial locks permit only
         // independently verified long-position reductions, with all other checks intact.

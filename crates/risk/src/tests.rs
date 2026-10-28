@@ -1,5 +1,7 @@
 use super::*;
 
+mod observation;
+
 fn money(fen: i64) -> Cny {
     Cny::from_fen(fen).unwrap()
 }
