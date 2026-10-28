@@ -201,68 +201,38 @@ impl State {
                 instrument,
                 bar,
                 rules,
+                opening,
             } => {
-                self.advance(*now, *day)?;
+                if *now < self.snapshot.as_of || *day < self.snapshot.trading_day || !day.is_valid()
+                {
+                    return Err("时间或交易日倒退/无效".into());
+                }
                 if self.sessions.contains(&(instrument.clone(), *day)) {
                     return Err("同证券/交易日已处理，不能换事件 ID 重用流动性".into());
                 }
-                let evidence =
-                    self.validate_bar(instrument, *day, *now, bar.as_ref(), rules.as_ref());
-                if evidence.is_ok() {
-                    let b = bar.as_ref().unwrap();
-                    self.snapshot.marks.retain(|m| m.instrument != *instrument);
-                    self.snapshot.marks.push(PositionMark {
-                        instrument: instrument.clone(),
-                        price: b.close,
-                        as_of: b.closes_at,
-                        available_at: b.available_at,
-                        source: b.provenance.source_version.clone(),
-                    });
-                }
-                self.observe()?;
-                let mut capacity = bar.as_ref().map_or(0, |b| b.capacity_shares);
-                for index in 0..self.orders.len() {
-                    if !self.orders[index].active()
-                        || self.orders[index].proposal.instrument != *instrument
-                    {
-                        continue;
+                match self.validate_bar(instrument, *day, *now, bar.as_ref(), rules.as_ref()) {
+                    Err(reason) => {
+                        // Persist the failed attempt, not a completed session. In
+                        // particular, do not move economic time past a later retry's
+                        // opening risk observation merely because no bar arrived.
+                        for order in self
+                            .orders
+                            .iter_mut()
+                            .filter(|o| o.active() && o.proposal.instrument == *instrument)
+                        {
+                            order.reason = reason.clone();
+                        }
+                        self.observe()?;
                     }
-                    if *now >= self.orders[index].proposal.expires_at {
-                        self.orders[index].status = OrderStatus::Expired;
-                        self.orders[index].reserved_fee = Cny::ZERO;
-                        self.orders[index].reason = "到期，释放剩余预留；不是超时未知成交".into();
-                        self.remove_pending(index);
-                        continue;
-                    }
-                    if let Err(reason) = &evidence {
-                        self.orders[index].reason = reason.clone();
-                        continue;
-                    }
-                    // Roll back this order on arithmetic/accounting failure, while
-                    // retaining the independently observed NAV and financial locks.
-                    let before_order = self.clone();
-                    let before_capacity = capacity;
-                    if let Err(error) = self.match_order(
-                        index,
-                        bar.as_ref().unwrap(),
-                        rules.as_ref().unwrap(),
-                        &mut capacity,
-                    ) {
-                        *self = before_order;
-                        capacity = before_capacity;
-                        let mut kernel =
-                            RiskKernel::restore(self.config.clone(), self.risk.clone())?;
-                        kernel.freeze(
-                            stratide_risk::RiskScope::Account,
-                            stratide_risk::FreezeReason::Manual,
-                        );
-                        self.risk = kernel.state().clone();
-                        self.orders[index].reason =
-                            format!("模拟会计失败，保持原预留并冻结等待人工检查：{error}");
+                    Ok(()) => {
+                        self.settle_session(
+                            bar.as_ref().unwrap(),
+                            rules.as_ref().unwrap(),
+                            opening.as_ref(),
+                            *now,
+                        )?;
                     }
                 }
-                self.sessions.push((instrument.clone(), *day));
-                self.observe()?;
             }
             Command::Freeze { scope, reason } => {
                 let mut k = RiskKernel::restore(self.config.clone(), self.risk.clone())?;
@@ -321,6 +291,124 @@ impl State {
         Ok(())
     }
 
+    fn validate_opening(
+        &self,
+        b: &DailyBar,
+        rules: &TradingRules,
+        opening: Option<&OpeningEvidence>,
+    ) -> Result<()> {
+        let e = opening.ok_or("缺独立开盘证据，不反推盘中执行资格")?;
+        if self.snapshot.as_of > b.opens_at {
+            return Err("已有晚于开盘的已提交状态，不能回溯改变当日执行".into());
+        }
+        let mut compatible = rules.clone();
+        compatible.available_at = e.rules.available_at;
+        compatible.source = e.rules.source.clone();
+        // A later suspension may conservatively invalidate fills, but its later
+        // status is not an opening NAV/financial-lock observation.
+        compatible.tradable = e.rules.tradable;
+        if compatible != e.rules
+            || e.rules.available_at > b.opens_at
+            || e.rules.available_at.0 < 0
+            || b.opens_at.0 - e.rules.available_at.0 > self.config.max_snapshot_age_ms
+            || e.rules.source.trim().is_empty()
+            || !e
+                .marks
+                .iter()
+                .any(|m| m.instrument == b.instrument && m.price == b.open)
+            || e.marks.iter().any(|m| {
+                m.as_of.0 < 0
+                    || m.as_of > m.available_at
+                    || m.available_at > b.opens_at
+                    || b.opens_at.0 - m.as_of.0 > self.config.max_mark_age_ms
+                    || m.source.trim().is_empty()
+            })
+        {
+            return Err("开盘估值/规则不完整、陈旧、未来或与日线不相容".into());
+        }
+        Ok(())
+    }
+
+    fn settle_session(
+        &mut self,
+        b: &DailyBar,
+        rules: &TradingRules,
+        opening: Option<&OpeningEvidence>,
+        accounted_at: Timestamp,
+    ) -> Result<()> {
+        let eligibility = self.validate_opening(b, rules, opening);
+        if eligibility.is_ok() {
+            let e = opening.unwrap();
+            self.advance(b.opens_at, b.day)?;
+            self.snapshot.marks = e.marks.clone();
+            self.observe()?;
+        }
+        let mut capacity = b.capacity_shares;
+        for index in 0..self.orders.len() {
+            if !self.orders[index].active()
+                || self.orders[index].proposal.instrument != b.instrument
+            {
+                continue;
+            }
+            if b.opens_at >= self.orders[index].proposal.expires_at {
+                self.expire(index);
+                continue;
+            }
+            if let Err(reason) = &eligibility {
+                self.orders[index].reason = reason.clone();
+                continue;
+            }
+            if !rules.tradable {
+                self.orders[index].reason = "时段停牌证据，保持未成交".into();
+                continue;
+            }
+            let before_order = self.clone();
+            let before_capacity = capacity;
+            if let Err(error) =
+                self.match_order(index, b, opening.unwrap(), accounted_at, &mut capacity)
+            {
+                *self = before_order;
+                capacity = before_capacity;
+                let mut kernel = RiskKernel::restore(self.config.clone(), self.risk.clone())?;
+                kernel.freeze(
+                    stratide_risk::RiskScope::Account,
+                    stratide_risk::FreezeReason::Manual,
+                );
+                self.risk = kernel.state().clone();
+                self.orders[index].reason =
+                    format!("模拟会计失败，保持原预留并冻结等待人工检查：{error}");
+            }
+        }
+        // Closing marks are observed ONLY after all modeled opening executions.
+        // They may latch losses for subsequent risk, never undo/select today's fill.
+        self.advance(accounted_at, b.day)?;
+        self.snapshot.marks.retain(|m| m.instrument != b.instrument);
+        self.snapshot.marks.push(PositionMark {
+            instrument: b.instrument.clone(),
+            price: b.close,
+            as_of: b.closes_at,
+            available_at: b.available_at,
+            source: b.provenance.source_version.clone(),
+        });
+        for index in 0..self.orders.len() {
+            if self.orders[index].active()
+                && self.orders[index].proposal.instrument == b.instrument
+                && accounted_at >= self.orders[index].proposal.expires_at
+            {
+                self.expire(index);
+            }
+        }
+        self.sessions.push((b.instrument.clone(), b.day));
+        self.observe()
+    }
+
+    fn expire(&mut self, index: usize) {
+        self.orders[index].status = OrderStatus::Expired;
+        self.orders[index].reserved_fee = Cny::ZERO;
+        self.orders[index].reason = "到期，释放剩余预留；不是超时未知成交".into();
+        self.remove_pending(index);
+    }
+
     fn remove_pending(&mut self, index: usize) {
         let id = self.orders[index].proposal.proposal_id;
         self.snapshot.pending_orders.retain(|o| o.proposal_id != id);
@@ -330,9 +418,11 @@ impl State {
         &mut self,
         index: usize,
         b: &DailyBar,
-        r: &TradingRules,
+        opening: &OpeningEvidence,
+        accounted_at: Timestamp,
         capacity: &mut i64,
     ) -> Result<()> {
+        let r = &opening.rules;
         let order = self.orders[index].clone();
         let mut p = order.proposal.clone();
         if !r.tradable || r.settlement == SettlementRule::Unknown || b.low == b.high {
@@ -490,7 +580,9 @@ impl State {
             price: p.limit_price,
             fees,
             day: b.day,
-            simulated_at: self.snapshot.as_of,
+            simulated_at: accounted_at,
+            risk_checked_at: self.snapshot.as_of,
+            opening_evidence: opening.clone(),
             evidence: b.clone(),
             fee_version: schedule.version.clone(),
         });

@@ -169,3 +169,72 @@ fn real_process_restarts_preserve_peak_flow_rejected_order_locks_and_missing_val
     );
     assert_eq!(next.risk, loss.risk);
 }
+
+#[test]
+fn missing_session_retry_and_open_then_close_order_survive_real_cli_processes() {
+    let temp = tempfile::tempdir().unwrap();
+    let path = temp.path().join("account");
+    let path = path.to_str().unwrap();
+    let file = temp.path().join("command.json");
+    create(path);
+    success(&["paper-submit-synthetic", path]);
+    let first = success(&["paper-match-synthetic", path]);
+    let mut p = fixture::proposal(&first.config, 2);
+    p.decision_at = Timestamp(fixture::T0 + fixture::DAY);
+    p.data_available_at = p.decision_at;
+    p.earliest_execution_at = Timestamp(p.decision_at.0 + 1);
+    let submitted = apply(
+        path,
+        &file,
+        "second-buy",
+        fixture::submit(
+            p,
+            TradingDay(20261029),
+            Timestamp(fixture::T0 + fixture::DAY),
+        ),
+    );
+    let mut b = fixture::bar(TradingDay(20261030), 2);
+    b.low = Cny::from_fen(800).unwrap();
+    b.close = b.low;
+    let opening = b.opens_at;
+    let closing = b.available_at;
+    let good = fixture::session(b);
+    let mut missing = good.clone();
+    if let Command::Match { bar, .. } = &mut missing {
+        *bar = None;
+    }
+    let failed = apply(path, &file, "missing", missing.clone());
+    assert_eq!(failed.snapshot.as_of, submitted.snapshot.as_of);
+    assert_eq!(
+        failed.snapshot.pending_orders,
+        submitted.snapshot.pending_orders
+    );
+    assert_eq!(success(&["paper-status", path]), failed);
+    let filled = apply(path, &file, "corrected", good.clone());
+    assert_eq!(filled.fills.len(), 2);
+    assert_eq!(filled.orders[1].status, OrderStatus::Filled);
+    assert_eq!(filled.snapshot.cash.fen(), 799938);
+    assert_eq!(filled.equity.unwrap().fen(), 959938);
+    assert_eq!(filled.fills[1].risk_checked_at, opening);
+    assert_eq!(filled.fills[1].simulated_at, closing);
+    assert!(filled
+        .risk
+        .freezes(RiskScope::Account)
+        .contains(&FreezeReason::DailyLoss));
+    assert_eq!(success(&["paper-status", path]), filled);
+    assert_eq!(apply(path, &file, "missing", missing), filled);
+    assert_eq!(apply(path, &file, "corrected", good.clone()), filled);
+    std::fs::write(&file, serde_json::to_vec(&good).unwrap()).unwrap();
+    assert_eq!(
+        cli(&[
+            "paper-apply",
+            path,
+            "repeat-with-new-id",
+            file.to_str().unwrap()
+        ])
+        .status
+        .code(),
+        Some(2)
+    );
+    assert_eq!(success(&["paper-status", path]), filled);
+}

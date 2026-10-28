@@ -148,6 +148,14 @@ pub struct DailyBar {
     pub status_verified: bool,
 }
 
+/// Independent opening observations. A completed daily bar is NOT evidence that
+/// its open price/portfolio marks/rules were available to risk at session open.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct OpeningEvidence {
+    pub marks: Vec<PositionMark>,
+    pub rules: TradingRules,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Fill {
     pub event_id: String,
@@ -160,6 +168,8 @@ pub struct Fill {
     pub day: TradingDay,
     /// Simulation accounting time; never a claimed real exchange execution time.
     pub simulated_at: Timestamp,
+    pub risk_checked_at: Timestamp,
+    pub opening_evidence: OpeningEvidence,
     pub evidence: DailyBar,
     pub fee_version: String,
 }
@@ -199,6 +209,8 @@ pub enum Command {
         instrument: Instrument,
         bar: Option<DailyBar>,
         rules: Option<TradingRules>,
+        #[serde(default)]
+        opening: Option<OpeningEvidence>,
     },
     Freeze {
         scope: stratide_risk::RiskScope,

@@ -18,8 +18,8 @@ pub fn instrument() -> Instrument {
 pub fn provenance() -> Provenance {
     Provenance {
         mode: DataMode::SyntheticTest,
-        source_version: "synthetic_test/artificial-v1".into(),
-        dataset_hash: format!("{:x}", Sha256::digest(b"synthetic_test/artificial-v1;600000.SH;CNY-fen;T0=1793170800000;OHLC=1000,1050,950,1000;volume=10000;capacity=100;T+1;lots=100;tick=1;bands=800..1200;commission=300ppm,min1;transfer=10ppm;sell-tax=500ppm")),
+        source_version: "synthetic_test/artificial-v2".into(),
+        dataset_hash: format!("{:x}", Sha256::digest(b"synthetic_test/artificial-v2;600000.SH;CNY-fen;T0=1793170800000;OHLC=1000,1050,950,1000;volume=10000;capacity=100;T+1;lots=100;tick=1;bands=800..1200;commission=300ppm,min1;transfer=10ppm;sell-tax=500ppm;independent-opening-marks-and-rules-at-open;matching-v2")),
         timezone: "Asia/Shanghai".into(),
         price_semantics: "unadjusted_cny_fen".into(),
     }
@@ -103,7 +103,18 @@ pub fn bar(day: TradingDay, offset: i64) -> DailyBar {
     }
 }
 pub fn session(b: DailyBar) -> Command {
+    let opening = OpeningEvidence {
+        marks: vec![PositionMark {
+            instrument: b.instrument.clone(),
+            price: b.open,
+            as_of: b.opens_at,
+            available_at: b.opens_at,
+            source: "synthetic_test/independent-opening-observation-v2".into(),
+        }],
+        rules: rules(b.day, b.opens_at),
+    };
     Command::Match {
+        opening: Some(opening),
         now: b.available_at,
         day: b.day,
         instrument: b.instrument.clone(),

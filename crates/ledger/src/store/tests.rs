@@ -1,6 +1,7 @@
 use super::*;
 use crate::synthetic::*;
 use std::process::Command as Process;
+mod r1;
 use stratide_contracts::*;
 use stratide_risk::{FreezeReason, RiskDecision, RiskKernel, RiskScope};
 
@@ -69,6 +70,54 @@ fn observe(price: i64, now: i64, day: u32, flow: i64) -> Command {
         marks: vec![mark(price, now)],
         external_flow_fen: flow,
     }
+}
+
+#[test]
+fn acceptance_missing_bar_can_be_retried_after_evidence_arrives() {
+    let (_temp, mut l) = create();
+    let p = proposal(&l.state.config, 1);
+    apply(
+        &mut l,
+        "submit-audit",
+        submit(p, TradingDay(20261028), Timestamp(T0)),
+    );
+    let b = bar(TradingDay(20261029), 1);
+    let mut missing = session(b.clone());
+    if let Command::Match { bar, .. } = &mut missing {
+        *bar = None;
+    }
+    apply(&mut l, "missing-audit", missing);
+    assert_eq!(l.state.fills.len(), 0);
+    assert!(
+        l.execute("valid-audit", session(b)).is_ok(),
+        "a failed evidence check must not consume the session"
+    );
+    assert_eq!(l.state.fills.len(), 1);
+}
+
+#[test]
+fn acceptance_closing_mark_cannot_retroactively_block_intraday_fill() {
+    let (_temp, mut l) = create();
+    buy(&mut l, 100);
+    let mut p = proposal(&l.state.config, 2);
+    p.decision_at = Timestamp(T0 + DAY);
+    p.data_available_at = p.decision_at;
+    p.earliest_execution_at = Timestamp(T0 + DAY + 1);
+    apply(
+        &mut l,
+        "submit-second-audit",
+        submit(p, TradingDay(20261029), Timestamp(T0 + DAY)),
+    );
+    assert_eq!(l.state.orders[1].status, OrderStatus::Open);
+    let mut b = bar(TradingDay(20261030), 2);
+    b.low = c(800);
+    b.close = c(800);
+    apply(&mut l, "down-day-audit", session(b));
+    assert_eq!(
+        l.state.orders[1].status,
+        OrderStatus::Filled,
+        "a close-derived loss lock cannot decide an earlier intraday fill"
+    );
 }
 
 #[test]
@@ -496,7 +545,7 @@ fn failed_storage_write_poisons_handle_and_preserves_committed_locks() {
 }
 
 #[test]
-fn sell_cash_overflow_rolls_back_fill_without_discarding_observed_loss_lock() {
+fn opening_nav_overflow_blocks_fill_without_discarding_closing_loss_lock() {
     let temp = tempfile::tempdir().unwrap();
     let mut cfg = config();
     cfg.initial_capital = c(i64::MAX);
@@ -528,17 +577,14 @@ fn sell_cash_overflow_rolls_back_fill_without_discarding_observed_loss_lock() {
     assert_eq!(l.state.snapshot.cash, cash);
     assert_eq!(l.state.fills.len(), 1);
     assert_eq!(l.state.snapshot.positions[0].quantity, 100);
-    assert!(l.state.orders[1].reason.contains("会计失败"));
+    // v2 sees the overflow already in the independent OPENING NAV, before any
+    // sell accounting. It still observes/persists the subsequent closing loss.
+    assert!(l.state.orders[1].reason.contains("全账户估值未知"));
     assert!(l
         .state
         .risk
         .freezes(RiskScope::Account)
         .contains(&FreezeReason::DailyLoss));
-    assert!(l
-        .state
-        .risk
-        .freezes(RiskScope::Account)
-        .contains(&FreezeReason::Manual));
     let before = l.state.clone();
     drop(l);
     assert_eq!(Ledger::open(path).unwrap().state, before);

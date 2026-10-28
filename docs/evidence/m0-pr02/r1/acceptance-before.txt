@@ -1,0 +1,28 @@
+   Compiling libsqlite3-sys v0.36.0
+   Compiling rusqlite v0.38.0
+   Compiling stratide-ledger v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m0-pr02\crates\ledger)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.71s
+     Running unittests src\lib.rs (target\debug\deps\stratide_ledger-614a10d826bfcbf1.exe)
+
+running 2 tests
+
+thread 'store::tests::acceptance_closing_mark_cannot_retroactively_block_intraday_fill' (10836) panicked at crates\ledger\src\store\tests.rs:102:5:
+assertion `left == right` failed: a close-derived loss lock cannot decide an earlier intraday fill
+  left: Open
+ right: Filled
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'store::tests::acceptance_missing_bar_can_be_retried_after_evidence_arrives' (16640) panicked at crates\ledger\src\store\tests.rs:84:5:
+a failed evidence check must not consume the session
+test store::tests::acceptance_closing_mark_cannot_retroactively_block_intraday_fill ... FAILED
+test store::tests::acceptance_missing_bar_can_be_retried_after_evidence_arrives ... FAILED
+
+failures:
+
+failures:
+    store::tests::acceptance_closing_mark_cannot_retroactively_block_intraday_fill
+    store::tests::acceptance_missing_bar_can_be_retried_after_evidence_arrives
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 14 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p stratide-ledger --lib`
