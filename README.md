@@ -2,16 +2,16 @@
 
 # Stratide
 
-**PR #8 最新状态：P1 日报缺口已修复，待独立复验。** 日报同时保留当日漏采与次日晚到补录；JSON/CSV、重启回归和新路径真实 CLI smoke 已执行，见 [R2 证据](docs/evidence/m1-pr04a-r2/README.md)。本机真实观察仍只有 1 个有效前向日、0 提案/成交。Owner 已接受个人非商业本机用途；供应商正式许可未经独立核实作为限制披露，不自动阻断本轮开发/验收，也不扩展为行情分发。开发会话工具执行记录曾包含明文 Token，不得称为“零泄漏”；Token 未加入 Git/PR/应用输出或应用日志，不在文档重现值，是否轮换由 Owner 决定。下方 blocked 记录仅为历史，独立验收与最终审查仍待完成。
+**最新进度：M1-PR04A 已独立技术验收、源码审查并合并。** [PR #8](https://github.com/handFOOLed/Stratide/pull/8) 固定 HEAD `295751cf15bfaa68407dd243f45394b5147e1227`，merge `1ef06eb1d17f8796e3b43d2ad0a903382fa0fd23`。当前 Windows 实际 Tushare 盘后单证券 observe-only 入 journal，记录接收/可得时间、原始字节摘要、重复/晚到与漏采缺口，并导出 JSON/CSV。Terra 在相同 SHA 独立通过 **89 项工作区测试**与离线原始 journal 复算；[验收报告](https://github.com/handFOOLed/Stratide/pull/8#issuecomment-6471878822)、[小猫代码审查](https://github.com/handFOOLed/Stratide/pull/8#pullrequestreview-5684495112)。真实联网采集由 Sol 执行，Terra 本轮未独立发出 HTTPS；目前仅 **1 个有效前向日、0 提案、0 模拟成交**，NAV/回撤不可用。Owner 接受个人非商业本机用途，供应商正式许可尚未独立核实；早期开发执行记录曾含 Token 明文（未见提交 Git/应用日志），该事实保留。**整个 M1、连续多日观察和真实行情驱动的 Paper 买卖尚未完成；不得用于真实资金。**
 
-**历史：M1-PR04A 首次提交时为 Draft / BLOCKED。** 已增加只观察的独立 journal、单次盘后采集适配器及 CSV/JSON CLI；本机 Tushare HTTPS `daily`/`trade_cal` 实测可读，但自动采集/原始响应持久保存许可仍未确认，样例默认阻断。有效前向日数、策略提案、模拟成交均为 0；没有修改 v3 财务账本。见 [命令、实际输出和未验证范围](docs/M1_PR04A.md)及[来源核验](docs/M1_PR04A_SOURCE_FEASIBILITY.md)。此分支尚待 Terra 独立验收、小猫审查和 Owner 授权合并，不能视为整个 M1 已完成。
+**历史：M1-PR04A 首次提交时为 Draft / BLOCKED。** 已增加只观察的独立 journal、单次盘后采集适配器及 CSV/JSON CLI；本机 Tushare HTTPS `daily`/`trade_cal` 实测可读，但自动采集/原始响应持久保存许可仍未确认，样例默认阻断。有效前向日数、策略提案、模拟成交均为 0；没有修改 v3 财务账本。见 [命令、实际输出和未验证范围](docs/M1_PR04A.md)及[来源核验](docs/M1_PR04A_SOURCE_FEASIBILITY.md)。这段记录描述最初的阻断阶段，后续已复验并合并 PR #8；整个 M1 仍未完成。
 
 [ADR-026](docs/adr/0026-budgeted-shadow-observation-and-local-strategy-registry.md)：限额研究与策略索引。[ADR-027](docs/adr/0027-historical-failure-as-evidence-not-permanent-ban.md)：历史失败作为研究证据，而不是永久研究禁令；重新研究也不会解除真实资金风控。
 
 **自主量化交易与开放式策略发现平台**  
 *Autonomous Quantitative Trading & Open-Ended Strategy Discovery*
 
-> **当前状态：M0-PR01、PR-02、PR-03 已合并，Windows 上完成 Terra 独立验收与 ChatGPT 源码审查。** 现有 **paper-only** 能力包括独立风控、单写入者 SQLite 持久账本、原子预留、保守日线模拟成交、冻结输入的确定性回放，以及六份可审计 CSV/JSON 报表；PR-03 见 [PR #6](https://github.com/handFOOLed/Stratide/pull/6)，合并提交 `13de8d43f663caa16c983609d2d5161ca497d123`。随仓样例仅为 `synthetic_test` **合成人工数据/费率**，没有经过核验的真实历史行情或长期前向模拟，也没有真实券商接口。Linux/macOS、物理断电及实际行情许可/可得性未验证。**不得使用当前代码管理真实资金或以示例数据声称盈利能力。**
+> **当前状态：M0-PR01～PR-03、M1-PR04A 均已合并。** M0 提供 paper-only Risk Kernel、持久 SQLite 财务账本、保守合成撮合和确定性历史回放；M1-PR04A 增加**真实 Tushare 盘后行情的独立只观察日志**，不接入财务账本或自动成交。历史回放的随仓样例仍是 `synthetic_test` 合成数据，不能等同真实历史收益；真实盘后观察只有单个有效前向交易日且尚无策略买卖。Linux/macOS、物理断电、行情源正式许可及长期连续观测未完成独立验证。**请勿使用当前代码管理真实资金。**
 
 人工成交先记入独立待归属账簿，不推断策略组归属，见 [ADR-032](docs/adr/0032-manual-trades-suspense-ledger-unassigned-attribution.md)；最终由 Owner 显式选择归属组别和数量，不允许自动按比例猜测或修改真实成交，见 [ADR-033](docs/adr/0033-owner-explicit-manual-fill-group-attribution.md)。
 
@@ -19,11 +19,11 @@ PR-02 已合并；其 R2 修复要求订单有效期严格覆盖完整交易时�
 
 ## 当前优先任务：可观察的模拟交易
 
-根据 [ADR-037](docs/adr/0037-observable-paper-trading-first-and-independent-review-gates.md)，先实现可复现的单策略模拟交易内核（M0），再接入真实来源行情进行前向 Paper Trading 观察（M1），输出净值、持仓、成交、费用、回撤及风险拒单等可核实报告。**GPT-6.1 Sol 编码、GPT-6.1 Terra 独立测试/出具同 SHA 验收报告、ChatGPT（小猫）审查并在明确通过后用 HEAD SHA 锁定安全合并、Owner 观察结果及决定范围**。详细 PR 交付与验收标准见 [模拟交易路线图](docs/PAPER_TRADING_ROADMAP.md)。所有结果须区分合成、历史回放和前向模拟；main 已交付 M0 的窄范围模拟内核；本分支新增 PR04A 只观察能力，仍不能用于真实资金。
+根据 [ADR-037](docs/adr/0037-observable-paper-trading-first-and-independent-review-gates.md)，先实现可复现的单策略模拟交易内核（M0），再接入真实来源行情进行前向 Paper Trading 观察（M1），输出净值、持仓、成交、费用、回撤及风险拒单等可核实报告。**GPT-6.1 Sol 编码、GPT-6.1 Terra 独立测试/出具同 SHA 验收报告、ChatGPT（小猫）审查并在明确通过后用 HEAD SHA 锁定安全合并、Owner 观察结果及决定范围**。详细 PR 交付与验收标准见 [模拟交易路线图](docs/PAPER_TRADING_ROADMAP.md)。所有结果须区分合成、历史回放和前向模拟；main 已交付 M0 模拟内核与 PR04A 的真实 EOD 只观察能力；下一步为 PR04B 多日前向观察及独立开盘证据，仍不能用于真实资金。
 
 ## 项目愿景
 
-已合并的回放命令、实际导出文件和验证边界见 [M0-PR03 实现说明](docs/M0_PR03.md)及 [R1 中断恢复修复](docs/M0_PR03_R1.md)；基础账本见 [M0-PR02 实现说明](docs/M0_PR02.md)。PR #6 的 [Terra 独立 PASS 验收](https://github.com/handFOOLed/Stratide/pull/6#issuecomment-6465953588) 与 [ChatGPT 同 SHA 代码审查](https://github.com/handFOOLed/Stratide/pull/6#pullrequestreview-5680851123) 已完成。**本分支已实现 M1-PR04A 单日真实 EOD 观察，待独立复验；整个 M1 与可信模拟买卖尚未完成。**
+已合并的回放命令、实际导出文件和验证边界见 [M0-PR03 实现说明](docs/M0_PR03.md)及 [R1 中断恢复修复](docs/M0_PR03_R1.md)；基础账本见 [M0-PR02 实现说明](docs/M0_PR02.md)。PR #6 的 [Terra 独立 PASS 验收](https://github.com/handFOOLed/Stratide/pull/6#issuecomment-6465953588) 与 [ChatGPT 同 SHA 代码审查](https://github.com/handFOOLed/Stratide/pull/6#pullrequestreview-5680851123) 已完成。**PR #8 的 M1-PR04A 已完成限定范围技术验收并合并；整个 M1 与可信模拟买卖尚未完成。**
 
 Stratide 是面向个人用户的**低资源占用、本地优先**的自动化交易平台。它允许云端 AI Agent 自主探索新的交易策略，但所有实际交易必须受到**独立、不可绕过的风控系统**约束。
 
@@ -68,12 +68,13 @@ Stratide 是面向个人用户的**低资源占用、本地优先**的自动化�
 ```text
 apps/
   stratided/           Rust 后台服务占位程序
-  stratide-cli/        风险示例、持久 Paper CLI、确定性回放与 CSV/JSON 报表
+  stratide-cli/        风险示例、持久 Paper CLI、历史回放与真实盘后观察命令
   dashboard/           未来的私有 Web 控制台（未实现）
 crates/
   contracts/           Paper 账户、提案与可信快照契约
   risk/                独立 Paper 风险审查（无下单/成交）
   ledger/              Paper 撮合、原子预留与 SQLite 事件账本
+  forward/             observe-only 真实 EOD 来源与独立 SQLite 观察日志
 research/              云端 Agent / 远程计算的设计说明
 config/                配置与部署说明
 scripts/               本地辅助工具说明
@@ -90,7 +91,7 @@ Cargo.toml             Rust Workspace
 README.en.md           English README
 ```
 
-本分支已有真实 EOD 只观察接入；策略运行时、真实券商执行与控制 API **尚未实现**；后续只在真实开发任务需要时增加，不提前堆空目录和无意义的抽象。
+main 已合并真实 EOD 只观察接入；策略运行时、真实券商执行与控制 API **尚未实现**；后续只在真实开发任务需要时增加，不提前堆空目录和无意义的抽象。
 
 ## 本地运行
 
@@ -127,6 +128,22 @@ Import-Csv state/pr03-report/fills.csv | Format-Table
 ```
 
 六份报告为 `report.json`、`events.json`、`daily.csv`、`orders.csv`、`fills.csv`、`positions.csv`。同一冻结输入重跑会检查账本事件和报表内容；意外中断的可识别残缺旧报表先归档，再以同路径恢复。**这些仅是合成数据的模拟账簿与计算演示，不是已验证的真实历史收益。**
+
+### 已合并 PR-04A：真实 EOD 只观察日志（不交易）
+
+使用新的观察目录，避免覆盖已有 `state/` 证据。默认随仓样例中的 `local_automation_and_raw_storage_authorized=false` 会阻断真实采集；若 Owner 确认其个人本机使用范围，请复制样例为**本地不提交的配置**，核对来源及用途后自行设置 `true`。采集使用既有进程环境 `STRATIDE_TUSHARE_TOKEN`（请勿把实际值提交 Git 或放进共享执行记录）。真实日线一般在盘后取得；不保证特定时刻已发布。
+
+```powershell
+Copy-Item samples/m1-pr04a-observer.json state/my-forward-config.json
+# 本地检查并修改配置的授权字段；不要修改仓库里的原样例。
+cargo run --locked -p stratide-cli -- forward-init state/my-forward-journal state/my-forward-config.json
+cargo run --locked -p stratide-cli -- forward-collect-once state/my-forward-journal
+cargo run --locked -p stratide-cli -- forward-status state/my-forward-journal
+cargo run --locked -p stratide-cli -- forward-report state/my-forward-journal state/my-forward-report
+Import-Csv state/my-forward-report/daily.csv | Format-Table
+```
+
+三份输出是 `report.json`、`daily.csv`、`events.json`。同一 HEAD 可重复导出；内容不同的旧报告不会被覆盖，需要选新目录。这里仅记录市场观测，**不计算纸面账户盈利，也不生成模拟订单**。详见 [M1-PR04A](docs/M1_PR04A.md)、[R2 独立测试证据](docs/evidence/m1-pr04a-r2/README.md)。
 
 `risk-demo` 的价格、规则、费用与时间均为固定 `synthetic_test` 输入，金额参数以整数分显式传入，无默认本金；接受提案不代表成交，也不改变现金或持仓。`stratided` 仍是占位程序。**编译成功不代表能够安全交易**；Windows 若未加载 MSVC 开发环境，可用 `./scripts/with-msvc.ps1` 代替 `cargo`。回放的实际 Windows 独立验收、报表及未验证项见 [M0-PR03](docs/M0_PR03.md) 和 [PR #6](https://github.com/handFOOLed/Stratide/pull/6)。
 
