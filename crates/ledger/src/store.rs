@@ -20,7 +20,7 @@ pub struct Ledger {
 
 fn digest(previous: &str, seq: i64, id: &str, payload: &str, state: &State) -> Result<String> {
     let input =
-        serde_json::to_vec(&(2, previous, seq, id, payload, state)).map_err(|e| e.to_string())?;
+        serde_json::to_vec(&(3, previous, seq, id, payload, state)).map_err(|e| e.to_string())?;
     Ok(format!("{:x}", Sha256::digest(input)))
 }
 
@@ -78,7 +78,7 @@ impl Ledger {
         let tx = db
             .transaction_with_behavior(TransactionBehavior::Immediate)
             .map_err(|e| e.to_string())?;
-        tx.execute_batch("PRAGMA user_version=2; CREATE TABLE events (seq INTEGER PRIMARY KEY, event_id TEXT NOT NULL UNIQUE, payload TEXT NOT NULL, digest TEXT NOT NULL); CREATE TABLE checkpoint (id INTEGER PRIMARY KEY CHECK(id=1), seq INTEGER NOT NULL, digest TEXT NOT NULL);")
+        tx.execute_batch("PRAGMA user_version=3; CREATE TABLE events (seq INTEGER PRIMARY KEY, event_id TEXT NOT NULL UNIQUE, payload TEXT NOT NULL, digest TEXT NOT NULL); CREATE TABLE checkpoint (id INTEGER PRIMARY KEY CHECK(id=1), seq INTEGER NOT NULL, digest TEXT NOT NULL);")
             .map_err(|e| e.to_string())?;
         tx.execute(
             "INSERT INTO events VALUES (0, 'genesis', ?1, ?2)",
@@ -108,9 +108,9 @@ impl Ledger {
         let check: String = db
             .query_row("PRAGMA integrity_check", [], |r| r.get(0))
             .map_err(|e| e.to_string())?;
-        if version != 2 || check != "ok" {
+        if version != 3 || check != "ok" {
             return Err(
-                "账本匹配模型需 v2 或 SQLite 完整性失败；保留原文件，不自动迁移/重建，禁止新风险"
+                "账本匹配模型需 v3 或 SQLite 完整性失败；保留原文件，不自动迁移/重建，禁止新风险"
                     .into(),
             );
         }

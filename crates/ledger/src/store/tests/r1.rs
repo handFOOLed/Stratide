@@ -163,18 +163,20 @@ fn incomplete_bar_or_rules_retry_survives_restart_without_reusing_valid_capacity
 }
 
 #[test]
-fn v1_ledger_is_preserved_and_rejected_without_automatic_reinterpretation() {
-    let (temp, l) = create();
-    drop(l);
-    let path = temp.path().join("account");
-    let db = Connection::open(path.join("ledger.sqlite")).unwrap();
-    db.execute_batch("PRAGMA user_version=1").unwrap();
-    drop(db);
-    let original = fs::read(path.join("ledger.sqlite")).unwrap();
-    let error = Ledger::open(&path)
-        .err()
-        .expect("v1 must not be replayed with v2 matching");
-    assert!(error.contains("v2"));
-    assert_eq!(fs::read(path.join("ledger.sqlite")).unwrap(), original);
-    assert!(Ledger::create(&path, genesis(config())).is_err());
+fn legacy_v1_and_v2_ledgers_are_preserved_without_automatic_reinterpretation() {
+    for version in [1, 2] {
+        let (temp, l) = create();
+        drop(l);
+        let path = temp.path().join("account");
+        let db = Connection::open(path.join("ledger.sqlite")).unwrap();
+        db.pragma_update(None, "user_version", version).unwrap();
+        drop(db);
+        let original = fs::read(path.join("ledger.sqlite")).unwrap();
+        let error = Ledger::open(&path)
+            .err()
+            .expect("old model must not be replayed as v3");
+        assert!(error.contains("v3"));
+        assert_eq!(fs::read(path.join("ledger.sqlite")).unwrap(), original);
+        assert!(Ledger::create(&path, genesis(config())).is_err());
+    }
 }

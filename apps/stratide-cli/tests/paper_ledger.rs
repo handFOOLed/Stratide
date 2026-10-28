@@ -238,3 +238,55 @@ fn missing_session_retry_and_open_then_close_order_survive_real_cli_processes() 
     );
     assert_eq!(success(&["paper-status", path]), filled);
 }
+
+#[test]
+fn expiry_window_is_persisted_across_real_cli_processes_without_replayed_fills() {
+    let temp = tempfile::tempdir().unwrap();
+    let file = temp.path().join("expiry-command.json");
+    let b = fixture::bar(TradingDay(20261029), 1);
+    for (name, expiry) in [
+        ("open", b.opens_at.0),
+        ("intraday", b.opens_at.0 + 1),
+        ("close", b.closes_at.0),
+        ("after-close", b.closes_at.0 + 1),
+    ] {
+        let directory = temp.path().join(name);
+        let path = directory.to_str().unwrap();
+        let initial = create(path);
+        let mut p = fixture::proposal(&initial.config, 9901);
+        p.expires_at = Timestamp(expiry);
+        let submit = fixture::submit(p, TradingDay(20261028), Timestamp(fixture::T0));
+        let submitted = apply(path, &file, "expiry-submit", submit.clone());
+        assert_eq!(submitted.orders[0].status, OrderStatus::Open);
+        assert_eq!(success(&["paper-status", path]), submitted);
+        let cmd = fixture::session(b.clone());
+        let final_state = apply(path, &file, "expiry-match", cmd.clone());
+        if expiry <= b.closes_at.0 {
+            assert_eq!(final_state.orders[0].status, OrderStatus::Expired);
+            assert!(final_state.fills.is_empty());
+            assert!(final_state.snapshot.positions.is_empty());
+            assert_eq!(final_state.snapshot.cash.fen(), 1000000);
+        } else {
+            assert_eq!(final_state.orders[0].status, OrderStatus::Filled);
+            assert_eq!(final_state.fills.len(), 1);
+            assert_eq!(final_state.snapshot.cash.fen(), 899969);
+        }
+        assert!(final_state.snapshot.pending_orders.is_empty());
+        assert_eq!(success(&["paper-status", path]), final_state);
+        assert_eq!(apply(path, &file, "expiry-submit", submit), final_state);
+        assert_eq!(apply(path, &file, "expiry-match", cmd.clone()), final_state);
+        std::fs::write(&file, serde_json::to_vec(&cmd).unwrap()).unwrap();
+        assert_eq!(
+            cli(&[
+                "paper-apply",
+                path,
+                "new-id-same-session",
+                file.to_str().unwrap()
+            ])
+            .status
+            .code(),
+            Some(2)
+        );
+        assert_eq!(success(&["paper-status", path]), final_state);
+    }
+}

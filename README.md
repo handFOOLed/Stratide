@@ -11,7 +11,7 @@
 
 人工成交先记入独立待归属账簿，不推断策略组归属，见 [ADR-032](docs/adr/0032-manual-trades-suspense-ledger-unassigned-attribution.md)；最终由 Owner 显式选择归属组别和数量，不允许自动按比例猜测或修改真实成交，见 [ADR-033](docs/adr/0033-owner-explicit-manual-fill-group-attribution.md)。
 
-R1 修复已提交自测；原 SHA 的独立验收未通过，新 SHA 尚待重新验收。撮合 v2 需要独立开盘证据，随后才观察收盘 NAV；缺行情可补数重试。v1 账本保留且拒绝自动迁移，示例使用新目录。详见 [R1 修复说明](docs/M0_PR02_R1.md)。
+R2 修复已自测，等待新 SHA 重新独立验收；原提交和 R1 均未通过验收。日线成交要求订单有效期严格覆盖完整交易时段，开盘资格不代表确定成交时刻；缺行情仍可补数重试。v1／v2 账本保留且拒绝自动迁移，新模型为 v3。详见 [R2 修复说明](docs/M0_PR02_R2.md)。
 
 ## 当前优先任务：可观察的模拟交易
 
@@ -101,10 +101,10 @@ cargo run -p stratided
 
 # state/ 是运行数据目录；仅创建父目录，不覆盖任何已有账户。
 New-Item -ItemType Directory -Force state | Out-Null
-cargo run -p stratide-cli -- paper-create state/paper-demo-r1 --initial-cash-fen 1000000 --max-order-fen 500000 --account-cap-fen 800000 --strategy-cap-fen 500000 --daily-loss-fen 100000 --drawdown-fen 200000
-cargo run -p stratide-cli -- paper-submit-synthetic state/paper-demo-r1
-cargo run -p stratide-cli -- paper-match-synthetic state/paper-demo-r1
-cargo run -p stratide-cli -- paper-status state/paper-demo-r1
+cargo run -p stratide-cli -- paper-create state/paper-demo-r2 --initial-cash-fen 1000000 --max-order-fen 500000 --account-cap-fen 800000 --strategy-cap-fen 500000 --daily-loss-fen 100000 --drawdown-fen 200000
+cargo run -p stratide-cli -- paper-submit-synthetic state/paper-demo-r2
+cargo run -p stratide-cli -- paper-match-synthetic state/paper-demo-r2
+cargo run -p stratide-cli -- paper-status state/paper-demo-r2
 ```
 
 `risk-demo` 的价格、规则、费用与时间均为固定 `synthetic_test` 输入，金额参数以整数分显式传入，无默认本金；接受提案不代表成交，也不改变现金或持仓。`stratided` 仍是占位程序。**编译成功不代表能够安全交易**；Windows 若未加载 MSVC 开发环境，可用 `./scripts/with-msvc.ps1` 代替 `cargo`。实际自测和未验证项见 [本轮实现说明](docs/M0_PR02.md)。

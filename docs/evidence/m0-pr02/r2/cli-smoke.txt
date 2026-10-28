@@ -1,0 +1,15 @@
+PR #4 R2 Sol production CLI self-test; pending Terra new-SHA acceptance.
+Client date: 2026-10-28 Asia/Taipei; Windows x64; Rust/Cargo 1.98.1; local dependency cache.
+Retained normal v3 ledger: state/pr04-r2-normal-b73b64822d234e6482f4f55d5c54619a
+Retained intraday-expiry v3 ledger: state/pr04-r2-expiry-b73b64822d234e6482f4f55d5c54619a
+Explicit principal=1000000 fen; max_order=500000; account_cap=800000; strategy_cap=500000; daily_loss=10000; drawdown=15000.
+Every command used a new CLI process. Expected successful calls all exited 0.
+Normal: create -> submit-synthetic -> match-synthetic -> status -> match retry; identical full state after reopen/retry.
+Normal result: 100 shares, fee=31, cash=899969, NAV=999969.
+Expiry: create -> paper-apply intraday-expiry-submit -> status -> match-synthetic -> status -> same submit event retry -> same match event retry.
+Expiry order: 9901; expires_at=opens_at+1ms; open=limit=1000; full-day low=950, high=1050.
+Expiry result: Expired, zero fills/fees/shares, zero remaining reservations, cash=NAV=1000000; full state identical after each reopen/retry.
+All prices/rules/rates are synthetic_test, not real market data or fills.
+Evidence hashes refer to LF-normalized UTF-8 files.
+sample-state.json SHA-256 (LF-normalized UTF-8): 92780aa0172927bcf75ce1a5ca8f70620f0ca072f470ac7c87f0d38425d1004a
+expired-state.json SHA-256 (LF-normalized UTF-8): 05187badd2059a892fdb485e21cac6c6ca92b04edc5aaa5ac02a849be9068b5d

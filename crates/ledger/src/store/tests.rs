@@ -2,6 +2,7 @@ use super::*;
 use crate::synthetic::*;
 use std::process::Command as Process;
 mod r1;
+mod r2;
 use stratide_contracts::*;
 use stratide_risk::{FreezeReason, RiskDecision, RiskKernel, RiskScope};
 
@@ -70,6 +71,26 @@ fn observe(price: i64, now: i64, day: u32, flow: i64) -> Command {
         marks: vec![mark(price, now)],
         external_flow_fen: flow,
     }
+}
+
+#[test]
+fn acceptance_intraday_expiry_cannot_use_unordered_full_day_crossing() {
+    let (_temp, mut l) = create();
+    let b = bar(TradingDay(20261029), 1);
+    let mut p = proposal(&l.state.config, 9901);
+    p.expires_at = Timestamp(b.opens_at.0 + 1);
+    apply(
+        &mut l,
+        "expiry-submit",
+        submit(p, TradingDay(20261028), Timestamp(T0)),
+    );
+    assert_eq!(l.state.orders[0].status, OrderStatus::Open);
+    apply(&mut l, "expiry-session", session(b));
+    assert!(
+        l.state.fills.is_empty(),
+        "full-day high/low cannot prove a crossing before expiry"
+    );
+    assert_eq!(l.state.orders[0].status, OrderStatus::Expired);
 }
 
 #[test]
@@ -619,14 +640,15 @@ fn crash_child() {
             apply(&mut l, "s", submit(p, TradingDay(20261028), Timestamp(T0)));
         }
         "fill" => apply(&mut l, "f", session(bar(TradingDay(20261029), 1))),
+        "expire" => apply(&mut l, "expiry", session(bar(TradingDay(20261029), 1))),
         "observe" => apply(&mut l, "loss", observe(800, T0 + DAY + 1, 20261029, 0)),
         _ => panic!("unknown child action"),
     }
 }
 
 #[test]
-fn process_death_before_after_reservation_fill_and_lock_commits_is_atomic() {
-    for action in ["submit", "fill", "observe"] {
+fn process_death_before_after_reservation_fill_expiry_and_lock_commits_is_atomic() {
+    for action in ["submit", "fill", "observe", "expire"] {
         for point in [
             "before_transaction",
             "before_reservation",
@@ -642,6 +664,11 @@ fn process_death_before_after_reservation_fill_and_lock_commits_is_atomic() {
             }
             if action == "observe" {
                 buy(&mut l, 100);
+            }
+            if action == "expire" {
+                let mut p = proposal(&l.state.config, 1);
+                p.expires_at = Timestamp(bar(TradingDay(20261029), 1).opens_at.0 + 1);
+                apply(&mut l, "s", submit(p, TradingDay(20261028), Timestamp(T0)));
             }
             let before = l.state.clone();
             drop(l);
@@ -666,6 +693,7 @@ fn process_death_before_after_reservation_fill_and_lock_commits_is_atomic() {
                     ),
                 ),
                 "fill" => ("f", session(bar(TradingDay(20261029), 1))),
+                "expire" => ("expiry", session(bar(TradingDay(20261029), 1))),
                 _ => ("loss", observe(800, T0 + DAY + 1, 20261029, 0)),
             };
             assert_eq!(l.execute(id, cmd.clone()).unwrap(), point != "after_commit");
@@ -676,6 +704,12 @@ fn process_death_before_after_reservation_fill_and_lock_commits_is_atomic() {
                 "fill" => {
                     assert_eq!(l.state.fills.len(), 1);
                     assert_eq!(l.state.snapshot.cash, c(899_969));
+                }
+                "expire" => {
+                    assert!(l.state.fills.is_empty());
+                    assert!(l.state.snapshot.pending_orders.is_empty());
+                    assert_eq!(l.state.snapshot.cash, c(1_000_000));
+                    assert_eq!(l.state.orders[0].status, OrderStatus::Expired);
                 }
                 _ => assert!(l
                     .state

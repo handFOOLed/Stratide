@@ -1,0 +1,9 @@
+PR #4 R2 Sol actual v2 compatibility proof; not independent acceptance.
+Source: state\pr04-r1-4a8eca52bbff41e48a99e44c7834d2c1\ledger.sqlite
+Source was actually created by R1 production CLI, not a v3 DB with edited version metadata.
+PRAGMA user_version (read-only): 2
+Copy retained at: state\r2-reject-actual-v2-d961886ee97a4bd48270d870f276198b
+CLI: paper-status <actual-v2-copy>; exit code: 2
+stderr: 错误：账本匹配模型需 v3 或 SQLite 完整性失败；保留原文件，不自动迁移/重建，禁止新风险
+SHA-256 original / copy before / copy after: 93a8a17e65b59d12e02291ca309ffd1e80936715058fb34cfce330988c1c04a6
+PASS: original and copy DB bytes unchanged; no automatic migration or reinitialization.

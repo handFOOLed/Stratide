@@ -354,6 +354,14 @@ impl State {
                 self.expire(index);
                 continue;
             }
+            // Unordered full-day extrema cannot prove a crossing before an
+            // intraday/exact-close expiry. Keep its reservation during every
+            // opening review; releasing it now would also leak future expiry.
+            if self.orders[index].proposal.expires_at <= b.closes_at {
+                self.orders[index].reason =
+                    "有效期未覆盖完整日线，不能证明到期前穿越；预留待到期结算".into();
+                continue;
+            }
             if let Err(reason) = &eligibility {
                 self.orders[index].reason = reason.clone();
                 continue;
@@ -379,8 +387,9 @@ impl State {
                     format!("模拟会计失败，保持原预留并冻结等待人工检查：{error}");
             }
         }
-        // Closing marks are observed ONLY after all modeled opening executions.
-        // They may latch losses for subsequent risk, never undo/select today's fill.
+        // Opening risk qualification is not a proven execution timestamp. The
+        // model uses the WHOLE session; observe closing NAV only after settling
+        // eligible model fills, without retrospectively selecting them by close.
         self.advance(accounted_at, b.day)?;
         self.snapshot.marks.retain(|m| m.instrument != b.instrument);
         self.snapshot.marks.push(PositionMark {
@@ -396,6 +405,12 @@ impl State {
                 && accounted_at >= self.orders[index].proposal.expires_at
             {
                 self.expire(index);
+                if b.opens_at < self.orders[index].proposal.expires_at
+                    && self.orders[index].proposal.expires_at <= b.closes_at
+                {
+                    self.orders[index].reason =
+                        "已到期，有效期未覆盖完整日线，不能证明到期前穿越；释放剩余预留".into();
+                }
             }
         }
         self.sessions.push((b.instrument.clone(), b.day));

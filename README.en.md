@@ -19,7 +19,7 @@ Status: **M0-PR02 paper-only implementation, independent acceptance pending**. A
 - **ADR-023:** Both sides of an internal group-to-group virtual allocation use the same trusted market-reference price. Internal reallocation is not a broker fill and adds no actual spread, fees, account equity or real trading P&L ([ADR-023](docs/adr/0023-single-market-reference-internal-transfer.md)).
 - **ADR-024:** Actual confirmed partial broker fills are allocated pro rata within the same precommitted priority among eligible groups, with deterministic share rounding, verified risk-reduction priority and reconciled real fees. Unfilled shares are not booked as positions ([ADR-024](docs/adr/0024-prorata-partial-fill-attribution.md)).
 
-R1 addresses two failed independent acceptance probes; the new SHA still needs independent acceptance. Matching v2 requires separate opening evidence before closing NAV observation and allows retries for unverified session data. Existing v1 ledgers are preserved and rejected without automatic migration; examples use a new directory. See [R1 evidence and limits](docs/M0_PR02_R1.md) (Chinese).
+R2 addresses the expiry-window failure after both previous revisions failed independent acceptance. Daily-bar fills require exclusive expiry strictly after session close; opening risk qualification is not a proven fill time. Missing-data retries remain supported. Matching model v3 preserves and rejects v1/v2 ledgers without automatic migration. The new SHA still requires independent acceptance. See [R2 evidence and limits](docs/M0_PR02_R2.md) (Chinese).
 
 ## Product intent
 
@@ -86,10 +86,10 @@ cargo run -p stratide-cli -- risk-demo --initial-cash-fen 1000000 --max-order-fe
 cargo run -p stratided
 
 New-Item -ItemType Directory -Force state | Out-Null
-cargo run -p stratide-cli -- paper-create state/paper-demo-r1 --initial-cash-fen 1000000 --max-order-fen 500000 --account-cap-fen 800000 --strategy-cap-fen 500000 --daily-loss-fen 100000 --drawdown-fen 200000
-cargo run -p stratide-cli -- paper-submit-synthetic state/paper-demo-r1
-cargo run -p stratide-cli -- paper-match-synthetic state/paper-demo-r1
-cargo run -p stratide-cli -- paper-status state/paper-demo-r1
+cargo run -p stratide-cli -- paper-create state/paper-demo-r2 --initial-cash-fen 1000000 --max-order-fen 500000 --account-cap-fen 800000 --strategy-cap-fen 500000 --daily-loss-fen 100000 --drawdown-fen 200000
+cargo run -p stratide-cli -- paper-submit-synthetic state/paper-demo-r2
+cargo run -p stratide-cli -- paper-match-synthetic state/paper-demo-r2
+cargo run -p stratide-cli -- paper-status state/paper-demo-r2
 ```
 
 `risk-demo` uses fixed `synthetic_test` prices, rules, costs and timestamps. Pass all principal/risk settings explicitly in integer CNY fen; there is no default capital. Acceptance never means a fill or changes cash/positions. `stratided` remains a placeholder. A successful build **does not** mean it is safe to trade. Actual Windows verification and unverified scope are recorded in [M0_PR02](docs/M0_PR02.md).

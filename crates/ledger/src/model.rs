@@ -168,6 +168,9 @@ pub struct Fill {
     pub day: TradingDay,
     /// Simulation accounting time; never a claimed real exchange execution time.
     pub simulated_at: Timestamp,
+    /// Opening risk qualification, NOT a fill instant. This model requires the
+    /// exclusive expires_at to be strictly AFTER evidence.closes_at, so its
+    /// entire [opens_at, closes_at] evidence window precedes order expiry.
     pub risk_checked_at: Timestamp,
     pub opening_evidence: OpeningEvidence,
     pub evidence: DailyBar,

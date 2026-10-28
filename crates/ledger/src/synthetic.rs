@@ -18,8 +18,8 @@ pub fn instrument() -> Instrument {
 pub fn provenance() -> Provenance {
     Provenance {
         mode: DataMode::SyntheticTest,
-        source_version: "synthetic_test/artificial-v2".into(),
-        dataset_hash: format!("{:x}", Sha256::digest(b"synthetic_test/artificial-v2;600000.SH;CNY-fen;T0=1793170800000;OHLC=1000,1050,950,1000;volume=10000;capacity=100;T+1;lots=100;tick=1;bands=800..1200;commission=300ppm,min1;transfer=10ppm;sell-tax=500ppm;independent-opening-marks-and-rules-at-open;matching-v2")),
+        source_version: "synthetic_test/artificial-v3".into(),
+        dataset_hash: format!("{:x}", Sha256::digest(b"synthetic_test/artificial-v3;600000.SH;CNY-fen;T0=1793170800000;OHLC=1000,1050,950,1000;volume=10000;capacity=100;T+1;lots=100;tick=1;bands=800..1200;commission=300ppm,min1;transfer=10ppm;sell-tax=500ppm;independent-opening-marks-and-rules-at-open;matching-v3;exclusive-expiry-strictly-after-session-close")),
         timezone: "Asia/Shanghai".into(),
         price_semantics: "unadjusted_cny_fen".into(),
     }
