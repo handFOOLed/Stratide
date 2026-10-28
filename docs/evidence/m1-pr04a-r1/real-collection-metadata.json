@@ -1,0 +1,98 @@
+{
+  "evidence_kind": "actual_local_https_collect_not_synthetic",
+  "license_basis": "owner_declaration_2026-10-28_not_independent_provider_certification",
+  "source_commit": "f801dd57e3e8605d51404008dd229a221e11585c",
+  "journal_head": "b7ba4a86e05c8ce3cf71c755afa8e7db2ff31fd3056b8b2ff6d12c610c084f52",
+  "event_count": 7,
+  "actual_valid_forward_days": 1,
+  "chain_and_checkpoint_verified": true,
+  "all_raw_hashes_verified": true,
+  "normalized_values_match_actual_raw": true,
+  "original_first_commit_unchanged": true,
+  "previous_report_not_overwritten": true,
+  "old_blocked_journal_unchanged": true,
+  "strategy_proposals": 0,
+  "simulated_fills": 0,
+  "nav_fen": null,
+  "drawdown_bps": null,
+  "collections": [
+    {
+      "event_sequence": 2,
+      "run_id": "run-1-1793189414443",
+      "status": "valid_eod",
+      "trade_day": "20261028",
+      "available_at": 1793189416934,
+      "late_backfill": false,
+      "duplicate_of": null,
+      "revision_of": null,
+      "raw_hashes": [
+        {
+          "api": "trade_cal",
+          "sha256": "1ffcc11241ad426887947aea08346fc14504b83a906a33327be0e62391693176",
+          "received_at": 1793189415611,
+          "server_date": "Wed, 28 Oct 2026 12:09:52 GMT"
+        },
+        {
+          "api": "daily",
+          "sha256": "98facba2c9573e2eb183c0f19521e623c5e374fa3a77d09f6ffcaa3c9db9afc8",
+          "received_at": 1793189416933,
+          "server_date": "Wed, 28 Oct 2026 12:09:53 GMT"
+        }
+      ]
+    },
+    {
+      "event_sequence": 4,
+      "run_id": "run-3-1793189444014",
+      "status": "valid_eod",
+      "trade_day": "20261028",
+      "available_at": 1793189453705,
+      "late_backfill": false,
+      "duplicate_of": 2,
+      "revision_of": null,
+      "raw_hashes": [
+        {
+          "api": "trade_cal",
+          "sha256": "c841a702c87b1afa73b14df19053c41b67b95f839f3cce55c05ac5cab0ee7d97",
+          "received_at": 1793189448459,
+          "server_date": "Wed, 28 Oct 2026 12:10:25 GMT"
+        },
+        {
+          "api": "daily",
+          "sha256": "7380580f3db9c8b416dbbce1af3f0456732ceb6d7e52e7cc79dca87f868cc938",
+          "received_at": 1793189453704,
+          "server_date": "Wed, 28 Oct 2026 12:10:29 GMT"
+        }
+      ]
+    },
+    {
+      "event_sequence": 6,
+      "run_id": "run-5-1793189453729",
+      "status": "valid_eod",
+      "trade_day": "20261027",
+      "available_at": 1793189457603,
+      "late_backfill": true,
+      "duplicate_of": null,
+      "revision_of": null,
+      "raw_hashes": [
+        {
+          "api": "trade_cal",
+          "sha256": "6fb87860523e605a65f457434a0db7b380854e6e2dfaedeba9514b68c53a8d62",
+          "received_at": 1793189455795,
+          "server_date": "Wed, 28 Oct 2026 12:10:32 GMT"
+        },
+        {
+          "api": "daily",
+          "sha256": "6acad357f601c70ecba107e9a7537f3edd079352cc0bce3fb0636350ac341440",
+          "received_at": 1793189457603,
+          "server_date": "Wed, 28 Oct 2026 12:10:34 GMT"
+        }
+      ]
+    }
+  ],
+  "local_report_hashes": {
+    "daily.csv": "c8495928b7774ac21d1650cefa69b585bfe0e802b3314ee07b7e57b4769707ff",
+    "events.json": "ca90a6aedcfbbe87ebc830d2c2c1513660345075386a4cc9b76c69fb71117ca3",
+    "report.json": "e2a6287c523413583b57098d724f80c8caff6fba7511eedefa55a1b25418b5f8"
+  },
+  "raw_market_data_uploaded": false
+}

@@ -1,8 +1,12 @@
 # Stratide 模拟交易优先路线图｜给 Sol / Terra / ChatGPT 的执行约定
 
-状态：**M0-PR01 [PR #2](https://github.com/handFOOLed/Stratide/pull/2)、M0-PR02 [PR #4](https://github.com/handFOOLed/Stratide/pull/4)、M0-PR03 [PR #6](https://github.com/handFOOLed/Stratide/pull/6) 均已完成 Windows Terra 独立验收、ChatGPT 源码审查并合并。PR-03 merge `13de8d43f663caa16c983609d2d5161ca497d123`：已交付合成数据驱动的确定性回放、可审计 CSV/JSON 报告与中断恢复。下一任务：[M1-PR04A Issue #7](https://github.com/handFOOLed/Stratide/issues/7) 已创建（真实 A 股盘后来源核验、只观察且不可回写的前向 journal）；Sol 尚未完成开发，Terra 尚未验收。M1 真实数据前向观察、独立开盘证据与模拟交易尚未实现/验收；Linux/macOS、行情使用许可和物理断电均未验证。** 关联 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md)、[M0](M0.md)、[RISK_POLICY](RISK_POLICY.md)、[AGENTS](../AGENTS.md)。
+状态：**M0-PR01 [PR #2](https://github.com/handFOOLed/Stratide/pull/2)、PR-02 [PR #4](https://github.com/handFOOLed/Stratide/pull/4)、PR-03 [PR #6](https://github.com/handFOOLed/Stratide/pull/6) 已合并；M1-PR04A [PR #8](https://github.com/handFOOLed/Stratide/pull/8) 已实现本机真实 EOD 只观察日志（1 个有效前向日、0 提案/成交），P1 漏采显示修复与当前测试见 [R2](evidence/m1-pr04a-r2/README.md)，仍待最终 SHA 独立复验及小猫审查。** 多日持续观察和独立开盘成交留 PR04B，不能宣称整个 M1 已完成。Owner 接受个人非商业本机用途，供应商授权未独立核实作为限制披露；不强制书面证明或轮换作为本轮前置。开发执行记录曾含 Token 明文，Git/应用日志/PR 不含值，是否轮换由 Owner 决定。关联 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md)。
 
 ## 完成的样子
+
+2026-10-28 的真实入库与恢复证据见 [R1](evidence/m1-pr04a-r1/README.md)，晚到缺口修复见 [R2](evidence/m1-pr04a-r2/README.md)。Owner 声明不冒充独立供应商认证；一次真实当日采集加完整测试/报告可以申请 PR04A 验收，多日观察不伪造。
+
+**历史（首次提交时）：** 当时自动保存范围未确认，journal 尚无真实日线，因此记录为 BLOCKED。原始失败证据见 [首次记录](evidence/m1-pr04a/README.md)，不会删除或事后改为成功；这一历史状态已由后续 Owner 决定及真实入库事实更新。
 
 Owner 在 Windows 本地能用 CLI 启动一个 paper-only 模拟账户，看到当天模拟账户净值、现金、证券数量、成交记录、费用与风控拒绝。系统能**重复运行同一历史区间而结果一致**、断点重启续算而不重复成交，并把观察数据保存成可读取的 CSV/JSON；后续才以真实数据做持续时间前推的 Paper Trading，每天检查真实已过去行情下的模拟表现。
 

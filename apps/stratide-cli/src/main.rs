@@ -1,4 +1,5 @@
 #![recursion_limit = "256"]
+mod forward;
 mod paper;
 mod replay;
 use std::{collections::BTreeMap, env, process::ExitCode};
@@ -23,6 +24,7 @@ fn run(args: Vec<String>) -> Result<(), String> {
             )
         }
         "risk-demo" => demo(&args[1..])?,
+        command if command.starts_with("forward-") => forward::run(&args)?,
         "paper-replay" | "paper-report" => replay::run(&args)?,
         command if command.starts_with("paper-") => paper::run(command, &args[1..])?,
         "help" | "--help" | "-h" => println!(
@@ -44,7 +46,13 @@ paper-apply <目录> <唯一事件ID> <可信命令JSON文件>
 paper-replay <输入JSON> <账本目录> <报表目录> --sha256 <输入文件SHA256> <上述全部六项参数>
 paper-report <输入JSON> <账本目录> <报表目录> --sha256 <输入文件SHA256>
 \
-Paper 演示使用 synthetic_test 人工行情/费率，绝非真实市场数据。"
+Paper 演示使用 synthetic_test 人工行情/费率，绝非真实市场数据。
+forward-init <新目录> <观察配置JSON>
+forward-source-check <目录>
+forward-collect-once <目录> [--trade-day YYYYMMDD]
+forward-status <目录>
+forward-report <目录> <新报告目录>
+Forward 仅 observe-only；不创建资金账本、不产生策略提案或成交。"
         ),
         other => return Err(format!("未知命令 {other}；使用 --help 查看用法")),
     }

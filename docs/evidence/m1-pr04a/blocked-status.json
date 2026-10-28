@@ -1,0 +1,24 @@
+{
+  "mode": "forward_observation_only_v1",
+  "config": {
+    "observation_id": "owner-eod-observer",
+    "instrument": "600000.SH",
+    "strategy_version": "none-observe-only-v1",
+    "source": "tushare_pro",
+    "license_note": "UNVERIFIED: automated local EOD observation and raw-response storage require applicable source permission; no raw-data redistribution authorization",
+    "local_automation_and_raw_storage_authorized": false
+  },
+  "started_at": "2026-10-28T19:50:00.071+08:00",
+  "head": "441f008e8eb1632010e7b96e0964958f941c72ceb12706843029de060e8a22c1",
+  "event_count": 5,
+  "actual_valid_forward_days": 0,
+  "collection_attempts": 2,
+  "pending_runs": 0,
+  "clock_halted": false,
+  "local_source_authorization_recorded": false,
+  "nav_fen": null,
+  "drawdown_bps": null,
+  "strategy_proposals": 0,
+  "simulated_fills": 0,
+  "pause_reason": "observe_only_no_independent_opening_rules_or_cost_evidence"
+}
