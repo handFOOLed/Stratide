@@ -2,9 +2,9 @@
 
 # Stratide
 
-**PR #8 current status: P1 daily-gap fix ready for independent retesting.** Reports preserve both a missed on-day observation and its later backfill; JSON/CSV, restart regression and actual CLI smoke ran in a new local output path. See [R2 evidence](docs/evidence/m1-pr04a-r2/README.md). Actual observation still covers one forward day with zero proposals/fills. The Owner accepts personal noncommercial local use; provider authorization remains independently unverified as a disclosed limitation, not an automatic prerequisite for this local milestone, and no redistribution is granted. Development tool-execution records contained a plaintext Token; do not claim zero exposure. It was not committed to Git/PR or emitted by the application or application logs. Rotation is the Owner's decision; the value is not repeated here. Earlier blocked evidence below is historical; independent acceptance and final review remain pending.
+**PR #8 / M1-PR04A merged** ([PR](https://github.com/handFOOLed/Stratide/pull/8); merge `1ef06eb1d17f8796e3b43d2ad0a903382fa0fd23`; reviewed HEAD `295751cf15bfaa68407dd243f45394b5147e1227`). A limited Windows **observe-only** Tushare EOD workflow now writes actually received market data, raw hashes, timestamps, duplicate/backfill/gap diagnostics and CSV/JSON reports to a separate forward journal. [Terra independent acceptance](https://github.com/handFOOLed/Stratide/pull/8#issuecomment-6471878822) included **89 Windows tests** and offline checks of Sol-collected raw bytes; the reviewer did **not** independently make HTTPS calls. [ChatGPT source review](https://github.com/handFOOLed/Stratide/pull/8#pullrequestreview-5684495112) passed. There is **one valid observed forward trading day, zero proposals and zero simulated fills**; NAV/drawdown are unavailable. Provider authorization is not independently certified; the Owner accepts personal noncommercial local use. A past development tool transcript exposed a plaintext Token; this remains disclosed, and the value must not be committed or logged by the application. Multi-day forward observations and actual paper trading are **not** completed.
 
-**Historical initial M1-PR04A submission: Draft / BLOCKED.** Adds a separate observe-only journal, single-shot EOD adapter and CSV/JSON CLI. Actual local Tushare HTTPS `daily`/`trade_cal` probes succeeded, but permission for automated collection and raw-response retention remains unverified; the sample blocks collection. Valid forward days, strategy proposals and simulated fills remain zero. The v3 financial ledger is unchanged. See [commands, actual outputs and limits](docs/M1_PR04A.md) and [source feasibility](docs/M1_PR04A_SOURCE_FEASIBILITY.md) (Chinese). Terra's independent acceptance, ChatGPT review and Owner-authorized merge are still pending; M1 is not complete.
+**Historical initial M1-PR04A submission: Draft / BLOCKED.** Initial provider permission and live-journal evidence were unavailable; the original blocked record is preserved in [M1-PR04A](docs/M1_PR04A.md) and [source feasibility notes](docs/M1_PR04A_SOURCE_FEASIBILITY.md). Subsequent Owner scope confirmation, real local collection, R2 fix, independent narrow acceptance and merge are documented above. **The complete M1 milestone is not finished.**
 
 [ADR-035](docs/adr/0035-record-date-corporate-action-group-attribution.md): record-date dividends and bonus shares are attributed automatically to eligible groups.
 [ADR-036](docs/adr/0036-owner-approval-for-voluntary-corporate-actions.md): funded rights subscriptions and voluntary issuer elections require event-specific Owner approval, never silent automatic execution.
@@ -17,7 +17,7 @@
 
 **Autonomous Quantitative Trading & Open-Ended Strategy Discovery**
 
-Status: **M0-PR01, PR-02 and PR-03 merged**, with independent Windows acceptance by Terra and source/evidence review by ChatGPT. The paper-only system now includes a Risk Kernel, a single-writer durable SQLite ledger, atomic cash/share reservations, conservative daily-bar simulated fills, deterministic replay of frozen JSON input, and six inspectable CSV/JSON reports. [PR #6](https://github.com/handFOOLed/Stratide/pull/6) was merged at `13de8d43f663caa16c983609d2d5161ca497d123`, after [Terra's R1 independent PASS](https://github.com/handFOOLed/Stratide/pull/6#issuecomment-6465953588) and [ChatGPT's SHA-specific code review](https://github.com/handFOOLed/Stratide/pull/6#pullrequestreview-5680851123). The committed example is strictly artificial `synthetic_test` market data and fees, **not verified historical performance or forward observation**. Real-data provenance/licensing, Linux/macOS, physical power-loss and live brokerage are not verified or implemented. Do not use this repository to manage real funds. See [replay commands, exported reports and limits](docs/M0_PR03.md) (Chinese).
+Status: **M0-PR01/02/03 and M1-PR04A merged**. The paper-only engine provides a Risk Kernel, durable SQLite financial ledger, conservative synthetic fills and deterministic replay; PR04A adds a **separate observe-only real EOD market-data journal** without placing simulated orders or producing account NAV. [PR #6](https://github.com/handFOOLed/Stratide/pull/6) delivered synthetic replay; [PR #8](https://github.com/handFOOLed/Stratide/pull/8) delivered the first limited real EOD observation on Windows. This is not multi-day forward-paper trading or proof of strategy returns. Linux/macOS, power loss, provider permission scope, fillability and brokerage remain unverified or unimplemented. **Do not use this code to manage real money.** See [M0-PR03](docs/M0_PR03.md) and [M1-PR04A](docs/M1_PR04A.md).
 
 - **ADR-020/021/022:** New versions require independent requalification. Strategy groups can hold the same instrument with separate internal data/P&L but one real account ledger. Trusted portfolio allocation nets compatible opposing group intents before actual broker orders; internal virtual transfers are not exchange fills. See [ADR-020](docs/adr/0020-versioned-requalification-auto-promotion.md), [ADR-021](docs/adr/0021-group-isolation-shared-instrument-attribution.md), and [ADR-022](docs/adr/0022-trusted-cross-group-intent-netting.md).
 - **ADR-023:** Both sides of an internal group-to-group virtual allocation use the same trusted market-reference price. Internal reallocation is not a broker fill and adds no actual spread, fees, account equity or real trading P&L ([ADR-023](docs/adr/0023-single-market-reference-internal-transfer.md)).
@@ -63,6 +63,7 @@ crates/
   portfolio/           future portfolio accounting/allocation
   risk/                independent paper risk review, no execution/fills
   ledger/              paper execution, reservations and SQLite event ledger
+  forward/             real EOD observe-only adapter and separate SQLite journal
   control-api/         future local-only control interface
 research/              cloud LLM and remote worker design notes
 config/                environment and deployment notes
@@ -112,6 +113,22 @@ Import-Csv state/pr03-report/fills.csv | Format-Table
 ```
 
 The six exports are `report.json`, `events.json`, `daily.csv`, `orders.csv`, `fills.csv` and `positions.csv`. Re-running verifies the frozen input, ledger events and derived output. Recognized incomplete exports are preserved as archives before recovery to the original path. See [M0-PR03](docs/M0_PR03.md) and [R1 recovery notes](docs/M0_PR03_R1.md).
+
+### Real-source EOD observation only (merged PR-04A)
+
+Use fresh observer/report paths so existing evidence is not overwritten. The checked-in `samples/m1-pr04a-observer.json` has `local_automation_and_raw_storage_authorized=false` and blocks live collection by default. To run within your own accepted usage scope, copy and review it locally, then explicitly set the flag to `true`. The collector requires `STRATIDE_TUSHARE_TOKEN` in the local process environment; do not commit the value to Git or print it in application logs.
+
+```powershell
+Copy-Item samples/m1-pr04a-observer.json state/my-forward-config.json
+# Review the local config copy and explicitly set its authorization flag when appropriate.
+cargo run --locked -p stratide-cli -- forward-init state/my-forward-journal state/my-forward-config.json
+cargo run --locked -p stratide-cli -- forward-collect-once state/my-forward-journal
+cargo run --locked -p stratide-cli -- forward-status state/my-forward-journal
+cargo run --locked -p stratide-cli -- forward-report state/my-forward-journal state/my-forward-report
+Import-Csv state/my-forward-report/daily.csv | Format-Table
+```
+
+The exports are `report.json`, `daily.csv` and `events.json`. This remains **observe-only**, with no paper trades, funded NAV or fake fill evidence. Existing reports with different contents are preserved; choose a new report directory. See [PR04A implementation](docs/M1_PR04A.md) and [R2 test evidence](docs/evidence/m1-pr04a-r2/README.md).
 
 `risk-demo` uses fixed `synthetic_test` prices, rules, costs and timestamps. Pass all principal/risk settings explicitly in integer CNY fen; there is no default capital. Acceptance never means a fill or changes cash/positions. `stratided` remains a placeholder. A successful build **does not** mean it is safe to trade. The paper ledger's Windows acceptance and replay reporting limits are recorded in [M0-PR02](docs/M0_PR02.md), [M0-PR03](docs/M0_PR03.md) and [PR #6](https://github.com/handFOOLed/Stratide/pull/6).
 
