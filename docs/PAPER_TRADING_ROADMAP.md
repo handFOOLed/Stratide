@@ -1,6 +1,6 @@
 # Stratide 模拟交易优先路线图｜给 Sol / Terra / ChatGPT 的执行约定
 
-状态：**计划已接受；代码尚未实现/验收。** 关联 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md)、[M0](M0.md)、[RISK_POLICY](RISK_POLICY.md)、[AGENTS](../AGENTS.md)。
+状态：**M0-PR01 已合并（[GitHub PR #2](https://github.com/handFOOLed/Stratide/pull/2)，merge `16a621ff3fe22776b56a7148831fe5f1ada8af32`）；内存 Paper 契约与 Risk Kernel 已获 Terra 独立验收和 ChatGPT 代码审查。模拟成交、持久化账本与持续观察尚未实现，下一任务为 [M0-PR02 Issue #3](https://github.com/handFOOLed/Stratide/issues/3)。** 关联 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md)、[M0](M0.md)、[RISK_POLICY](RISK_POLICY.md)、[AGENTS](../AGENTS.md)。
 
 ## 完成的样子
 
