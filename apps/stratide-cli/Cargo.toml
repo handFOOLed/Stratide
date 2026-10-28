@@ -6,3 +6,4 @@ publish = false
 
 [dependencies]
 stratide-contracts = { path = "../../crates/contracts" }
+stratide-risk = { path = "../../crates/risk" }

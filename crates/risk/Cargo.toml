@@ -1,0 +1,8 @@
+[package]
+name = "stratide-risk"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[dependencies]
+stratide-contracts = { path = "../contracts" }
