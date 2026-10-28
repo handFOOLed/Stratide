@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "mode": "synthetic_test",
+  "source": "synthetic_test/hand-authored",
+  "license": "generated-in-repository-no-market-data",
+  "source_version": "fixture-v1",
+  "timezone": "Asia/Shanghai",
+  "price_semantics": "unadjusted_cny_fen",
+  "instrument": {
+    "market": "Shanghai",
+    "code": "600000"
+  },
+  "fee": {
+    "version": "artificial-fees-v1",
+    "source": "synthetic_test/not-a-real-tariff",
+    "valid_from": 20261028,
+    "valid_through": 20261130,
+    "commission_ppm": 300,
+    "minimum_commission_fen": 1,
+    "transfer_ppm": 10,
+    "sell_tax_ppm": 500
+  },
+  "sessions": [
+    {
+      "day": 20261028,
+      "opens_at": 1793151000000,
+      "closes_at": 1793170800000,
+      "available_at": 1793170801000,
+      "open_fen": 1000,
+      "high_fen": 1050,
+      "low_fen": 950,
+      "close_fen": 1000,
+      "volume_shares": 10000,
+      "capacity_shares": 100,
+      "status_verified": true,
+      "opening": {
+        "price_fen": 1000,
+        "as_of": 1793151000000,
+        "available_at": 1793151000000,
+        "source": "synthetic_test/independent-opening-v1",
+        "rules": {
+          "available_at": 1793151000000,
+          "source": "synthetic_test/explicit-rules-v1",
+          "tradable": true,
+          "settlement": "TPlusOne",
+          "buy_lot": 100,
+          "sell_lot": 100,
+          "allow_odd_lot_liquidation": true,
+          "tick_size_fen": 1,
+          "min_price_fen": 800,
+          "max_price_fen": 1200
+        }
+      },
+      "rules": {
+        "available_at": 1793151000000,
+        "source": "synthetic_test/explicit-rules-v1",
+        "tradable": true,
+        "settlement": "TPlusOne",
+        "buy_lot": 100,
+        "sell_lot": 100,
+        "allow_odd_lot_liquidation": true,
+        "tick_size_fen": 1,
+        "min_price_fen": 800,
+        "max_price_fen": 1200
+      }
+    },
+    {
+      "day": 20261029,
+      "opens_at": 1793237400000,
+      "closes_at": 1793257200000,
+      "available_at": 1793257201000,
+      "open_fen": 1000,
+      "high_fen": 1050,
+      "low_fen": 950,
+      "close_fen": 980,
+      "volume_shares": 10000,
+      "capacity_shares": 100,
+      "status_verified": true,
+      "opening": {
+        "price_fen": 1000,
+        "as_of": 1793237400000,
+        "available_at": 1793237400000,
+        "source": "synthetic_test/independent-opening-v1",
+        "rules": {
+          "available_at": 1793237400000,
+          "source": "synthetic_test/explicit-rules-v1",
+          "tradable": true,
+          "settlement": "TPlusOne",
+          "buy_lot": 100,
+          "sell_lot": 100,
+          "allow_odd_lot_liquidation": true,
+          "tick_size_fen": 1,
+          "min_price_fen": 800,
+          "max_price_fen": 1200
+        }
+      },
+      "rules": {
+        "available_at": 1793237400000,
+        "source": "synthetic_test/explicit-rules-v1",
+        "tradable": true,
+        "settlement": "TPlusOne",
+        "buy_lot": 100,
+        "sell_lot": 100,
+        "allow_odd_lot_liquidation": true,
+        "tick_size_fen": 1,
+        "min_price_fen": 800,
+        "max_price_fen": 1200
+      }
+    },
+    {
+      "day": 20261030,
+      "opens_at": 1793323800000,
+      "closes_at": 1793343600000,
+      "available_at": 1793343601000,
+      "open_fen": 980,
+      "high_fen": 1010,
+      "low_fen": 900,
+      "close_fen": 930,
+      "volume_shares": 10000,
+      "capacity_shares": 100,
+      "status_verified": true,
+      "opening": {
+        "price_fen": 980,
+        "as_of": 1793323800000,
+        "available_at": 1793323800000,
+        "source": "synthetic_test/independent-opening-v1",
+        "rules": {
+          "available_at": 1793323800000,
+          "source": "synthetic_test/explicit-rules-v1",
+          "tradable": true,
+          "settlement": "TPlusOne",
+          "buy_lot": 100,
+          "sell_lot": 100,
+          "allow_odd_lot_liquidation": true,
+          "tick_size_fen": 1,
+          "min_price_fen": 800,
+          "max_price_fen": 1200
+        }
+      },
+      "rules": {
+        "available_at": 1793323800000,
+        "source": "synthetic_test/explicit-rules-v1",
+        "tradable": true,
+        "settlement": "TPlusOne",
+        "buy_lot": 100,
+        "sell_lot": 100,
+        "allow_odd_lot_liquidation": true,
+        "tick_size_fen": 1,
+        "min_price_fen": 800,
+        "max_price_fen": 1200
+      }
+    },
+    {
+      "day": 20261102,
+      "opens_at": 1793583000000,
+      "closes_at": 1793602800000,
+      "available_at": 1793602801000,
+      "open_fen": 930,
+      "high_fen": 1000,
+      "low_fen": 900,
+      "close_fen": 970,
+      "volume_shares": 10000,
+      "capacity_shares": 100,
+      "status_verified": true,
+      "opening": {
+        "price_fen": 930,
+        "as_of": 1793583000000,
+        "available_at": 1793583000000,
+        "source": "synthetic_test/independent-opening-v1",
+        "rules": {
+          "available_at": 1793583000000,
+          "source": "synthetic_test/explicit-rules-v1",
+          "tradable": true,
+          "settlement": "TPlusOne",
+          "buy_lot": 100,
+          "sell_lot": 100,
+          "allow_odd_lot_liquidation": true,
+          "tick_size_fen": 1,
+          "min_price_fen": 800,
+          "max_price_fen": 1200
+        }
+      },
+      "rules": {
+        "available_at": 1793583000000,
+        "source": "synthetic_test/explicit-rules-v1",
+        "tradable": true,
+        "settlement": "TPlusOne",
+        "buy_lot": 100,
+        "sell_lot": 100,
+        "allow_odd_lot_liquidation": true,
+        "tick_size_fen": 1,
+        "min_price_fen": 800,
+        "max_price_fen": 1200
+      }
+    }
+  ]
+}

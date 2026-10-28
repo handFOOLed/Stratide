@@ -1,0 +1,37 @@
+M0-PR03 Sol 自测记录（非 Terra 独立验收）
+基线 origin/main: 33238553a38167a63b5e17047d4be54e38d27c5b
+环境: Windows x64, PowerShell, Rust/Cargo 1.98.1, 已安装 MSVC, 本机已有依赖缓存
+输入: samples/m0-pr03-synthetic.json
+输入 SHA-256: e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe
+模式: synthetic_test，人工生成价格/规则/容量/费率；不是真实市场或 PIT 验证
+
+命令与结果（在仓库根目录执行）：
+  cargo fmt --all -- --check                         PASS, exit 0
+  ./scripts/with-msvc.ps1 check --workspace --locked  PASS, exit 0
+  ./scripts/with-msvc.ps1 test --workspace --locked   PASS, exit 0
+    72 tests passed: CLI paper_ledger 4, replay 4, risk_demo 2,
+    contracts 1, ledger 28, risk 33; doc tests 0
+  ./scripts/with-msvc.ps1 clippy --workspace --all-targets --locked '--' -D warnings
+                                                      PASS, exit 0
+  git diff --check                                    PASS, exit 0
+  python samples/generate_m0_pr03_synthetic.py         PASS, output matches committed SHA-256
+
+CLI 新账本 smoke（实际运行两次；第二次没有追加成交）：
+  ./scripts/with-msvc.ps1 run --quiet --locked -p stratide-cli -- paper-replay samples/m0-pr03-synthetic.json state/m0-pr03-run-final docs/evidence/m0-pr03/sample-report --sha256 e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe --initial-cash-fen 1000000 --max-order-fen 500000 --account-cap-fen 800000 --strategy-cap-fen 500000 --daily-loss-fen 100000 --drawdown-fen 200000
+  PASS, exit 0；重复运行输出相同账本尾摘要：
+  2df95c387f82ec0399537ee7cd43e0abe06208a6c5c7aba08f1484c6ff458740
+
+真实导出在 sample-report/：report.json, events.json, daily.csv,
+orders.csv, fills.csv, positions.csv。
+独立计算：初始现金 1,000,000 分；买入 100×1,000 分、费用 31 分；
+卖出 100×930 分、费用 76 分；末期现金/NAV = 992,893 分；
+已实现 P&L -7,107 分；持仓 0；风控拒单 1；总费用 107 分。
+新集成测试从两个独立空账本目录跨进程重放，逐字节比较上述六个文件；
+验证坏哈希、迟到行情、重复交易日、缺独立开盘证据、状态未核验的 NAV 缺口，以及既有 v3 合成账本不能被重标为回放报告。
+
+工具链警告：F: 卷的 Rust incremental hard link 未成功，Cargo 回退复制；
+所有上述命令最终 exit 0。这不是产品编译/测试失败。
+
+未验证：Linux/macOS；真实历史数据的来源、许可、实际 available_at、
+费率、交易日历、真实市场可成交性；持续 forward paper；硬断电。
+Terra 验收、小猫审查和合并尚未发生。

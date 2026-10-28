@@ -1,0 +1,459 @@
+use super::{days_from_civil, Dataset, STRATEGY_SPEC, STRATEGY_VERSION};
+use serde::Serialize;
+use serde_json::json;
+use sha2::{Digest, Sha256};
+use std::{
+    collections::{BTreeMap, VecDeque},
+    fs,
+    path::Path,
+};
+use stratide_contracts::{Cny, Side, TradingDay};
+use stratide_ledger::{Command, Fill, Ledger, OrderStatus, State};
+
+#[derive(Serialize)]
+struct Daily {
+    day: u32,
+    nav_fen: Option<i64>,
+    cash_fen: i64,
+    available_cash_fen: i64,
+    reserved_cash_fen: i64,
+    held_shares: i64,
+    sellable_shares: i64,
+    unsettled_shares: i64,
+    reserved_sell_shares: i64,
+    pending_orders: usize,
+    cumulative_fee_fen: i64,
+    realized_pnl_fen: Option<i128>,
+    unrealized_pnl_fen: Option<i128>,
+    remaining_cost_basis_fen: Option<i128>,
+    external_flow_total_fen: i64,
+    valuation_error: Option<String>,
+}
+
+struct Lot {
+    shares: i64,
+    cost_fen: i128,
+}
+
+fn accounting(state: &State) -> (Option<i128>, Option<i128>, Option<i128>) {
+    let mut lots: VecDeque<Lot> = VecDeque::new();
+    let mut realized = 0_i128;
+    for fill in &state.fills {
+        let gross = i128::from(fill.price.fen()) * i128::from(fill.quantity);
+        let fees = match fill.fees.total() {
+            Ok(f) => i128::from(f.fen()),
+            Err(_) => return (None, None, None),
+        };
+        if fill.side == Side::Buy {
+            lots.push_back(Lot {
+                shares: fill.quantity,
+                cost_fen: gross + fees,
+            });
+        } else {
+            let mut remaining = fill.quantity;
+            let mut cost = 0_i128;
+            while remaining > 0 {
+                let Some(lot) = lots.front_mut() else {
+                    return (None, None, None);
+                };
+                let take = remaining.min(lot.shares);
+                let taken_cost = if take == lot.shares {
+                    lot.cost_fen
+                } else {
+                    lot.cost_fen * i128::from(take) / i128::from(lot.shares)
+                };
+                lot.shares -= take;
+                lot.cost_fen -= taken_cost;
+                remaining -= take;
+                cost += taken_cost;
+                if lot.shares == 0 {
+                    lots.pop_front();
+                }
+            }
+            realized += gross - fees - cost;
+        }
+    }
+    let held: i64 = state.snapshot.positions.iter().map(|l| l.quantity).sum();
+    if lots.iter().map(|l| l.shares).sum::<i64>() != held {
+        return (None, None, None);
+    }
+    let basis = lots.iter().map(|l| l.cost_fen).sum::<i128>();
+    let mark = state.snapshot.positions.first().and_then(|p| {
+        state
+            .snapshot
+            .marks
+            .iter()
+            .find(|m| m.instrument == p.instrument)
+    });
+    let unrealized = if held == 0 {
+        Some(0)
+    } else if state.equity.is_none() {
+        None
+    } else {
+        mark.map(|m| i128::from(m.price.fen()) * i128::from(held) - basis)
+    };
+    (Some(realized), unrealized, Some(basis))
+}
+
+fn daily(
+    day: TradingDay,
+    state: &State,
+    t_plus_one: bool,
+    completed: bool,
+) -> Result<Daily, String> {
+    let held = state
+        .snapshot
+        .positions
+        .iter()
+        .try_fold(0_i64, |n, l| n.checked_add(l.quantity))
+        .ok_or("持仓溢出")?;
+    let unsettled = if t_plus_one {
+        state
+            .snapshot
+            .positions
+            .iter()
+            .filter(|l| l.acquired_on >= day)
+            .map(|l| l.quantity)
+            .sum()
+    } else {
+        0
+    };
+    let reserved_sell: i64 = state
+        .snapshot
+        .pending_orders
+        .iter()
+        .filter(|o| o.side == Side::Sell)
+        .map(|o| o.quantity)
+        .sum();
+    let reserved_cash: i64 = state
+        .snapshot
+        .pending_orders
+        .iter()
+        .map(|o| o.reserved_cash.fen())
+        .sum();
+    let sellable = held
+        .checked_sub(unsettled)
+        .and_then(|v| v.checked_sub(reserved_sell))
+        .ok_or("可卖数量溢出")?;
+    let available_cash = state
+        .snapshot
+        .cash
+        .fen()
+        .checked_sub(reserved_cash)
+        .ok_or("可用现金溢出")?;
+    if sellable < 0 || available_cash < 0 {
+        return Err("报表预留超过资金/可卖持仓".into());
+    }
+    let fees = state
+        .fills
+        .iter()
+        .try_fold(0_i64, |n, f| -> Result<i64, String> {
+            n.checked_add(f.fees.total()?.fen())
+                .ok_or_else(|| "费用溢出".to_string())
+        })?;
+    let (realized, unrealized, basis) = accounting(state);
+    Ok(Daily {
+        day: day.0,
+        nav_fen: if completed {
+            state.equity.map(Cny::fen)
+        } else {
+            None
+        },
+        cash_fen: state.snapshot.cash.fen(),
+        available_cash_fen: available_cash,
+        reserved_cash_fen: reserved_cash,
+        held_shares: held,
+        sellable_shares: sellable,
+        unsettled_shares: unsettled,
+        reserved_sell_shares: reserved_sell,
+        pending_orders: state.snapshot.pending_orders.len(),
+        cumulative_fee_fen: fees,
+        realized_pnl_fen: realized,
+        unrealized_pnl_fen: if completed { unrealized } else { None },
+        remaining_cost_basis_fen: basis,
+        external_flow_total_fen: state.snapshot.equity_basis.net_external_flow_total_fen,
+        valuation_error: if completed {
+            state.valuation_error.clone()
+        } else {
+            Some(
+                "当日行情状态未核验；账本未推进，NAV unavailable；资金/持仓仅为上次已确认状态"
+                    .into(),
+            )
+        },
+    })
+}
+
+fn csv_cell(s: &str) -> String {
+    let safe = if s.starts_with(['=', '+', '-', '@', '\t']) {
+        format!("'{s}")
+    } else {
+        s.into()
+    };
+    format!("\"{}\"", safe.replace('"', "\"\""))
+}
+fn opt<T: ToString>(v: Option<T>) -> String {
+    v.map(|x| x.to_string()).unwrap_or_default()
+}
+fn write(path: &Path, name: &str, bytes: &[u8]) -> Result<(), String> {
+    fs::write(path.join(name), bytes).map_err(|e| format!("写入 {name} 失败：{e}"))
+}
+
+pub(super) fn export(
+    dataset: &Dataset,
+    ledger: &Ledger,
+    expected: &[(String, Command)],
+    out: &Path,
+) -> Result<(), String> {
+    let history = ledger.history()?;
+    if history.len() != expected.len() + 1
+        || history
+            .iter()
+            .skip(1)
+            .zip(expected)
+            .any(|(entry, (id, command))| {
+                entry.event_id != *id || entry.command.as_ref() != Some(command)
+            })
+    {
+        return Err("账本事件与冻结输入/固定策略不一致或回放未完成；拒绝导出".into());
+    }
+    let mut final_by_day: BTreeMap<u32, (&State, bool)> = BTreeMap::new();
+    let mut events = Vec::new();
+    let mut previous_fills = 0;
+    let mut previous_orders = 0;
+    for entry in &history {
+        if let Some(command) = &entry.command {
+            match command {
+                Command::Match {
+                    day, instrument, ..
+                } => {
+                    let completed = entry.state.sessions.contains(&(instrument.clone(), *day));
+                    final_by_day.insert(day.0, (&entry.state, completed));
+                }
+                Command::Submit { day, .. } => {
+                    let completed = final_by_day.get(&day.0).is_some_and(|(_, c)| *c);
+                    final_by_day.insert(day.0, (&entry.state, completed));
+                }
+                _ => {}
+            }
+            events.push(json!({
+                "seq": entry.seq, "event_id": entry.event_id, "ledger_digest": entry.digest,
+                "command": command, "account_as_of": entry.state.snapshot.as_of,
+                "cash_fen": entry.state.snapshot.cash.fen(), "nav_fen": entry.state.equity.map(Cny::fen),
+                "new_orders": &entry.state.orders[previous_orders..],
+                "new_fills": &entry.state.fills[previous_fills..],
+                "risk": entry.state.risk, "valuation_error": entry.state.valuation_error,
+            }));
+            previous_orders = entry.state.orders.len();
+            previous_fills = entry.state.fills.len();
+        }
+    }
+    let mut daily_rows = Vec::new();
+    for s in &dataset.sessions {
+        let (state, completed) = final_by_day.get(&s.day.0).ok_or("缺少每日账本状态")?;
+        daily_rows.push(daily(
+            s.day,
+            state,
+            s.rules.settlement == stratide_contracts::SettlementRule::TPlusOne,
+            *completed,
+        )?);
+    }
+    let final_state = ledger.state();
+    let last = daily_rows.last().ok_or("无每日观察")?;
+    let initial = final_state.config.initial_capital.fen();
+    let flow = final_state
+        .snapshot
+        .equity_basis
+        .net_external_flow_total_fen;
+    let adjusted_last = last.nav_fen.and_then(|v| v.checked_sub(flow));
+    let total_return_bps = if flow == 0 {
+        adjusted_last.map(|v| (i128::from(v) - i128::from(initial)) * 10_000 / i128::from(initial))
+    } else {
+        None
+    };
+    let mut peak = i128::from(initial);
+    let mut max_drawdown_bps = Some(0_i128);
+    for row in &daily_rows {
+        if let Some(nav) = row
+            .nav_fen
+            .and_then(|v| v.checked_sub(row.external_flow_total_fen))
+        {
+            let nav = i128::from(nav);
+            peak = peak.max(nav);
+            max_drawdown_bps = max_drawdown_bps.map(|m| m.max((peak - nav) * 10_000 / peak));
+        } else {
+            max_drawdown_bps = None;
+        }
+    }
+    let total_fees = last.cumulative_fee_fen;
+    let first_buy: Option<&Fill> = final_state.fills.iter().find(|f| f.side == Side::Buy);
+    let buy_hold_nav = if flow == 0 && last.nav_fen.is_some() {
+        first_buy.and_then(|f| {
+            let final_mark = final_state
+                .snapshot
+                .marks
+                .iter()
+                .find(|m| m.instrument == f.instrument)?;
+            let entry = f
+                .price
+                .fen()
+                .checked_mul(f.quantity)?
+                .checked_add(f.fees.total().ok()?.fen())?;
+            initial
+                .checked_sub(entry)?
+                .checked_add(final_mark.price.fen().checked_mul(f.quantity)?)
+        })
+    } else {
+        None
+    };
+    let missing_opening_sessions = dataset
+        .sessions
+        .iter()
+        .filter(|s| s.opening.is_none())
+        .count();
+    let unverified_status_sessions = dataset
+        .sessions
+        .iter()
+        .filter(|s| !s.status_verified)
+        .count();
+    let no_fill_sessions = dataset
+        .sessions
+        .iter()
+        .filter(|s| !final_state.fills.iter().any(|f| f.day == s.day))
+        .count();
+    let mut unobserved_calendar_days = 0_i64;
+    for pair in dataset.sessions.windows(2) {
+        unobserved_calendar_days +=
+            days_from_civil(pair[1].day)? - days_from_civil(pair[0].day)? - 1;
+    }
+    let config_hash = format!(
+        "{:x}",
+        Sha256::digest(serde_json::to_vec(&final_state.config).map_err(|e| e.to_string())?)
+    );
+    let summary = json!({
+        "report_schema": 1, "ledger_schema": 3, "mode": dataset.mode,
+        "evidence_class": if dataset.mode == stratide_ledger::DataMode::SyntheticTest { "engine_test_only" } else { "exploratory_historical_replay_not_pit_verified" },
+        "paper_only": true, "source": dataset.source, "license": dataset.license,
+        "source_version": dataset.source_version, "input_sha256": final_state.provenance.dataset_hash,
+        "timezone": dataset.timezone, "price_semantics": dataset.price_semantics,
+        "instrument": dataset.instrument, "first_day": dataset.sessions.first().unwrap().day,
+        "last_day": dataset.sessions.last().unwrap().day,
+        "strategy_version": STRATEGY_VERSION,
+        "strategy_spec_sha256": format!("{:x}", Sha256::digest(STRATEGY_SPEC.as_bytes())),
+        "config_sha256": config_hash,
+        "config": final_state.config, "ledger_head": ledger.head(),
+        "initial_nav_fen": initial, "ending_nav_fen": last.nav_fen,
+        "ending_cash_fen": last.cash_fen, "ending_available_cash_fen": last.available_cash_fen,
+        "ending_held_shares": last.held_shares, "ending_sellable_shares": last.sellable_shares,
+        "ending_unsettled_shares": last.unsettled_shares, "ending_pending_orders": last.pending_orders,
+        "external_flow_total_fen": flow, "total_fee_fen": total_fees,
+        "realized_pnl_fen": last.realized_pnl_fen,
+        "unrealized_pnl_fen": last.unrealized_pnl_fen,
+        "remaining_cost_basis_fen": last.remaining_cost_basis_fen,
+        "total_return_bps": total_return_bps, "max_daily_observation_drawdown_bps": max_drawdown_bps,
+        "cash_benchmark_nav_fen": if flow == 0 { Some(initial) } else { None },
+        "buy_hold_benchmark_nav_fen": buy_hold_nav,
+        "buy_hold_benchmark_note": "仅在本策略首笔模拟买入确已成交时，以相同股数/入场价/买入费用持有至末日收盘；不估算离场费，不代表可执行独立策略",
+        "missing_opening_evidence_sessions": missing_opening_sessions,
+        "unverified_status_sessions": unverified_status_sessions,
+        "no_fill_sessions": no_fill_sessions,
+        "unobserved_calendar_days_including_weekends": unobserved_calendar_days,
+        "risk_rejections": final_state.orders.iter().filter(|o| o.status == OrderStatus::Rejected).collect::<Vec<_>>(),
+        "daily": daily_rows, "orders": final_state.orders, "fills": final_state.fills,
+        "positions": final_state.snapshot.positions, "events": events,
+    });
+    let report_json = serde_json::to_vec_pretty(&summary).map_err(|e| e.to_string())?;
+    let events_json = serde_json::to_vec_pretty(&events).map_err(|e| e.to_string())?;
+    let mut daily_csv = String::from("day,nav_fen,cash_fen,available_cash_fen,reserved_cash_fen,held_shares,sellable_shares,unsettled_shares,reserved_sell_shares,pending_orders,cumulative_fee_fen,realized_pnl_fen,unrealized_pnl_fen,remaining_cost_basis_fen,external_flow_total_fen,valuation_error\n");
+    for d in &daily_rows {
+        daily_csv.push_str(&format!(
+            "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n",
+            d.day,
+            opt(d.nav_fen),
+            d.cash_fen,
+            d.available_cash_fen,
+            d.reserved_cash_fen,
+            d.held_shares,
+            d.sellable_shares,
+            d.unsettled_shares,
+            d.reserved_sell_shares,
+            d.pending_orders,
+            d.cumulative_fee_fen,
+            opt(d.realized_pnl_fen),
+            opt(d.unrealized_pnl_fen),
+            opt(d.remaining_cost_basis_fen),
+            d.external_flow_total_fen,
+            csv_cell(d.valuation_error.as_deref().unwrap_or(""))
+        ));
+    }
+    let mut orders_csv =
+        String::from("proposal_id,day,side,quantity,limit_fen,status,remaining,reason\n");
+    for o in &final_state.orders {
+        orders_csv.push_str(&format!(
+            "{},{},{:?},{},{},{:?},{},{}\n",
+            o.proposal.proposal_id.0,
+            o.accepted_on.0,
+            o.proposal.side,
+            o.proposal.quantity,
+            o.proposal.limit_price.fen(),
+            o.status,
+            o.remaining,
+            csv_cell(&o.reason)
+        ));
+    }
+    let mut fills_csv = String::from("fill_id,order_id,day,side,quantity,price_fen,commission_fen,transfer_fen,tax_fen,total_fee_fen,simulated_at,risk_checked_at,market_opens_at,market_closes_at,bar_available_at,source_version,input_sha256\n");
+    for f in &final_state.fills {
+        fills_csv.push_str(&format!(
+            "{},{},{},{:?},{},{},{},{},{},{},{},{},{},{},{},{},{}\n",
+            csv_cell(&f.event_id),
+            f.order_id.0,
+            f.day.0,
+            f.side,
+            f.quantity,
+            f.price.fen(),
+            f.fees.commission.fen(),
+            f.fees.transfer.fen(),
+            f.fees.tax.fen(),
+            f.fees.total()?.fen(),
+            f.simulated_at.0,
+            f.risk_checked_at.0,
+            f.evidence.opens_at.0,
+            f.evidence.closes_at.0,
+            f.evidence.available_at.0,
+            csv_cell(&f.evidence.provenance.source_version),
+            f.evidence.provenance.dataset_hash
+        ));
+    }
+    let mut positions_csv = String::from("market,code,acquired_on,shares\n");
+    for p in &final_state.snapshot.positions {
+        positions_csv.push_str(&format!(
+            "{:?},{},{},{}\n",
+            p.instrument.market, p.instrument.code, p.acquired_on.0, p.quantity
+        ));
+    }
+    let files = [
+        ("events.json", events_json),
+        ("daily.csv", daily_csv.into_bytes()),
+        ("orders.csv", orders_csv.into_bytes()),
+        ("fills.csv", fills_csv.into_bytes()),
+        ("positions.csv", positions_csv.into_bytes()),
+        ("report.json", report_json),
+    ];
+    if out.exists() {
+        for (name, bytes) in &files {
+            if fs::read(out.join(name)).map_err(|e| e.to_string())? != *bytes {
+                return Err(format!(
+                    "既有报表 {name} 与本次账本不一致；请指定新目录，不覆盖旧证据"
+                ));
+            }
+        }
+    } else {
+        if let Some(parent) = out.parent() {
+            fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+        }
+        fs::create_dir(out).map_err(|e| e.to_string())?;
+        for (name, bytes) in &files {
+            write(out, name, bytes)?;
+        }
+    }
+    Ok(())
+}

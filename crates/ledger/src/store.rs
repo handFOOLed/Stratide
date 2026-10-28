@@ -18,6 +18,16 @@ pub struct Ledger {
     poisoned: bool,
 }
 
+/// Verified projection of one committed event. The digest is the v3 ledger
+/// chain value; report code consumes this instead of inventing executions.
+pub struct AuditEntry {
+    pub seq: i64,
+    pub event_id: String,
+    pub command: Option<Command>,
+    pub state: State,
+    pub digest: String,
+}
+
 fn digest(previous: &str, seq: i64, id: &str, payload: &str, state: &State) -> Result<String> {
     let input =
         serde_json::to_vec(&(3, previous, seq, id, payload, state)).map_err(|e| e.to_string())?;
@@ -182,6 +192,69 @@ impl Ledger {
 
     pub fn state(&self) -> &State {
         &self.state
+    }
+
+    pub fn head(&self) -> &str {
+        &self.head
+    }
+
+    pub fn history(&self) -> Result<Vec<AuditEntry>> {
+        let mut stmt = self
+            .db
+            .prepare("SELECT seq,event_id,payload,digest FROM events ORDER BY seq")
+            .map_err(|e| e.to_string())?;
+        let rows = stmt
+            .query_map([], |r| {
+                Ok((
+                    r.get::<_, i64>(0)?,
+                    r.get::<_, String>(1)?,
+                    r.get::<_, String>(2)?,
+                    r.get::<_, String>(3)?,
+                ))
+            })
+            .map_err(|e| e.to_string())?;
+        let mut history = Vec::new();
+        let mut current: Option<State> = None;
+        let mut previous = String::new();
+        for row in rows {
+            let (seq, event_id, payload, hash) = row.map_err(|e| e.to_string())?;
+            if seq != history.len() as i64 {
+                return Err("审计事件序列缺失".into());
+            }
+            let command = if seq == 0 {
+                if event_id != "genesis" {
+                    return Err("审计缺少 genesis".into());
+                }
+                current = Some(State::new(
+                    serde_json::from_str(&payload).map_err(|e| e.to_string())?,
+                )?);
+                None
+            } else {
+                let command: Command = serde_json::from_str(&payload).map_err(|e| e.to_string())?;
+                current
+                    .as_mut()
+                    .ok_or("审计缺少初始账户")?
+                    .apply(&command)?;
+                Some(command)
+            };
+            let state = current.as_ref().ok_or("审计缺少状态")?;
+            state.validate()?;
+            if digest(&previous, seq, &event_id, &payload, state)? != hash {
+                return Err("审计事件摘要不匹配".into());
+            }
+            previous = hash.clone();
+            history.push(AuditEntry {
+                seq,
+                event_id,
+                command,
+                state: state.clone(),
+                digest: hash,
+            });
+        }
+        if previous != self.head || current.as_ref() != Some(&self.state) {
+            return Err("审计尾状态与权威账本不一致".into());
+        }
+        Ok(history)
     }
 
     /// true = committed new event; false = identical retry, no new economic event.

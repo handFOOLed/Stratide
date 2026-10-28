@@ -364,7 +364,9 @@ dependencies = [
 name = "stratide-cli"
 version = "0.0.1"
 dependencies = [
+ "serde",
  "serde_json",
+ "sha2",
  "stratide-contracts",
  "stratide-ledger",
  "stratide-risk",
