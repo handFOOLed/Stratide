@@ -1,6 +1,6 @@
 # Stratide 模拟交易优先路线图｜给 Sol / Terra / ChatGPT 的执行约定
 
-状态：**M0-PR01 已合并（[GitHub PR #2](https://github.com/handFOOLed/Stratide/pull/2)，merge `16a621ff3fe22776b56a7148831fe5f1ada8af32`）；内存 Paper 契约与 Risk Kernel 已获 Terra 独立验收和 ChatGPT 代码审查。[M0-PR02 Issue #3](https://github.com/handFOOLed/Stratide/issues/3) 的模拟成交、原子预留与持久账本已实现并自测，等待独立验收和审查；持续前向观察尚未实现。见 [PR-02 实现与边界](M0_PR02.md)。** 关联 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md)、[M0](M0.md)、[RISK_POLICY](RISK_POLICY.md)、[AGENTS](../AGENTS.md)。
+状态：**M0-PR01 已通过验收并合并（[PR #2](https://github.com/handFOOLed/Stratide/pull/2)）；M0-PR02 模拟成交、原子预留与单写入者 SQLite 账本已由 Terra 在 Windows 独立 PASS、ChatGPT 审查放行并合并（[PR #4](https://github.com/handFOOLed/Stratide/pull/4)，merge `ed36f8328353fa63941a28b7df7224d02247708a`）。当前下一任务为 [M0-PR03 Issue #5](https://github.com/handFOOLed/Stratide/issues/5)：可复现历史回放与报告。前向 paper 观察、真实行情与真实券商仍未实现或验收。** 关联 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md)、[M0](M0.md)、[RISK_POLICY](RISK_POLICY.md)、[AGENTS](../AGENTS.md)。
 
 ## 完成的样子
 
