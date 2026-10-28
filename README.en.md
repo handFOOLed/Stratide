@@ -13,7 +13,7 @@
 
 **Autonomous Quantitative Trading & Open-Ended Strategy Discovery**
 
-Status: **M0 scaffold — NOT a trading system**. No market-data provider, broker connection, order routing, research agent, or real-money execution is implemented. Do not use this repository to manage real funds.
+Status: **M0-PR01 in-memory risk slice — NOT a trading system**. Paper proposal contracts, independent risk review and a synthetic CLI example are implemented. Simulated fills, a durable ledger, market-data ingestion and continuous paper trading are not implemented. Do not use this repository to manage real funds. See [implementation, verification and PR-02 dependencies](docs/M0_PR01.md) (Chinese). Sol's self-tests do not replace Terra's independent acceptance or ChatGPT review; Sol does not merge.
 
 - **ADR-020/021/022:** New versions require independent requalification. Strategy groups can hold the same instrument with separate internal data/P&L but one real account ledger. Trusted portfolio allocation nets compatible opposing group intents before actual broker orders; internal virtual transfers are not exchange fills. See [ADR-020](docs/adr/0020-versioned-requalification-auto-promotion.md), [ADR-021](docs/adr/0021-group-isolation-shared-instrument-attribution.md), and [ADR-022](docs/adr/0022-trusted-cross-group-intent-netting.md).
 - **ADR-023:** Both sides of an internal group-to-group virtual allocation use the same trusted market-reference price. Internal reallocation is not a broker fill and adds no actual spread, fees, account equity or real trading P&L ([ADR-023](docs/adr/0023-single-market-reference-internal-transfer.md)).
@@ -48,14 +48,14 @@ Stratide is a resource-light, local-first automated trading system with open-end
 ```text
 apps/
   stratided/           tiny placeholder for future background service
-  stratide-cli/        tiny placeholder for future local CLI
+  stratide-cli/        local status and synthetic_test risk example
   dashboard/           future private Web UI (not implemented)
 crates/
-  contracts/           shared protocol placeholder
+  contracts/           paper account, proposal and trusted snapshot contracts
   data/                future data acquisition module
   strategy-runtime/    future isolated strategy runtime
   portfolio/           future portfolio accounting/allocation
-  risk/                future independent risk decision module
+  risk/                independent paper risk review, no execution/fills
   execution/           future order state machine
   ledger/              future append-only transaction/audit ledger
   control-api/         future local-only control interface
@@ -81,10 +81,11 @@ Install a current stable Rust toolchain. This repo is a minimal Cargo workspace 
 cargo check --workspace
 cargo test --workspace
 cargo run -p stratide-cli -- status
+cargo run -p stratide-cli -- risk-demo --initial-cash-fen 1000000 --max-order-fen 500000 --account-cap-fen 800000 --strategy-cap-fen 500000 --daily-loss-fen 100000 --drawdown-fen 200000
 cargo run -p stratided
 ```
 
-Both executables only identify themselves as M0 placeholders. A successful build **does not** mean it is safe to trade.
+`risk-demo` uses fixed `synthetic_test` prices, rules, costs and timestamps. Pass all principal/risk settings explicitly in integer CNY fen; there is no default capital. Acceptance never means a fill or changes cash/positions. `stratided` remains a placeholder. A successful build **does not** mean it is safe to trade. Actual Windows verification and unverified items are recorded in [M0_PR01](docs/M0_PR01.md).
 
 ## GitHub repository
 

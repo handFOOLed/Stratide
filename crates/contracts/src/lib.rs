@@ -1,4 +1,7 @@
-//! Compile-time workspace anchor only. Trading contracts require grill-with-docs review.
+//! Paper-only contracts. Trusted account/configuration/evidence are never Worker input.
+
+mod paper;
+pub use paper::*;
 
 /// Not a protocol version. Merely an M0 scaffold identifier.
 pub const VERSION: &str = "0.0.1-scaffold";

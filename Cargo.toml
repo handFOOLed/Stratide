@@ -4,6 +4,7 @@ members = [
   "apps/stratided",
   "apps/stratide-cli",
   "crates/contracts",
+  "crates/risk",
 ]
 
 [workspace.package]

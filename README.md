@@ -7,7 +7,7 @@
 **自主量化交易与开放式策略发现平台**  
 *Autonomous Quantitative Trading & Open-Ended Strategy Discovery*
 
-> **当前状态：M0 工程骨架，尚不是可用的交易系统。** 目前尚未实现行情接入、券商接口、下单执行、研究 Agent 或真实资金交易。**请勿使用当前代码管理真实资金。**
+> **当前状态：M0-PR01 内存风控切片，尚不是可用的交易系统。** 已实现交易提案契约、独立风险审查和合成 CLI 示例；尚未实现模拟成交、持久账本、行情接入或持续模拟交易。**请勿使用当前代码管理真实资金。**
 
 人工成交先记入独立待归属账簿，不推断策略组归属，见 [ADR-032](docs/adr/0032-manual-trades-suspense-ledger-unassigned-attribution.md)；最终由 Owner 显式选择归属组别和数量，不允许自动按比例猜测或修改真实成交，见 [ADR-033](docs/adr/0033-owner-explicit-manual-fill-group-attribution.md)。
 
@@ -16,6 +16,8 @@
 根据 [ADR-037](docs/adr/0037-observable-paper-trading-first-and-independent-review-gates.md)，先实现可复现的单策略模拟交易内核（M0），再接入真实来源行情进行前向 Paper Trading 观察（M1），输出净值、持仓、成交、费用、回撤及风险拒单等可核实报告。**GPT-6.1 Sol 编码、GPT-6.1 Terra 独立测试和验收并在审查通过后合并、ChatGPT 审查 PR、Owner 观察效果及决定范围**。详细 PR 交付与验收标准见 [模拟交易路线图](docs/PAPER_TRADING_ROADMAP.md)。所有结果须区分合成、历史回放和前向模拟；当前未交付这些能力，仍不能用于真实资金。
 
 ## 项目愿景
+
+PR-01 的实际功能、运行方式、自测记录及 PR-02 依赖见 [M0-PR01 实现说明](docs/M0_PR01.md)。本轮自测不代替 Terra 独立验收与 ChatGPT 审查；本轮不合并 PR。
 
 Stratide 是面向个人用户的**低资源占用、本地优先**的自动化交易平台。它允许云端 AI Agent 自主探索新的交易策略，但所有实际交易必须受到**独立、不可绕过的风控系统**约束。
 
@@ -60,10 +62,11 @@ Stratide 是面向个人用户的**低资源占用、本地优先**的自动化�
 ```text
 apps/
   stratided/           Rust 后台服务占位程序
-  stratide-cli/        本地 CLI 占位程序
+  stratide-cli/        本地状态与 synthetic_test 风控示例
   dashboard/           未来的私有 Web 控制台（未实现）
 crates/
-  contracts/           共享契约占位库
+  contracts/           Paper 账户、提案与可信快照契约
+  risk/                独立 Paper 风险审查（无下单/成交）
 research/              云端 Agent / 远程计算的设计说明
 config/                配置与部署说明
 scripts/               本地辅助工具说明
@@ -80,7 +83,7 @@ Cargo.toml             Rust Workspace
 README.en.md           English README
 ```
 
-数据、策略运行时、风控、执行、账本、控制 API 等模块**尚未实现**；后续只在真实开发任务需要时增加，不提前堆空目录和无意义的抽象。
+数据、策略运行时、执行、持久账本、控制 API 等模块**尚未实现**；后续只在真实开发任务需要时增加，不提前堆空目录和无意义的抽象。
 
 ## 本地运行
 
@@ -90,10 +93,11 @@ README.en.md           English README
 cargo check --workspace
 cargo test --workspace
 cargo run -p stratide-cli -- status
+cargo run -p stratide-cli -- risk-demo --initial-cash-fen 1000000 --max-order-fen 500000 --account-cap-fen 800000 --strategy-cap-fen 500000 --daily-loss-fen 100000 --drawdown-fen 200000
 cargo run -p stratided
 ```
 
-目前两个可执行程序仅用于验证 M0 工程结构，**编译成功不代表能够安全交易**。当前版本尚未经过完整本地编译与测试验证。
+`risk-demo` 的价格、规则、费用与时间均为固定 `synthetic_test` 输入，金额参数以整数分显式传入，无默认本金；接受提案不代表成交，也不改变现金或持仓。`stratided` 仍是占位程序。**编译成功不代表能够安全交易**；实际 Windows 自测及未验证项见 [实现说明](docs/M0_PR01.md)。
 
 仓库：[handFOOLed/Stratide](https://github.com/handFOOLed/Stratide)（Private）。请使用正常的 GitHub 身份认证拉取，不要将 API Key、券商凭据或个人账户数据提交到仓库。
 
