@@ -1,0 +1,50 @@
+   Compiling stratide-forward v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\crates\forward)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\stratide_forward-39aw3yyw9fdck\s-hnnb535job-0j250ry-working`
+
+warning: `stratide-forward` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.73s
+     Running unittests src\lib.rs (target\debug\deps\stratide_forward-2871aec5ea900a9f.exe)
+
+running 4 tests
+test tests::r1::r1_interrupted_attempt_consumes_automatic_slot_before_and_after_recovery ... FAILED
+test tests::r1::r1_automatic_recovery_does_not_start_a_new_collection ... FAILED
+test tests::r1::r1_calendar_conflict_is_scoped_to_its_date_in_asof_and_report ... FAILED
+test tests::r1::r1_later_rollback_cannot_erase_an_earlier_asof_view ... FAILED
+
+failures:
+
+---- tests::r1::r1_interrupted_attempt_consumes_automatic_slot_before_and_after_recovery stdout ----
+
+thread 'tests::r1::r1_interrupted_attempt_consumes_automatic_slot_before_and_after_recovery' (46592) panicked at crates\forward\src\tests\r1.rs:11:5:
+assertion failed: j.eod_existing_step(at() + 1).unwrap().is_some()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- tests::r1::r1_automatic_recovery_does_not_start_a_new_collection stdout ----
+
+thread 'tests::r1::r1_automatic_recovery_does_not_start_a_new_collection' (36820) panicked at crates\forward\src\tests\r1.rs:38:5:
+automatic recovery must wait for an explicit retry
+
+---- tests::r1::r1_calendar_conflict_is_scoped_to_its_date_in_asof_and_report stdout ----
+
+thread 'tests::r1::r1_calendar_conflict_is_scoped_to_its_date_in_asof_and_report' (51048) panicked at crates\forward\src\tests\r1.rs:122:5:
+assertion `left == right` failed
+  left: Object {"available_at": Number(1793178000000), "bar": Object {"close_fen": Number(1002), "high_fen": Number(1009), "low_fen": Number(999), "open_fen": Number(1001), "price_semantics": String("unadjusted_cny_fen"), "source_volume_unit": String("hand_100_shares"), "trade_day": String("20261028"), "volume_shares": Number(10001)}, "late_backfill": Bool(false), "opening_execution_eligible": Bool(false), "sequence": Number(4)}
+ right: Null
+
+---- tests::r1::r1_later_rollback_cannot_erase_an_earlier_asof_view stdout ----
+
+thread 'tests::r1::r1_later_rollback_cannot_erase_an_earlier_asof_view' (46920) panicked at crates\forward\src\tests\r1.rs:66:5:
+assertion `left == right` failed: a later fault with a regressed clock cannot become a past fact
+  left: Object {"available_at": Number(1793178000000), "bar": Object {"close_fen": Number(1002), "high_fen": Number(1009), "low_fen": Number(999), "open_fen": Number(1001), "price_semantics": String("unadjusted_cny_fen"), "source_volume_unit": String("hand_100_shares"), "trade_day": String("20261028"), "volume_shares": Number(10001)}, "late_backfill": Bool(false), "opening_execution_eligible": Bool(false), "sequence": Number(2)}
+ right: Null
+
+
+failures:
+    tests::r1::r1_automatic_recovery_does_not_start_a_new_collection
+    tests::r1::r1_calendar_conflict_is_scoped_to_its_date_in_asof_and_report
+    tests::r1::r1_interrupted_attempt_consumes_automatic_slot_before_and_after_recovery
+    tests::r1::r1_later_rollback_cannot_erase_an_earlier_asof_view
+
+test result: FAILED. 0 passed; 4 failed; 0 ignored; 0 measured; 19 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `-p stratide-forward --lib`

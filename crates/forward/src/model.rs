@@ -6,6 +6,8 @@ pub const ENDPOINT: &str = "https://api.tushare.pro";
 pub const VERSION: &str = "stratide-forward-v1/tushare-http-v1";
 pub const TIMEZONE: &str = "Asia/Shanghai";
 pub const PAUSE: &str = "observe_only_no_independent_opening_rules_or_cost_evidence";
+pub const AVAILABILITY_SEMANTICS: &str =
+    "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time";
 
 /// No principal or risk defaults: this is an observation identity, not a funded account.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -102,6 +104,8 @@ pub struct Outcome {
     pub calendar: Vec<CalendarDay>,
     pub bar: Option<Bar>,
     pub provider_published_at: Option<i64>,
+    /// Validation-complete wall time sampled before appending/committing the
+    /// outcome; not a commit timestamp or proof another reader could see it then.
     pub available_at: Option<i64>,
     pub duplicate_of: Option<i64>,
     pub revision_of: Option<i64>,

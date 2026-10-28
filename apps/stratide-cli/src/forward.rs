@@ -25,7 +25,7 @@ pub fn run(args: &[String]) -> Result<(), String> {
             let journal = Journal::open(path)?;
             let at = at.parse::<i64>().map_err(|_| "as-of 必须是 UTC epoch 毫秒整数")?;
             let view = journal.eod_as_of(day, at)?;
-            println!("{}", serde_json::to_string_pretty(&serde_json::json!({"as_of": at, "journal_head": journal.head(), "view": view, "purpose": "read_only_eod_audit_not_execution_evidence"})).map_err(|e| e.to_string())?);
+            println!("{}", serde_json::to_string_pretty(&serde_json::json!({"as_of": at, "journal_head": journal.head(), "view": view, "clock_uncertainty": journal.clock_uncertainty(), "available_at_semantics": stratide_forward::AVAILABILITY_SEMANTICS, "purpose": "read_only_eod_audit_not_execution_evidence"})).map_err(|e| e.to_string())?);
         },
         ["forward-eod-step", path, reports] => {
             let mut journal = Journal::open(path)?;

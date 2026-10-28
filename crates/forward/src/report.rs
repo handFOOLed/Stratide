@@ -294,6 +294,8 @@ impl Journal {
         }
         let csv = csv.into_inner().map_err(|e| e.to_string())?;
         let report = serde_json::json!({ "schema_version": 2, "status": status, "days_and_attempts": rows, "continuity": continuity,
+            "clock_uncertainty": self.clock_uncertainty(),
+            "available_at_semantics": AVAILABILITY_SEMANTICS,
             "raw_values_and_responses": "events.json (exact response bytes in raw.body; verify sha256)",
             "metrics_unavailable_reason": "observation identity has no funded paper ledger, strategy or fills",
             "endpoint_version": VERSION,

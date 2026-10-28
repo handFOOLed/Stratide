@@ -2,6 +2,8 @@
 
 # Stratide
 
+PR04B 原提交 `945b250` 独立验收发现三项 P1，已进行 R1 修复；新 SHA 独立复验仍待完成，见 [修复与证据](docs/evidence/m1-pr04b-r1/README.md)。保持 Draft，不接入成交。
+
 **PR04B 工程增量（Draft，未合并）：** 新增每日 `forward-eod-step`、可选前台 `observe-eod.ps1 -Watch`、逐日完整性摘要和只读 `forward-eod-at` 时间视图。复用 PR04A 的真实 journal，不改财务账本；真实证据仍只有 **1 个有效观察日、0 提案/成交**，连续真实交易日与独立开盘尚待验证。操作、测试及限制见 [PR04B](docs/M1_PR04B.md) 和 [开盘证据研究](docs/M1_PR04B_OPENING_EVIDENCE.md)。
 
 **最新进度：M1-PR04A 已独立技术验收、源码审查并合并。** [PR #8](https://github.com/handFOOLed/Stratide/pull/8) 固定 HEAD `295751cf15bfaa68407dd243f45394b5147e1227`，merge `1ef06eb1d17f8796e3b43d2ad0a903382fa0fd23`。当前 Windows 实际 Tushare 盘后单证券 observe-only 入 journal，记录接收/可得时间、原始字节摘要、重复/晚到与漏采缺口，并导出 JSON/CSV。Terra 在相同 SHA 独立通过 **89 项工作区测试**与离线原始 journal 复算；[验收报告](https://github.com/handFOOLed/Stratide/pull/8#issuecomment-6471878822)、[小猫代码审查](https://github.com/handFOOLed/Stratide/pull/8#pullrequestreview-5684495112)。真实联网采集由 Sol 执行，Terra 本轮未独立发出 HTTPS；目前仅 **1 个有效前向日、0 提案、0 模拟成交**，NAV/回撤不可用。Owner 接受个人非商业本机用途，供应商正式许可尚未独立核实；早期开发执行记录曾含 Token 明文（未见提交 Git/应用日志），该事实保留。**整个 M1、连续多日观察和真实行情驱动的 Paper 买卖尚未完成；不得用于真实资金。**

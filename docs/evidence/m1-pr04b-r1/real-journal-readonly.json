@@ -1,0 +1,26 @@
+{
+  "verification_kind": "developer_full_readonly_offline_recheck_not_independent_acceptance",
+  "sqlite_open_mode": "ro + query_only + read_transaction",
+  "integrity_check": "ok",
+  "journal_schema": 1041,
+  "events": 3,
+  "checkpoint_count": 1,
+  "head": "dd145c62834bc68f2a16ed2c06a7f18a106a4550c37864f401b90f0a47f6d19a",
+  "event_chain_and_checkpoint_recomputed": true,
+  "raw_sha256_recomputed": 2,
+  "normalized_bars_recomputed": 1,
+  "calendars_recomputed": 1,
+  "actual_valid_forward_days": 1,
+  "pending_runs": 0,
+  "available_at_epoch_ms": [
+    1793192840090
+  ],
+  "database_sha256_before": "c86536eee8bcdc2dd0d22cc7505d5fb9d5e8569c3e288bf6b7a79e2f796762f8",
+  "database_sha256_after": "c86536eee8bcdc2dd0d22cc7505d5fb9d5e8569c3e288bf6b7a79e2f796762f8",
+  "original_bytes_unchanged": true,
+  "new_http_calls": 0,
+  "raw_market_data_uploaded": false,
+  "available_at_semantics": "validated_in_process_precommit_not_exact_commit_visibility",
+  "original_journal_and_reports_match_initial_hashes": true,
+  "unchanged_files_verified": 4
+}

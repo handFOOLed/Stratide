@@ -1,0 +1,28 @@
+   Compiling stratide-forward v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\crates\forward)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\stratide_forward-39aw3yyw9fdck\s-hnnb5vnqua-10w0b3s-working`
+
+warning: `stratide-forward` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.81s
+     Running unittests src\lib.rs (target\debug\deps\stratide_forward-2871aec5ea900a9f.exe)
+
+running 4 tests
+test tests::r1::r1_automatic_recovery_does_not_start_a_new_collection ... ok
+test tests::r1::r1_interrupted_attempt_consumes_automatic_slot_before_and_after_recovery ... ok
+test tests::r1::r1_later_rollback_cannot_erase_an_earlier_asof_view ... ok
+test tests::r1::r1_calendar_conflict_is_scoped_to_its_date_in_asof_and_report ... FAILED
+
+failures:
+
+---- tests::r1::r1_calendar_conflict_is_scoped_to_its_date_in_asof_and_report stdout ----
+
+thread 'tests::r1::r1_calendar_conflict_is_scoped_to_its_date_in_asof_and_report' (24408) panicked at crates\forward\src\tests\r1.rs:129:23:
+called `Result::unwrap()` on an `Err` value: "报告未发布；保留 C:\\Users\\wsj20\\AppData\\Local\\Packages\\sandbox.{8f7496fa-e5ff-4784-9856-610880dd834c}\\AC\\Temp\\.tmpe6jc37\\.forward-report-KurGKq：Access is denied. (os error 5)"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tests::r1::r1_calendar_conflict_is_scoped_to_its_date_in_asof_and_report
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 19 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `-p stratide-forward --lib`

@@ -1,0 +1,19 @@
+    Checking ring v0.17.14
+    Checking libsqlite3-sys v0.36.0
+    Checking rusqlite v0.38.0
+    Checking stratide-ledger v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\crates\ledger)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\stratide_ledger-3d0rsnv7r2gbv\s-hnnb9y4km6-1xhshhk-working`
+
+warning: `stratide-ledger` (lib) generated 1 warning
+    Checking rustls-webpki v0.103.16
+    Checking rustls v0.23.46
+    Checking ureq v3.5.0
+    Checking stratide-forward v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\crates\forward)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\stratide_forward-1uyak51b8zzod\s-hnnb9z637a-0q4f01m-working`
+
+warning: `stratide-forward` (lib) generated 1 warning
+    Checking stratide-cli v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\apps\stratide-cli)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\stratide_cli-1pvkkowq5hif4\s-hnnb9z93ax-16ltk47-working`
+
+warning: `stratide-cli` (bin "stratide-cli") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.52s

@@ -4,7 +4,7 @@ mod model;
 mod provider;
 mod report;
 mod store;
-pub use continuity::{EodStep, EodView};
+pub use continuity::{ClockUncertainty, EodStep, EodView};
 pub use model::*;
 pub use provider::source_check;
 pub use store::Journal;

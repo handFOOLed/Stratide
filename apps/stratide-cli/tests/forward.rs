@@ -33,6 +33,11 @@ fn real_cli_process_restart_blocked_attempts_and_report_no_money_mutation() {
     assert!(audit.status.success());
     let audit: serde_json::Value = serde_json::from_slice(&audit.stdout).unwrap();
     assert!(audit["view"].is_null());
+    assert!(audit["clock_uncertainty"].is_null());
+    assert_eq!(
+        audit["available_at_semantics"],
+        stratide_forward::AVAILABILITY_SEMANTICS
+    );
     assert!(cli(&["forward-report", dir, rpt]).status.success());
     let csv = fs::read(report.join("daily.csv")).unwrap();
     assert!(cli(&["forward-report", dir, rpt]).status.success());

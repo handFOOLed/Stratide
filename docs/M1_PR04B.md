@@ -1,5 +1,7 @@
 # M1-PR04B：连续真实 EOD 观察流程与开盘证据研究
 
+**R1 修复状态：原 HEAD `945b2501ec4fb3b02f02da6c7253a77a525c2be1` 独立验收不通过，三项 P1 已修复并补充开发回归；需对 PR 新 HEAD 重新独立验收。** [拒绝结论及修复证据](evidence/m1-pr04b-r1/README.md) 保留旧失败与新自测边界。仍为 Draft、未合并、未接入 Paper 成交。
+
 状态：**工程自测完成后提交 Draft；真实连续多交易日及独立开盘尚待验证，M1 未完成，不合并。** 基线为 2026-10-28 fetch 的最新 `main`：`e41adc7`。开发分支 `codex/m1-pr04b-eod`；不改既有 Owner 分支、PR04A 日志或财务内核。自测不是 Terra 独立验收或小猫源码审查。
 
 ## 范围与风险
@@ -14,12 +16,12 @@
 forward-eod-step <原 journal> <新报告根目录>
   校验并恢复未完成意图（只追加 Interrupted，不重建未知响应）
   16:00 前：waiting，不请求 HTTP、不耗采集次数
-  当日16:00后已有针对当日的完成尝试：跳过请求
+  当日16:00后已有针对当日的持久化意图（含中断/未知）：跳过请求
   否则：复用 collect-once -> trade_cal + daily -> 原始响应事务
   按 HEAD 发布 report.json / daily.csv / events.json
 ```
 
-日界线为 Asia/Shanghai。失败的盘后尝试也占用当日自动槽位，重启不会自行再请求；显式 `forward-collect-once` 可在每日最多 8 次的既有总限额内重试。16:00 前人工探测和旧交易日 backfill **不占用当日盘后槽位**。跨午夜收到的响应只记 late，不算当日有效观察或 ready。每天最多一次正常 EOD 步进不等于供应商长期稳定性已验证。
+日界线为 Asia/Shanghai。已提交的盘后 Started 即占用自动槽位，包含未完成和恢复后 Interrupted；重启只追加中断诊断，不自行再次请求。显式 `forward-collect-once` 可在每日最多 8 次的既有总限额内重试。16:00 前人工探测和旧交易日 backfill **不占用当日盘后槽位**。跨午夜收到的响应只记 late，不算当日有效观察或 ready。每天最多一次正常 EOD 步进不等于供应商长期稳定性已验证。
 
 失败/时钟 halt 仍尝试导出已提交诊断；导出失败不会撤销已提交的采集，原目录保留。报告按 `<报告根目录>/<journal HEAD>` 发布，相同 HEAD 可重报，新 HEAD 新目录。报告格式升至 schema 2，仅增加完整性摘要；**journal schema 仍为 1041**。旧报告不能用新格式覆盖，应选新的报告根目录。报告根目录应与 journal、旧报告目录分开。
 
@@ -58,7 +60,11 @@ $observer = '../m1-pr04a-worktree/state/pr04a-r2-smoke-20261028/observer'
 & $cli forward-eod-at $observer 20261028 1793192840090 # 恰好可得：可读旧EOD版本
 ```
 
-读取须同时满足完成时间、`available_at` 与原始接收时间不晚于 as-of；只选有效 EOD，晚到或修订只能从其真正可得时间开始出现。该时点已知的日历冲突/时钟故障拒绝返回数据，未来冲突不能改写之前的审计视图。输出始终 `opening_execution_eligible=false`，仅用于审计，**没有订单执行能力**。生产采集 CLI 没有 `--now`、历史时钟注入或原始数据导入入口。当地摘要链的信任局限与 PR04A 一致，不承诺防御完整权限重写或外部授时认证。
+读取须同时满足记录的完成时间、`available_at` 与原始接收时间不晚于 as-of；只选有效 EOD，晚到或修订不能提前出现。`available_at` 表示进程完成校验后、提交 SQLite 前采样的墙钟，**不等于原始接收时间，也不是精确的事务提交/其他读取者持久可读时刻**。此命令审计的是已提交日志中记录的进程内时间；不能据此证明某读取者恰好在该毫秒读到数据。输出及报告提供 `available_at_semantics`，旧事件与字段不回写。
+
+日历冲突逐目标日期累计判断：其他日期的冲突不遮蔽本日期已有的有效 EOD。时钟回拨按追加顺序处理：保留故障前有序事件前缀中不晚于 `previous_high_water` 的历史视图；超过该边界则因时间关系不明返回 null，故障之后的事件不混入旧前缀。`clock_uncertainty` 说明故障序号、前缀边界和回拨后的原始检测值；`detected_at` 不能用作故障发生的精确墙钟。历史前缀不表示系统时钟获外部认证，采集仍永久 halt，不自动解锁。输出始终 `opening_execution_eligible=false`，仅用于审计，**没有订单执行能力**。生产采集 CLI 没有 `--now`、历史时钟注入或原始数据导入入口；测试内部时间 seam 不对外暴露。
+
+R1 报告增加上述语义元数据，journal schema 1041 不变；报告仍 schema 2 的追加字段。为保留原报告，本次修复后请使用新的报告根目录（如 `state/pr04b-r1/reports`），不要覆盖 `state/pr04b/reports`。
 
 ## 实际验证与仍需等真实日期的项目
 

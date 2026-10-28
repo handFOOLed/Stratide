@@ -375,6 +375,8 @@ impl Journal {
     ) -> Result<String> {
         outcome.late_backfill = day < today || day < local_day(finished)?.as_str();
         if outcome.available_at.is_some() {
+            // Sampled validation-complete time, before append/SQLite commit.
+            // It is never an attestation of exact durable reader visibility.
             outcome.available_at = Some(finished);
         }
         // A changed trading calendar is unresolved source evidence, not permission to choose.
