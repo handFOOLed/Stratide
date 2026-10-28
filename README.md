@@ -2,6 +2,8 @@
 
 # Stratide
 
+**M1-PR04A 开发分支：Draft / BLOCKED。** 已增加只观察的独立 journal、单次盘后采集适配器及 CSV/JSON CLI；本机 Tushare HTTPS `daily`/`trade_cal` 实测可读，但自动采集/原始响应持久保存许可仍未确认，样例默认阻断。有效前向日数、策略提案、模拟成交均为 0；没有修改 v3 财务账本。见 [命令、实际输出和未验证范围](docs/M1_PR04A.md)及[来源核验](docs/M1_PR04A_SOURCE_FEASIBILITY.md)。此分支尚待 Terra 独立验收、小猫审查和 Owner 授权合并，不能视为整个 M1 已完成。
+
 [ADR-026](docs/adr/0026-budgeted-shadow-observation-and-local-strategy-registry.md)：限额研究与策略索引。[ADR-027](docs/adr/0027-historical-failure-as-evidence-not-permanent-ban.md)：历史失败作为研究证据，而不是永久研究禁令；重新研究也不会解除真实资金风控。
 
 **自主量化交易与开放式策略发现平台**  

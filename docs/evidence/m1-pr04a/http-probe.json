@@ -1,0 +1,22 @@
+[
+  {
+    "api": "daily",
+    "status": "access_ok_not_license_verification",
+    "received_at": 1793188468102,
+    "sha256": "13efd0fbf7dbad41be0ffa8b7a951b77a398dd6306211e09a2a71160d6766abd",
+    "rows": 1,
+    "clock_verified": true,
+    "raw_retained": false,
+    "license_verified": false
+  },
+  {
+    "api": "trade_cal",
+    "status": "access_ok_not_license_verification",
+    "received_at": 1793188468973,
+    "sha256": "7c74f8539ba50765fa3e4e2fc06f38178972e1cd2019d2435918ee769cae63de",
+    "rows": 1,
+    "clock_verified": true,
+    "raw_retained": false,
+    "license_verified": false
+  }
+]

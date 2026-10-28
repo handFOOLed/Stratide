@@ -1,0 +1,8 @@
+{
+  "observation_id": "owner-eod-observer",
+  "instrument": "600000.SH",
+  "strategy_version": "none-observe-only-v1",
+  "source": "tushare_pro",
+  "license_note": "UNVERIFIED: automated local EOD observation and raw-response storage require applicable source permission; no raw-data redistribution authorization",
+  "local_automation_and_raw_storage_authorized": false
+}

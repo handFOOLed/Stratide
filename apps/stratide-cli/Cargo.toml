@@ -5,6 +5,7 @@ edition.workspace = true
 publish = false
 
 [dependencies]
+stratide-forward = { path = "../../crates/forward" }
 stratide-contracts = { path = "../../crates/contracts" }
 stratide-risk = { path = "../../crates/risk" }
 stratide-ledger = { path = "../../crates/ledger" }
