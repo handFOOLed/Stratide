@@ -7,9 +7,10 @@ A local-first, **paper-only** personal quantitative research system: Rust risk/l
 ## Status
 
 - **Implemented:** paper Risk Kernel, durable ledger and reports, exploratory historical EOD replay, observe-only forward EOD journal, and [Web Dashboard V1](apps/dashboard/README.md).
-- **Draft on this branch:** [Agent V1](docs/M2_PR02.md) adds persistent tasks, daily/monthly spending gates, controlled HTTPS generation, a local fake Provider, EOD deduplication and basic Web controls. [API](docs/AGENT_API.md) and [self-test evidence](docs/evidence/m2-pr02/README.md) are available. **REAL_PROVIDER_NOT_VERIFIED**; no paid requests without Owner budgets/consent. Targeted independent risk checks and fixed-HEAD review remain pending.
+- **Agent V1 is in main:** persistent tasks, daily/monthly spending gates, controlled Providers, a local fake, EOD deduplication and [APIs](docs/AGENT_API.md). **REAL_PROVIDER_NOT_VERIFIED**; no paid requests without Owner budgets/consent.
+- **Draft on this branch:** [M2-PR04](docs/M2_PR04.md) adds candidate registration → freeze → independent evaluation → isolated historical replay through a CLI. Engineering self-tests pass; research evidence remains insufficient and eligibility is denied. Fixed-HEAD review and targeted independent challenges remain pending.
 - **Limits:** 68 historical sessions / 3 simulated fills; longer history `DATA_BLOCKED` by corporate-action and fee evidence. Only one valid forward observation day; **no continuous forward-paper fills or account NAV**.
-- **Next:** [#22 Agent implementation and APIs (Sol)](https://github.com/handFOOLed/Stratide/issues/22) → [#23 complete UI/UX redesign (DeepSeek)](https://github.com/handFOOLed/Stratide/issues/23). See [current status and evidence](docs/STATUS.md).
+- **Current order:** [#29 core implementation](https://github.com/handFOOLed/Stratide/issues/29) follows **Core-first, UI-later**. Sol will integrate all UI using the merged PR #28 visual baseline after the core features are complete. See [current status and evidence](docs/STATUS.md).
 
 ## Try the dashboard on Windows
 

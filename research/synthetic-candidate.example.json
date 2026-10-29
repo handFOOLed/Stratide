@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "template_id": "first-buy-second-sell-third-risk-probe-v1",
+  "parameters": {},
+  "hypothesis": "用仓库已有固定 synthetic_test 模板验证候选管线、财务一致性与风险拒绝。",
+  "limitations": ["人工数据只证明工程链路可运行；不产生真实市场研究、SMA 或交易资格。"]
+}

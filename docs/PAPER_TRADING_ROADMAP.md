@@ -1,22 +1,23 @@
 # Stratide Paper 阶段路线图（当前执行版）
 
-> 2026-10-29；最新实现与数据边界见 [STATUS](STATUS.md)。旧各 PR 实施/验收细节仍保存在 `docs/M0_*.md`、`docs/M1_*.md`、`docs/M2_PR01.md` 与 `docs/evidence/`，**本页不重复过去的 Draft 状态或整页验收日志**。
+> 2026-10-30；最新实现与数据边界见 [STATUS](STATUS.md)。Owner 已决定 **Core-first、UI-later**：后续核心功能不要求同期 Dashboard/UI，最终由 Sol 按已合并 PR #28 的视觉基准统一集成。旧各 PR 实施/验收细节仍保存在 `docs/M0_*.md`、`docs/M1_*.md`、`docs/M2_PR01.md` 与 `docs/evidence/`。
 
 ## 已完成（已并入 main）
 
 1. **M0 Paper Core**：[PR #2](https://github.com/handFOOLed/Stratide/pull/2)、[#4](https://github.com/handFOOLed/Stratide/pull/4)、[#6](https://github.com/handFOOLed/Stratide/pull/6)：单账户 Risk Kernel、模拟撮合、持久账本、回放和六报告。
 2. **M1 已实现部分**：[PR #8](https://github.com/handFOOLed/Stratide/pull/8)、[#9](https://github.com/handFOOLed/Stratide/pull/9)、[#12](https://github.com/handFOOLed/Stratide/pull/12)、[#14](https://github.com/handFOOLed/Stratide/pull/14)、[#18](https://github.com/handFOOLed/Stratide/pull/18)：真实 EOD **observe-only**、68 日历史探索性回测、独立研究评价和长窗口 DATA_BLOCKED 调查。**M1 前向 Paper 成交仍未完成**。
 3. **M2 Web V1**：[PR #21](https://github.com/handFOOLed/Stratide/pull/21)：localhost 同源只读 API 与可启动 Dashboard，Owner 指定一个已发布的报告快照；历史回放不进入前向账户 NAV。
+4. **Agent V1 与视觉基准**：#22 核心及 PR #27 状态修复已在 main；[PR #28](https://github.com/handFOOLed/Stratide/pull/28) 确立视觉基准，不代表功能全部完成。真实 Provider 未验证。
 
 ## 当前和下一个完整功能包
 
-**本分支 #22 Draft：** Agent 功能闭环与基础 UI 已实现并自测，见 [操作](M2_PR02.md)、[稳定 Agent API](AGENT_API.md) 和 [证据](evidence/m2-pr02/README.md)。同 HEAD 审查与付费/外发权限专项独立核查待完成；不代表已合并或已验证真实 Provider。DeepSeek 继续按既定 #23 接口交接执行正式 UI。
+**本分支 M2-PR04 Draft：** 候选 → 冻结 → 独立评价代码 → 隔离历史回放已有可运行 CLI 与开发自测，见 [操作](M2_PR04.md) 和 [证据](evidence/m2-pr04/README.md)。工程通过与研究/交易资格分开；同 HEAD 审查和针对性独立反证仍待完成。
 
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |
-| **当前 #22** | **Sol Max** | [自主研究 Agent V1](https://github.com/handFOOLed/Stratide/issues/22)：Provider、可信日/月 Budget Gate、授权、持久任务、取消/暂停、EOD 触发、API 与可操作基础 UI。未配置授权/预算不付费。不得触碰交易账本或假称独立策略通过。 |
-| **随后 #23** | **DeepSeek** | [完整 Web UI/UX](https://github.com/handFOOLed/Stratide/issues/23)：先完成信息归属/设计系统，再实施五页共享组件、字体、按钮、动效、滚动条稳定布局；**去除跨页面重复资产模块和“查看更多”跳转**。详见 [DS 交接](UI_HANDOFF_DEEPSEEK.md)。 |
-| **后续（尚未授权实现）** | Owner 再定范围 | 独立评价与 Paper-only 策略联动：候选冻结 → 独立 Evaluator → 可信 Risk/Ledger；继续 [#10](https://github.com/handFOOLed/Stratide/issues/10) 真正的前向观察与 [#17](https://github.com/handFOOLed/Stratide/issues/17) 数据缺口。 |
+| **当前 #29** | **Sol** | [M2-PR04](https://github.com/handFOOLed/Stratide/issues/29)：登记/冻结候选、复用可信 Evaluator 与固定回放、独立本地账本/报告、默认拒绝资格；Core-only，不接入 Risk/Ledger 写权限或 forward_paper。 |
+| **后续核心** | Owner 再定范围 | 继续 [#10](https://github.com/handFOOLed/Stratide/issues/10) 前向证据与 [#17](https://github.com/handFOOLed/Stratide/issues/17) 数据缺口；证据不足保持 BLOCKED，新的交易联动需独立授权。 |
+| **核心全部完成后** | **Sol** | 按 PR #28 已确定的设计体系统一集成全部 UI；当前各功能任务无需同步前端。 |
 
 ## 一直有效的边界
 
