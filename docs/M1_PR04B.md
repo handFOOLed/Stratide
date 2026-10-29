@@ -1,5 +1,7 @@
 # M1-PR04B：连续真实 EOD 观察流程与开盘证据研究
 
+**R2：R1 HEAD `36bcbb80e1a5c4eec629543e753ff07fd83f1a8f` 独立验收暂不通过。** 新发现的“旧日补录引入当日日历冲突后仍 ready”已修复；[R2 回归与证据](evidence/m1-pr04b-r2/README.md) 保留原探针失败和开发自测。当前新 HEAD 仍须独立复验，以下 R1 是历史修复记录。
+
 **R1 修复状态：原 HEAD `945b2501ec4fb3b02f02da6c7253a77a525c2be1` 独立验收不通过，三项 P1 已修复并补充开发回归；需对 PR 新 HEAD 重新独立验收。** [拒绝结论及修复证据](evidence/m1-pr04b-r1/README.md) 保留旧失败与新自测边界。仍为 Draft、未合并、未接入 Paper 成交。
 
 状态：**工程自测完成后提交 Draft；真实连续多交易日及独立开盘尚待验证，M1 未完成，不合并。** 基线为 2026-10-28 fetch 的最新 `main`：`e41adc7`。开发分支 `codex/m1-pr04b-eod`；不改既有 Owner 分支、PR04A 日志或财务内核。自测不是 Terra 独立验收或小猫源码审查。
@@ -47,6 +49,10 @@ $observer = '../m1-pr04a-worktree/state/pr04a-r2-smoke-20261028/observer'
 前台脚本默认只执行一次；`-Watch` 每分钟只查本机时钟，达到窗口才启动 CLI。失败立即退出，Ctrl+C 可停，进程退出/电脑休眠期间没有观察承诺；重启脚本继续读原 journal，不追溯补造漏掉的价格。`MaxDays` 是处理的自然日期数，含休市日，不是成功交易日数。本次**没有启动无人值守采集、安装调度任务或持久保存 Token**。当前进程没有 Tushare Token；2026-10-29 上午步进只验证 waiting，不假装第二个 EOD 已发生。
 
 ## 日报完整性与未来函数防护
+
+R2 的 readiness 使用**当前全部已知的当日日历证据**，包括其他交易日补录返回的日历；冲突会撤销原有 ready，并返回 `already_attempted_today:calendar_conflict`。这是当前操作状态，不回写原成功尝试或释放/重复消费自动槽位。旧日补录仅引入其他日期冲突时，不因此撤销当日已有成功结果。
+
+“逐日期隔离”仅指**已有有效 EOD 的读取及上述当日 readiness 校验**。新采集依然保守地整次拒绝：同一日历响应中任意日期与旧证据冲突，整个新 outcome 记 `calendar_conflict` 并丢弃标准化 bar；即使新 bar 所属日期本身无冲突，也不会被接纳。这可能造成连续观察缺口，本轮未放宽它，不能宣称新采集已完全按日期隔离。
 
 `report.json.continuity` 对初始化至**日志最后事件时刻**逐自然日汇总：`valid_eod / missing_valid_eod / market_closed / calendar_unknown / calendar_conflict / awaiting_eod_window`，包含同日尝试数、晚到数、日历实收时间及最长已知开市日缺口。休市不打断已知开市缺口，未知/冲突打断可确认的连续性；不能把未知日历视为休市或完整覆盖。晚到补录不修复当日覆盖，失败的当日尝试与从未尝试的缺口仍分别留在原 CSV/JSON。
 

@@ -1,0 +1,31 @@
+   Compiling ring v0.17.14
+   Compiling libsqlite3-sys v0.36.0
+   Compiling rustls v0.23.46
+   Compiling rusqlite v0.38.0
+   Compiling rustls-webpki v0.103.16
+   Compiling ureq v3.5.0
+   Compiling stratide-forward v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\crates\forward)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\stratide_forward-39aw3yyw9fdck\s-hnnbjagz36-0f16kr4-working`
+
+warning: `stratide-forward` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.55s
+     Running unittests src\lib.rs (target\debug\deps\stratide_forward-2871aec5ea900a9f.exe)
+
+running 1 test
+test tests::r2::audit_backfill_conflict_must_invalidate_current_ready ... FAILED
+
+failures:
+
+---- tests::r2::audit_backfill_conflict_must_invalidate_current_ready stdout ----
+
+thread 'tests::r2::audit_backfill_conflict_must_invalidate_current_ready' (39560) panicked at crates\forward\src\tests\r2.rs:19:5:
+conflicting same-day calendar must invalidate readiness
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tests::r2::audit_backfill_conflict_must_invalidate_current_ready
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 24 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p stratide-forward --lib`

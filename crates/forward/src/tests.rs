@@ -4,6 +4,7 @@ use serde_json::json;
 use std::fs;
 mod continuity;
 mod r1;
+mod r2;
 
 fn config() -> Config {
     Config {

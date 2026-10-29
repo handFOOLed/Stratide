@@ -81,7 +81,17 @@ impl Journal {
         }
         let mut latest_run = None;
         let mut latest = None;
+        let mut calendar = None;
+        let mut calendar_conflict = false;
         for entry in self.entries() {
+            // Backfills for another trade day can carry new evidence about
+            // today. Readiness uses all known evidence, not just today's slot.
+            if let Event::CollectionFinished { outcome, .. } = &entry.event {
+                for d in outcome.calendar.iter().filter(|d| d.day == day) {
+                    calendar_conflict |= calendar.is_some_and(|open| open != d.is_open);
+                    calendar = Some(d.is_open);
+                }
+            }
             match &entry.event {
                 Event::CollectionStarted {
                     run_id,
@@ -123,6 +133,10 @@ impl Journal {
                 }
                 _ => (),
             }
+        }
+        if let Some(step) = latest.as_mut().filter(|_| calendar_conflict) {
+            step.ready = false;
+            step.status = "already_attempted_today:calendar_conflict".into();
         }
         // The durable intent is enough: an unknown response must never trigger
         // an automatic retry. Early probes/backfills still do not consume EOD.

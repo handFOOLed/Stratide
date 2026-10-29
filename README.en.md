@@ -2,7 +2,7 @@
 
 # Stratide
 
-Independent acceptance rejected PR04B's original `945b250` with three P1 findings. R1 repairs and developer regressions are documented [here](docs/evidence/m1-pr04b-r1/README.md); independent reacceptance of the new SHA is pending. The PR stays Draft, with no paper execution integration.
+Independent reacceptance confirmed the original three R1 fixes but found a new P1: a prior-day backfill could introduce today's calendar conflict without revoking readiness. R2 fixes this inconsistency; [failure and repair evidence](docs/evidence/m1-pr04b-r2/README.md) is preserved. Independent acceptance of the new SHA is pending. The PR stays Draft, with no paper execution integration.
 
 **PR04B engineering increment (Draft, unmerged):** adds daily `forward-eod-step`, optional foreground `observe-eod.ps1 -Watch`, calendar-day completeness summaries and read-only `forward-eod-at` views. It reuses the actual PR04A journal without changing the financial ledger. Evidence still covers **one valid observation day, zero proposals/fills**; consecutive real trading days and independent opening receipts remain unverified. See [PR04B operations and evidence](docs/M1_PR04B.md) and [opening-evidence research](docs/M1_PR04B_OPENING_EVIDENCE.md) (Chinese).
 

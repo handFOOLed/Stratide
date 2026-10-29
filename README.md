@@ -2,7 +2,7 @@
 
 # Stratide
 
-PR04B 原提交 `945b250` 独立验收发现三项 P1，已进行 R1 修复；新 SHA 独立复验仍待完成，见 [修复与证据](docs/evidence/m1-pr04b-r1/README.md)。保持 Draft，不接入成交。
+PR04B 的 R1 已修复原三项 P1；独立复验又发现旧日补录带回当日冲突后仍报告 ready 的 P1，本轮 R2 修复并保留 [失败/修复证据](docs/evidence/m1-pr04b-r2/README.md)。新 SHA 仍待独立验收，保持 Draft，不接入成交。
 
 **PR04B 工程增量（Draft，未合并）：** 新增每日 `forward-eod-step`、可选前台 `observe-eod.ps1 -Watch`、逐日完整性摘要和只读 `forward-eod-at` 时间视图。复用 PR04A 的真实 journal，不改财务账本；真实证据仍只有 **1 个有效观察日、0 提案/成交**，连续真实交易日与独立开盘尚待验证。操作、测试及限制见 [PR04B](docs/M1_PR04B.md) 和 [开盘证据研究](docs/M1_PR04B_OPENING_EVIDENCE.md)。
 

@@ -1,0 +1,34 @@
+{
+  "repaired_from_sha": "36bcbb80e1a5c4eec629543e753ff07fd83f1a8f",
+  "base_sha": "e41adc71b3d28e02dc8a642c6b21101ca263ac0f",
+  "validation_kind": "developer_self_test_not_independent_acceptance",
+  "original_independent_acceptance": "R1_NOT_PASSED_new_readiness_P1",
+  "platform": "windows-x86_64",
+  "rust": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "test_count": 105,
+  "new_regression_tests": 3,
+  "fmt_exit": 0,
+  "check_exit": 0,
+  "test_exit": 0,
+  "clippy_exit": 0,
+  "independent_probe_source_sha256": "f99ecb96036ccefbc02fe9f7319ec11449cb1f7e658a0e421cd0b569bbfff83a",
+  "tested_source_sha256": {
+    "crates/forward/src/continuity.rs": "d335becf997736c546be3ac31aa3a2121639e418226f1f619b42a8a8e6a6d280",
+    "crates/forward/src/tests.rs": "5c4a42faae5b554da132ff4df8316069cb62e632b759fb95cca24faa24e7113f",
+    "crates/forward/src/tests/r2.rs": "9ea6e6cb290b73dffe0df6a245b24cc06344b21262c4b42f3e0385d94d3da81b"
+  },
+  "hash_scope": "local tested file bytes; checkout line endings may differ",
+  "unchanged_original_files_verified": 4,
+  "original_files_sha256": {
+    "F:\\Desktop\\Documents\\Codex\\Stratide\\m1-pr04a-worktree\\state\\pr04a-r2-smoke-20261028\\observer\\forward.sqlite": "C86536EEE8BCDC2DD0D22CC7505D5FB9D5E8569C3E288BF6B7A79E2F796762F8",
+    "F:\\Desktop\\Documents\\Codex\\Stratide\\m1-pr04a-worktree\\state\\pr04a-r2-smoke-20261028\\report\\report.json": "5D9A9480D373D26B6142512A997ED7DAAC647827CADD926EA577BA642AE23D49",
+    "F:\\Desktop\\Documents\\Codex\\Stratide\\m1-pr04a-worktree\\state\\pr04a-r2-smoke-20261028\\report\\daily.csv": "0EB4F92E2600F06A5C3BF743648B31EF8E498B43A36B62A0DB548D3335028223",
+    "F:\\Desktop\\Documents\\Codex\\Stratide\\m1-pr04a-worktree\\state\\pr04a-r2-smoke-20261028\\report\\events.json": "0A8A7C94963FA6C236D06B222B68FE001C4DD0F59D7BDDE1E55AFEAF8137D615"
+  },
+  "real_journal_chain_raw_recomputed_this_round": false,
+  "new_http_calls": 0,
+  "actual_valid_forward_days": 1,
+  "paper_execution_connected": false,
+  "new_sha_independent_acceptance": "PENDING"
+}

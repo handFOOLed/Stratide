@@ -1,0 +1,10 @@
+   Compiling stratide-forward v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\crates\forward)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.27s
+     Running unittests src\lib.rs (target\debug\deps\stratide_forward-2871aec5ea900a9f.exe)
+
+running 3 tests
+test tests::r2::audit_backfill_conflict_must_invalidate_current_ready ... ok
+test tests::r2::r2_first_eod_still_conservatively_rejects_a_response_with_other_date_conflict ... ok
+test tests::r2::r2_readiness_matches_target_date_evidence_after_backfill_and_restart ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 24 filtered out; finished in 0.04s
