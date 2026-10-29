@@ -2,11 +2,11 @@
 
 Status: **agreed product principles**, not a profitability claim.
 
-## Approved implementation priority (ADR-037)
+## Current phase and responsibility
 
-First ship a **working, observable paper trading simulator**. Deliver deterministic paper risk/order/fill/ledger replay and restart recovery (M0), then provenance-tagged genuine forward paper observation and readable daily NAV/trades/fee/drawdown reports (M1). Historical backtests or synthetic scenarios must never be mislabelled as live observations. GPT-6.1 Sol implements, GPT-6.1 Terra independently validates and merges **only after** ChatGPT code review resolves blocking issues. Owner controls scope and reviews actual paper outcomes. See [paper trading roadmap](PAPER_TRADING_ROADMAP.md).
+**Paper-first, Web + research Agent during the paper phase, no live trading.** The M0 simulation core and read-only Web V1 are merged; M1 forward observations are still observe-only and incomplete. Source-of-truth implementation facts: [STATUS](STATUS.md) and [roadmap](PAPER_TRADING_ROADMAP.md).
 
-**2026-10-29 Owner 阶段补充（[Issue #19](https://github.com/handFOOLed/Stratide/issues/19)、[Issue #20](https://github.com/handFOOLed/Stratide/issues/20)）：Web Dashboard 与研究 Agent 均在 paper 阶段开发，不以未来实盘或 mini PC 为前置条件。** Issue #20 交付本机只读 Paper Web，研究 Agent 自动化由下一项任务实现；每次交付可启动、可交互的完整纵向功能包。此范围更新不改写 Accepted ADR，也不授权券商、真实资金、云端部署或付费调用。操作见 [Dashboard](../apps/dashboard/README.md)。
+**2026-10-29 Owner workflow:** Sol builds backend/Agent/API; DeepSeek owns the final UI/UX and shared frontend design system ([handoff](UI_HANDOFF_DEEPSEEK.md)); ChatGPT reviews a fixed commit and merges only with Owner authorization. Ordinary UI does not require redundant full independent testing; financial, credential, cloud-sharing and paid-budget changes require targeted independent challenge. Original [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md) remains historical Accepted text pending explicit review of the process update; its old "Terra merges" phrasing is **superseded in current practice**. No acceptance or authorization for real-money activity is implied.
 
 ## Mission
 
