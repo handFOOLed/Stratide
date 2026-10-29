@@ -2,11 +2,12 @@
 
 # Stratide
 
-A local-first, **paper-only** personal quantitative research system: Rust risk/ledger and replay, genuine EOD observation, and a local read-only Web Dashboard. Cloud research Agent development is next. **Not authorized for real-money trading; no proven trading edge.**
+A local-first, **paper-only** personal quantitative research system: Rust risk/ledger and replay, genuine EOD observation, a local read-only Paper Dashboard and controlled research Agent. **Not authorized for real-money trading; no proven trading edge.**
 
 ## Status
 
 - **Implemented:** paper Risk Kernel, durable ledger and reports, exploratory historical EOD replay, observe-only forward EOD journal, and [Web Dashboard V1](apps/dashboard/README.md).
+- **Draft on this branch:** [Agent V1](docs/M2_PR02.md) adds persistent tasks, daily/monthly spending gates, controlled HTTPS generation, a local fake Provider, EOD deduplication and basic Web controls. [API](docs/AGENT_API.md) and [self-test evidence](docs/evidence/m2-pr02/README.md) are available. **REAL_PROVIDER_NOT_VERIFIED**; no paid requests without Owner budgets/consent. Targeted independent risk checks and fixed-HEAD review remain pending.
 - **Limits:** 68 historical sessions / 3 simulated fills; longer history `DATA_BLOCKED` by corporate-action and fee evidence. Only one valid forward observation day; **no continuous forward-paper fills or account NAV**.
 - **Next:** [#22 Agent implementation and APIs (Sol)](https://github.com/handFOOLed/Stratide/issues/22) → [#23 complete UI/UX redesign (DeepSeek)](https://github.com/handFOOLed/Stratide/issues/23). See [current status and evidence](docs/STATUS.md).
 
@@ -16,6 +17,9 @@ From the repository root, using a **synthetic test report**:
 
 ```powershell
 pwsh -NoProfile -File scripts/start-dashboard.ps1 -ReportDir 'docs/evidence/m0-pr03/sample-report'
+
+# Local fake Agent only; synthetic TST fees.
+pwsh -NoProfile -File scripts/start-dashboard.ps1 -ReportDir 'docs/evidence/m0-pr03/sample-report' -AgentDir state/agent-fake -FakeAgent
 ```
 
 Open `http://127.0.0.1:8710`; stop with Ctrl+C. For your own published report and other commands, see [Dashboard instructions](apps/dashboard/README.md) and [engineering roadmap](docs/PAPER_TRADING_ROADMAP.md).

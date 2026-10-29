@@ -1,6 +1,6 @@
 // Test-only fixture publisher. The production launcher has no default dataset.
-import { spawn } from 'node:child_process';
-import { mkdtemp, cp, readFile, writeFile } from 'node:fs/promises';
+import { spawn, spawnSync } from 'node:child_process';
+import { mkdtemp, mkdir, cp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,7 +9,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.
 const [scenario, port] = process.argv.slice(2);
 const args = ['--port',port];
 const fixture = path.join(root,'docs/evidence/m0-pr03/sample-report');
-if (scenario === 'synthetic') args.push('--report-dir',fixture);
+if (scenario === 'synthetic' || scenario === 'agent') args.push('--report-dir',fixture);
 else if (scenario === 'historical') {
   if (!process.env.STRATIDE_HISTORICAL_REPORT) throw new Error('Explicit historical report required');
   args.push('--report-dir',process.env.STRATIDE_HISTORICAL_REPORT);
@@ -32,6 +32,14 @@ else if (scenario === 'historical') {
 }
 args.push('--assets-dir',path.join(root,'apps/dashboard/dist'));
 const exe = process.env.STRATIDE_DASHBOARD_BIN || path.join(root,'target/debug',process.platform === 'win32' ? 'stratided.exe' : 'stratided');
+if (scenario === 'agent') {
+  const dir=await mkdtemp(path.join(tmpdir(),'stratide-agent-browser-'));
+  const init=spawnSync(exe,['--agent-init-fake',dir],{cwd:root,stdio:'pipe',windowsHide:true});
+  if(init.status!==0) throw new Error('fake fixture initialization failed');
+  const evidence=path.join(root,'state/issue22-browser'); await mkdir(evidence,{recursive:true});
+  await writeFile(path.join(evidence,'session.json'),JSON.stringify({token:(await readFile(path.join(dir,'owner-token'),'utf8')).trim()}));
+  args.push('--agent-dir',dir);
+}
 const child = spawn(exe,args,{cwd:root,stdio:'inherit',windowsHide:true});
 child.on('error', error=>{ console.error(error.message); process.exit(1); });
 child.on('exit', code=>process.exit(code ?? 1));

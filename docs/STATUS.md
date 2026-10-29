@@ -1,6 +1,6 @@
 # Stratide 当前状态
 
-> 截至 2026-10-29，基于 `main` merge `8591cff4`（[PR #21](https://github.com/handFOOLed/Stratide/pull/21)）。这是**当前实现快照**，不是未来功能承诺；合并新代码后须更新。
+> 截至 2026-10-29，基于 `main` merge `527c4469`（[PR #24](https://github.com/handFOOLed/Stratide/pull/24)），附本分支 Agent Draft 状态。这是**当前实现快照**，不是实盘或独立验收承诺。
 
 ## 已实现
 
@@ -15,7 +15,7 @@
 
 ## 仍未实现 / 未验证
 
-- **自主研究 Agent**、真实云模型调用、任务与日/月 Budget Gate：尚未进入 `main`。当前开发任务 [#22](https://github.com/handFOOLed/Stratide/issues/22)，先由 Sol 完成可信功能、接口和最低限度可操作 UI。
+- **Agent V1 本分支 Draft 已完成开发自测、尚未进入 main：** 持久任务、日/月预算、受控云文本路径、本地 fake、EOD 与基础 Web 交互可运行；[操作/API](M2_PR02.md) 和 [129 Rust / 4 前端 / 8 浏览器自测证据](evidence/m2-pr02/README.md) 已保存。真实 Provider **REAL_PROVIDER_NOT_VERIFIED**；同 HEAD 审查及付费/外发专项独立风险核查待完成。
 - **正式 UI/UX**：现有 Web 仍是原生 JS/CSS/Vite 功能版；[Issue #23](https://github.com/handFOOLed/Stratide/issues/23) 由 **DeepSeek** 主导全站信息架构、字体、设计系统、共享组件与动画，待 Agent API 稳定后执行。见 [DeepSeek 交接说明](UI_HANDOFF_DEEPSEEK.md)。
 - **真正连续的前向 Paper 成交/NAV**：现有 forward 是 observe-only；[Issue #10](https://github.com/handFOOLed/Stratide/issues/10) 仍需新的真实观察和可信开盘/成本证据。历史回放不能计作 forward。
 - **公司行为处理和历史 PIT 认证**：未完成；不能因审计 PASS 误称长窗口已贯通。真实券商、实盘资金、公共 Web、无人值守策略自动部署均未获授权。

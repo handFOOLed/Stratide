@@ -1,3 +1,4 @@
+pub mod agent_api;
 pub mod snapshot;
 
 use serde_json::{json, Value};
@@ -17,6 +18,8 @@ pub struct Config {
     pub evaluation_file: Option<PathBuf>,
     pub assets_dir: PathBuf,
     pub port: u16,
+    pub agent_dir: Option<PathBuf>,
+    pub agent_config: Option<PathBuf>,
 }
 
 impl Config {
@@ -26,6 +29,8 @@ impl Config {
             evaluation_file: None,
             assets_dir: DEFAULT_ASSETS.into(),
             port: DEFAULT_PORT,
+            agent_dir: None,
+            agent_config: None,
         };
         let mut args = args.peekable();
         let mut seen = std::collections::BTreeSet::new();
@@ -35,6 +40,8 @@ impl Config {
                 "--evaluation-file",
                 "--assets-dir",
                 "--port",
+                "--agent-dir",
+                "--agent-config",
             ]
             .contains(&arg.as_str())
                 || !seen.insert(arg.clone())
@@ -46,6 +53,8 @@ impl Config {
                 "--report-dir" => config.report_dir = Some(value.into()),
                 "--evaluation-file" => config.evaluation_file = Some(value.into()),
                 "--assets-dir" => config.assets_dir = value.into(),
+                "--agent-dir" => config.agent_dir = Some(value.into()),
+                "--agent-config" => config.agent_config = Some(value.into()),
                 "--port" => {
                     config.port = value.parse::<u16>().map_err(|_| "端口必须为 1–65535")?;
                     if config.port == 0 {
@@ -95,6 +104,49 @@ pub struct Reply {
 }
 
 impl App {
+    /// A bounded projection, never raw reports, identities, lots or account cash.
+    pub fn agent_summary(&self) -> stratide_research::InputSummary {
+        let mut summary = stratide_research::InputSummary {
+            version: "paper-summary-v1:no-input".into(),
+            source_day: String::new(),
+            mode: "no_input".into(),
+            scopes: vec!["owner_task".into()],
+            summary: json!({"paper":"not_configured"}),
+            eod_eligible: false,
+        };
+        if let Some(Ok(s)) = &self.snapshot {
+            let r = &s.report;
+            let raw = r.last_day.0.to_string();
+            summary.source_day = format!("{}-{}-{}", &raw[..4], &raw[4..6], &raw[6..]);
+            summary.mode = s.metadata["mode"].as_str().unwrap_or("unknown").to_string();
+            summary.version = format!(
+                "paper-summary-v1:{}",
+                s.metadata["snapshot_id"].as_str().unwrap_or("invalid")
+            );
+            summary.scopes.push("paper_summary_v1".into());
+            summary.summary = json!({"snapshot_id":s.metadata["snapshot_id"],"mode":summary.mode,
+                "first_day":s.metadata["first_day"],"last_day":s.metadata["last_day"],
+                "evidence_class":s.metadata["evidence_class"],"report_days":r.daily.len().to_string(),
+                "simulated_fills":r.fills.len().to_string(),"risk_rejections":r.risk_rejections.len().to_string(),
+                "total_return_bps":r.total_return_bps.map(|v|v.to_string()),
+                "drawdown_bps":r.max_daily_observation_drawdown_bps.map(|v|v.to_string()),
+                "missing_valuation_days":r.daily.iter().filter(|d|d.nav_fen.is_none()).count().to_string(),
+                "provenance":"published_six_report_consistency_checked_not_independent_qualification"});
+            // The report's observed session date is used, never a guessed weekday.
+            summary.eod_eligible = summary.mode == "historical_replay"
+                && r.daily.last().is_some_and(|d| d.nav_fen.is_some())
+                && r.unverified_status_sessions == 0;
+        }
+        if let Some(Ok(e)) = &self.research {
+            summary.scopes.push("historical_summary_v1".into());
+            let brief = json!({"research_evidence":e["research_evidence"],"engineering":e["engineering"],
+                "window_count":e["windows"].as_array().map(|a|a.len().to_string()),"account_inclusion":false});
+            let digest = stratide_research::hash(brief.to_string().as_bytes());
+            summary.version.push_str(&format!(":evaluation:{digest}"));
+            summary.summary["historical_evaluation"] = brief;
+        }
+        summary
+    }
     pub fn load(report_dir: Option<&Path>, evaluation_file: Option<&Path>) -> Self {
         Self {
             snapshot: report_dir.map(Snapshot::load),
@@ -195,13 +247,28 @@ pub fn bind_local(port: u16) -> Result<Server, String> {
 }
 
 pub fn handle(app: &App, assets: &Assets, req: Request, port: u16) {
+    handle_with_agent(app, assets, req, port, None)
+}
+
+pub fn handle_with_agent(
+    app: &App,
+    assets: &Assets,
+    mut req: Request,
+    port: u16,
+    agent: Option<&stratide_research::Agent>,
+) {
+    if req.url().starts_with("/api/agent/") {
+        let reply = agent_api::reply(app, agent, &mut req, port);
+        respond(req, reply);
+        return;
+    }
     let header = |name: &'static str| {
         req.headers()
             .iter()
             .find(|h| h.field.equiv(name))
             .map(|h| h.value.as_str())
     };
-    let reply = app.reply(
+    let mut reply = app.reply(
         assets,
         req.method().as_str(),
         req.url(),
@@ -209,6 +276,16 @@ pub fn handle(app: &App, assets: &Assets, req: Request, port: u16) {
         header("Origin"),
         port,
     );
+    if req.url() == "/api/health" && reply.status == 200 && agent.is_some() {
+        if let Ok(mut value) = serde_json::from_slice::<Value>(&reply.body) {
+            value["data"]["agent"] = json!("local_research_available");
+            reply.body = serde_json::to_vec(&value).expect("health JSON");
+        }
+    }
+    respond(req, reply);
+}
+
+fn respond(req: Request, reply: Reply) {
     let mut response = Response::from_data(reply.body).with_status_code(StatusCode(reply.status));
     for (key, value) in [
         ("Content-Type", reply.mime), ("Cache-Control", "no-store"), ("X-Content-Type-Options", "nosniff"),

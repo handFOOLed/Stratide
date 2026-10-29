@@ -10,6 +10,8 @@ Status: **agreed product principles**, not a profitability claim.
 
 ## Mission
 
+**Issue #22 paper 阶段实现补充：** 本地自主研究 Agent V1 提供持久任务、日/月硬预算、受控云文本研究与 Web 控制；不能执行生成代码、写 Paper 财务、修改 Risk 或自行批准策略。真实付费外发需 Owner 明确预算/价格/服务用途与数据范围授权。操作和流程修订建议见 [M2-PR02](M2_PR02.md)；Accepted ADR 未静默改写。
+
 Stratide autonomously discovers, evaluates, manages and eventually executes trading strategies under independently enforced financial risk constraints. It must be able to conclude there is no credible edge and refrain from opening new risk.
 
 ## Owner priorities
