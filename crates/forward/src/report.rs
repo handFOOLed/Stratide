@@ -1,4 +1,5 @@
 use crate::{model::*, Journal, Result};
+use chrono::Timelike;
 use serde::Serialize;
 use std::{
     collections::BTreeMap,
@@ -228,12 +229,73 @@ impl Journal {
             }
         }
         rows.sort_by(|a, b| (&a.calendar_day, a.attempt).cmp(&(&b.calendar_day, b.attempt)));
+        // Summary uses the entire calendar range, not the number of attempts.
+        // Later backfills/revisions cannot turn a missed on-day observation into coverage.
+        let first_day = local_day(self.entries()[0].event.time())?;
+        let cutoff = self.entries().iter().map(|e| e.event.time()).max().unwrap();
+        let last_day = local_day(cutoff)?;
+        let cutoff_hour = chrono::DateTime::parse_from_rfc3339(&local_time(cutoff)?)
+            .map_err(|e| e.to_string())?
+            .hour();
+        let mut coverage = vec![];
+        let mut day = date(&first_day)?;
+        let last = date(&last_day)?;
+        let mut gap_streak = 0;
+        let mut longest_gap_streak = 0;
+        while day <= last {
+            let key = day.format("%Y%m%d").to_string();
+            let daily: Vec<_> = rows.iter().filter(|r| r.calendar_day == key).collect();
+            let valid = daily
+                .iter()
+                .any(|r| r.on_day_attempt && r.status == "valid_eod" && r.close_fen.is_some());
+            let is_open = calendar.get(&key).and_then(|c| c.0);
+            let state = match (calendar.get(&key), is_open) {
+                (Some(_), None) => "calendar_conflict",
+                (_, None) => "calendar_unknown",
+                (_, Some(false)) => "market_closed",
+                (_, Some(true)) if valid => "valid_eod",
+                (_, Some(true)) if key == last_day && cutoff_hour < 16 => "awaiting_eod_window",
+                _ => "missing_valid_eod",
+            };
+            match state {
+                "missing_valid_eod" => {
+                    gap_streak += 1;
+                    longest_gap_streak = longest_gap_streak.max(gap_streak);
+                }
+                "market_closed" => (),
+                _ => gap_streak = 0,
+            }
+            coverage.push(serde_json::json!({
+                "calendar_day": key,
+                "state": state,
+                "on_day_attempts": daily.iter().filter(|r| r.on_day_attempt).count(),
+                "late_attempts": daily.iter().filter(|r| r.late_backfill).count(),
+                "calendar_received_at": calendar.get(&key).map(|c| local_time(c.2)).transpose()?,
+            }));
+            day = day.succ_opt().ok_or("日期溢出")?;
+        }
+        let count = |state: &str| coverage.iter().filter(|d| d["state"] == state).count();
+        let continuity = serde_json::json!({
+            "as_of_journal_event_at": local_time(cutoff)?,
+            "first_day": first_day, "through_day": last_day,
+            "valid_eod_days": count("valid_eod"),
+            "missing_valid_eod_days": count("missing_valid_eod"),
+            "closed_days": count("market_closed"),
+            "calendar_unknown_days": count("calendar_unknown"),
+            "calendar_conflict_days": count("calendar_conflict"),
+            "awaiting_eod_days": count("awaiting_eod_window"),
+            "longest_known_open_day_gap": longest_gap_streak,
+            "gap_streak_semantics": "closed days do not break a streak; unknown/conflict days break certainty; later backfill never repairs on-day coverage",
+            "days": coverage,
+        });
         let mut csv = csv::Writer::from_writer(Vec::new());
         for row in &rows {
             csv.serialize(row).map_err(|e| e.to_string())?;
         }
         let csv = csv.into_inner().map_err(|e| e.to_string())?;
-        let report = serde_json::json!({ "schema_version": 1, "status": status, "days_and_attempts": rows,
+        let report = serde_json::json!({ "schema_version": 2, "status": status, "days_and_attempts": rows, "continuity": continuity,
+            "clock_uncertainty": self.clock_uncertainty(),
+            "available_at_semantics": AVAILABILITY_SEMANTICS,
             "raw_values_and_responses": "events.json (exact response bytes in raw.body; verify sha256)",
             "metrics_unavailable_reason": "observation identity has no funded paper ledger, strategy or fills",
             "endpoint_version": VERSION,

@@ -1,0 +1,75 @@
+   Compiling ring v0.17.14
+   Compiling libsqlite3-sys v0.36.0
+   Compiling rustls v0.23.46
+    Checking rusqlite v0.38.0
+    Checking stratide-ledger v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\crates\ledger)
+    Checking rustls-webpki v0.103.16
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\stratide_ledger-0b7dk283thphk\s-hnnb94m4xl-1kibqfo-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\stratide_ledger-1yxjingm2xe8b\s-hnnb94m54n-02z810a-working`
+
+warning: `stratide-ledger` (lib) generated 1 warning
+warning: `stratide-ledger` (lib test) generated 1 warning
+    Checking ureq v3.5.0
+    Checking stratide-forward v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\crates\forward)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\stratide_forward-2tstd53kndiok\s-hnnb95lp5g-0pofmu3-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\stratide_forward-04dudcciqiuto\s-hnnb95lph0-06atsf4-working`
+
+error: you seem to be trying to use `match` for destructuring a single pattern. Consider using `if let`
+   --> crates\forward\src\continuity.rs:170:13
+    |
+170 | /             match &entry.event {
+171 | |                 Event::CollectionFinished {
+172 | |                     outcome,
+173 | |                     finished_at,
+...   |
+204 | |                 _ => (),
+205 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#single_match
+    = note: `-D clippy::single-match` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::single_match)]`
+help: try
+    |
+170 ~             if let Event::CollectionFinished {
+171 +                     outcome,
+172 +                     finished_at,
+173 +                     ..
+174 +                 } = &entry.event {
+175 +                 // Same per-date conflict rule as the continuity report;
+176 +                 // a different date's conflict cannot erase this day's EOD.
+177 +                 for d in outcome.calendar.iter().filter(|d| d.day == day) {
+178 +                     if calendar.is_some_and(|open| open != d.is_open) {
+179 +                         return Ok(None);
+180 +                     }
+181 +                     calendar = Some(d.is_open);
+182 +                 }
+183 +                 if outcome.status != "valid_eod" {
+184 +                     continue;
+185 +                 }
+186 +                 if let (Some(bar), Some(available_at)) = (&outcome.bar, outcome.available_at) {
+187 +                     if bar.trade_day == day
+188 +                         && available_at <= decision_at
+189 +                         && available_at >= *finished_at
+190 +                         && outcome.raw.iter().all(|r| r.received_at <= available_at)
+191 +                     {
+192 +                         selected = Some(EodView {
+193 +                             sequence: entry.sequence,
+194 +                             available_at,
+195 +                             available_at_semantics: AVAILABILITY_SEMANTICS,
+196 +                             bar,
+197 +                             late_backfill: outcome.late_backfill,
+198 +                             opening_execution_eligible: false,
+199 +                         });
+200 +                     }
+201 +                 }
+202 +             }
+    |
+
+warning: `stratide-forward` (lib) generated 1 warning
+error: could not compile `stratide-forward` (lib) due to 1 previous error; 1 warning emitted
+warning: build failed, waiting for other jobs to finish...
+warning: `stratide-forward` (lib test) generated 1 warning
+error: could not compile `stratide-forward` (lib test) due to 1 previous error; 1 warning emitted

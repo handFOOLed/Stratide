@@ -293,9 +293,7 @@ impl Journal {
         }
         Ok(())
     }
-    pub fn collect_once(&mut self, trade_day: Option<&str>) -> Result<String> {
-        let observed = now();
-        let timer = Instant::now();
+    pub(crate) fn prepare_collection(&mut self, observed: i64) -> Result<()> {
         self.check_clock(observed)?;
         for run_id in self.pending() {
             self.append(Event::Interrupted {
@@ -303,6 +301,12 @@ impl Journal {
                 detected_at: observed,
             })?;
         }
+        Ok(())
+    }
+    pub fn collect_once(&mut self, trade_day: Option<&str>) -> Result<String> {
+        let observed = now();
+        let timer = Instant::now();
+        self.prepare_collection(observed)?;
         let today = local_day(observed)?;
         let day = trade_day.unwrap_or(&today);
         date(day)?;
@@ -371,6 +375,8 @@ impl Journal {
     ) -> Result<String> {
         outcome.late_backfill = day < today || day < local_day(finished)?.as_str();
         if outcome.available_at.is_some() {
+            // Sampled validation-complete time, before append/SQLite commit.
+            // It is never an attestation of exact durable reader visibility.
             outcome.available_at = Some(finished);
         }
         // A changed trading calendar is unresolved source evidence, not permission to choose.

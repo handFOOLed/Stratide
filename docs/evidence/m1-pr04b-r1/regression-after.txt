@@ -1,0 +1,12 @@
+   Compiling stratide-forward v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\crates\forward)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.93s
+     Running unittests src\lib.rs (target\debug\deps\stratide_forward-2871aec5ea900a9f.exe)
+
+running 5 tests
+test tests::r1::r1_later_rollback_cannot_erase_an_earlier_asof_view ... ok
+test tests::r1::r1_automatic_recovery_does_not_start_a_new_collection ... ok
+test tests::r1::r1_interrupted_attempt_consumes_automatic_slot_before_and_after_recovery ... ok
+test tests::r1::r1_calendar_conflict_is_scoped_to_its_date_in_asof_and_report ... ok
+test tests::r1::r1_process_death_at_start_and_finish_commit_boundaries_respects_automatic_slot ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 19 filtered out; finished in 0.06s

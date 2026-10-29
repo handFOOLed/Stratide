@@ -1,0 +1,13 @@
+    Checking ring v0.17.14
+    Checking libsqlite3-sys v0.36.0
+    Checking stratide-contracts v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\crates\contracts)
+    Checking rusqlite v0.38.0
+    Checking stratide-risk v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\crates\risk)
+    Checking stratided v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\apps\stratided)
+    Checking stratide-ledger v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\crates\ledger)
+    Checking rustls-webpki v0.103.16
+    Checking rustls v0.23.46
+    Checking ureq v3.5.0
+    Checking stratide-forward v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\crates\forward)
+    Checking stratide-cli v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\apps\stratide-cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.41s

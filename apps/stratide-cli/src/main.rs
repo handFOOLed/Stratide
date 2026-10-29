@@ -50,6 +50,8 @@ Paper 演示使用 synthetic_test 人工行情/费率，绝非真实市场数据
 forward-init <新目录> <观察配置JSON>
 forward-source-check <目录>
 forward-collect-once <目录> [--trade-day YYYYMMDD]
+forward-eod-step <目录> <报告根目录>
+forward-eod-at <目录> <交易日> <UTC epoch毫秒>
 forward-status <目录>
 forward-report <目录> <新报告目录>
 Forward 仅 observe-only；不创建资金账本、不产生策略提案或成交。"

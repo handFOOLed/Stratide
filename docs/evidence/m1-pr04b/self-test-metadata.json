@@ -1,0 +1,32 @@
+{
+  "base_sha": "e41adc71b3d28e02dc8a642c6b21101ca263ac0f",
+  "validation_kind": "developer_self_test_not_independent_acceptance",
+  "platform": "windows-x86_64",
+  "rust": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "fmt_exit": 0,
+  "check_exit": 0,
+  "test_exit": 0,
+  "test_count": 97,
+  "clippy_exit": 0,
+  "offline": true,
+  "production_source_and_test_sha256": {
+    "crates/forward/src/continuity.rs": "0142e759375cfb497bbedcf3ce5544d282a6f84305f043fd6bad81a366424551",
+    "crates/forward/src/store.rs": "7ad21fdacb372863c50064941d9b7d44c4ab086e435e217e7436b9f27cd9c46c",
+    "crates/forward/src/report.rs": "1d3d9961eeb4fcd6eaa7abe5ca1c07a0011615ae86624b70e00801015ca023f8",
+    "crates/forward/src/tests.rs": "f3d0c987aea2147c2849d8a3af4f496fd1fb1d53c625ab36b5f23a1149ca35b1",
+    "crates/forward/src/tests/continuity.rs": "a47bfe42640608db9d8cbddb24ff52a24bef7c80e9d55d9767f1a572b1f2cf54",
+    "crates/forward/src/lib.rs": "64e214f19383a717ac8743b65b9779248e1722071eee2ce078f44b51f66bcd11",
+    "apps/stratide-cli/src/forward.rs": "202296ca389ceb8ea0d661c851fdd478290a1cac9728604b8ff76d811235dd1f",
+    "apps/stratide-cli/src/main.rs": "f9e57c87883d861fd990059f19f1706b0dbf875226022cd5d6b088ce119a008b",
+    "apps/stratide-cli/tests/forward.rs": "fc64726d7d30763c278b9a639fc52b71d2ba4a3232ce94a24116e5ba033e8c6a",
+    "scripts/observe-eod.ps1": "bdc31ebb49d8a33a8781d67f14e623081bd8697ef5d040b782cf75b0849136a6"
+  },
+  "linux_macos": "NOT VERIFIED",
+  "actual_new_http_calls": 0,
+  "actual_valid_forward_days": 1,
+  "continuous_real_trading_days": "NOT VERIFIED",
+  "opening_evidence": "NOT VERIFIED",
+  "paper_fills_enabled": false,
+  "hash_scope": "local tested file bytes; checkout line endings may differ"
+}

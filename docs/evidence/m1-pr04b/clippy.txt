@@ -1,0 +1,40 @@
+   Compiling ring v0.17.14
+   Compiling libsqlite3-sys v0.36.0
+   Compiling rustls v0.23.46
+    Checking rusqlite v0.38.0
+    Checking stratide-ledger v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\crates\ledger)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\stratide_ledger-0b7dk283thphk\s-hnnavqdy0w-0ckl9w1-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\stratide_ledger-1yxjingm2xe8b\s-hnnavqdxxf-1ljxs68-working`
+
+    Checking rustls-webpki v0.103.16
+warning: `stratide-ledger` (lib) generated 1 warning
+warning: `stratide-ledger` (lib test) generated 1 warning
+    Checking ureq v3.5.0
+    Checking stratide-forward v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\crates\forward)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\stratide_forward-2tstd53kndiok\s-hnnavre2hq-0uopaj4-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\stratide_forward-04dudcciqiuto\s-hnnavre2ii-182lf93-working`
+
+warning: `stratide-forward` (lib) generated 1 warning
+    Checking stratide-cli v0.0.1 (F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\apps\stratide-cli)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\replay-0ivikwlnegx8g\s-hnnavrj6gi-0lgbiza-working`
+
+warning: `stratide-forward` (lib test) generated 1 warning
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\stratide_cli-3994gv7oydywl\s-hnnavrj6p0-0p9taq6-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\paper_ledger-3hkltcf7y7a5k\s-hnnavrj7wt-1kkhxgk-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\risk_demo-1nne0z8s29iww\s-hnnavrj95b-030kecp-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\stratide_cli-2ntxfi0l1ie6k\s-hnnavrjali-115cn31-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\F:\Desktop\Documents\Codex\Stratide\m1-pr04b-worktree\target\debug\incremental\forward-1fhr1amp4vdbb\s-hnnavrjbon-1eu3oc8-working`
+
+warning: `stratide-cli` (test "replay") generated 1 warning
+warning: `stratide-cli` (test "paper_ledger") generated 1 warning
+warning: `stratide-cli` (test "risk_demo") generated 1 warning
+warning: `stratide-cli` (test "forward") generated 1 warning
+warning: `stratide-cli` (bin "stratide-cli" test) generated 1 warning
+warning: `stratide-cli` (bin "stratide-cli") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.92s
