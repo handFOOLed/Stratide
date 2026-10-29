@@ -168,11 +168,16 @@ pub struct Fill {
     pub day: TradingDay,
     /// Simulation accounting time; never a claimed real exchange execution time.
     pub simulated_at: Timestamp,
-    /// Opening risk qualification, NOT a fill instant. This model requires the
+    /// Opening risk qualification (modeled for historical_execution), NOT a fill instant.
+    /// The original daily-crossing model requires the
     /// exclusive expires_at to be strictly AFTER evidence.closes_at, so its
     /// entire [opens_at, closes_at] evidence window precedes order expiry.
     pub risk_checked_at: Timestamp,
-    pub opening_evidence: OpeningEvidence,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub opening_evidence: Option<OpeningEvidence>,
+    /// Only the isolated historical reducer sets this; never opening evidence.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub historical_execution: Option<String>,
     pub evidence: DailyBar,
     pub fee_version: String,
 }
@@ -193,6 +198,14 @@ pub struct State {
 /// Trusted-core commands. No Worker/control-network API is exposed by this crate.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Command {
+    /// Ex-post historical model, NOT a prospective opening observation. Fixed
+    /// v1: next-open +/- one adverse tick, 100-share session capacity, no OHLC
+    /// crossing or full-day volume eligibility. Never accepted in synthetic mode.
+    HistoricalNextOpenV1 {
+        now: Timestamp,
+        bar: DailyBar,
+        rules: TradingRules,
+    },
     Observe {
         now: Timestamp,
         day: TradingDay,

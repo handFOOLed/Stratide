@@ -1,0 +1,13 @@
+{
+  "mode": "historical_replay",
+  "first_day": "20260717",
+  "last_day": "20261028",
+  "rows": 68,
+  "input_sha256": "9460155e70947ee3c536cc02ec81d555401f1a2b824198ab660a0e2283c33ff7",
+  "raw_sha256": {
+    "daily": "d479248a0a712e043e7ea533a6e6bc7ab48418798037ad60397bf773400717be",
+    "calendar": "6d1ac48d6340ca96c9f02e921dc222e5eb4dadacb72162c3747c02365b2148d2",
+    "limits": "fadbd383650c753e00448054066a4447000aa1e53d497374de5d5e1c0db50598",
+    "suspensions": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  }
+}

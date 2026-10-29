@@ -1,4 +1,4 @@
-use super::{days_from_civil, Dataset, STRATEGY_SPEC, STRATEGY_VERSION};
+use super::{days_from_civil, historical, Dataset, STRATEGY_SPEC};
 use serde::Serialize;
 use serde_json::json;
 use sha2::{Digest, Sha256};
@@ -227,6 +227,14 @@ pub(super) fn export(
                     let completed = entry.state.sessions.contains(&(instrument.clone(), *day));
                     final_by_day.insert(day.0, (&entry.state, completed));
                 }
+                Command::HistoricalNextOpenV1 { bar, .. } => {
+                    let completed = bar.status_verified
+                        && entry
+                            .state
+                            .sessions
+                            .contains(&(bar.instrument.clone(), bar.day));
+                    final_by_day.insert(bar.day.0, (&entry.state, completed));
+                }
                 Command::Submit { day, .. } => {
                     let completed = final_by_day.get(&day.0).is_some_and(|(_, c)| *c);
                     final_by_day.insert(day.0, (&entry.state, completed));
@@ -335,8 +343,8 @@ pub(super) fn export(
         "timezone": dataset.timezone, "price_semantics": dataset.price_semantics,
         "instrument": dataset.instrument, "first_day": dataset.sessions.first().unwrap().day,
         "last_day": dataset.sessions.last().unwrap().day,
-        "strategy_version": STRATEGY_VERSION,
-        "strategy_spec_sha256": format!("{:x}", Sha256::digest(STRATEGY_SPEC.as_bytes())),
+        "strategy_version": historical::strategy_version(dataset),
+        "strategy_spec_sha256": format!("{:x}", Sha256::digest(if dataset.historical.is_some() { historical::SPEC } else { STRATEGY_SPEC }.as_bytes())),
         "config_sha256": config_hash,
         "config": final_state.config, "ledger_head": ledger.head(),
         "initial_nav_fen": initial, "ending_nav_fen": last.nav_fen,
@@ -359,6 +367,16 @@ pub(super) fn export(
         "daily": daily_rows, "orders": final_state.orders, "fills": final_state.fills,
         "positions": final_state.snapshot.positions, "events": events,
     });
+    let mut summary = summary;
+    if let Some(historical) = &dataset.historical {
+        summary["historical_assumptions"] =
+            serde_json::to_value(historical).map_err(|e| e.to_string())?;
+        summary["execution_model"] = json!("next-open-adverse-tick-100-v1");
+        summary["fee_assumption"] =
+            serde_json::to_value(&dataset.fee).map_err(|e| e.to_string())?;
+        summary["forward_opening_evidence_claimed"] = json!(false);
+        summary["historical_model_sessions"] = json!(dataset.sessions.len());
+    }
     let report_json = serde_json::to_vec_pretty(&summary).map_err(|e| e.to_string())?;
     let events_json = serde_json::to_vec_pretty(&events).map_err(|e| e.to_string())?;
     let mut daily_csv = String::from("day,nav_fen,cash_fen,available_cash_fen,reserved_cash_fen,held_shares,sellable_shares,unsettled_shares,reserved_sell_shares,pending_orders,cumulative_fee_fen,realized_pnl_fen,unrealized_pnl_fen,remaining_cost_basis_fen,external_flow_total_fen,valuation_error\n");
@@ -399,6 +417,10 @@ pub(super) fn export(
         ));
     }
     let mut fills_csv = String::from("fill_id,order_id,day,side,quantity,price_fen,commission_fen,transfer_fen,tax_fen,total_fee_fen,simulated_at,risk_checked_at,market_opens_at,market_closes_at,bar_available_at,source_version,input_sha256\n");
+    if dataset.historical.is_some() {
+        fills_csv.pop();
+        fills_csv.push_str(",execution_assumption\n");
+    }
     for f in &final_state.fills {
         fills_csv.push_str(&format!(
             "{},{},{},{:?},{},{},{},{},{},{},{},{},{},{},{},{},{}\n",
@@ -420,6 +442,13 @@ pub(super) fn export(
             csv_cell(&f.evidence.provenance.source_version),
             f.evidence.provenance.dataset_hash
         ));
+        if dataset.historical.is_some() {
+            fills_csv.pop();
+            fills_csv.push_str(&format!(
+                ",{}\n",
+                csv_cell(f.historical_execution.as_deref().unwrap_or("unavailable"))
+            ));
+        }
     }
     let mut positions_csv = String::from("market,code,acquired_on,shares\n");
     for p in &final_state.snapshot.positions {

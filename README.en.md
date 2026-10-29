@@ -2,6 +2,8 @@
 
 # Stratide
 
+**M1-PR05B in this branch (Draft, Sol self-tested):** [Issue #11](https://github.com/handFOOLed/Stratide/issues/11) prioritizes real historical EOD input → fixed SMA5/20 → an isolated next-open assumption → the existing Risk Kernel, ledger and six reports. The actual smoke loaded 68 sessions for `600000.SH`; see [commands, source hashes, financial results and limitations](docs/M1_PR05B.md) (Chinese). Historical assumptions do not establish received-at-open observations or verified PIT evidence. [Issue #10](https://github.com/handFOOLed/Stratide/issues/10) continues independently; Terra acceptance and ChatGPT review remain pending. Do not merge.
+
 Independent reacceptance confirmed the original three R1 fixes but found a new P1: a prior-day backfill could introduce today's calendar conflict without revoking readiness. R2 fixes this inconsistency; [failure and repair evidence](docs/evidence/m1-pr04b-r2/README.md) is preserved. Independent acceptance of the new SHA is pending. The PR stays Draft, with no paper execution integration.
 
 **PR04B engineering increment (Draft, unmerged):** adds daily `forward-eod-step`, optional foreground `observe-eod.ps1 -Watch`, calendar-day completeness summaries and read-only `forward-eod-at` views. It reuses the actual PR04A journal without changing the financial ledger. Evidence still covers **one valid observation day, zero proposals/fills**; consecutive real trading days and independent opening receipts remain unverified. See [PR04B operations and evidence](docs/M1_PR04B.md) and [opening-evidence research](docs/M1_PR04B_OPENING_EVIDENCE.md) (Chinese).

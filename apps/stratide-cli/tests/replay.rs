@@ -92,6 +92,18 @@ fn independent_directories_and_restarts_produce_identical_paper_reports() {
     assert_eq!(report["fills"].as_array().unwrap().len(), 2);
     assert_eq!(report["risk_rejections"].as_array().unwrap().len(), 1);
     let head = report["ledger_head"].clone();
+    let prior_v3: serde_json::Value = serde_json::from_slice(
+        &fs::read(
+            Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("../../docs/evidence/m0-pr03/sample-report/report.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(
+        head, prior_v3["ledger_head"],
+        "historical branch must preserve prior v3 digest/reducer semantics"
+    );
     assert_eq!(
         head,
         serde_json::from_slice::<serde_json::Value>(&fs::read(rb.join("report.json")).unwrap())
