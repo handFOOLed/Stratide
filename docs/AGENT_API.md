@@ -19,6 +19,12 @@
 
 models 只展示 id/label/kind/model/endpoint、authorization、price_version 与 verification，不含环境变量值/Key/grant 写入接口。备用仅保存，不自动 fallback。预算、价格、授权和端点只通过 Owner 本机可信设置维护，Web 不提供额度加额/清锁或 Key 写入。
 
+### 固定状态语义（后端修复，无前端接口结构变更）
+
+- `eod.latest` 继续为 null 或 `{source_day,disposition}`。有关联 `eod-v1:<源日>` 任务时，disposition 读取权威任务状态：queued/running/completed/failed/cancel_requested/cancelled/outcome_uncertain；过期跳过保留 skipped_superseded，没有任务的暂停跳过保留 skipped_paused。旧版遗留的 queued 调度标记无需迁移，读取时即可显示实际完成/失败状态。`eod.reason` 仍表示调度原因，不是任务执行状态。去重仍沿用原 trigger_key，不重新调用 Provider。
+- `models[].availability` 保留 `not_verified / last_task_completed / unavailable_or_outcome_unknown` 三个值，仅由相同配置版本的 Provider 调用观察或 DNS/客户端连接准备故障决定。`last_reason` 对应这次 Provider 观察；从未有 Provider 观察时为 null。本地预算/授权/价格/输入拒绝，以及发送前的取消或重启，不会将模型误标为不可用，也不会覆盖此前的 Provider 故障或成功观察。
+- 本地拒绝保持原任务状态与 reason 错误码（如 failed + DAILY_BUDGET_EXHAUSTED / AUTHORIZATION_REQUIRED），当前配置资格由 authorization 表示，限额及未结清预留由 budget 表示。这些字段不作为 Provider 故障统计；未知费用仍保留，失败任务的重试权限不变。
+
 budget 中包含 currency/timezone/day/month、daily/monthly_limit_micro、daily/monthly_settled_micro、reserved_micro（所有未结清周期）、daily/monthly_remaining_micro、call_count（尝试数）、input/output_tokens、usage_estimate_micro、billing。调用详情还包含 maximum_micro/settled_micro/usage_micro、price_version、原始预留 day/month 和 state。`usage_received` 仍保留最大预留；最终账单未核定不是精确消费。
 
 result 包含 research.hypothesis/evidence/risks/next_steps，及可信生成的 provider/model、input_summary_version/source_day/input_mode、generated_at、synthetic_provider、qualification、limitations、billing。Provider 文本没有代码、交易、文件或工具权限。详情和列表从持久结果读取，不进行二次推理。

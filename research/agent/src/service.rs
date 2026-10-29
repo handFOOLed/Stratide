@@ -196,7 +196,29 @@ impl Agent {
                     .err()
                     .map(|e| e.0)
                     .unwrap_or("authorized".into()));
-                let last:Option<(String,Option<String>)>=c.query_row("SELECT status,reason FROM tasks WHERE provider_id=?1 AND provider_hash=?2 AND status NOT IN ('queued','running','cancel_requested') ORDER BY id DESC LIMIT 1",params![model.id,model.fingerprint()],|r|Ok((r.get(0)?,r.get(1)?))).optional()?;
+                // Local policy/input/budget rejections, pre-send cancellation and
+                // confirmed-not-sent retries are not Provider observations. Keep
+                // prior Provider health; task.reason/authorization/budget expose
+                // the local block.
+                let last: Option<(String, Option<String>)> = c.query_row(
+                    "SELECT
+                        CASE WHEN t.result IS NOT NULL AND c.state IN ('settled','usage_received')
+                             THEN 'completed' ELSE 'failed' END,
+                        CASE WHEN t.reason IN ('PROVIDER_DNS_UNAVAILABLE','PROVIDER_CLIENT_UNAVAILABLE') THEN t.reason
+                             WHEN t.result IS NOT NULL AND c.state IN ('settled','usage_received') THEN 'RESEARCH_SAVED'
+                             WHEN c.state='settled' THEN t.reason
+                             ELSE COALESCE(c.reason,t.reason) END
+                     FROM tasks t LEFT JOIN calls c ON c.id=(
+                        SELECT id FROM calls WHERE task_id=t.id AND state!='reserved'
+                          AND (state!='no_charge' OR reason NOT IN ('RESTART_BEFORE_DISPATCH','CANCELLED_BEFORE_DISPATCH','FAKE_CONFIRMED_NOT_SENT'))
+                        ORDER BY id DESC LIMIT 1)
+                     WHERE t.provider_id=?1 AND t.provider_hash=?2
+                       AND t.status NOT IN ('queued','running','cancel_requested')
+                       AND (c.id IS NOT NULL OR t.reason IN ('PROVIDER_DNS_UNAVAILABLE','PROVIDER_CLIENT_UNAVAILABLE'))
+                     ORDER BY t.finished_at DESC,t.id DESC LIMIT 1",
+                    params![model.id,model.fingerprint()],
+                    |r| Ok((r.get(0)?,r.get(1)?)),
+                ).optional()?;
                 view["availability"] = json!(match last.as_ref().map(|v| v.0.as_str()) {
                     Some("failed" | "outcome_uncertain") => "unavailable_or_outcome_unknown",
                     Some("completed") => "last_task_completed",
