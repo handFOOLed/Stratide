@@ -1,6 +1,6 @@
 import { defineConfig } from '@playwright/test';
 
-const scenarios = [['synthetic',8711],['empty',8712],['invalid',8713],['missing-nav',8714]];
+const scenarios = [['synthetic',8711],['empty',8712],['invalid',8713],['missing-nav',8714],['agent',8716]];
 if (process.env.STRATIDE_HISTORICAL_REPORT) scenarios.push(['historical',8715]);
 export default defineConfig({
   testDir: './tests', testMatch: '*.browser.js', workers: 1,

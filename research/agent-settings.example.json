@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "budget": null,
+  "models": [],
+  "default_model": null,
+  "backup_model": null,
+  "max_tasks": 1000,
+  "max_storage_mb": 64
+}

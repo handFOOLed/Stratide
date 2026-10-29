@@ -10,6 +10,8 @@
 
 ## 当前和下一个完整功能包
 
+**本分支 #22 Draft：** Agent 功能闭环与基础 UI 已实现并自测，见 [操作](M2_PR02.md)、[稳定 Agent API](AGENT_API.md) 和 [证据](evidence/m2-pr02/README.md)。同 HEAD 审查与付费/外发权限专项独立核查待完成；不代表已合并或已验证真实 Provider。DeepSeek 继续按既定 #23 接口交接执行正式 UI。
+
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |
 | **当前 #22** | **Sol Max** | [自主研究 Agent V1](https://github.com/handFOOLed/Stratide/issues/22)：Provider、可信日/月 Budget Gate、授权、持久任务、取消/暂停、EOD 触发、API 与可操作基础 UI。未配置授权/预算不付费。不得触碰交易账本或假称独立策略通过。 |

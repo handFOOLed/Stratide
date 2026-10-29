@@ -1,6 +1,6 @@
 # Dashboard V1 只读 API
 
-仅用于 127.0.0.1 本地 paper-only Dashboard，默认端口 8710。Owner 启动时选定一个已发布六报告目录。没有 HTTP 文件路径参数、账户切换或写入路由。
+仅用于 127.0.0.1 本地 paper-only Dashboard，默认端口 8710。Owner 启动时选定一个已发布六报告目录。没有 HTTP 文件路径参数、账户切换或财务写入路由。M2-PR02 的研究任务写操作单独限定在经过 Owner 认证的 `/api/agent/…`，见 [Agent API](AGENT_API.md)；下文 Paper 账户路由仍只读。
 
 ## 响应与数字
 

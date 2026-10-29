@@ -22,7 +22,7 @@ test('synthetic account, confirmed fills, rejected orders and all five navigatio
   await page.getByRole('tab',{name:'研究与回测'}).click();
   await expect(page.getByText('尚未配置独立研究结果',{exact:true})).toBeVisible();
   await page.getByRole('link',{name:'Agent 管理',exact:true}).click();
-  await expect(page.getByText('研究 Agent 尚未实现',{exact:true})).toBeVisible();
+  await expect(page.getByRole('button',{name:'解锁 Agent 管理'})).toBeVisible();
   await page.getByRole('link',{name:'通知与审批',exact:true}).click();
   await expect(page.getByText('通知服务尚未接入',{exact:true})).toBeVisible();
   await page.getByRole('link',{name:'设置',exact:true}).click();

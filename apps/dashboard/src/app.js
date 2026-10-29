@@ -7,6 +7,7 @@
    400/600 weight, 8/12px radius. Semantic colors are applied after structure. */
 import './tokens.css';
 import './styles.css';
+import { agentView, initAgents } from './agents.js';
 import { RANGES, METRICS, MODES, STATUS, money, bps, shares, signClass, esc, day, timestamp,
   instrument, preference, remember, rangeRows, sortRows, chartModel } from './model.js';
 
@@ -53,14 +54,14 @@ function shell(content) {
   root.innerHTML = `<div class="shell"><aside class="sidebar">
     <a class="brand" href="#overview" aria-label="Stratide 总览"><span class="brand-mark">S</span><span>Stratide<small>Paper workspace</small></span></a>
     <div class="nav-label">工作空间</div><nav aria-label="主导航">${Object.entries(pages).map(([key, name]) => `<a href="#${key}" class="nav-item ${page === key ? 'active' : ''}" ${page === key ? 'aria-current="page"' : ''}>${icon(key)}<span>${name}</span></a>`).join('')}</nav>
-    <div class="sidebar-footer"><span class="local-dot"></span><span>本地工作空间<small>127.0.0.1 · 只读访问</small></span></div>
+    <div class="sidebar-footer"><span class="local-dot"></span><span>本地工作空间<small>Paper 只读 · 研究可控</small></span></div>
     </aside><div class="workspace"><header class="topbar"><div class="breadcrumb">工作空间 <span>/</span> <strong>${pages[page]}</strong></div>
       <div class="topbar-actions">${badge('PAPER ONLY', 'paper')}
       <details class="health"><summary><span class="status-dot ${state.online ? 'online' : ''}"></span>${state.loading ? '连接中' : state.online ? '服务可达' : '连接离线'}<span aria-hidden="true">⌄</span></summary>
-        <div class="health-panel"><strong>本地服务状态</strong><dl><dt>Web 服务</dt><dd>${state.online ? '本次请求成功' : '当前无法连接'}</dd><dt>市场数据</dt><dd>已发布快照，非实时</dd><dt>风控</dt><dd>仅展示报表记录</dd><dt>前向账户</dt><dd>尚无前向模拟账户</dd><dt>研究 Agent</dt><dd>尚未实现</dd><dt>通知服务</dt><dd>尚未实现</dd></dl></div></details>
+        <div class="health-panel"><strong>本地服务状态</strong><dl><dt>Web 服务</dt><dd>${state.online ? '本次请求成功' : '当前无法连接'}</dd><dt>市场数据</dt><dd>已发布快照，非实时</dd><dt>风控</dt><dd>仅展示报表记录</dd><dt>前向账户</dt><dd>尚无前向模拟账户</dd><dt>研究 Agent</dt><dd>独立研究控制页</dd><dt>通知服务</dt><dd>尚未实现</dd></dl></div></details>
       <label class="theme-picker"><span class="sr-only">主题</span><select aria-label="主题" data-theme-select>${[['system','跟随系统'],['light','浅色'],['dark','深色']].map(([key,name]) => `<option value="${key}" ${state.theme === key ? 'selected' : ''}>${name}</option>`).join('')}</select></label></div></header>
       <main id="main"><div class="page-heading"><div><h1>${page === 'overview' ? '账户总览' : pages[page]}</h1><p>${page === 'overview' ? '一处查看 Paper 账户的资产、持仓与模拟成交。' : page === 'history' ? '沿同一账户查看交易与表现，独立查阅研究结果。' : 'Stratide 本地 Paper 工作空间'}</p></div><button class="button" data-action="reload" ${state.loading ? 'disabled' : ''}>↻ 重新连接</button></div>
-      ${sourceNote()}${content}<footer class="page-footer"><span>Stratide · 本地 Paper Dashboard V1</span><span>尚无前向模拟账户 · 研究 Agent 尚未实现</span></footer></main></div></div>`;
+      ${sourceNote()}${content}<footer class="page-footer"><span>Stratide · 本地 Paper Dashboard V1</span><span>尚无前向模拟账户 · 研究不改变账户资产</span></footer></main></div></div>`;
 }
 
 function unavailable() {
@@ -159,13 +160,13 @@ function settings() {
   const m = state.meta;
   return `<section class="panel settings-panel"><h2>外观</h2><p>浅色、深色或跟随系统，选择保存在当前浏览器。</p><div class="segment" role="group" aria-label="主题设置">${[['system','跟随系统'],['light','浅色'],['dark','深色']].map(([key,name])=>`<button data-action="theme" data-value="${key}" aria-pressed="${state.theme === key}" class="${state.theme === key ? 'selected' : ''}">${name}</button>`).join('')}</div></section>
     <section class="panel settings-panel"><h2>数据连接</h2><p>启动参数指定一个已发布的权威 Paper 六报告目录。页面重新连接只读取当前内存快照；更换报告或更新内容后，使用指定目录重启服务。</p><dl class="metadata"><dt>账户状态</dt><dd>${m ? '已加载只读快照' : '尚未加载报告'}</dd><dt>数据源版本</dt><dd>${esc(m?.source_version || '未配置')}</dd><dt>证据等级</dt><dd>${esc(m?.evidence_class || '不可用')}</dd><dt>验证范围</dt><dd>六报告结构与一致性；不代表独立账本重新验收</dd><dt>报告区间</dt><dd>${m ? `${day(m.first_day)} — ${day(m.last_day)}` : '—'}</dd><dt>快照摘要</dt><dd class="code">${esc(m?.snapshot_id || '—')}</dd><dt>账本尾摘要</dt><dd class="code">${esc(m?.ledger_head || '—')}</dd><dt>前向模拟</dt><dd>尚无前向模拟账户</dd></dl></section>
-    <section class="panel settings-panel"><h2>连接与权限设置</h2>${empty('业务设置尚未实现', '当前服务只读、仅绑定 127.0.0.1。Agent、密钥配置、预算和通知连接尚未接入。')}</section>`;
+    <section class="panel settings-panel"><h2>连接与权限设置</h2>${empty('可信本机研究设置', '服务仅绑定 127.0.0.1。Paper 账户保持只读；模型、预算、授权在本机 Agent settings.json 设置，密钥从环境变量读取。Web 研究控制需 Owner 令牌；通知连接尚未接入。')}</section>`;
 }
 
 function render() {
   const { page } = route();
   const content = page === 'overview' ? overview() : page === 'history' ? history() : page === 'settings' ? settings()
-    : page === 'agents' ? `<section class="panel">${empty('研究 Agent 尚未实现', '当前没有 Agent 运行、研究任务或费用账本。模型与预算未配置，不展示虚构的活跃状态或消费金额。')}</section>`
+    : page === 'agents' ? agentView()
     : `<div class="notification-columns"><section class="panel"><div class="section-heading"><h2>通知</h2>${badge('尚未实现')}</div>${empty('通知服务尚未接入', '没有已配置的通知渠道，也不声称发送过任何消息。')}</section><section class="panel"><div class="section-heading"><h2>审批</h2>${badge('尚未实现')}</div>${empty('审批服务尚未接入', '当前只读服务没有业务审批或预算修改入口。')}</section></div>`;
   shell(content);
   drawChart();
@@ -232,4 +233,5 @@ document.addEventListener('change', event => {
   if (event.target.matches('[data-theme-select]')) { state.theme = event.target.value; remember('theme',state.theme); applyTheme(); render(); }
 });
 window.addEventListener('hashchange', () => { if (drawer.open) drawer.close(); render(); });
+initAgents({ render, drawer });
 load();

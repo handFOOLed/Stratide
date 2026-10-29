@@ -1,6 +1,6 @@
 # Stratide 本地 Web Dashboard V1
 
-关联 [Issue #20](https://github.com/handFOOLed/Stratide/issues/20)。本机 paper-only、只读、同源；展示启动时明确指定的一个完整六报告快照。总览与历史页面已实现，Agent / 通知 / 业务设置显示尚未实现；浅色、深色、系统主题可用。不提供网页导出或交易写入。
+关联 [Issue #20](https://github.com/handFOOLed/Stratide/issues/20) 与 [Issue #22](https://github.com/handFOOLed/Stratide/issues/22)。本机 paper-only、同源；总览/历史展示启动时明确指定的一个完整六报告固定快照。Agent 管理已接入持久研究任务、预算、模型选择、取消/暂停和 EOD；操作见 [Agent V1](../../docs/M2_PR02.md)。通知仍为未接入状态，浅色/深色/系统主题保留。不提供财务写入或网页导出。
 
 ## Windows 启动
 
@@ -34,7 +34,7 @@ npm --prefix apps/dashboard run build
 
 - 只接收现有 `report_schema=1 / ledger_schema=3` 的完整六报告：report.json、events.json、daily.csv、orders.csv、fills.csv、positions.csv。不支持中断前缀、observe-only forward 报告或 SQLite 路径。
 - 启动时交叉校验 JSON/CSV、摘要与末日、持仓/预留、成交归属与费用，读完再次核对六文件未变化。失败时账户 API 返回 503，UI 显示不可用。缺估值是显式 null+reason，和坏文件分开。
-- 六报告一致性检查**不是**重放校验账本链或独立策略验收。Owner 应指定既有权威报告。服务没有 Ledger::open、SQLite 连接、回放/撮合调用或文件写入，不取得 writer.lock。
+- 六报告一致性检查**不是**重放校验账本链或独立策略验收。Owner 应指定既有权威报告。Paper 投影不调用 Ledger::open、回放/撮合或财务 SQLite 写入，不取得 writer.lock。Agent 使用自己的独立 SQLite 任务/费用目录。
 - 成功加载后固定在内存；网页“重新连接”与刷新只读取该快照。**新报告发布完成后，停止并以明确目录重启服务才会更新**。没有目录监视、自动择新或多个实验拼接。
 - 每个响应保留模式、source_version、源日/最后有效估值日、快照摘要、证据等级、缺估值原因、历史执行假设与来源缺口计数。“服务可达”只表示本次 HTTP 请求成功；行情是最后发布快照，不能承诺实时。
 - historical_replay 保留 exploratory / 未核验 PIT 等级，synthetic_test 保留引擎测试标签。当前 v3 财务报告没有 forward_paper；observe-only 日志不产生净值/成交，页面明确显示“尚无前向模拟账户”。不支持的模式拒绝载入。
@@ -44,7 +44,7 @@ npm --prefix apps/dashboard run build
 
 ## API 与测试
 
-见 [API 契约](../../docs/DASHBOARD_API.md)。原生 JavaScript + Vite，Rust tiny_http 同源服务静态资源。生产端无 UI 框架、CDN、遥测或外部网络调用。HTTP 仅绑定 IPv4 127.0.0.1，不支持 LAN/公网；偏好仅保存在 localStorage。
+见 [Paper API](../../docs/DASHBOARD_API.md) 与 [Agent API](../../docs/AGENT_API.md)。原生 JavaScript + Vite，Rust tiny_http 同源静态服务，无 UI 框架、CDN 或遥测。HTTP 仅绑定 IPv4 127.0.0.1，不支持 LAN/公网；显示偏好保存于 localStorage，Owner 令牌仅留内存。仅配置并授权后的研究后端可向确定的 HTTPS Provider 发送摘要。
 
 ```powershell
 cargo fmt --all -- --check
@@ -67,4 +67,4 @@ npm --prefix apps/dashboard run test:browser
 python scripts/test-dashboard.py --historical-report $env:STRATIDE_HISTORICAL_REPORT --evaluation-file $env:STRATIDE_EVALUATION_FILE
 ```
 
-实际 Windows 自测、截图、只读证据与局限见 [交付记录](../../docs/M2_PR01.md)。研究 Agent 是下一项独立任务入口，当前不存在 Agent 活跃、预算消费、通知发送或审批能力。
+原 Dashboard Windows 自测、截图与只读证据见 [M2-PR01](../../docs/M2_PR01.md)。研究 Agent 的接口、可信本机设置、付费/数据授权见 [M2-PR02](../../docs/M2_PR02.md)；通知与审批尚未接入。
