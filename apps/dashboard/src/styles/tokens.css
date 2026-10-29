@@ -1,0 +1,237 @@
+/* Stratide UI tokens — single source of truth for theme, type, spacing and motion. */
+:root {
+  color-scheme: light;
+
+  --font-sans: "Inter", "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --font-mono: "SFMono-Regular", "Cascadia Mono", "Cascadia Code", Consolas, "Liberation Mono", monospace;
+
+  /* Type floor: body 15px, tables/secondary >= 14px, labels >= 12.5px. */
+  --fs-2xs: 12.5px;
+  --fs-xs: 13px;
+  --fs-sm: 14px;
+  --fs-md: 14.5px;
+  --fs-base: 15px;
+  --fs-lg: 16px;
+  --fs-xl: 18px;
+  --fs-2xl: 21px;
+  --fs-3xl: 24px;
+  --fs-4xl: 29px;
+  --fs-display: 38px;
+
+  --lh-tight: 1.15;
+  --lh-snug: 1.35;
+  --lh-base: 1.55;
+  --lh-relaxed: 1.68;
+
+  --tracking-tight: -0.018em;
+  --tracking-tighter: -0.03em;
+  --tracking-caps: 0.06em;
+
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-16: 64px;
+
+  --radius-xs: 5px;
+  --radius-sm: 7px;
+  --radius-md: 9px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 999px;
+
+  /* Neutral surface ladder: page -> sidebar -> card -> raised overlay. */
+  --page-bg: #f6f7f9;
+  --sidebar-bg: #fbfbfc;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-subtle: #f6f7f9;
+  --surface-sunken: #eceef1;
+  --surface-hover: #f2f3f5;
+  --input-bg: #ffffff;
+
+  --border: #e5e7eb;
+  --border-faint: #eef0f3;
+  --border-strong: #d5d8de;
+  --divider: #eef0f3;
+
+  --text: #191a1c;
+  --text-secondary: #4d5157;
+  --text-muted: #61666e;
+  --text-faint: #72787f;
+  --text-inverse: #fbfbfc;
+
+  --accent: #2f6fed;
+  --accent-hover: #2359cd;
+  --accent-soft: #eef3fe;
+  --accent-border: #cddcfb;
+  --accent-ink: #1c4bb4;
+
+  /* A-share convention: gains are red, losses are green. Keep Stratide's own hues. */
+  --gain: #b3352c;
+  --gain-soft: #fdf0ee;
+  --gain-border: #f2d5d1;
+  --loss: #0b7350;
+  --loss-soft: #ecf7f1;
+  --loss-border: #cfe8dc;
+  --warning: #8a5a08;
+  --warning-soft: #fdf6e7;
+  --warning-border: #ecdcbb;
+  --danger: #b32e26;
+  --danger-soft: #fdf0ee;
+  --danger-border: #f0d2ce;
+  --success: #0b7350;
+  --success-soft: #ecf7f1;
+  --success-border: #cfe8dc;
+
+  --focus: #2f6fed;
+  --overlay: rgba(20, 21, 23, 0.42);
+  --scrim: rgba(20, 21, 23, 0.32);
+
+  --shadow-xs: 0 1px 2px rgba(23, 25, 29, 0.04);
+  --shadow-sm: 0 1px 2px rgba(23, 25, 29, 0.05), 0 8px 24px -18px rgba(23, 25, 29, 0.18);
+  --shadow-pop: 0 16px 44px -16px rgba(20, 22, 26, 0.26), 0 2px 6px rgba(20, 22, 26, 0.06);
+  --shadow-drawer: -24px 0 64px -28px rgba(18, 20, 24, 0.26);
+
+  --brand-mark-bg: #191a1c;
+  --brand-mark-fg: #fbfbfc;
+  --nav-active-bg: #eceef1;
+  --nav-active-text: #191a1c;
+  --row-hover: #f7f8fa;
+  --skeleton: #e9ebee;
+  --skeleton-shine: #f3f5f7;
+
+  --chart-line: #2f6fed;
+  --chart-line-soft: #7ea4f8;
+  --chart-grid: #e8eaee;
+  --chart-axis: #7c828b;
+  --chart-cursor: #b8bcc3;
+  --chart-gain: #b3352c;
+  --chart-loss: #0b7350;
+
+  --scrollbar-thumb: #d4d8de;
+
+  --sidebar-w: 236px;
+  --topbar-h: 56px;
+  --page-pad: clamp(16px, 2vw, 32px);
+  --content-max: 1600px;
+  --table-row-h: 44px;
+  --table-head-h: 32px;
+  --row-5-h: 220px;
+
+  --motion-hover: 140ms;
+  --motion-nav: 200ms;
+  --motion-content: 240ms;
+  --motion-drawer: 300ms;
+  --motion-modal: 220ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  --z-sidebar: 40;
+  --z-topbar: 30;
+  --z-sticky: 20;
+  --z-overlay: 1000;
+  --z-toast: 1100;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Near-black page with charcoal surface steps, low-contrast hairlines. */
+  --page-bg: #0a0a0b;
+  --sidebar-bg: #0e0e10;
+  --surface: #141416;
+  --surface-raised: #191a1c;
+  --surface-subtle: #1a1b1d;
+  --surface-sunken: #232427;
+  --surface-hover: #1f2023;
+  --input-bg: #101012;
+
+  --border: #26272b;
+  --border-faint: #1e1f22;
+  --border-strong: #3a3c41;
+  --divider: #212226;
+
+  --text: #ededee;
+  --text-secondary: #b3b6bc;
+  --text-muted: #9aa0a9;
+  --text-faint: #838993;
+  --text-inverse: #111113;
+
+  --accent: #7ba5ff;
+  --accent-hover: #a1c0ff;
+  --accent-soft: #16233c;
+  --accent-border: #2b4068;
+  --accent-ink: #b6cdff;
+
+  --gain: #ff9d94;
+  --gain-soft: #2a1816;
+  --gain-border: #4a2a27;
+  --loss: #66d9a8;
+  --loss-soft: #10251b;
+  --loss-border: #244d3a;
+  --warning: #e6b46b;
+  --warning-soft: #2a2113;
+  --warning-border: #4a3a1f;
+  --danger: #ff9188;
+  --danger-soft: #2a1716;
+  --danger-border: #4d2b28;
+  --success: #66d9a8;
+  --success-soft: #10251b;
+  --success-border: #244d3a;
+
+  --focus: #7ba5ff;
+  --overlay: rgba(0, 0, 0, 0.64);
+  --scrim: rgba(0, 0, 0, 0.52);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45), 0 10px 30px -20px rgba(0, 0, 0, 0.8);
+  --shadow-pop: 0 20px 54px -22px rgba(0, 0, 0, 0.92), 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-drawer: -24px 0 64px -28px rgba(0, 0, 0, 0.72);
+
+  --brand-mark-bg: #ededee;
+  --brand-mark-fg: #131315;
+  --nav-active-bg: #1e1f22;
+  --nav-active-text: #ededee;
+  --row-hover: #191a1c;
+  --skeleton: #1f2023;
+  --skeleton-shine: #28292d;
+
+  --chart-line: #7ba5ff;
+  --chart-line-soft: #4a6cb5;
+  --chart-grid: #232427;
+  --chart-axis: #9297a0;
+  --chart-cursor: #4a4c52;
+  --chart-gain: #ff9d94;
+  --chart-loss: #66d9a8;
+
+  --scrollbar-thumb: #34363b;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-hover: 0.01ms;
+    --motion-nav: 0.01ms;
+    --motion-content: 0.01ms;
+    --motion-drawer: 0.01ms;
+    --motion-modal: 0.01ms;
+  }
+}
+
+:root[data-motion="reduce"] {
+  --motion-hover: 0.01ms;
+  --motion-nav: 0.01ms;
+  --motion-content: 0.01ms;
+  --motion-drawer: 0.01ms;
+  --motion-modal: 0.01ms;
+}

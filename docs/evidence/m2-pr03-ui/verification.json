@@ -1,0 +1,93 @@
+{
+  "issue": 23,
+  "branch": "feat/ui-redesign",
+  "base": "e320751c71f2a1f73b588bed21b106f384897090",
+  "head_ref": "feat/ui-redesign",
+  "head_note": "Exact head SHA is recorded in the Draft PR / verification run. This JSON is committed with the code, so a commit cannot contain its own final SHA.",
+  "main_synced": "995605c2693397b756e3be457b466633495582aa",
+  "review_followup": {
+    "gitignore_state_anchor_fixed": true,
+    "state_source_files_tracked": 5,
+    "pr27_ui_semantics": ["last_task_completed", "skipped_superseded", "skipped_paused", "last_reason"],
+    "clean_worktree": {
+      "typecheck": "pass",
+      "build": "pass",
+      "unit": "pass",
+      "dom_e2e": "pass",
+      "playwright_list": "pass: 12 tests / 3 files"
+    }
+  },
+  "date": "2026-10-29",
+  "environment": {
+    "os": "Windows 11",
+    "node": "24.19.0",
+    "rust": "1.98.1",
+    "browsers_installed": ["Microsoft Edge", "Google Chrome"],
+    "dsh_sandbox": "workspace-write, Low integrity"
+  },
+  "scope": [
+    "apps/dashboard/**",
+    "docs/UI_DESIGN_SYSTEM.md",
+    "docs/evidence/m2-pr03-ui/**"
+  ],
+  "backend_changes": false,
+  "checks": {
+    "typecheck": { "status": "pass", "command": "npm --prefix apps/dashboard run typecheck" },
+    "build": {
+      "status": "pass",
+      "command": "npm --prefix apps/dashboard run build",
+      "app_js_bytes": 379033,
+      "app_css_bytes": 71432,
+      "index_html_bytes": 1093,
+      "cdn_or_runtime_font_requests": false
+    },
+    "unit": { "status": "pass", "tests": 4, "command": "npm --prefix apps/dashboard test" },
+    "dom_functional": {
+      "status": "pass",
+      "command": "node apps/dashboard/scripts/dom-e2e.mjs",
+      "checks": [
+        "overview", "history fills + drawer", "history orders + drawer", "history daily",
+        "history strategies", "history research", "notifications", "settings theme/motion",
+        "agent unlock", "agent create + detail", "agent pause + cancel", "agent navigation + lock"
+      ],
+      "detail_read_does_not_increase_call_count": true,
+      "token_absent_from_storage_and_dom": true
+    },
+    "dom_states": {
+      "status": "pass",
+      "command": "node apps/dashboard/scripts/dom-states.mjs",
+      "checks": ["empty snapshot", "invalid snapshot", "missing NAV + settings gaps", "offline"]
+    },
+    "playwright_discovery": {
+      "status": "pass",
+      "tests": 12,
+      "files": 3,
+      "command": "npm --prefix apps/dashboard run test:browser -- --list"
+    },
+    "playwright_browser": {
+      "status": "not_verified",
+      "reason": "DSH Low integrity sandbox blocks Chromium Mojo named pipes and Playwright worker spawn.",
+      "observed_errors": ["Error: spawn EPERM", "mojo platform_channel.cc:187 Check failed: Access is denied (0x5)"]
+    },
+    "screenshots": {
+      "status": "not_verified",
+      "expected_directory": "state/m2-pr03-browser/",
+      "reason": "Real Chromium could not be started; no screenshots were fabricated."
+    },
+    "historical_68_day_regression": {
+      "status": "not_verified",
+      "reason": "The frozen 68-day six-report directory was not present at documented local paths; historical_replay data was not fabricated. Playwright keeps the scenario behind STRATIDE_HISTORICAL_REPORT."
+    }
+  },
+  "financial_semantics": {
+    "paper_api_unchanged": true,
+    "agent_api_unchanged": true,
+    "risk_ledger_budget_files_changed": false,
+    "fake_or_placeholder_financial_values": false
+  },
+  "remaining": [
+    "Run Playwright and generate real browser screenshots in a normal (non-sandboxed) Windows session.",
+    "Notifications and approvals remain unimplemented and are shown honestly.",
+    "Issue #26 EOD/provider semantics remain a backend follow-up."
+  ]
+}

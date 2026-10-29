@@ -1,0 +1,693 @@
+/* App shell: one grid, one main scroll container, stable gutter, aligned gutters. */
+.app-shell {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  height: 100dvh;
+  min-height: 100vh;
+  background: var(--page-bg);
+}
+
+.sidebar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: var(--sidebar-w);
+  height: 100dvh;
+  border-right: 1px solid var(--border);
+  background: var(--sidebar-bg);
+  z-index: var(--z-sidebar);
+}
+
+.sidebar-scroll {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 10px 8px;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 16px 14px 18px;
+}
+
+.brand-mark {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--brand-mark-bg);
+  color: var(--brand-mark-fg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.brand-mark svg {
+  width: 18px;
+  height: 18px;
+}
+
+.brand-copy {
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.brand-name {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.brand-sub {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-label {
+  padding: 8px 10px;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: var(--tracking-caps);
+  white-space: nowrap;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  padding: 0 10px 0 12px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 14.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    background-color var(--motion-hover) var(--ease-standard),
+    color var(--motion-hover) var(--ease-standard);
+}
+
+.nav-item::before {
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 2px;
+  height: 15px;
+  border-radius: 2px;
+  background: var(--accent);
+  content: "";
+  opacity: 0;
+  transform: translateY(-50%) scaleY(0.4);
+  transition:
+    opacity var(--motion-nav) var(--ease-out),
+    transform var(--motion-nav) var(--ease-out);
+}
+
+.nav-item:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.nav-item[aria-current="page"] {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+  font-weight: 600;
+}
+
+.nav-item[aria-current="page"]::before {
+  opacity: 1;
+  transform: translateY(-50%) scaleY(1);
+}
+
+.nav-item[aria-current="page"] .nav-icon {
+  color: var(--accent);
+}
+
+.nav-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+  transition: color var(--motion-hover) var(--ease-standard);
+}
+
+.nav-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.nav-item:hover .nav-icon {
+  color: var(--text-secondary);
+}
+
+.nav-text {
+  font-family: "Microsoft YaHei UI", "PingFang SC", "Noto Sans SC", var(--font-sans);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  margin-left: auto;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.status-dot {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-faint);
+}
+
+.status-dot--online {
+  background: var(--success);
+  box-shadow: 0 0 0 3px var(--success-soft);
+}
+
+.status-dot--offline {
+  background: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-soft);
+}
+
+.status-dot--warning {
+  background: var(--warning);
+  box-shadow: 0 0 0 3px var(--warning-soft);
+}
+
+/* ---------- Sidebar account (Codex-style profile entry) ---------- */
+.sidebar-account {
+  flex: 0 0 auto;
+  padding: 8px 10px 12px;
+  border-top: 1px solid var(--border-faint);
+}
+
+.account-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: var(--radius-md);
+  color: var(--text);
+  text-align: left;
+  transition: background-color var(--motion-hover) var(--ease-standard);
+}
+
+.account-button:hover {
+  background: var(--surface-hover);
+}
+
+.account-button[aria-expanded="true"] {
+  background: var(--surface-hover);
+}
+
+.avatar {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.avatar--lg {
+  width: 34px;
+  height: 34px;
+  font-size: 14px;
+}
+
+.account-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.account-name {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-sub {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-chevron {
+  margin-left: auto;
+  color: var(--text-faint);
+  transition: transform var(--motion-nav) var(--ease-out);
+}
+
+.account-button[aria-expanded="true"] .account-chevron {
+  transform: rotate(180deg);
+}
+
+/* Popover anchored above the sidebar account button. */
+.account-menu-wrap {
+  position: relative;
+}
+
+.account-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: calc(var(--z-sidebar) + 4);
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-pop);
+  animation: account-menu-in 160ms var(--ease-out) both;
+}
+
+@keyframes account-menu-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.account-menu__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.account-menu__title {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.account-menu__sub {
+  margin-top: 1px;
+  color: var(--text-muted);
+  font-size: 12.5px;
+}
+
+.account-menu__list {
+  padding: 5px;
+}
+
+.account-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  height: 34px;
+  padding: 0 9px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 14px;
+  text-align: left;
+  transition:
+    background-color var(--motion-hover) var(--ease-standard),
+    color var(--motion-hover) var(--ease-standard);
+}
+
+.account-menu__item:hover,
+.account-menu__item:focus-visible {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.account-menu__item svg {
+  color: var(--text-muted);
+}
+
+.account-menu__item:focus-visible {
+  outline-offset: -2px;
+}
+
+.account-menu__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--divider);
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
+.account-menu__foot .mono {
+  font-size: 12px;
+}
+
+/* Workspace is the only main scroll container. The topbar and tabs are sticky
+   inside it so their gutters and the page content share the same content box. */
+.workspace {
+  position: relative;
+  min-width: 0;
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  scroll-behavior: smooth;
+  background: var(--page-bg);
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-topbar);
+  border-bottom: 1px solid var(--border);
+  background: var(--page-bg);
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  .topbar {
+    background: color-mix(in srgb, var(--page-bg) 86%, transparent);
+    backdrop-filter: blur(16px) saturate(1.08);
+  }
+}
+
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  max-width: var(--content-max);
+  height: var(--topbar-h);
+  margin: 0 auto;
+  padding: 0 var(--page-pad);
+}
+
+.topbar-left,
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.topbar-left {
+  gap: 8px;
+}
+
+.topbar-actions {
+  gap: 6px;
+}
+
+.health-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    background-color var(--motion-hover) var(--ease-standard),
+    border-color var(--motion-hover) var(--ease-standard),
+    color var(--motion-hover) var(--ease-standard);
+}
+
+.health-pill:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.health-pill .status-dot {
+  width: 6px;
+  height: 6px;
+}
+
+.health-pill[data-tone="offline"] .status-dot {
+  background: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-soft);
+}
+
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  transition:
+    background-color var(--motion-hover) var(--ease-standard),
+    border-color var(--motion-hover) var(--ease-standard),
+    color var(--motion-hover) var(--ease-standard),
+    transform var(--motion-hover) var(--ease-standard);
+}
+
+.icon-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.icon-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.icon-btn:active {
+  transform: scale(0.96);
+}
+
+.mobile-menu {
+  display: none;
+}
+
+.main-inner {
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 12px var(--page-pad) 14px;
+}
+
+.page-frame {
+  animation: page-enter var(--motion-content) var(--ease-out) both;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 960–1199: compact icon rail. */
+@media (max-width: 1199px) and (min-width: 960px) {
+  :root {
+    --sidebar-w: 76px;
+  }
+
+  .sidebar-brand {
+    justify-content: center;
+    padding: 16px 0 18px;
+  }
+
+  .brand-copy,
+  .nav-label,
+  .nav-text,
+  .nav-badge,
+  .account-copy,
+  .account-chevron {
+    display: none;
+  }
+
+  .sidebar-scroll {
+    padding: 0 10px 8px;
+  }
+
+  .nav-item {
+    justify-content: center;
+    height: 42px;
+    padding: 0;
+  }
+
+  .nav-item::before {
+    left: 0;
+  }
+
+  .nav-icon,
+  .nav-icon svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .sidebar-account {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0 12px;
+  }
+
+  .account-button {
+    justify-content: center;
+    padding: 6px;
+  }
+
+  .account-menu {
+    left: calc(100% + 8px);
+    bottom: 0;
+    width: 220px;
+  }
+}
+
+@media (max-width: 959px) {
+  .app-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar:not(.sidebar--mobile) {
+    display: none;
+  }
+
+  .mobile-menu {
+    display: inline-grid;
+  }
+
+  .topbar-inner {
+    height: 54px;
+  }
+
+  .main-inner {
+    padding-top: 14px;
+  }
+}
+
+@media (max-width: 720px) {
+  :root {
+    --topbar-h: 54px;
+    --page-pad: 16px;
+  }
+
+  .health-pill {
+    width: 30px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .health-pill-label {
+    display: none;
+  }
+
+  .main-inner {
+    padding-top: 12px;
+    padding-bottom: 24px;
+  }
+}
+
+/* Mobile navigation uses the same sidebar content in an overlay, never a second menu design. */
+.sidebar--mobile {
+  width: 100%;
+  height: 100%;
+  border-right: 0;
+  background: var(--sidebar-bg);
+}
+
+.sidebar--mobile .sidebar-brand {
+  padding-top: 18px;
+}
+
+.brand-link {
+  display: flex;
+  flex: 0 0 auto;
+  border-radius: 9px;
+}
+
+.mobile-nav-close {
+  margin-left: auto;
+}
+
+.mobile-nav-panel {
+  width: min(312px, 86vw);
+  height: 100%;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+  background: var(--sidebar-bg);
+  box-shadow: 24px 0 64px -28px rgba(18, 20, 24, 0.24);
+  animation: mobile-nav-in var(--motion-drawer) var(--ease-out) both;
+}
+
+@keyframes mobile-nav-in {
+  from { transform: translateX(-28px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.overlay__panel:focus {
+  outline: none;
+}
+
+.tab-panel-enter {
+  animation: tab-enter var(--motion-content) var(--ease-out) both;
+}
+
+@keyframes tab-enter {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.skeleton-gap {
+  height: 18px;
+}

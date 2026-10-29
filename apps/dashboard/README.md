@@ -1,10 +1,10 @@
 # Stratide 本地 Web Dashboard V1
 
-关联 [Issue #20](https://github.com/handFOOLed/Stratide/issues/20) 与 [Issue #22](https://github.com/handFOOLed/Stratide/issues/22)。本机 paper-only、同源；总览/历史展示启动时明确指定的一个完整六报告固定快照。Agent 管理已接入持久研究任务、预算、模型选择、取消/暂停和 EOD；操作见 [Agent V1](../../docs/M2_PR02.md)。通知仍为未接入状态，浅色/深色/系统主题保留。不提供财务写入或网页导出。
+关联 [Issue #20](https://github.com/handFOOLed/Stratide/issues/20) 与 [Issue #22](https://github.com/handFOOLed/Stratide/issues/22)。本机 paper-only、同源；总览/历史展示启动时明确指定的一个完整六报告固定快照。Agent 管理已接入持久研究任务、预算、模型选择、取消/暂停和 EOD；操作见 [Agent V1](../../docs/M2_PR02.md)。通知仍为未接入状态，浅色/深色/系统主题与 reduced-motion 保留。UI 已按 M2-PR03 重构为 React 19 + TypeScript + 共享设计系统；信息归属、token 与动效规范见 [UI 设计系统](../../docs/UI_DESIGN_SYSTEM.md)。不提供财务写入或网页导出。
 
 ## Windows 启动
 
-在本分支仓库根目录运行，需要已有 Rust、VS C++ Build Tools、Node.js 20.19+ / 22.12+ 或更新受支持版本、PowerShell 7。无 Docker、数据库服务或云模型依赖。首次安装使用锁文件内的免费开发依赖。
+在本分支仓库根目录运行，需要已有 Rust、VS C++ Build Tools、Node.js 20.19+ / 22.12+ 或更新受支持版本、PowerShell 7。前端单元测试直接导入 TypeScript，建议使用 Node 24（或支持内置 type stripping 的 22.18+）；生产构建本身仍可在 Node 20.19+ 运行。无 Docker、数据库服务或云模型依赖。首次安装使用锁文件内的免费开发依赖。
 
 ```powershell
 # Owner 明确选择的现有报告目录，不自动寻找“最近实验”。
@@ -17,7 +17,7 @@ pwsh -NoProfile -File scripts/start-dashboard.ps1 -ReportDir 'docs/evidence/m0-p
 pwsh -NoProfile -File scripts/start-dashboard.ps1 -ReportDir 'D:\Paper\account-report' -EvaluationFile 'D:\Research\evaluation.json'
 ```
 
-打开 `http://127.0.0.1:8710`。脚本执行 npm ci、Vite 构建、MSVC Rust 构建，健康响应后打开默认浏览器；Ctrl+C 停止该次启动的服务。`-NoBrowser` 不打开浏览器，`-NoBuild` 复用已构建产物，`-Port 8716` 更换本机端口。含空格的目录通过参数数组传递。**不传 ReportDir 会显示未配置状态，没有默认资金或默认测试账户。**
+打开 `http://127.0.0.1:8710`。脚本执行 npm ci、esbuild 前端构建、MSVC Rust 构建，健康响应后打开默认浏览器；Ctrl+C 停止该次启动的服务。`-NoBrowser` 不打开浏览器，`-NoBuild` 复用已构建产物，`-Port 8716` 更换本机端口。含空格的目录通过参数数组传递。**不传 ReportDir 会显示未配置状态，没有默认资金或默认测试账户。**
 
 手动构建与运行：
 
@@ -44,19 +44,28 @@ npm --prefix apps/dashboard run build
 
 ## API 与测试
 
-见 [Paper API](../../docs/DASHBOARD_API.md) 与 [Agent API](../../docs/AGENT_API.md)。原生 JavaScript + Vite，Rust tiny_http 同源静态服务，无 UI 框架、CDN 或遥测。HTTP 仅绑定 IPv4 127.0.0.1，不支持 LAN/公网；显示偏好保存于 localStorage，Owner 令牌仅留内存。仅配置并授权后的研究后端可向确定的 HTTPS Provider 发送摘要。
+见 [Paper API](../../docs/DASHBOARD_API.md) 与 [Agent API](../../docs/AGENT_API.md)。前端为 React 19 + TypeScript + esbuild（单包 app.js/app.css），Rust tiny_http 同源静态服务，无运行时 CDN、外部字体请求或遥测。HTTP 仅绑定 IPv4 127.0.0.1，不支持 LAN/公网；显示偏好保存于 localStorage，Owner 令牌仅留内存。仅配置并授权后的研究后端可向确定的 HTTPS Provider 发送摘要。
 
 ```powershell
 cargo fmt --all -- --check
 ./scripts/with-msvc.ps1 test --workspace --locked --offline
 ./scripts/with-msvc.ps1 clippy --workspace --all-targets --locked --offline '--' -D warnings
+npm --prefix apps/dashboard run typecheck
 npm --prefix apps/dashboard run build
 npm --prefix apps/dashboard test
 npm --prefix apps/dashboard run test:browser
 python scripts/test-dashboard.py
 ```
 
-浏览器测试默认使用已安装 Edge 的 Chromium 内核，可设置 STRATIDE_BROWSER_CHANNEL=chrome；浏览器缺失时报告 NOT VERIFIED，不伪造截图。测试用临时 synthetic fixture，无正式默认 mock。截图位于忽略目录 state/issue20-browser/。
+浏览器测试默认使用已安装 Edge 的 Chromium 内核，可设置 STRATIDE_BROWSER_CHANNEL=chrome；浏览器缺失或受限沙箱无法启动时报告 NOT VERIFIED，不伪造截图。测试用临时 synthetic fixture，无正式默认 mock。Playwright 截图位于忽略目录 state/m2-pr03-browser/。首轮受限环境的 jsdom/NOT VERIFIED 记录见 [M2-PR03 证据](../../docs/evidence/m2-pr03-ui/README.md)；第二轮精修在本机 Windows 普通用户会话用真实 Edge 执行完整套件（18/18），覆盖 1920×1080 / 1366×768 单屏、375px、五行分页、消失/出现滚动条、真实开合动效与稳定截图。最终仍以 Terra 独立 worktree 复测与 Owner 本机确认为准。
+
+若 `%TEMP%` 被策略限制、`--agent-init-fake` 无法在系统临时目录创建配置，可把临时目录指到仓库忽略目录后再跑（仅影响本机测试夹具，不改变产品行为）：
+
+```powershell
+$env:TEMP = (Resolve-Path './state/tmp').Path
+$env:TMP  = $env:TEMP
+npm --prefix apps/dashboard run test:browser
+```
 
 68 日冻结数据在本机可访问时显式传入，不重新采集、不覆盖原数据：
 
@@ -67,4 +76,4 @@ npm --prefix apps/dashboard run test:browser
 python scripts/test-dashboard.py --historical-report $env:STRATIDE_HISTORICAL_REPORT --evaluation-file $env:STRATIDE_EVALUATION_FILE
 ```
 
-原 Dashboard Windows 自测、截图与只读证据见 [M2-PR01](../../docs/M2_PR01.md)。研究 Agent 的接口、可信本机设置、付费/数据授权见 [M2-PR02](../../docs/M2_PR02.md)；通知与审批尚未接入。
+原 Dashboard Windows 自测、截图与只读证据见 [M2-PR01](../../docs/M2_PR01.md)。研究 Agent 的接口、可信本机设置、付费/数据授权见 [M2-PR02](../../docs/M2_PR02.md)；通知与审批尚未接入。M2-PR03 的改造前/后缺陷、jsdom 验收和 NOT VERIFIED 说明见 [UI 证据](../../docs/evidence/m2-pr03-ui/README.md)；本机 jsdom 验收脚本为 apps/dashboard/scripts/dom-e2e.mjs 与 dom-states.mjs。
