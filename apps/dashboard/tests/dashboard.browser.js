@@ -137,11 +137,13 @@ test('real browser screenshots at 1920, 1366 and 375 for light, dark, drawer and
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({ path: path.join(evidence, 'overview-' + width + '-light.png') });
     await page.getByRole('button', { name: '切换到深色主题' }).click();
+    await page.waitForTimeout(260);
     await page.screenshot({ path: path.join(evidence, 'overview-' + width + '-dark.png') });
     if (width === 1366) {
       await page.goto('/#history/fills');
       await page.screenshot({ path: path.join(evidence, 'history-1366-dark.png') });
       await page.getByRole('button', { name: '切换到浅色主题' }).click();
+      await page.waitForTimeout(260);
       await page.locator('.fills-table tbody tr .row-link').first().click();
       await page.screenshot({ path: path.join(evidence, 'fill-drawer-1366-light.png') });
       await page.getByRole('button', { name: '关闭详情' }).click();
