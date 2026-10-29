@@ -196,9 +196,10 @@ impl Agent {
                     .err()
                     .map(|e| e.0)
                     .unwrap_or("authorized".into()));
-                // Local policy/input/budget rejections and pre-send cancellation
-                // are not Provider observations. Keep prior Provider health;
-                // task.reason/authorization/budget still expose the local block.
+                // Local policy/input/budget rejections, pre-send cancellation and
+                // confirmed-not-sent retries are not Provider observations. Keep
+                // prior Provider health; task.reason/authorization/budget expose
+                // the local block.
                 let last: Option<(String, Option<String>)> = c.query_row(
                     "SELECT
                         CASE WHEN t.result IS NOT NULL AND c.state IN ('settled','usage_received')
@@ -209,7 +210,7 @@ impl Agent {
                              ELSE COALESCE(c.reason,t.reason) END
                      FROM tasks t LEFT JOIN calls c ON c.id=(
                         SELECT id FROM calls WHERE task_id=t.id AND state!='reserved'
-                          AND (state!='no_charge' OR reason NOT IN ('RESTART_BEFORE_DISPATCH','CANCELLED_BEFORE_DISPATCH'))
+                          AND (state!='no_charge' OR reason NOT IN ('RESTART_BEFORE_DISPATCH','CANCELLED_BEFORE_DISPATCH','FAKE_CONFIRMED_NOT_SENT'))
                         ORDER BY id DESC LIMIT 1)
                      WHERE t.provider_id=?1 AND t.provider_hash=?2
                        AND t.status NOT IN ('queued','running','cancel_requested')

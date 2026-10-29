@@ -2,7 +2,7 @@
 use chrono::{DateTime, Utc};
 use serde_json::{json, Value};
 use std::fs;
-use stratide_research::{config::Settings, Agent, InputSummary, TaskRequest};
+use stratide_research::{budget, config::Settings, provider, Agent, InputSummary, TaskRequest};
 
 fn now() -> DateTime<Utc> {
     "2026-10-29T09:00:00Z".parse().unwrap()
@@ -246,4 +246,90 @@ fn provider_dns_preparation_failure_is_distinct_from_local_policy_rejection() {
     let status = model(&agent, "fake");
     assert_eq!(status["availability"], "unavailable_or_outcome_unknown");
     assert_eq!(status["last_reason"], "PROVIDER_DNS_UNAVAILABLE");
+}
+
+#[test]
+fn safe_not_sent_attempt_then_lower_owner_budget_preserves_prior_provider_health() {
+    let mut settings = Settings::fake();
+    settings.default_model = Some("fake-safe-retry".into());
+    let (dir, agent) = setup(&settings);
+    let completed = agent.create(&request(), now()).unwrap();
+    agent.tick(now()).unwrap();
+    assert_eq!(
+        agent.store().task(completed).unwrap()["status"],
+        "completed"
+    );
+    let previous = model(&agent, "fake-safe-retry");
+    assert_eq!(previous["availability"], "last_task_completed");
+
+    let id = agent.create(&request(), now()).unwrap();
+    let configured = settings
+        .models
+        .iter()
+        .find(|m| m.id == "fake-safe-retry")
+        .unwrap();
+    let mut connection = agent.store().connect().unwrap();
+    let call = budget::reserve(
+        &mut connection,
+        settings.budget.as_ref().unwrap(),
+        now(),
+        budget::Reservation {
+            task_id: id,
+            maximum_micro: configured
+                .cost(configured.max_input_tokens, configured.max_output_tokens)
+                .unwrap(),
+            task_limit: None,
+            price_version: &configured.price.as_ref().unwrap().version,
+        },
+    )
+    .unwrap();
+    connection
+        .execute("UPDATE calls SET state='dispatched' WHERE id=?1", [call])
+        .unwrap();
+    let prepared = provider::prepare(
+        configured,
+        &json!({"owner_task":request(),"published_summary":input()}),
+    )
+    .unwrap();
+    let provider::Outcome::NoCharge {
+        retryable: true,
+        reason,
+    } = provider::call(prepared, 1)
+    else {
+        panic!("first fake attempt must confirm that nothing was sent");
+    };
+    assert_eq!(reason, "FAKE_CONFIRMED_NOT_SENT");
+    connection
+        .execute(
+            "UPDATE calls SET state='no_charge',reason=?1,finished_at=?2 WHERE id=?3",
+            rusqlite::params![reason, now().to_rfc3339(), call],
+        )
+        .unwrap();
+    // The persisted first-attempt boundary is deterministic: queue the remaining
+    // retry step through the real worker, without timing races or production hooks.
+    settings.budget.as_mut().unwrap().daily_limit_micro = 1;
+    fs::write(
+        dir.path().join("settings.json"),
+        serde_json::to_vec(&settings).unwrap(),
+    )
+    .unwrap();
+    let before = agent.status(now()).unwrap()["budget"].clone();
+    agent.tick(now()).unwrap();
+
+    let task = agent.store().task(id).unwrap();
+    assert_eq!(task["status"], "failed");
+    assert_eq!(task["reason"], "DAILY_BUDGET_EXHAUSTED");
+    assert_eq!(task["calls"].as_array().unwrap().len(), 1);
+    assert_eq!(task["calls"][0]["state"], "no_charge");
+    assert_eq!(task["calls"][0]["reason"], "FAKE_CONFIRMED_NOT_SENT");
+    let status = agent.status(now()).unwrap();
+    assert_eq!(status["budget"]["call_count"], before["call_count"]);
+    assert_eq!(status["budget"]["reserved_micro"], before["reserved_micro"]);
+    assert_eq!(
+        status["budget"]["daily_settled_micro"],
+        before["daily_settled_micro"]
+    );
+    let after = model(&agent, "fake-safe-retry");
+    assert_eq!(after["availability"], previous["availability"]);
+    assert_eq!(after["last_reason"], previous["last_reason"]);
 }
