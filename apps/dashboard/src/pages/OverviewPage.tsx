@@ -178,6 +178,7 @@ export function OverviewPage({ paper, titleRef }: { paper: PaperDataState; title
 
       <div className="overview-grid">
         <Card className="account-card">
+          <h2 className="sr-only">账户与风险</h2>
           <CardBody>
             <div className="account-top">
               <div className="account-main">

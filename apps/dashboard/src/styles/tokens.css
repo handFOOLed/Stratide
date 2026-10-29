@@ -66,8 +66,8 @@
 
   --text: #191a1c;
   --text-secondary: #4d5157;
-  --text-muted: #6a6f78;
-  --text-faint: #8d929a;
+  --text-muted: #61666e;
+  --text-faint: #72787f;
   --text-inverse: #fbfbfc;
 
   --accent: #2f6fed;
@@ -165,7 +165,7 @@
   --text: #ededee;
   --text-secondary: #b3b6bc;
   --text-muted: #9aa0a9;
-  --text-faint: #71767e;
+  --text-faint: #838993;
   --text-inverse: #111113;
 
   --accent: #7ba5ff;
