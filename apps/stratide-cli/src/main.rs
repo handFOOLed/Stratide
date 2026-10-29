@@ -26,6 +26,7 @@ fn run(args: Vec<String>) -> Result<(), String> {
         "risk-demo" => demo(&args[1..])?,
         command if command.starts_with("forward-") => forward::run(&args)?,
         "paper-replay" | "paper-report" => replay::run(&args)?,
+        "paper-benchmark" => replay::benchmark::run(&args)?,
         command if command.starts_with("paper-") => paper::run(command, &args[1..])?,
         "help" | "--help" | "-h" => println!(
             "stratide-cli status\nstratide-cli risk-demo\n\
@@ -45,6 +46,7 @@ paper-status <目录>
 paper-apply <目录> <唯一事件ID> <可信命令JSON文件>
 paper-replay <输入JSON> <账本目录> <报表目录> --sha256 <输入文件SHA256> <上述全部六项参数>
 paper-report <输入JSON> <账本目录> <报表目录> --sha256 <输入文件SHA256>
+paper-benchmark <输入JSON> <新目录> --sha256 <SHA256> --start-index <含> --end-index <不含> <上述六项参数>
 \
 Paper 演示使用 synthetic_test 人工行情/费率，绝非真实市场数据。
 forward-init <新目录> <观察配置JSON>

@@ -6,6 +6,7 @@ use stratide_ledger::{
     Command, DailyBar, DataMode, FeeSchedule, Genesis, Ledger, OpeningEvidence, Provenance,
 };
 
+pub(super) mod benchmark;
 mod historical;
 mod report;
 
