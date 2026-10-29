@@ -1,6 +1,13 @@
 use crate::model::*;
 use stratide_contracts::*;
 use stratide_risk::{RiskDecision, RiskKernel};
+mod historical;
+
+struct FillContext<'a> {
+    rules: &'a TradingRules,
+    price: Cny,
+    opening: Option<&'a OpeningEvidence>,
+}
 
 impl State {
     pub(crate) fn new(g: Genesis) -> Result<Self> {
@@ -106,6 +113,9 @@ impl State {
 
     pub(crate) fn apply(&mut self, cmd: &Command) -> Result<()> {
         match cmd {
+            Command::HistoricalNextOpenV1 { now, bar, rules } => {
+                self.historical_next_open(bar, rules, *now)?;
+            }
             Command::Observe {
                 now,
                 day,
@@ -439,7 +449,7 @@ impl State {
     ) -> Result<()> {
         let r = &opening.rules;
         let order = self.orders[index].clone();
-        let mut p = order.proposal.clone();
+        let p = order.proposal.clone();
         if !r.tradable || r.settlement == SettlementRule::Unknown || b.low == b.high {
             self.orders[index].reason = "停牌、未知交收或一字板：估值可观察，保持未成交".into();
             return Ok(());
@@ -460,6 +470,30 @@ impl State {
             self.orders[index].reason = "非后续时段、仅触价、开盘不利或封板边界，保持未成交".into();
             return Ok(());
         }
+        self.fill_order(
+            index,
+            b,
+            accounted_at,
+            capacity,
+            FillContext {
+                rules: r,
+                price: p.limit_price,
+                opening: Some(opening),
+            },
+        )
+    }
+
+    fn fill_order(
+        &mut self,
+        index: usize,
+        b: &DailyBar,
+        accounted_at: Timestamp,
+        capacity: &mut i64,
+        execution: FillContext<'_>,
+    ) -> Result<()> {
+        let r = execution.rules;
+        let order = self.orders[index].clone();
+        let mut p = order.proposal.clone();
         p.quantity = order.remaining;
         let schedule = order.fee_schedule.as_ref().ok_or("已接受订单缺费率")?;
         if schedule.validate(&p.instrument, b.day).is_err()
@@ -507,8 +541,8 @@ impl State {
             self.orders[index].reason = "保守流动性额度不足整手，保持未成交".into();
             return Ok(());
         }
-        let gross = p
-            .limit_price
+        let gross = execution
+            .price
             .checked_mul(quantity)
             .map_err(|e| e.to_string())?;
         let fees = schedule.fees(gross, p.side)?;
@@ -569,7 +603,12 @@ impl State {
         } else {
             OrderStatus::PartiallyFilled
         };
-        o.reason = "保守日线限价穿越模型模拟成交；不是交易所成交".into();
+        o.reason = if execution.opening.is_some() {
+            "保守日线限价穿越模型模拟成交；不是交易所成交"
+        } else {
+            "historical_ex_post_execution_assumption：next-open 不利一跳；非实时实收或真实成交"
+        }
+        .into();
         if o.remaining > 0 {
             self.snapshot.pending_orders.push(PendingOrder {
                 proposal_id: p.proposal_id,
@@ -592,12 +631,15 @@ impl State {
             instrument: p.instrument,
             side: p.side,
             quantity,
-            price: p.limit_price,
+            price: execution.price,
             fees,
             day: b.day,
             simulated_at: accounted_at,
             risk_checked_at: self.snapshot.as_of,
-            opening_evidence: opening.clone(),
+            opening_evidence: execution.opening.cloned(),
+            historical_execution: execution.opening.is_none().then(|| {
+                "historical_ex_post_execution_assumption/next-open-adverse-tick-100-v1".into()
+            }),
             evidence: b.clone(),
             fee_version: schedule.version.clone(),
         });

@@ -1,5 +1,7 @@
 # Stratide 模拟交易优先路线图｜给 Sol / Terra / ChatGPT 的执行约定
 
+**2026-10-29 Owner 排序更新（Issue #11）：** 当前优先做真实历史 EOD 驱动的探索性回测，无需等待新前向交易日或购买集合竞价权限。历史 next-open 仅为隔离的事后执行假设，不进入原 forward journal；Issue #10 独立保持 OPEN。PR05B 的实现、自测与可重复操作见 [M1_PR05B](M1_PR05B.md)，仍待独立验收/审查及 Owner 合并授权。以下保留此前阶段的进度记录。
+
 状态：**M0-PR01 [PR #2](https://github.com/handFOOLed/Stratide/pull/2)、PR-02 [PR #4](https://github.com/handFOOLed/Stratide/pull/4)、PR-03 [PR #6](https://github.com/handFOOLed/Stratide/pull/6) 与 M1-PR04A [PR #8](https://github.com/handFOOLed/Stratide/pull/8) 均已合并。** PR04A 经 [Terra Windows 独立技术 PASS（89 测试、真实 journal 离线复验）](https://github.com/handFOOLed/Stratide/pull/8#issuecomment-6471878822) 和 [小猫源码审查 PASS](https://github.com/handFOOLed/Stratide/pull/8#pullrequestreview-5684495112)，以 HEAD `295751cf15bfaa68407dd243f45394b5147e1227` 合并，merge `1ef06eb1d17f8796e3b43d2ad0a903382fa0fd23`。当前仅 **1 个真实有效前向观察日、0 提案/成交，NAV/回撤不可用**；独立验收未重复 HTTP 实际联网，仅对 Sol 本机 raw/journal 复算。**M1 仍未完成，下一步 PR04B 需验证独立开盘证据、持续多日真实观察和可信 Paper 决策/成交。** Owner 接受个人非商业本机使用，供应商正式许可未获独立核实（仅作限制披露、不自动禁止个人开发）；历史执行记录曾包含明文 Token，不能改写为无暴露。禁止公开再分发行情或将观察日志当实盘/盈利证明。关联 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md)。
 
 ## 完成的样子

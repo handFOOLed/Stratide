@@ -6,6 +6,7 @@ use stratide_ledger::{
     Command, DailyBar, DataMode, FeeSchedule, Genesis, Ledger, OpeningEvidence, Provenance,
 };
 
+mod historical;
 mod report;
 
 const DAY_MS: i64 = 86_400_000;
@@ -25,6 +26,8 @@ struct Dataset {
     instrument: Instrument,
     fee: FeeInput,
     sessions: Vec<Session>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    historical: Option<historical::HistoricalMetadata>,
 }
 
 #[derive(Clone, Deserialize, Serialize)]
@@ -133,7 +136,7 @@ impl RulesInput {
 
 impl Dataset {
     fn validate(&self) -> Result<(), String> {
-        if self.schema_version != 1
+        if !matches!(self.schema_version, 1 | 2)
             || self.sessions.is_empty()
             || !self.instrument.is_valid()
             || self.source.trim().is_empty()
@@ -144,6 +147,7 @@ impl Dataset {
         {
             return Err("输入 schema/来源/许可/证券/时区/未复权价格语义不完整".into());
         }
+        historical::validate(self)?;
         if self.mode == DataMode::HistoricalReplay && self.source.contains("synthetic") {
             return Err("人工合成来源不得标为 historical_replay".into());
         }
@@ -306,9 +310,19 @@ pub fn run(args: &[String]) -> Result<(), String> {
         c.account_id = "replay-account".into();
         c.deployment = DeploymentIdentity {
             group_id: "replay-group".into(),
-            strategy_id: "two-signal-example".into(),
-            frozen_version: STRATEGY_VERSION.into(),
-            deployment_id: "replay-v1".into(),
+            strategy_id: if dataset.historical.is_some() {
+                "sma-cross"
+            } else {
+                "two-signal-example"
+            }
+            .into(),
+            frozen_version: historical::strategy_version(&dataset).into(),
+            deployment_id: if dataset.historical.is_some() {
+                "historical-sma-v1"
+            } else {
+                "replay-v1"
+            }
+            .into(),
         };
         c.max_snapshot_age_ms = 7 * DAY_MS;
         c.max_mark_age_ms = 7 * DAY_MS;
@@ -364,6 +378,9 @@ fn commands(
     provenance: &Provenance,
     config: &PaperAccountConfig,
 ) -> Result<Vec<(String, Command)>, String> {
+    if dataset.historical.is_some() {
+        return historical::commands(dataset, provenance, config);
+    }
     let fee = dataset.fee_schedule()?;
     let mut commands = Vec::new();
     for (index, session) in dataset.sessions.iter().enumerate() {

@@ -32,6 +32,8 @@ fn closing_price_only_changes_post_execution_nav_not_fill_eligibility() {
         assert_eq!(f.simulated_at, accounted_at);
         assert!(f
             .opening_evidence
+            .as_ref()
+            .unwrap()
             .marks
             .iter()
             .all(|m| m.available_at <= f.risk_checked_at));
