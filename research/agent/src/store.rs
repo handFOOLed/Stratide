@@ -286,7 +286,14 @@ impl Store {
         let c = self.connect()?;
         let recent: Option<(String, String)> = c
             .query_row(
-                "SELECT source_day,disposition FROM eod ORDER BY source_day DESC LIMIT 1",
+                // EOD rows record scheduling/deduplication decisions. Task state
+                // is authoritative for execution, including existing queued
+                // markers written before an earlier process completed/crashed.
+                "SELECT e.source_day,
+                    CASE WHEN t.reason='EOD_SUPERSEDED_SKIPPED' THEN 'skipped_superseded'
+                         ELSE COALESCE(t.status,e.disposition) END
+                 FROM eod e LEFT JOIN tasks t ON t.trigger_key='eod-v1:'||e.source_day
+                 ORDER BY e.source_day DESC LIMIT 1",
                 [],
                 |r| Ok((r.get(0)?, r.get(1)?)),
             )
