@@ -63,12 +63,15 @@ export const EOD_DISPOSITION_LABELS: Record<string, string> = {
   cancelled: '已取消',
   outcome_uncertain: '结果 / 费用不确定',
   skipped: '已跳过',
+  skipped_superseded: '已跳过 · 已被新源日替代',
+  skipped_paused: '已跳过 · Agent 暂停',
   not_triggered: '尚未触发',
 };
 
 export const AVAILABILITY_LABELS: Record<string, string> = {
   not_verified: '未验证',
   available: '可用',
+  last_task_completed: '最近调用完成',
   unavailable: '不可用',
   unavailable_or_outcome_unknown: '状态未知，可能含未结费用',
 };
@@ -76,6 +79,7 @@ export const AVAILABILITY_LABELS: Record<string, string> = {
 export const AVAILABILITY_TONES: Record<string, BadgeTone> = {
   not_verified: 'neutral',
   available: 'success',
+  last_task_completed: 'success',
   unavailable: 'warning',
   unavailable_or_outcome_unknown: 'warning',
 };

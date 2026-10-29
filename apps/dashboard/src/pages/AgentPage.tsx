@@ -514,6 +514,9 @@ function ModelsCard({ status, agent }: { status: AgentStatus; agent: AgentState 
                   <AvailabilityBadge availability={selected.availability} />
                 </div>
                 <span className="model-selected__meta">{selected.kind} · {selected.model} · 授权 {selected.authorization}</span>
+                {selected.last_reason ? (
+                  <span className="model-selected__meta">最近 Provider 观察：{selected.last_reason}</span>
+                ) : null}
               </div>
             ) : (
               <span className="muted">未配置模型</span>
@@ -544,7 +547,10 @@ function ModelsCard({ status, agent }: { status: AgentStatus; agent: AgentState 
                     <td><span className="cell-title">{model.label}</span><span className="cell-sub">{model.id}</span></td>
                     <td><span className="cell-sub">{model.kind}</span><span className="cell-mono">{model.model}</span></td>
                     <td>{model.authorization}</td>
-                    <td><AvailabilityBadge availability={model.availability} /></td>
+                    <td>
+                      <AvailabilityBadge availability={model.availability} />
+                      {model.last_reason ? <span className="cell-sub">{model.last_reason}</span> : null}
+                    </td>
                     <td><Badge tone={model.verification === 'FAKE_SYNTHETIC_ONLY' ? 'warning' : 'warning'}>{VERIFICATION_LABELS[model.verification] ?? model.verification}</Badge></td>
                     <td className="cell-mono">{model.price_version}</td>
                   </tr>
