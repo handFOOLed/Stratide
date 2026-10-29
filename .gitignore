@@ -18,8 +18,8 @@ secrets/
 config/local.toml
 /STRATIDE_TUSHARE_TOKEN.md
 
-# Runtime money/data artifacts
-state/
+# Runtime money/data artifacts (repo root only; apps/dashboard/src/state is tracked source)
+/state/
 logs/
 data/
 *.db
