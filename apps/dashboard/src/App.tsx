@@ -1,14 +1,13 @@
 import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { AppShell } from './layout/AppShell';
-import { PageFooter } from './components/layout/PageFooter';
 import { OverviewPage } from './pages/OverviewPage';
 import { HistoryPage } from './pages/HistoryPage';
 import { AgentPage } from './pages/AgentPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { navigate, useRoute, PAGE_LABELS } from './lib/route';
-import type { HistoryTab } from './lib/route';
+import type { HistoryTab, SettingsSection } from './lib/route';
 import { usePageScrollReset, usePageTitle } from './lib/hooks';
 import { usePaperData } from './state/usePaperData';
 import { useHealth } from './state/useHealth';
@@ -71,7 +70,15 @@ export function App() {
       page = <NotificationsPage health={health} titleRef={titleRef} />;
       break;
     case 'settings':
-      page = <SettingsPage paper={paper} health={health} titleRef={titleRef} />;
+      page = (
+        <SettingsPage
+          paper={paper}
+          health={health}
+          section={route.section}
+          onSection={(section: SettingsSection) => navigate({ page: 'settings', section })}
+          titleRef={titleRef}
+        />
+      );
       break;
     case 'overview':
     default:
@@ -88,7 +95,6 @@ export function App() {
       onRefresh={refreshAll}
       refreshing={paper.refreshing || health.checking}
       mainRef={mainRef}
-      footer={<PageFooter />}
     >
       <div className="page-frame" key={route.page}>
         {page}

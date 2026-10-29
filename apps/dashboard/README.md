@@ -57,7 +57,15 @@ npm --prefix apps/dashboard run test:browser
 python scripts/test-dashboard.py
 ```
 
-浏览器测试默认使用已安装 Edge 的 Chromium 内核，可设置 STRATIDE_BROWSER_CHANNEL=chrome；浏览器缺失或受限沙箱无法启动时报告 NOT VERIFIED，不伪造截图。测试用临时 synthetic fixture，无正式默认 mock。Playwright 截图位于忽略目录 state/m2-pr03-browser/。本轮受限环境无法启动 Chromium，真实浏览器证据见 [M2-PR03 证据](../../docs/evidence/m2-pr03-ui/README.md)。
+浏览器测试默认使用已安装 Edge 的 Chromium 内核，可设置 STRATIDE_BROWSER_CHANNEL=chrome；浏览器缺失或受限沙箱无法启动时报告 NOT VERIFIED，不伪造截图。测试用临时 synthetic fixture，无正式默认 mock。Playwright 截图位于忽略目录 state/m2-pr03-browser/。首轮受限环境的 jsdom/NOT VERIFIED 记录见 [M2-PR03 证据](../../docs/evidence/m2-pr03-ui/README.md)；第二轮精修在本机 Windows 普通用户会话用真实 Edge 执行完整套件（18/18），覆盖 1920×1080 / 1366×768 单屏、375px、五行分页、消失/出现滚动条、真实开合动效与稳定截图。最终仍以 Terra 独立 worktree 复测与 Owner 本机确认为准。
+
+若 `%TEMP%` 被策略限制、`--agent-init-fake` 无法在系统临时目录创建配置，可把临时目录指到仓库忽略目录后再跑（仅影响本机测试夹具，不改变产品行为）：
+
+```powershell
+$env:TEMP = (Resolve-Path './state/tmp').Path
+$env:TMP  = $env:TEMP
+npm --prefix apps/dashboard run test:browser
+```
 
 68 日冻结数据在本机可访问时显式传入，不重新采集、不覆盖原数据：
 

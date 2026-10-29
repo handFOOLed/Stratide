@@ -6,26 +6,27 @@
     "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans SC", sans-serif;
   --font-mono: "SFMono-Regular", "Cascadia Mono", "Cascadia Code", Consolas, "Liberation Mono", monospace;
 
-  --fs-2xs: 10.5px;
-  --fs-xs: 11.5px;
-  --fs-sm: 12.5px;
-  --fs-md: 13.5px;
-  --fs-base: 14px;
+  /* Type floor: body 15px, tables/secondary >= 14px, labels >= 12.5px. */
+  --fs-2xs: 12.5px;
+  --fs-xs: 13px;
+  --fs-sm: 14px;
+  --fs-md: 14.5px;
+  --fs-base: 15px;
   --fs-lg: 16px;
   --fs-xl: 18px;
-  --fs-2xl: 22px;
-  --fs-3xl: 26px;
-  --fs-4xl: 32px;
-  --fs-display: 42px;
+  --fs-2xl: 21px;
+  --fs-3xl: 24px;
+  --fs-4xl: 29px;
+  --fs-display: 38px;
 
-  --lh-tight: 1.12;
+  --lh-tight: 1.15;
   --lh-snug: 1.35;
   --lh-base: 1.55;
   --lh-relaxed: 1.68;
 
-  --tracking-tight: -0.02em;
-  --tracking-tighter: -0.035em;
-  --tracking-caps: 0.075em;
+  --tracking-tight: -0.018em;
+  --tracking-tighter: -0.03em;
+  --tracking-caps: 0.06em;
 
   --space-0: 0;
   --space-1: 4px;
@@ -44,84 +45,88 @@
   --radius-xs: 5px;
   --radius-sm: 7px;
   --radius-md: 9px;
-  --radius-lg: 13px;
-  --radius-xl: 18px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
   --radius-pill: 999px;
 
-  --page-bg: #f5f5f2;
-  --sidebar-bg: #fbfbf9;
+  /* Neutral surface ladder: page -> sidebar -> card -> raised overlay. */
+  --page-bg: #f6f7f9;
+  --sidebar-bg: #fbfbfc;
   --surface: #ffffff;
   --surface-raised: #ffffff;
-  --surface-subtle: #f8f8f5;
-  --surface-sunken: #efefeb;
-  --surface-hover: #f3f3ef;
+  --surface-subtle: #f6f7f9;
+  --surface-sunken: #eceef1;
+  --surface-hover: #f2f3f5;
   --input-bg: #ffffff;
 
-  --border: #e5e5df;
-  --border-faint: #ededE8;
-  --border-strong: #d2d2ca;
-  --divider: #ecece7;
+  --border: #e5e7eb;
+  --border-faint: #eef0f3;
+  --border-strong: #d5d8de;
+  --divider: #eef0f3;
 
-  --text: #181817;
-  --text-secondary: #555550;
-  --text-muted: #73736c;
-  --text-faint: #96968e;
-  --text-inverse: #fbfbf8;
+  --text: #191a1c;
+  --text-secondary: #4d5157;
+  --text-muted: #6a6f78;
+  --text-faint: #8d929a;
+  --text-inverse: #fbfbfc;
 
   --accent: #2f6fed;
-  --accent-hover: #245ed4;
-  --accent-soft: #eef3ff;
-  --accent-border: #c9d9ff;
-  --accent-ink: #1d4fb8;
+  --accent-hover: #2359cd;
+  --accent-soft: #eef3fe;
+  --accent-border: #cddcfb;
+  --accent-ink: #1c4bb4;
 
-  --gain: #b83a30;
-  --gain-soft: #fbefed;
-  --gain-border: #f0d3cf;
-  --loss: #0e7a4f;
-  --loss-soft: #ebf7f0;
-  --loss-border: #cfe9dc;
-  --warning: #92570a;
-  --warning-soft: #fdf5e5;
-  --warning-border: #eedfbf;
-  --danger: #b8332b;
-  --danger-soft: #fcefed;
-  --danger-border: #f0cfca;
-  --success: #0e7a4f;
-  --success-soft: #ebf7f0;
-  --success-border: #cfe9dc;
+  /* A-share convention: gains are red, losses are green. Keep Stratide's own hues. */
+  --gain: #b3352c;
+  --gain-soft: #fdf0ee;
+  --gain-border: #f2d5d1;
+  --loss: #0b7350;
+  --loss-soft: #ecf7f1;
+  --loss-border: #cfe8dc;
+  --warning: #8a5a08;
+  --warning-soft: #fdf6e7;
+  --warning-border: #ecdcbb;
+  --danger: #b32e26;
+  --danger-soft: #fdf0ee;
+  --danger-border: #f0d2ce;
+  --success: #0b7350;
+  --success-soft: #ecf7f1;
+  --success-border: #cfe8dc;
 
   --focus: #2f6fed;
-  --overlay: rgba(22, 22, 19, 0.42);
-  --scrim: rgba(22, 22, 19, 0.32);
+  --overlay: rgba(20, 21, 23, 0.42);
+  --scrim: rgba(20, 21, 23, 0.32);
 
-  --shadow-xs: 0 1px 2px rgba(24, 24, 20, 0.04);
-  --shadow-sm: 0 1px 2px rgba(24, 24, 20, 0.05), 0 8px 24px -18px rgba(24, 24, 20, 0.18);
-  --shadow-pop: 0 18px 50px -18px rgba(20, 20, 16, 0.32), 0 2px 8px rgba(20, 20, 16, 0.06);
-  --shadow-drawer: -24px 0 64px -28px rgba(18, 18, 14, 0.28);
+  --shadow-xs: 0 1px 2px rgba(23, 25, 29, 0.04);
+  --shadow-sm: 0 1px 2px rgba(23, 25, 29, 0.05), 0 8px 24px -18px rgba(23, 25, 29, 0.18);
+  --shadow-pop: 0 16px 44px -16px rgba(20, 22, 26, 0.26), 0 2px 6px rgba(20, 22, 26, 0.06);
+  --shadow-drawer: -24px 0 64px -28px rgba(18, 20, 24, 0.26);
 
-  --brand-mark-bg: #1b1b19;
-  --brand-mark-fg: #fbfbf8;
-  --nav-active-bg: #eeeee9;
-  --nav-active-text: #181817;
-  --row-hover: #fafaf7;
-  --skeleton: #e9e9e3;
-  --skeleton-shine: #f4f4ef;
+  --brand-mark-bg: #191a1c;
+  --brand-mark-fg: #fbfbfc;
+  --nav-active-bg: #eceef1;
+  --nav-active-text: #191a1c;
+  --row-hover: #f7f8fa;
+  --skeleton: #e9ebee;
+  --skeleton-shine: #f3f5f7;
 
   --chart-line: #2f6fed;
   --chart-line-soft: #7ea4f8;
-  --chart-grid: #e9e9e3;
-  --chart-axis: #73736c;
-  --chart-cursor: #b9b9b0;
-  --chart-gain: #b83a30;
-  --chart-loss: #0e7a4f;
+  --chart-grid: #e8eaee;
+  --chart-axis: #7c828b;
+  --chart-cursor: #b8bcc3;
+  --chart-gain: #b3352c;
+  --chart-loss: #0b7350;
 
-  --scrollbar-thumb: #d3d3cb;
+  --scrollbar-thumb: #d4d8de;
 
   --sidebar-w: 236px;
-  --topbar-h: 58px;
-  --page-pad: clamp(18px, 2.2vw, 40px);
-  --content-max: 1340px;
-  --table-row-h: 52px;
+  --topbar-h: 56px;
+  --page-pad: clamp(16px, 2vw, 32px);
+  --content-max: 1600px;
+  --table-row-h: 44px;
+  --table-head-h: 32px;
+  --row-5-h: 220px;
 
   --motion-hover: 140ms;
   --motion-nav: 200ms;
@@ -142,74 +147,75 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --page-bg: #09090a;
-  --sidebar-bg: #0d0d0f;
-  --surface: #111113;
-  --surface-raised: #161618;
-  --surface-subtle: #171719;
-  --surface-sunken: #1d1d20;
-  --surface-hover: #1a1a1d;
-  --input-bg: #0f0f11;
+  /* Near-black page with charcoal surface steps, low-contrast hairlines. */
+  --page-bg: #0a0a0b;
+  --sidebar-bg: #0e0e10;
+  --surface: #141416;
+  --surface-raised: #191a1c;
+  --surface-subtle: #1a1b1d;
+  --surface-sunken: #232427;
+  --surface-hover: #1f2023;
+  --input-bg: #101012;
 
-  --border: #26262a;
-  --border-faint: #1e1e22;
-  --border-strong: #3a3a40;
-  --divider: #222226;
+  --border: #26272b;
+  --border-faint: #1e1f22;
+  --border-strong: #3a3c41;
+  --divider: #212226;
 
-  --text: #f1f1ed;
-  --text-secondary: #b0b0a8;
-  --text-muted: #8f8f87;
-  --text-faint: #6c6c65;
-  --text-inverse: #111110;
+  --text: #ededee;
+  --text-secondary: #b3b6bc;
+  --text-muted: #9aa0a9;
+  --text-faint: #71767e;
+  --text-inverse: #111113;
 
-  --accent: #82a8ff;
-  --accent-hover: #a2beff;
-  --accent-soft: #17233c;
-  --accent-border: #2c4270;
-  --accent-ink: #b7ccff;
+  --accent: #7ba5ff;
+  --accent-hover: #a1c0ff;
+  --accent-soft: #16233c;
+  --accent-border: #2b4068;
+  --accent-ink: #b6cdff;
 
-  --gain: #ff9a90;
+  --gain: #ff9d94;
   --gain-soft: #2a1816;
   --gain-border: #4a2a27;
-  --loss: #62d9a6;
+  --loss: #66d9a8;
   --loss-soft: #10251b;
   --loss-border: #244d3a;
-  --warning: #e8b56b;
+  --warning: #e6b46b;
   --warning-soft: #2a2113;
   --warning-border: #4a3a1f;
-  --danger: #ff8a80;
+  --danger: #ff9188;
   --danger-soft: #2a1716;
   --danger-border: #4d2b28;
-  --success: #62d9a6;
+  --success: #66d9a8;
   --success-soft: #10251b;
   --success-border: #244d3a;
 
-  --focus: #82a8ff;
-  --overlay: rgba(0, 0, 0, 0.62);
+  --focus: #7ba5ff;
+  --overlay: rgba(0, 0, 0, 0.64);
   --scrim: rgba(0, 0, 0, 0.52);
 
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45), 0 10px 30px -20px rgba(0, 0, 0, 0.8);
-  --shadow-pop: 0 22px 60px -24px rgba(0, 0, 0, 0.9), 0 2px 8px rgba(0, 0, 0, 0.4);
-  --shadow-drawer: -24px 0 64px -28px rgba(0, 0, 0, 0.7);
+  --shadow-pop: 0 20px 54px -22px rgba(0, 0, 0, 0.92), 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-drawer: -24px 0 64px -28px rgba(0, 0, 0, 0.72);
 
-  --brand-mark-bg: #f1f1ed;
-  --brand-mark-fg: #111113;
-  --nav-active-bg: #1b1b1e;
-  --nav-active-text: #f1f1ed;
-  --row-hover: #151517;
-  --skeleton: #1e1e21;
-  --skeleton-shine: #26262a;
+  --brand-mark-bg: #ededee;
+  --brand-mark-fg: #131315;
+  --nav-active-bg: #1e1f22;
+  --nav-active-text: #ededee;
+  --row-hover: #191a1c;
+  --skeleton: #1f2023;
+  --skeleton-shine: #28292d;
 
-  --chart-line: #82a8ff;
-  --chart-line-soft: #4b6fb8;
-  --chart-grid: #222226;
-  --chart-axis: #8f8f87;
-  --chart-cursor: #4a4a50;
-  --chart-gain: #ff9a90;
-  --chart-loss: #62d9a6;
+  --chart-line: #7ba5ff;
+  --chart-line-soft: #4a6cb5;
+  --chart-grid: #232427;
+  --chart-axis: #9297a0;
+  --chart-cursor: #4a4c52;
+  --chart-gain: #ff9d94;
+  --chart-loss: #66d9a8;
 
-  --scrollbar-thumb: #33333a;
+  --scrollbar-thumb: #34363b;
 }
 
 @media (prefers-reduced-motion: reduce) {

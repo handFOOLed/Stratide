@@ -6,9 +6,19 @@ export type PageKey = (typeof PAGE_KEYS)[number];
 export const HISTORY_TABS = ['fills', 'orders', 'daily', 'strategies', 'research'] as const;
 export type HistoryTab = (typeof HISTORY_TABS)[number];
 
+export const SETTINGS_SECTIONS = ['appearance', 'data', 'security', 'about'] as const;
+export type SettingsSection = (typeof SETTINGS_SECTIONS)[number];
+
 export interface Route {
   page: PageKey;
   tab: HistoryTab;
+  section: SettingsSection;
+}
+
+export interface RouteTarget {
+  page: PageKey;
+  tab?: HistoryTab;
+  section?: SettingsSection;
 }
 
 export const PAGE_LABELS: Record<PageKey, string> = {
@@ -27,23 +37,39 @@ export const HISTORY_TAB_LABELS: Record<HistoryTab, string> = {
   research: '研究档案',
 };
 
+export const SETTINGS_SECTION_LABELS: Record<SettingsSection, string> = {
+  appearance: '外观',
+  data: '数据连接',
+  security: '权限与安全',
+  about: '关于',
+};
+
 export function parseRoute(hash: string): Route {
   const raw = hash.replace(/^#/, '').replace(/^\/+/, '');
   const [pagePart, tabPart] = raw.split('/');
   const page = (PAGE_KEYS as readonly string[]).includes(pagePart) ? (pagePart as PageKey) : 'overview';
   let tab: HistoryTab = 'fills';
+  let section: SettingsSection = 'appearance';
   if (page === 'history') {
     if (tabPart === 'performance') tab = 'daily';
     else if (tabPart && (HISTORY_TABS as readonly string[]).includes(tabPart)) tab = tabPart as HistoryTab;
   }
-  return { page, tab };
+  if (page === 'settings' && tabPart && (SETTINGS_SECTIONS as readonly string[]).includes(tabPart)) {
+    section = tabPart as SettingsSection;
+  }
+  return { page, tab, section };
 }
 
-export function routeHref(route: Route): string {
-  return route.page === 'history' ? `#history/${route.tab}` : `#${route.page}`;
+export function routeHref(route: RouteTarget): string {
+  if (route.page === 'history') return `#history/${route.tab ?? 'fills'}`;
+  if (route.page === 'settings') {
+    const section = route.section ?? 'appearance';
+    return section === 'appearance' ? '#settings' : `#settings/${section}`;
+  }
+  return `#${route.page}`;
 }
 
-export function navigate(route: Route, options: { replace?: boolean } = {}): void {
+export function navigate(route: RouteTarget, options: { replace?: boolean } = {}): void {
   const href = routeHref(route);
   if (window.location.hash === href) return;
   if (options.replace) {

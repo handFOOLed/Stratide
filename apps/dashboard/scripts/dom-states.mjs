@@ -69,8 +69,8 @@ async function waitFor(predicate, label, timeout = 12000) {
   assert(doc.body.textContent.includes('最后估值缺失'), 'missing nav warning');
   assert(doc.body.textContent.includes('缺少可信收盘估值'), 'valuation reason');
   assert(doc.querySelector('.chart-svg'), 'chart renders valid points around gap');
-  assert(doc.body.textContent.includes('缺估值 1 日'), 'chart gap caption');
-  window.location.hash = '#settings';
+  assert(doc.body.textContent.includes('缺 1 日'), 'chart gap caption');
+  window.location.hash = '#settings/data';
   await waitFor(() => doc.body.textContent.includes('数据连接'), 'settings');
   assert(doc.body.textContent.includes('测试专用：缺少可信收盘估值'), 'settings gap reason');
   assert(!doc.body.textContent.includes('[object Object]'), 'gap object not dumped');

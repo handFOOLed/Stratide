@@ -17,7 +17,6 @@ export function AppShell({
   refreshing,
   mainRef,
   children,
-  footer,
 }: {
   route: Route;
   health: HealthState;
@@ -27,7 +26,6 @@ export function AppShell({
   refreshing: boolean;
   mainRef: RefObject<HTMLDivElement | null>;
   children: ReactNode;
-  footer: ReactNode;
 }) {
   const [navOpen, setNavOpen] = useState(false);
   const contentRef = useRef<HTMLElement>(null);
@@ -60,7 +58,6 @@ export function AppShell({
         />
         <main className="main-inner" id="main-content" tabIndex={-1} ref={contentRef}>
           {children}
-          {footer}
         </main>
       </div>
 

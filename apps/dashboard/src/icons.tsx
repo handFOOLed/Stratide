@@ -39,6 +39,7 @@ export type IconName =
   | 'activity'
   | 'key'
   | 'server'
+  | 'user'
   | 'arrow-up-right'
   | 'arrow-right'
   | 'calendar'
@@ -223,6 +224,12 @@ const paths: Record<IconName, ReactNode> = {
       <rect x="3.5" y="4" width="17" height="6.5" rx="1.7" />
       <rect x="3.5" y="13.5" width="17" height="6.5" rx="1.7" />
       <path d="M7 7.2h.1M7 16.7h.1" />
+    </>
+  ),
+  user: (
+    <>
+      <circle cx="12" cy="8.2" r="3.7" />
+      <path d="M4.8 20c0-3.4 3.2-5.6 7.2-5.6s7.2 2.2 7.2 5.6" />
     </>
   ),
   'arrow-up-right': <path d="M7 17 17 7M8 7h9v9" />,

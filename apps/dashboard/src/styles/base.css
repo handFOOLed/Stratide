@@ -82,7 +82,6 @@ svg {
 }
 
 table {
-  border-collapse: collapse;
   border-spacing: 0;
 }
 
@@ -190,14 +189,14 @@ textarea {
   transform: translateY(0);
 }
 
+/* Theme surfaces cross-fade. Table rows do NOT: a border-color transition on
+   reordered rows is what flashed a dark hairline while sorting. */
 body,
 .app-shell,
 .sidebar,
 .topbar,
 .card,
 .tabs-bar,
-.data-table th,
-.data-table td,
 .input,
 .select,
 .textarea,

@@ -35,17 +35,22 @@ export function EquityChart({
   metric,
   label,
   heightClass,
+  navTopFen = null,
 }: {
   rows: EquityRow[];
   metric: ChartMetric;
   label: string;
   heightClass?: string;
+  navTopFen?: bigint | null;
 }) {
   const frameRef = useRef<HTMLDivElement>(null);
   const measured = useElementSize(frameRef);
   const width = measured.width > 16 ? measured.width : 760;
-  const height = measured.height > 16 ? measured.height : 300;
-  const model = useMemo(() => buildChartModel(rows, metric, width, height), [height, metric, rows, width]);
+  const height = measured.height > 16 ? measured.height : 260;
+  const model = useMemo(
+    () => buildChartModel(rows, metric, width, height, { navTopFen }),
+    [height, metric, navTopFen, rows, width],
+  );
   const [hover, setHover] = useState<number | null>(null);
   const gradientId = 'chart-area-' + useId().replace(/[^a-zA-Z0-9_-]/g, '');
 
@@ -76,17 +81,18 @@ export function EquityChart({
     const first = model.points.find((point) => point !== null);
     const last = [...model.points].reverse().find((point) => point !== null);
     if (!first || !last) return '没有有效估值';
+    const missing = model.totalCount - model.validCount;
     return (
       formatDay(model.firstDay ?? '') +
       ' 至 ' +
       formatDay(model.lastDay ?? '') +
       '，' +
       String(model.validCount) +
-      ' 个有效估值点。首个 ' +
+      ' 个有效估值。首个 ' +
       chartMetricValue(metric, first.value) +
       '，最后 ' +
       chartMetricValue(metric, last.value) +
-      '。缺失估值保持断开，不补点。'
+      (missing > 0 ? '。缺失估值断开 ' + String(missing) + ' 日，不补点。' : '。')
     );
   }, [metric, model]);
 
@@ -95,7 +101,7 @@ export function EquityChart({
   if (!model) {
     return (
       <div className={frameClass} ref={frameRef}>
-        <div className="chart-empty">此区间没有有效估值。缺失值保留为空，不生成收益点或填充日期。</div>
+        <div className="chart-empty">此区间没有有效估值。</div>
       </div>
     );
   }
@@ -117,8 +123,30 @@ export function EquityChart({
         viewBox={'0 0 ' + String(model.width) + ' ' + String(model.height)}
         role="img"
         aria-label={label + '。' + summary}
+        tabIndex={0}
         onPointerMove={onPointerMove}
         onPointerLeave={() => setHover(null)}
+        onFocus={() => {
+          if (hover === null && points.length > 0) setHover(points.length - 1);
+        }}
+        onBlur={() => setHover(null)}
+        onKeyDown={(event) => {
+          if (points.length === 0) return;
+          if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+            event.preventDefault();
+            const current = hover === null ? points.length - 1 : hover;
+            const next = event.key === 'ArrowLeft' ? Math.max(0, current - 1) : Math.min(points.length - 1, current + 1);
+            setHover(next);
+          } else if (event.key === 'Home') {
+            event.preventDefault();
+            setHover(0);
+          } else if (event.key === 'End') {
+            event.preventDefault();
+            setHover(points.length - 1);
+          } else if (event.key === 'Escape') {
+            setHover(null);
+          }
+        }}
       >
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -127,6 +155,7 @@ export function EquityChart({
           </linearGradient>
         </defs>
 
+        {/* Five equal steps: a faint dashed gridline every 20% of the axis. */}
         {model.ticks.map((tick) => (
           <g key={String(tick.y)}>
             <line
@@ -164,22 +193,6 @@ export function EquityChart({
           <path key={'line-' + String(index)} className="chart-line" d={segment} />
         ))}
 
-        {model.totalCount <= 31
-          ? model.points.map((point, index) =>
-              point ? (
-                <circle
-                  key={'dot-' + String(index)}
-                  className={'chart-dot' + (active === point ? ' chart-dot--active' : '')}
-                  cx={point.x}
-                  cy={point.y}
-                  r={3}
-                >
-                  <title>{formatDay(point.day) + ' · ' + chartMetricValue(metric, point.value)}</title>
-                </circle>
-              ) : null,
-            )
-          : null}
-
         {active ? (
           <g>
             <line
@@ -198,7 +211,7 @@ export function EquityChart({
             key={'x-' + String(index)}
             className="chart-axis-text"
             x={tick.x}
-            y={model.height - 8}
+            y={model.height - 6}
             textAnchor={tick.anchor}
           >
             {chartDayLabel(tick.day)}
@@ -207,18 +220,9 @@ export function EquityChart({
       </svg>
 
       {active ? (
-        <div
-          className="chart-tooltip"
-          style={tooltipStyle}
-          aria-hidden="true"
-        >
+        <div className="chart-tooltip" style={tooltipStyle} aria-hidden="true">
           <div className="chart-tooltip__day">{formatDay(active.day)}</div>
-          <div className="chart-tooltip__value">
-            {chartMetricValue(metric, active.value)}
-            <span className="chart-tooltip__metric">
-              {metric === 'return' ? '累计收益率' : metric === 'pnl' ? '累计盈亏' : '账户净值'}
-            </span>
-          </div>
+          <div className="chart-tooltip__value">{chartMetricValue(metric, active.value)}</div>
         </div>
       ) : null}
     </div>

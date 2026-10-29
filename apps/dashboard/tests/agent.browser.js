@@ -56,7 +56,9 @@ test('real Agent API creates, stores, reads, cancels, pauses and does not call t
   await page.getByRole('button', { name: '关闭详情' }).click();
 
   await page.getByRole('button', { name: '优雅暂停', exact: true }).click();
-  await expect(page.getByText('已优雅暂停')).toBeVisible();
+  // The toast says "已优雅暂停研究"; the runtime badge is the authoritative state.
+  await expect(page.locator('.agent-runtime .badge')).toHaveText('已优雅暂停');
+  await expect(page.locator('.runtime-title')).toHaveText('已暂停接收新任务');
   const cancelled = await createTask(page, 'Web 排队取消');
   await expect(cancelled).toContainText('排队中');
   await cancelled.getByRole('button', { name: '取消', exact: true }).click();

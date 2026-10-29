@@ -2,6 +2,7 @@ import { BrandMark, Icon } from '../icons';
 import type { IconName } from '../icons';
 import { PAGE_LABELS, routeHref } from '../lib/route';
 import type { PageKey, Route } from '../lib/route';
+import { UserMenu } from './UserMenu';
 
 const NAV: Array<{ page: PageKey; icon: IconName }> = [
   { page: 'overview', icon: 'overview' },
@@ -40,9 +41,8 @@ export function SidebarContent({
         ) : null}
       </div>
       <div className="sidebar-scroll">
-        <div className="nav-group">
-          <p className="nav-label">工作空间</p>
-          <nav className="nav-list" aria-label="主导航">
+        <nav className="nav-group" aria-label="主导航">
+          <div className="nav-list">
             {NAV.map((item) => (
               <a
                 key={item.page}
@@ -58,20 +58,10 @@ export function SidebarContent({
                 <span className="nav-text">{PAGE_LABELS[item.page]}</span>
               </a>
             ))}
-          </nav>
-        </div>
-        <div className="sidebar-status" title="本机只读工作空间">
-          <span className="status-dot status-dot--online" aria-hidden="true" />
-          <span className="sidebar-status-copy">
-            <span className="sidebar-status-title">本机 Paper 工作空间</span>
-            <span className="sidebar-status-detail">只读账户 · 研究受控</span>
-          </span>
-        </div>
+          </div>
+        </nav>
       </div>
-      <div className="sidebar-footer">
-        <span className="sidebar-footer-host">127.0.0.1 · local</span>
-        <span className="sidebar-footer-version">v{__UI_VERSION__}</span>
-      </div>
+      <UserMenu onNavigate={onNavigate} />
     </aside>
   );
 }
