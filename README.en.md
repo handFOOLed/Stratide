@@ -2,6 +2,8 @@
 
 # Stratide
 
+**This branch: M2-PR01 (Draft; developer self-tests, independent acceptance pending).** [Issue #20](https://github.com/handFOOLed/Stratide/issues/20) adds a local read-only Paper Dashboard: Rust HTTP API, account overview, confirmed fills and order history, account performance, separately selected research results, themes and detail drawers. It reads one explicitly selected published six-report snapshot, never the trading writer. Web and Agent development belong in the paper phase; research Agent automation is not implemented here. See [Windows startup and API instructions](apps/dashboard/README.md) and [delivery evidence](docs/M2_PR01.md) (Chinese). Earlier milestone records remain below.
+
 **M1-PR05B in this branch (Draft, Sol self-tested):** [Issue #11](https://github.com/handFOOLed/Stratide/issues/11) prioritizes real historical EOD input → fixed SMA5/20 → an isolated next-open assumption → the existing Risk Kernel, ledger and six reports. The actual smoke loaded 68 sessions for `600000.SH`; see [commands, source hashes, financial results and limitations](docs/M1_PR05B.md) (Chinese). Historical assumptions do not establish received-at-open observations or verified PIT evidence. [Issue #10](https://github.com/handFOOLed/Stratide/issues/10) continues independently; Terra acceptance and ChatGPT review remain pending. Do not merge.
 
 Independent reacceptance confirmed the original three R1 fixes but found a new P1: a prior-day backfill could introduce today's calendar conflict without revoking readiness. R2 fixes this inconsistency; [failure and repair evidence](docs/evidence/m1-pr04b-r2/README.md) is preserved. Independent acceptance of the new SHA is pending. The PR stays Draft, with no paper execution integration.
@@ -33,7 +35,7 @@ PR-02 is merged. Its R2 fix requires exclusive expiry strictly after session clo
 
 ## Product intent
 
-Stratide is a resource-light, local-first automated trading system with open-ended autonomous research, cloud LLMs only, independent financial risk controls, and a future optional private Web Dashboard. Target design is a personal account around CNY 100,000; this is a sizing assumption, not funds committed or a return promise.
+Stratide is a resource-light, local-first automated trading system with open-ended autonomous research, cloud LLMs only, independent financial risk controls, a local read-only Paper Web Dashboard and optional authenticated remote access later. Target design is a personal account around CNY 100,000; this is a sizing assumption, not funds committed or a return promise.
 
 - **Now:** develop and run on Windows PC; backtesting and paper trading first.
 - **Later, conditional:** deploy the same portable core on a low-power 24/7 **Apple Silicon Mac mini (macOS ARM64) or Linux mini PC**, with private authenticated web access. Broker adapters may require separate platform-specific integration.
@@ -61,7 +63,7 @@ Stratide is a resource-light, local-first automated trading system with open-end
 apps/
   stratided/           tiny placeholder for future background service
   stratide-cli/        local risk demo, durable paper CLI, deterministic replay and reports
-  dashboard/           future private Web UI (not implemented)
+  dashboard/           local read-only Paper Web: overview, history, themes, details
 crates/
   contracts/           paper account, proposal and trusted snapshot contracts
   data/                future data acquisition module

@@ -16,6 +16,7 @@ __pycache__/
 *.key
 secrets/
 config/local.toml
+/STRATIDE_TUSHARE_TOKEN.md
 
 # Runtime money/data artifacts
 state/
@@ -33,3 +34,9 @@ data/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Local Dashboard build / browser evidence
+/apps/dashboard/node_modules/
+/apps/dashboard/dist/
+/apps/dashboard/test-results/
+/apps/dashboard/playwright-report/

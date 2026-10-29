@@ -4,7 +4,9 @@ Status: **agreed product principles**, not a profitability claim.
 
 ## Approved implementation priority (ADR-037)
 
-First ship a **working, observable paper trading simulator**, not a broker adapter, cloud Agent or dashboard. Deliver deterministic paper risk/order/fill/ledger replay and restart recovery (M0), then provenance-tagged genuine forward paper observation and readable daily NAV/trades/fee/drawdown reports (M1). Historical backtests or synthetic scenarios must never be mislabelled as live observations. GPT-6.1 Sol implements, GPT-6.1 Terra independently validates and merges **only after** ChatGPT code review resolves blocking issues. Owner controls scope and reviews actual paper outcomes. See [paper trading roadmap](PAPER_TRADING_ROADMAP.md).
+First ship a **working, observable paper trading simulator**. Deliver deterministic paper risk/order/fill/ledger replay and restart recovery (M0), then provenance-tagged genuine forward paper observation and readable daily NAV/trades/fee/drawdown reports (M1). Historical backtests or synthetic scenarios must never be mislabelled as live observations. GPT-6.1 Sol implements, GPT-6.1 Terra independently validates and merges **only after** ChatGPT code review resolves blocking issues. Owner controls scope and reviews actual paper outcomes. See [paper trading roadmap](PAPER_TRADING_ROADMAP.md).
+
+**2026-10-29 Owner 阶段补充（[Issue #19](https://github.com/handFOOLed/Stratide/issues/19)、[Issue #20](https://github.com/handFOOLed/Stratide/issues/20)）：Web Dashboard 与研究 Agent 均在 paper 阶段开发，不以未来实盘或 mini PC 为前置条件。** Issue #20 交付本机只读 Paper Web，研究 Agent 自动化由下一项任务实现；每次交付可启动、可交互的完整纵向功能包。此范围更新不改写 Accepted ADR，也不授权券商、真实资金、云端部署或付费调用。操作见 [Dashboard](../apps/dashboard/README.md)。
 
 ## Mission
 
@@ -39,10 +41,10 @@ Stratide autonomously discovers, evaluates, manages and eventually executes trad
 - **ADR-035:** allocate passive dividends, bonus shares and verified mandatory corporate actions automatically based on each group's eligible record-date holdings. Reconcile broker cash/shares, tax, entitlements and cost basis without double-counted profit. Voluntary rights actions requiring new cash or election remain unapproved; M0 does not implement this.
 - **ADR-036:** funded rights subscriptions, tender choices and other voluntary corporate actions require event-specific Owner approval. The system may identify, verify, inform and remind but does not automatically spend cash or apply. Owner approval never bypasses trusted broker/Risk Kernel checks. Passive distributions remain automatic, and no live feature enters M0.
 - **ADR-006:** autonomous research cannot turn repeated holdout peeking into false trading advantage; freeze candidate versions, keep independent evaluator authority, record all evaluations and require genuine forward evidence before live eligibility.
-- Develop and paper trade on user's Windows PC first. A persistent **macOS ARM64 Mac mini or Linux mini PC** and private web dashboard are **conditional** on sustained evidence of value; broker integration may be OS-specific.
+- Develop and paper trade on user's Windows PC first, with a local read-only Web Dashboard during paper development. A persistent **macOS ARM64 Mac mini or Linux mini PC** and remote authenticated deployment remain **conditional** on sustained evidence of value; broker integration may be OS-specific.
 - **ADR-017:** use one authoritative trading instance, persist order/portfolio/risk state and reconcile before live restart; do not operate two active trading cores or automatic hardware failover. Hardware downtime is accepted rather than risking duplicate orders.
 - Local footprint should be tiny: no GPU and no local model inference; LLM via cloud API, remote compute when justified. **Hybrid strategy decisions** are accepted: light strategies may run locally, complex ones remotely, but all proposals must pass local risk and order controls ([ADR-001](adr/0001-hybrid-strategy-execution.md)). **ADR-014:** generated Python/ML strategies execute in independent local/remote Workers, never inside the credential-bearing Rust core; WASM is not mandatory.
-- No conventional stock-terminal GUI required. A CLI plus reports is sufficient for now.
+- No conventional stock-terminal GUI required. Keep the headless CLI and reports available alongside the local paper-phase Web Dashboard.
 - Prioritize credible financial failure over cosmetic edge cases and speculative enterprise hardening.
 
 ## Explicit non-goals now
