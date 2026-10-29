@@ -2,6 +2,8 @@
 
 # Stratide
 
+**本分支 M2-PR01（Draft，开发自测，待独立验收）：** 按 [Issue #20](https://github.com/handFOOLed/Stratide/issues/20) 完成本地只读 Paper Web Dashboard V1：Rust API、总览、历史成交/订单/账户表现与独立研究档案、主题和详情抽屉。启动时明确指定一个完整六报告目录；没有自动择新实验或交易写权限。Windows 一键启动与 API 说明见 [Dashboard](apps/dashboard/README.md)，实际自测见 [交付记录](docs/M2_PR01.md)。Web 与 Agent 均在 paper 阶段开发，Agent 自动化尚未实现；以下保留已有里程碑历史。
+
 **本分支 M1-PR05B（Draft，Sol 自测）：** 按 [Issue #11](https://github.com/handFOOLed/Stratide/issues/11) 优先加入真实历史 EOD → 固定 SMA5/20 → 隔离 next-open 假设 → 原 Risk/账本/六报告的探索性回测。已实际加载 `600000.SH` 的 68 个交易日，命令、来源哈希、财务结果和限制见 [历史回测操作说明](docs/M1_PR05B.md)。历史假设不是实时开盘实收或 PIT 认证；[Issue #10](https://github.com/handFOOLed/Stratide/issues/10) 的真实前向观察独立继续，待 Terra 独立验收与小猫审查，不合并。
 
 PR04B 的 R1 已修复原三项 P1；独立复验又发现旧日补录带回当日冲突后仍报告 ready 的 P1，本轮 R2 修复并保留 [失败/修复证据](docs/evidence/m1-pr04b-r2/README.md)。新 SHA 仍待独立验收，保持 Draft，不接入成交。
@@ -75,7 +77,7 @@ Stratide 是面向个人用户的**低资源占用、本地优先**的自动化�
 apps/
   stratided/           Rust 后台服务占位程序
   stratide-cli/        风险示例、持久 Paper CLI、历史回放与真实盘后观察命令
-  dashboard/           未来的私有 Web 控制台（未实现）
+  dashboard/           本机只读 Paper Web（总览、历史、主题、详情）
 crates/
   contracts/           Paper 账户、提案与可信快照契约
   risk/                独立 Paper 风险审查（无下单/成交）

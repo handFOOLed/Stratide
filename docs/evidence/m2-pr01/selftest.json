@@ -1,0 +1,40 @@
+{
+  "scope": "developer_self_test_not_independent_acceptance",
+  "cases": [
+    {
+      "mode": "synthetic_test",
+      "source_version": "fixture-v1",
+      "first_day": 20261028,
+      "last_day": 20261102,
+      "sessions": 4,
+      "fills": 2,
+      "orders": 3,
+      "report_sha256": "ab7438455f5b61e96e26ae272d61587cb73e45463d072cd1a51425e0eafc4f45",
+      "original_files_checked": 6,
+      "original_bytes_and_mtime_unchanged": true,
+      "refresh_pinned": true,
+      "restart_identical": true,
+      "read_only_http": true,
+      "financial_values_match_report": true,
+      "research_separate": "NOT_CONFIGURED"
+    },
+    {
+      "mode": "historical_replay",
+      "source_version": "tushare-daily-trade_cal-stk_limit-suspend_d/adapter-v1",
+      "first_day": 20260717,
+      "last_day": 20261028,
+      "sessions": 68,
+      "fills": 3,
+      "orders": 3,
+      "report_sha256": "e9cb7b2942d87c98ec68dcc14faaeb3d607ace16ad70ae0c24a99f3ad431e065",
+      "original_files_checked": 8,
+      "original_bytes_and_mtime_unchanged": true,
+      "refresh_pinned": true,
+      "restart_identical": true,
+      "read_only_http": true,
+      "financial_values_match_report": true,
+      "research_separate": true
+    }
+  ],
+  "historical_68": "VERIFIED"
+}

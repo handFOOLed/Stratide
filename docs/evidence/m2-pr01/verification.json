@@ -1,0 +1,67 @@
+{
+  "scope": "developer_self_test_not_independent_acceptance",
+  "base": "a0d8914600717e2bc22bf165025c36dc303947ef",
+  "rust_workspace_tests": 117,
+  "dashboard_rust_tests": 7,
+  "frontend_model_tests": 4,
+  "browser_tests": 5,
+  "fmt": "PASS",
+  "clippy": "PASS",
+  "frontend_build": "PASS",
+  "windows_launcher": "PASS",
+  "credential_document_ignored_and_untracked": "VERIFIED_NO_CONTENT_READ",
+  "text_contrast_pairs": 14,
+  "minimum_text_contrast": 5.67,
+  "screenshots": {
+    "historical-1366-viewport.png": {
+      "width": 1366,
+      "height": 900
+    },
+    "historical-1366.png": {
+      "width": 1366,
+      "height": 1691
+    },
+    "historical-1920-viewport.png": {
+      "width": 1920,
+      "height": 1080
+    },
+    "historical-1920.png": {
+      "width": 1920,
+      "height": 1737
+    },
+    "historical-holding-drawer.png": {
+      "width": 1920,
+      "height": 1080
+    },
+    "synthetic-1280.png": {
+      "width": 1280,
+      "height": 1617
+    },
+    "synthetic-1366-viewport.png": {
+      "width": 1366,
+      "height": 900
+    },
+    "synthetic-1366.png": {
+      "width": 1366,
+      "height": 1617
+    },
+    "synthetic-1920-viewport.png": {
+      "width": 1920,
+      "height": 1080
+    },
+    "synthetic-1920.png": {
+      "width": 1920,
+      "height": 1663
+    },
+    "synthetic-375.png": {
+      "width": 375,
+      "height": 2773
+    }
+  },
+  "historical_screenshots": "local_ignored_directory_only",
+  "platform": "Windows x86_64",
+  "rust": "1.98.1",
+  "node": "24.19.0",
+  "python": "3.12.10",
+  "browser": "Microsoft Edge 156.0.4314.50 (Chromium)"
+}
