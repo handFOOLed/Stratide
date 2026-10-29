@@ -87,9 +87,7 @@ export function AgentPage({ agent, titleRef }: { agent: AgentState; titleRef?: R
 
   const header = (
     <PageHeader
-      eyebrow="Local research"
       title="Agent 管理"
-      description="持久研究任务、硬预算与模型状态。研究不修改账户 NAV、持仓或策略资格，也不会获得交易权限。"
       titleRef={titleRef}
       side={
         unlocked ? (
@@ -109,7 +107,7 @@ export function AgentPage({ agent, titleRef }: { agent: AgentState; titleRef?: R
             </Button>
           </>
         ) : (
-          <Badge tone="outline">Owner token required</Badge>
+          <Badge tone="outline">未解锁</Badge>
         )
       }
     />
@@ -128,15 +126,13 @@ export function AgentPage({ agent, titleRef }: { agent: AgentState; titleRef?: R
           <div className="col-7">
             <Card className="agent-gate">
               <div className="agent-gate__icon" aria-hidden="true"><Icon name="lock" size={22} /></div>
-              <div className="page-eyebrow">Owner-gated</div>
               <h2 className="agent-gate__title">解锁本机研究控制</h2>
               <p className="agent-gate__desc">
-                创建、查看、暂停或取消持久研究任务，读取预算与调用记录。所有请求都需要本机 owner-token，令牌只保存在当前页面内存。
+                使用本机 Owner 令牌查看和管理研究任务。
               </p>
               <ul className="gate-points">
-                <li><Icon name="key" size={14} /><span>令牌不写入 localStorage、sessionStorage、URL 或控制台。</span></li>
-                <li><Icon name="database" size={14} /><span>浏览器刷新后需重新解锁；刷新和打开详情不会调用付费模型。</span></li>
-                <li><Icon name="shield" size={14} /><span>研究 Agent 无下单、账本写入、风险配置或密钥读取权限。</span></li>
+                <li><Icon name="key" size={14} /><span>令牌仅保存在页面内存，刷新后需重新解锁。</span></li>
+                <li><Icon name="database" size={14} /><span>刷新列表与查看详情不会调用付费模型。</span></li>
               </ul>
               <div className="agent-gate__actions">
                 <Button variant="primary" icon="unlock" onClick={() => setUnlockOpen(true)}>
@@ -150,25 +146,21 @@ export function AgentPage({ agent, titleRef }: { agent: AgentState; titleRef?: R
             <Card className="agent-boundary">
               <CardHead
                 title="研究边界"
-                subtitle="当前 Web 只提供已实现的研究控制"
                 actions={<Badge tone="outline">Paper only</Badge>}
               />
               <div className="boundary-list">
                 <div className="boundary-item">
                   <span className="boundary-item__icon"><Icon name="file" /></span>
-                  <div><strong>持久任务</strong><p>队列、状态、结果与费用记录保存在本机 SQLite，列表和详情只读取已保存内容。</p></div>
+                  <div><strong>持久任务</strong><p>任务、结果与调用记录保存在本机。</p></div>
                 </div>
                 <div className="boundary-item">
                   <span className="boundary-item__icon"><Icon name="wallet" /></span>
-                  <div><strong>硬预算</strong><p>日/月上限与预留由可信 Gate 执行；Web 不提供加额、清锁或密钥写入。</p></div>
+                  <div><strong>硬预算</strong><p>日/月上限与调用预留由可信服务执行。</p></div>
                 </div>
                 <div className="boundary-item">
                   <span className="boundary-item__icon"><Icon name="shield" /></span>
-                  <div><strong>无交易权限</strong><p>研究输出只是探索性假设，不是独立资格、收益证明或实盘部署许可。</p></div>
+                  <div><strong>无交易权限</strong><p>探索性研究不授予策略资格或实盘许可。</p></div>
                 </div>
-              </div>
-              <div className="card__foot">
-                <span>通知渠道与审批服务仍未接入。</span>
               </div>
             </Card>
           </div>
@@ -252,7 +244,6 @@ export function AgentPage({ agent, titleRef }: { agent: AgentState; titleRef?: R
           <Card className="agent-runtime">
             <CardHead
               title="研究运行状态"
-              subtitle="单 worker · 研究不触碰账户资金与交易权限"
               actions={
                 <Badge tone={status.paused ? 'warning' : runningTasks ? 'accent' : 'neutral'}>
                   {status.paused ? '已优雅暂停' : runningTasks ? '研究中 ' + String(runningTasks) : '等待执行'}
@@ -265,8 +256,8 @@ export function AgentPage({ agent, titleRef }: { agent: AgentState; titleRef?: R
                   <h3 className="runtime-title">{status.paused ? '已暂停接收新任务' : '等待或执行已授权研究'}</h3>
                   <p className="runtime-desc">
                     {status.paused
-                      ? '不会开始新任务；已提交的调用可完成。只有 Owner 主动恢复后才会继续。'
-                      : '任务串行执行，列表与详情读取不会触发模型调用。'}
+                      ? '暂停接收新任务，已提交的调用可完成。'
+                      : '任务串行执行，详情只读取已保存记录。'}
                   </p>
                 </div>
                 <div className="runtime-actions">
@@ -361,7 +352,6 @@ export function AgentPage({ agent, titleRef }: { agent: AgentState; titleRef?: R
         onClose={() => {
           if (agent.busy !== 'create') setCreateOpen(false);
         }}
-        eyebrow="New research task"
         title="新建研究任务"
         description="任务会进入持久队列，并受日/月硬预算与新任务配置约束。"
         wide
@@ -395,7 +385,6 @@ function BudgetCard({ status, agent }: { status: AgentStatus; agent: AgentState 
     <Card className="agent-budget">
       <CardHead
         title="研究预算"
-        subtitle="由可信预算 Gate 独立执行；Web 不能加额"
         actions={<Badge tone={configured ? 'success' : 'warning'}>{configured ? budget.currency : '未配置'}</Badge>}
       />
       <CardBody>
@@ -441,7 +430,7 @@ function BudgetCard({ status, agent }: { status: AgentStatus; agent: AgentState 
               <div><dt>收到用量估算</dt><dd className="numeric">{formatMicro(budget.usage_estimate_micro, { currency: budget.currency })}</dd></div>
             </dl>
             <div className="budget-note">
-              {budget.currency} · 预算单位 micro (1e-6) · {budget.timezone} · {budget.day} / {budget.month}。云端用量是估算；最终账单未核定前保留最大预留，未知费用不按 0 处理。
+              {budget.currency} · {budget.timezone} · {budget.day} / {budget.month}。未核定费用按最大预留计。
             </div>
           </>
         )}
@@ -459,12 +448,12 @@ function ModelsCard({ status, agent }: { status: AgentStatus; agent: AgentState 
     <Card className="agent-models">
       <CardHead
         title="模型与自动研究"
-        subtitle="默认/备用选择只影响新任务；已排队或运行中的任务保留原配置版本。"
+        subtitle="模型选择仅影响新任务"
         actions={<Badge tone="outline">{status.automatic_fallback.startsWith('disabled') ? '自动 fallback 关闭' : '备用仅保存'}</Badge>}
       />
       <CardBody>
         <div className="model-config-grid">
-          <Field label="默认模型" htmlFor="agent-default-model" hint="用于之后创建的任务；不会改写历史任务。">
+          <Field label="默认模型" htmlFor="agent-default-model">
             <Select
               id="agent-default-model"
               value={status.default_model ?? ''}
@@ -567,7 +556,7 @@ function ModelsCard({ status, agent }: { status: AgentStatus; agent: AgentState 
           </summary>
           <div className="disclosure__body">
             {usage.length === 0 ? (
-              <p className="muted">尚无已记录用量。调用详情只在任务完成后累计。</p>
+              <p className="muted">尚无已记录用量。</p>
             ) : (
               <table className="mini-table">
                 <thead>
@@ -592,9 +581,6 @@ function ModelsCard({ status, agent }: { status: AgentStatus; agent: AgentState 
             )}
           </div>
         </details>
-        <div className="model-footnote">
-          Provider 文本没有代码、交易、文件或工具权限。研究输出仅为探索性假设，不是策略资格或实盘许可。
-        </div>
       </CardBody>
     </Card>
   );
@@ -639,8 +625,7 @@ function TasksCard({
   return (
     <Card className="agent-tasks">
       <CardHead
-        title={'研究任务 · ' + String(agent.tasks.length)}
-        subtitle="列表与详情只读取本地持久记录；浏览器刷新不会重新调用付费模型。"
+        title="研究任务"
         actions={
           <>
             <IconButton
@@ -1032,7 +1017,6 @@ function UnlockModal({
       onClose={() => {
         if (!loading) onClose();
       }}
-      eyebrow="Local access"
       title="解锁本机研究控制"
       description="令牌只保存在当前页面内存，不写入浏览器存储或 URL。"
       footer={

@@ -10,13 +10,11 @@ async function measure(page) {
     const workspace = document.querySelector('.workspace');
     const title = rect('.page-title');
     const card = rect('.main-inner .card');
-    const breadcrumb = rect('.breadcrumb');
     const tabs = rect('.tabs-bar');
     const inner = rect('.main-inner');
     return {
       titleX: title ? title.x : null,
       cardX: card ? card.x : null,
-      breadcrumbX: breadcrumb ? breadcrumb.x : null,
       tabsX: tabs ? tabs.x : null,
       innerX: inner ? inner.x : null,
       innerWidth: inner ? inner.width : null,
@@ -54,7 +52,7 @@ test('single scroll container, stable gutter and aligned left edges across pages
     const agents = await measure(page);
 
     await page.goto('/#settings');
-    await expect(page.getByRole('heading', { name: '外观' })).toBeVisible();
+    await expect(page.getByRole('tabpanel', { name: '外观' })).toBeVisible();
     const settings = await measure(page);
 
     for (const state of [overview, history, agents, settings]) {
@@ -63,12 +61,11 @@ test('single scroll container, stable gutter and aligned left edges across pages
       expect(state.docScrollWidth).toBeLessThanOrEqual(state.viewport);
     }
 
-    // Content starts on the same left baseline as the page title. Settings puts
-    // its category rail first, so the rail (not the first card) carries the edge.
+    // Each page's outer card starts on the same left baseline as its title.
     closeTo(overview.titleX, overview.cardX, 'overview title/card @' + width);
     closeTo(history.titleX, history.cardX, 'history title/card @' + width);
     closeTo(agents.titleX, agents.cardX, 'agents title/card @' + width);
-    closeTo(settings.titleX, await page.locator('.settings-nav').evaluate((el) => el.getBoundingClientRect().x), 'settings title/rail @' + width);
+    closeTo(settings.titleX, settings.cardX, 'settings title/card @' + width);
 
     closeTo(overview.innerX, history.innerX);
     closeTo(history.innerX, agents.innerX);
@@ -76,10 +73,6 @@ test('single scroll container, stable gutter and aligned left edges across pages
     closeTo(overview.innerWidth, history.innerWidth);
     closeTo(history.innerWidth, agents.innerWidth);
     if (width >= 960) {
-      closeTo(overview.breadcrumbX, overview.titleX);
-      closeTo(history.breadcrumbX, history.titleX);
-      closeTo(agents.breadcrumbX, agents.titleX);
-      closeTo(settings.breadcrumbX, settings.titleX);
       closeTo(history.tabsX, history.titleX);
     }
 
@@ -123,19 +116,29 @@ test('overview fits one desktop screen at 1920x1080 and 1366x768', async ({ page
     await expect(page.getByTestId('nav-value')).toBeVisible();
     const state = await measure(page);
     expect(state.workspaceScrollHeight).toBeLessThanOrEqual(state.workspaceClientHeight + 1);
+    const risk = await page.locator('.risk-card').boundingBox();
     const account = await page.locator('.account-card').boundingBox();
     const chart = await page.locator('.chart-card').boundingBox();
     const positions = await page.locator('.positions-card').boundingBox();
     const fills = await page.locator('.recent-fills-card').boundingBox();
-    expect(account && chart && positions && fills).toBeTruthy();
-    if (account && chart && positions && fills) {
+    expect(risk && account && chart && positions && fills).toBeTruthy();
+    if (risk && account && chart && positions && fills) {
       // Same row = same top edge; allow sub-pixel rounding from fractional grid tracks.
+      expect(account.x).toBeGreaterThan(risk.x + risk.width - 1);
       expect(chart.x).toBeGreaterThan(account.x + account.width - 1);
+      expect(Math.abs(account.width - risk.width)).toBeLessThanOrEqual(1);
+      expect(Math.abs(chart.width - 3 * risk.width)).toBeLessThanOrEqual(2);
+      expect(Math.abs(account.y - risk.y)).toBeLessThanOrEqual(2);
       expect(Math.abs(chart.y - account.y)).toBeLessThanOrEqual(2);
       expect(positions.y).toBeGreaterThan(account.y + account.height - 1);
       expect(fills.x).toBeGreaterThan(positions.x + positions.width - 1);
       expect(Math.abs(fills.y - positions.y)).toBeLessThanOrEqual(2);
+      expect(Math.abs(positions.width / fills.width - 1.06 / 0.94)).toBeLessThan(0.01);
       expect(positions.height).toBeGreaterThanOrEqual(5 * 44);
+    }
+    for (const selector of ['.risk-card .card__body', '.account-card .card__body']) {
+      const overflow = await page.locator(selector).evaluate((el) => el.scrollHeight - el.clientHeight);
+      expect(overflow, selector + ' @' + width).toBeLessThanOrEqual(1);
     }
   }
 });
@@ -208,10 +211,11 @@ test('positions keep a five-row window and paginate beyond it', async ({ page })
 
 test('navigation moves focus to the page title and tabs keep their own focus', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('link', { name: '设置', exact: true }).click();
+  await page.getByRole('button', { name: /本机 Owner/ }).click();
+  await page.getByRole('menuitem', { name: '设置' }).click();
   await expect(page.locator('.page-title')).toBeFocused();
 
-  await page.getByRole('link', { name: '历史与报告', exact: true }).click();
+  await page.getByRole('link', { name: '历史报告', exact: true }).click();
   await expect(page.locator('.page-title')).toBeFocused();
   const ordersTab = page.getByRole('tab', { name: /订单/ });
   await ordersTab.click();
@@ -221,6 +225,7 @@ test('navigation moves focus to the page title and tabs keep their own focus', a
 
 test('sidebar profile menu opens above the account button and closes with Escape', async ({ page }) => {
   await page.goto('/');
+  await expect(page.getByRole('link', { name: '设置', exact: true })).toHaveCount(0);
   const trigger = page.getByRole('button', { name: /本机 Owner/ });
   await expect(trigger).toBeVisible();
   await trigger.click();
@@ -232,15 +237,24 @@ test('sidebar profile menu opens above the account button and closes with Escape
   expect(triggerBox && menuBox).toBeTruthy();
   if (triggerBox && menuBox) {
     expect(menuBox.y + menuBox.height).toBeLessThanOrEqual(triggerBox.y + 1);
+    expect(menuBox.x + menuBox.width).toBeLessThanOrEqual(triggerBox.x + triggerBox.width + 1);
   }
+  await expect(page.getByRole('menuitem', { name: /切换到.*外观/ })).toHaveCount(0);
   await page.keyboard.press('Escape');
   await expect(menu).toHaveCount(0);
   await expect(trigger).toBeFocused();
 
   await trigger.click();
   await page.getByRole('menuitem', { name: '关于 Stratide' }).click();
-  await expect(page.getByRole('heading', { name: '关于' })).toBeVisible();
+  await expect(page.getByRole('tabpanel', { name: '关于' })).toBeVisible();
   await expect(page.getByRole('tab', { name: '关于' })).toHaveAttribute('aria-selected', 'true');
+
+  // Settings must remain reachable when the sidebar becomes an icon rail.
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto('/');
+  await trigger.click();
+  await page.getByRole('menuitem', { name: '设置' }).click();
+  await expect(page.getByRole('tabpanel', { name: '外观' })).toBeVisible();
 });
 
 test('reduced motion is honoured by system preference and explicit setting', async ({ page }) => {
@@ -262,12 +276,20 @@ test('reduced motion is honoured by system preference and explicit setting', asy
   })).toBeLessThan(1);
 
   await page.goto('/#settings');
-  await page.getByRole('button', { name: '减少动效' }).click();
+  const motionSwitch = page.getByRole('switch', { name: '减弱动态效果' });
+  await expect(motionSwitch).toHaveAttribute('aria-checked', 'false');
+  await motionSwitch.click();
+  await expect(motionSwitch).toHaveAttribute('aria-checked', 'true');
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduce');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await page.getByRole('button', { name: '跟随系统' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduce');
+  await motionSwitch.focus();
+  await page.keyboard.press('Space');
+  await expect(motionSwitch).toHaveAttribute('aria-checked', 'false');
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'full');
   expect(await motionVar()).toBe(300);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduce');
 });
 
 test('drawer and modal really animate, settle into their final state and restore focus', async ({ page }) => {

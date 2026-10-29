@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Icon } from '../icons';
 import { navigate } from '../lib/route';
 import { useOnClickOutside } from '../lib/hooks';
-import { useTheme } from '../state/ThemeProvider';
 
 const ITEM_SELECTOR = '[data-account-menu-item]';
 
@@ -16,7 +15,6 @@ export function UserMenu({ onNavigate }: { onNavigate?: () => void }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const { resolvedTheme, toggleTheme } = useTheme();
 
   const close = useCallback(
     (restoreFocus = true) => {
@@ -76,6 +74,7 @@ export function UserMenu({ onNavigate }: { onNavigate?: () => void }) {
           ref={triggerRef}
           type="button"
           className="account-button"
+          aria-label="本机 Owner，Paper 工作空间"
           aria-haspopup="menu"
           aria-expanded={open}
           aria-controls="account-menu"
@@ -118,16 +117,6 @@ export function UserMenu({ onNavigate }: { onNavigate?: () => void }) {
               >
                 <Icon name="info" size={16} />
                 关于 Stratide
-              </button>
-              <button
-                type="button"
-                role="menuitem"
-                data-account-menu-item=""
-                className="account-menu__item"
-                onClick={toggleTheme}
-              >
-                <Icon name={resolvedTheme === 'dark' ? 'sun' : 'moon'} size={16} />
-                切换到{resolvedTheme === 'dark' ? '浅色' : '深色'}外观
               </button>
             </div>
             <div className="account-menu__foot">

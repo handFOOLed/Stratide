@@ -14,7 +14,6 @@
   flex-direction: column;
   width: var(--sidebar-w);
   height: 100dvh;
-  overflow: hidden;
   border-right: 1px solid var(--border);
   background: var(--sidebar-bg);
   z-index: var(--z-sidebar);
@@ -171,6 +170,7 @@
 }
 
 .nav-text {
+  font-family: "Microsoft YaHei UI", "PingFang SC", "Noto Sans SC", var(--font-sans);
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -308,7 +308,6 @@
   left: 0;
   z-index: calc(var(--z-sidebar) + 4);
   width: 100%;
-  min-width: 228px;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -445,27 +444,6 @@
 
 .topbar-actions {
   gap: 6px;
-}
-
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  color: var(--text-muted);
-  font-size: 13.5px;
-  white-space: nowrap;
-}
-
-.breadcrumb-sep {
-  color: var(--text-faint);
-}
-
-.breadcrumb-current {
-  overflow: hidden;
-  color: var(--text-secondary);
-  font-weight: 500;
-  text-overflow: ellipsis;
 }
 
 .health-pill {
@@ -633,10 +611,6 @@
     height: 54px;
   }
 
-  .breadcrumb {
-    font-size: 13px;
-  }
-
   .main-inner {
     padding-top: 14px;
   }
@@ -646,11 +620,6 @@
   :root {
     --topbar-h: 54px;
     --page-pad: 16px;
-  }
-
-  .breadcrumb-prefix,
-  .breadcrumb-sep {
-    display: none;
   }
 
   .health-pill {

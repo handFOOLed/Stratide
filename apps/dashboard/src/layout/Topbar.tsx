@@ -1,6 +1,4 @@
 import { Icon } from '../icons';
-import { PAGE_LABELS } from '../lib/route';
-import type { PageKey } from '../lib/route';
 import { useTheme } from '../state/ThemeProvider';
 import { HealthPopover } from './HealthPopover';
 import type { HealthState } from '../state/useHealth';
@@ -8,7 +6,6 @@ import type { ApiError } from '../lib/api';
 import type { SnapshotMeta } from '../lib/types';
 
 export function Topbar({
-  page,
   health,
   meta,
   paperError,
@@ -16,7 +13,6 @@ export function Topbar({
   refreshing,
   onOpenNav,
 }: {
-  page: PageKey;
   health: HealthState;
   meta: SnapshotMeta | null;
   paperError: ApiError | null;
@@ -32,11 +28,6 @@ export function Topbar({
           <button type="button" className="icon-btn mobile-menu" aria-label="打开导航" title="打开导航" onClick={onOpenNav}>
             <Icon name="menu" />
           </button>
-          <div className="breadcrumb" aria-label="当前位置">
-            <span className="breadcrumb-prefix">Stratide</span>
-            <span className="breadcrumb-sep" aria-hidden="true">/</span>
-            <span className="breadcrumb-current">{PAGE_LABELS[page]}</span>
-          </div>
         </div>
         <div className="topbar-actions">
           <HealthPopover

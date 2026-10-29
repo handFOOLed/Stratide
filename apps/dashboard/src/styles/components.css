@@ -44,6 +44,7 @@
 .page-title {
   margin-top: 4px;
   color: var(--text);
+  font-family: "Microsoft YaHei UI", "PingFang SC", "Noto Sans SC", var(--font-sans);
   font-size: var(--fs-3xl);
   font-weight: 600;
   letter-spacing: var(--tracking-tighter);

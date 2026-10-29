@@ -23,9 +23,9 @@ export interface RouteTarget {
 
 export const PAGE_LABELS: Record<PageKey, string> = {
   overview: '总览',
-  history: '历史与报告',
+  history: '历史报告',
   agents: 'Agent 管理',
-  notifications: '通知与审批',
+  notifications: '通知审批',
   settings: '设置',
 };
 

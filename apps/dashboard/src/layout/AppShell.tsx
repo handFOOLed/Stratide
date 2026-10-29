@@ -48,7 +48,6 @@ export function AppShell({
       <SidebarContent route={route} />
       <div className="workspace" ref={mainRef}>
         <Topbar
-          page={route.page}
           health={health}
           meta={meta}
           paperError={paperError}

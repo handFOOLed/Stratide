@@ -1,7 +1,7 @@
 /* Page compositions. Shared primitives live in components.css. */
 
 /* ---------- Overview: one desktop screen, two tiers ---------- */
-/* Tier 1: account + risk | equity curve. Tier 2: positions | recent fills. */
+/* Tier 1: risk | account assets | equity curve. Tier 2: positions | recent fills. */
 .overview-page {
   display: flex;
   flex-direction: column;
@@ -12,10 +12,24 @@
 .overview-grid {
   display: grid;
   flex: 1;
-  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
-  grid-template-rows: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  grid-template-rows: minmax(min-content, 0.95fr) minmax(0, 1.05fr);
   gap: 14px;
   min-height: 0;
+}
+
+.overview-top,
+.overview-bottom {
+  display: grid;
+  gap: 14px;
+  min-height: 0;
+}
+
+.overview-top {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 3fr);
+}
+
+.overview-bottom {
+  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
 }
 
 /* Both list cards share the row height so their footers line up. */
@@ -25,6 +39,7 @@
   max-height: 420px;
 }
 
+.risk-card,
 .account-card,
 .chart-card,
 .positions-card,
@@ -35,68 +50,31 @@
   overflow: hidden;
 }
 
-/* --- Account + risk --- */
+/* --- Risk and account assets --- */
+.risk-card .card__body,
 .account-card .card__body {
   display: flex;
   flex: 1;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 12px;
   min-height: 0;
 }
 
-.account-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 10px;
-  margin-top: 5px;
-  color: var(--text-muted);
-  font-size: 13px;
+.risk-card .card__body {
+  gap: var(--space-4);
 }
 
-.account-meta__id {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.01em;
-}
-
-.account-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
-  min-width: 0;
+.account-card .card__body {
+  gap: var(--space-3);
 }
 
 .account-main {
   min-width: 0;
 }
 
-.account-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.account-currency {
-  padding: 1px 5px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text-faint);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-}
-
 .account-value {
-  margin-top: 5px;
+  margin-top: var(--space-2);
   color: var(--text);
-  font-size: clamp(30px, 2.5vw, 42px);
+  font-size: clamp(28px, 2.2vw, 38px);
   font-weight: 600;
   letter-spacing: -0.04em;
   line-height: 1.02;
@@ -105,48 +83,46 @@
 
 .account-delta {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 7px;
-  margin-top: 6px;
-  font-size: 14px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.account-delta__title {
+  font-size: var(--fs-sm);
   font-weight: 600;
+  line-height: var(--lh-snug);
 }
 
-.account-delta-label {
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 400;
+.account-delta__value {
+  font-size: var(--fs-3xl);
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--lh-tight);
 }
 
-.account-cash {
-  display: grid;
-  flex: 0 0 auto;
-  grid-template-columns: repeat(3, minmax(0, auto));
-  gap: 0;
-  margin: 2px 0 0;
-}
-
-.account-cash > div {
+.account-reserved {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
   min-width: 0;
-  padding: 0 14px;
-  border-left: 1px solid var(--divider);
+  margin: 0;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--divider);
 }
 
-.account-cash > div:first-child {
-  border-left: 0;
-}
-
-.account-cash dt {
+.account-reserved dt {
   color: var(--text-muted);
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
+  font-weight: 500;
   white-space: nowrap;
 }
 
-.account-cash dd {
-  margin: 3px 0 0;
+.account-reserved dd {
+  margin: 0;
   color: var(--text);
-  font-size: 14px;
+  font-size: var(--fs-base);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -158,10 +134,9 @@
 
 .risk-strip {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
   padding: 9px 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -170,7 +145,7 @@
 
 .risk-strip__main {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   color: var(--text-secondary);
   font-size: 13.5px;
@@ -182,13 +157,17 @@
 }
 
 .risk-strip__meta {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 8px;
+  width: 100%;
   color: var(--text-muted);
   font-size: 12.5px;
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+}
+
+.risk-strip__meta span:last-child {
+  grid-column: 1 / -1;
 }
 
 .risk-strip--alert {
@@ -201,54 +180,69 @@
   color: var(--warning);
 }
 
+.account-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: auto;
+}
+
 .account-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0;
-  padding-top: 11px;
-  border-top: 1px solid var(--divider);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.account-stat-group {
+  display: grid;
+  /* Each unit group shares the sign, currency and decimal tracks. */
+  grid-template-columns: repeat(6, max-content);
+  row-gap: var(--space-2);
+  align-content: start;
+}
+
+.account-stat-group + .account-stat-group {
+  padding-inline-start: var(--space-3);
+  border-inline-start: 1px solid color-mix(in srgb, var(--border-strong) 50%, transparent);
 }
 
 .account-stat {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: baseline;
+  row-gap: var(--space-1);
   min-width: 0;
-  padding: 0 14px;
-  border-right: 1px solid var(--divider);
-}
-
-.account-stat:first-child {
-  padding-left: 0;
-}
-
-.account-stat:last-child {
-  padding-right: 0;
-  border-right: 0;
 }
 
 .account-stat__label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  grid-column: 1 / -1;
   color: var(--text-muted);
   font-size: 12.5px;
+  line-height: var(--lh-snug);
   white-space: nowrap;
 }
 
 .account-stat__value {
-  margin-top: 3px;
-  overflow: hidden;
-  color: var(--text);
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
   font-size: 15px;
   font-weight: 600;
-  letter-spacing: -0.01em;
   line-height: 1.3;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.account-stat__value--risk {
-  display: flex;
-  align-items: center;
-  gap: 7px;
+.account-stat__sign {
+  text-align: center;
+}
+
+.account-stat__integer {
+  text-align: right;
+}
+
+.account-stat__missing {
+  grid-column: 3 / -1;
+  text-align: right;
 }
 
 /* --- Equity curve --- */
@@ -271,27 +265,17 @@
   margin-top: 0;
 }
 
-.chart-foot {
-  display: flex;
-  flex: 0 0 auto;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px 12px;
-  padding: 4px 14px 10px;
-  color: var(--text-muted);
-  font-size: 13px;
-  line-height: 1.4;
-}
-
-.chart-foot__meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-}
-
 /* --- Positions & fills --- */
+.recent-fills-table {
+  table-layout: fixed;
+}
+
+.recent-fills-table col:nth-child(1) { width: 16%; }
+.recent-fills-table col:nth-child(2) { width: 31%; }
+.recent-fills-table col:nth-child(3) { width: 15%; }
+.recent-fills-table col:nth-child(4) { width: 17%; }
+.recent-fills-table col:nth-child(5) { width: 21%; }
+
 .positions-card .table-scroll,
 .recent-fills-card .table-scroll {
   flex: 1;
@@ -483,7 +467,7 @@
 
 .reconciliation-strip {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: minmax(max-content, 1.5fr) repeat(5, minmax(0, 1fr));
   gap: 12px;
   margin: 0;
 }
@@ -1184,18 +1168,16 @@
 .settings-page {
   display: grid;
   grid-template-columns: 196px minmax(0, 1fr);
-  gap: 26px;
-  align-items: start;
+  align-items: stretch;
+  overflow: hidden;
 }
 
 .settings-nav {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 6px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
+  padding: var(--space-2);
+  border-inline-end: 1px solid color-mix(in srgb, var(--border-strong) 50%, transparent);
 }
 
 .settings-nav__item {
@@ -1233,39 +1215,8 @@
   color: var(--accent);
 }
 
-.settings-nav__meta {
-  margin: 8px 4px 2px;
-  padding-top: 10px;
-  border-top: 1px solid var(--divider);
-  color: var(--text-faint);
-  font-size: 12px;
-  line-height: 1.5;
-}
-
 .settings-panel {
   min-width: 0;
-}
-
-.settings-panel__head {
-  margin-bottom: 14px;
-}
-
-.settings-panel__title {
-  color: var(--text);
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-
-.settings-panel__desc {
-  margin-top: 4px;
-  color: var(--text-muted);
-  font-size: 14px;
-  line-height: 1.55;
-}
-
-.settings-card .card__head {
-  padding-top: 14px;
 }
 
 .settings-group + .settings-group {
@@ -1300,14 +1251,6 @@
   color: var(--text);
   font-size: 14.5px;
   font-weight: 600;
-}
-
-.settings-row__hint {
-  margin-top: 3px;
-  max-width: 62ch;
-  color: var(--text-muted);
-  font-size: 13.5px;
-  line-height: 1.55;
 }
 
 .theme-fieldset {
@@ -1841,10 +1784,6 @@
     font-size: 46px;
   }
 
-  .account-card .card__body {
-    gap: 16px;
-  }
-
   .account-stat__value {
     font-size: 16px;
   }
@@ -1859,9 +1798,6 @@
     font-size: 17px;
   }
 
-  .account-cash dd {
-    font-size: 15px;
-  }
 }
 
 /* ---------- Responsive page rules ---------- */
@@ -1871,13 +1807,16 @@
     min-height: 0;
   }
 
-  .overview-grid {
+  .overview-grid,
+  .overview-top,
+  .overview-bottom {
     display: flex;
     flex-direction: column;
     flex: none;
     gap: 14px;
   }
 
+  .risk-card,
   .account-card,
   .chart-card,
   .positions-card,
@@ -1892,7 +1831,6 @@
 
   .settings-page {
     grid-template-columns: 176px minmax(0, 1fr);
-    gap: 18px;
   }
 
   .agent-grid .col-7,
@@ -1936,22 +1874,10 @@
 }
 
 @media (max-width: 860px) {
-  .overview-grid {
+  .overview-grid,
+  .overview-top,
+  .overview-bottom {
     gap: 12px;
-  }
-
-  .account-top {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .account-cash {
-    width: 100%;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .account-cash > div:first-child {
-    padding-left: 0;
   }
 
   .account-value {
@@ -1965,7 +1891,6 @@
   .settings-page {
     display: flex;
     flex-direction: column;
-    gap: 14px;
   }
 
   /* Categories become a horizontal strip on small screens. */
@@ -1975,7 +1900,8 @@
     width: 100%;
     overflow-x: auto;
     scrollbar-width: none;
-    padding: 4px;
+    border-inline-end: 0;
+    border-block-end: 1px solid color-mix(in srgb, var(--border-strong) 50%, transparent);
   }
 
   .settings-nav::-webkit-scrollbar {
@@ -1987,10 +1913,6 @@
     height: 34px;
     padding: 0 12px;
     white-space: nowrap;
-  }
-
-  .settings-nav__meta {
-    display: none;
   }
 
   .daily-summary .reconciliation-strip {
@@ -2038,49 +1960,6 @@
 }
 
 @media (max-width: 560px) {
-  .account-cash {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 6px;
-  }
-
-  .account-cash > div {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 0 0 6px;
-    border-left: 0;
-    border-bottom: 1px solid var(--divider);
-  }
-
-  .account-cash > div:last-child {
-    padding-bottom: 0;
-    border-bottom: 0;
-  }
-
-  .account-cash dd {
-    margin: 0;
-  }
-
-  .account-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    row-gap: 12px;
-  }
-
-  .account-stat:nth-child(2n) {
-    padding-right: 0;
-    border-right: 0;
-  }
-
-  .account-stat:nth-child(3) {
-    padding-left: 0;
-  }
-
-  .chart-foot {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
   .reconciliation-strip {
     grid-template-columns: minmax(0, 1fr);
     gap: 0;
@@ -2142,12 +2021,6 @@
   .tasks-pagination {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .settings-row {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 8px;
   }
 
   .fee-breakdown {

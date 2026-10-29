@@ -9,7 +9,6 @@ const NAV: Array<{ page: PageKey; icon: IconName }> = [
   { page: 'history', icon: 'history' },
   { page: 'agents', icon: 'agent' },
   { page: 'notifications', icon: 'notifications' },
-  { page: 'settings', icon: 'settings' },
 ];
 
 export function SidebarContent({

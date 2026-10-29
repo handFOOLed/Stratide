@@ -25,7 +25,6 @@ import {
   formatDateTime,
   formatDay,
   formatShares,
-  instrumentLabel,
   orderStatusLabel,
   parseInteger,
   signClass,
@@ -68,16 +67,13 @@ export function HistoryPage({ paper, research, tab, onTab, titleRef }: HistoryPr
 
   const header = (
     <PageHeader
-      eyebrow="Records"
-      title="历史与报告"
-      description="同一已发布快照的完整成交、订单与逐日核对，以及独立的策略/研究档案。这里不重复总览的资产曲线。"
+      title="历史报告"
       titleRef={titleRef}
       side={
         meta ? (
           <>
             <ModeBadge mode={meta.mode} />
             <Badge tone="outline">源日 {formatDay(meta.last_day)}</Badge>
-            <span className="page-meta">只读记录</span>
           </>
         ) : null
       }
@@ -86,8 +82,7 @@ export function HistoryPage({ paper, research, tab, onTab, titleRef }: HistoryPr
 
   const tabsBar = (
     <div className="tabs-bar">
-      <Tabs tabs={tabs} value={tab} onChange={onTab} label="历史与报告视图" idPrefix="history" />
-      <span className="tabs-bar__meta">同一份六报告 · 不跨快照拼接</span>
+      <Tabs tabs={tabs} value={tab} onChange={onTab} label="历史报告视图" idPrefix="history" />
     </div>
   );
 
@@ -266,7 +261,6 @@ function FillsTab({
                   </td>
                   <td>
                     <span className="cell-title">{fill.instrument.code}</span>
-                    <span className="cell-sub">{instrumentLabel(fill.instrument)}</span>
                   </td>
                   <td><SideBadge side={fill.side} /></td>
                   <td className="num">{formatCny(fill.price_fen)}</td>
@@ -430,8 +424,7 @@ function DailyTab({ bundle }: { bundle: NonNullable<PaperDataState['bundle']> })
     <div className="daily-layout">
       <Card className="daily-summary">
         <CardHead
-          title="逐日核对"
-          subtitle="用报告中的逐日字段做内部一致性核对，不复刻总览资产曲线"
+          title="报告摘要"
           actions={<Badge tone={missing ? 'warning' : 'neutral'}>{missing ? '有缺失估值' : '逐日完整'}</Badge>}
         />
         <CardBody>
@@ -441,7 +434,7 @@ function DailyTab({ bundle }: { bundle: NonNullable<PaperDataState['bundle']> })
               <dd>{formatDay(rows[0]?.day ?? null)} — {formatDay(rows[rows.length - 1]?.day ?? null)}</dd>
             </div>
             <div>
-              <dt>源日期</dt>
+              <dt>报告日</dt>
               <dd className="numeric">{String(rows.length)}</dd>
             </div>
             <div>
@@ -461,14 +454,10 @@ function DailyTab({ bundle }: { bundle: NonNullable<PaperDataState['bundle']> })
               <dd className="numeric">{formatCny(account.total_fee_fen)}</dd>
             </div>
           </dl>
-          <Callout tone="info" className="daily-callout">
-            本视图用于逐日核对与差异检查。逐日外部资金流与费用拆分未由当前只读 API 提供，页面不做推断，也不会用插值补齐缺失估值。
-          </Callout>
         </CardBody>
       </Card>
 
       <Card className="history-card">
-        <CardHead title="逐日记录" subtitle="点击一行核对 NAV、现金与隐含持仓市值" />
         {rows.length === 0 ? (
           <EmptyState compact icon="calendar" title="没有逐日记录" description="报告没有可展示的逐日字段。" />
         ) : (
@@ -477,7 +466,7 @@ function DailyTab({ bundle }: { bundle: NonNullable<PaperDataState['bundle']> })
               <thead>
                 <tr>
                   <th>源日期</th>
-                  <th className="num">账户净值</th>
+                  <th className="num">账户资产</th>
                   <th className="num">现金</th>
                   <th className="num">隐含持仓</th>
                   <th className="num">累计盈亏</th>
@@ -529,7 +518,7 @@ function DailyTab({ bundle }: { bundle: NonNullable<PaperDataState['bundle']> })
               </tbody>
             </Table>
             <div className="card__foot">
-              <span>隐含持仓 = NAV − 现金，仅用于报告内部核对。</span>
+              <span>隐含持仓 = 账户资产 − 现金</span>
               <span>最新源日 {formatDay(latest?.day ?? null)}</span>
             </div>
           </>
@@ -561,8 +550,7 @@ function StrategiesTab({
   return (
     <Card className="history-card">
       <CardHead
-        title="策略档案"
-        subtitle="已发布报告中冻结的部署记录，不是运行中的策略列表"
+        title="冻结部署"
         actions={<Badge tone="outline">{String(strategies.length)} 条</Badge>}
       />
       {strategies.length === 0 ? (
@@ -570,7 +558,6 @@ function StrategiesTab({
           compact
           icon="layers"
           title="没有策略记录"
-          description="此报告没有冻结部署记录，也没有生成占位策略。"
         />
       ) : (
         <>
@@ -606,17 +593,14 @@ function StrategiesTab({
                   <td>{record.deployment.group_id}</td>
                   <td className="cell-mono">{record.deployment.frozen_version}</td>
                   <td><Badge tone="neutral">{record.status === 'snapshot_record_only' ? '快照记录' : record.status}</Badge></td>
-                  <td className="num">{record.pnl_fen === null ? '—' : formatCny(record.pnl_fen)}</td>
-                  <td className="num">{record.drawdown_bps === null ? '—' : formatBps(record.drawdown_bps)}</td>
+                  <td className={'num ' + signClass(record.pnl_fen)}>{formatCny(record.pnl_fen, { signed: true })}</td>
+                  <td className={'num ' + ((parseInteger(record.drawdown_bps) ?? 0n) > 0n ? 'loss' : '')}>{formatBps(record.drawdown_bps)}</td>
                   <td className="cell-reason" title={record.unavailable_reason ?? ''}>{record.unavailable_reason || '—'}</td>
                   <td className="row-action-cell" aria-hidden="true"><span className="row-chevron">›</span></td>
                 </tr>
               ))}
             </tbody>
           </Table>
-          <div className="card__foot">
-            <span>独立收益 / 回撤不可用时不显示 0，也不从账户净收益反推。</span>
-          </div>
         </>
       )}
       <StrategyDrawer
@@ -650,9 +634,6 @@ function ResearchTab({ research }: { research: ResearchState }) {
           code={research.error.code}
           actions={<Button variant="secondary" icon="refresh" onClick={research.refresh}>重新读取</Button>}
         />
-        <div className="card__foot">
-          <span>研究文件读取失败不会改变 Paper 账户净值，也不会触发模型调用。</span>
-        </div>
       </Card>
     );
   }
@@ -663,12 +644,10 @@ function ResearchTab({ research }: { research: ResearchState }) {
         <EmptyState
           icon="file"
           title="尚未配置独立研究结果"
-          description="服务启动时可用 --evaluation-file 指定一个本机已保存的 evaluation.json。独立研究档案不会汇入账户 NAV，也不会自动重新评价策略。"
-          code="--evaluation-file <本机文件>"
+          description="仅展示独立评估报告，不计入账户资产。"
         />
         <div className="card__foot">
           <span>当前状态：{research.data?.status ?? 'not_configured'}</span>
-          <span>研究不改变账户资产</span>
         </div>
       </Card>
     );

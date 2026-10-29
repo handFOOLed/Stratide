@@ -3,7 +3,7 @@ import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { settle, settleOverlay } from './settle.mjs';
 
-const evidence = path.resolve('../../state/m2-pr03-browser');
+const evidence = path.resolve(process.env.STRATIDE_UI_EVIDENCE_DIR || '../../state/m2-pr03-browser');
 mkdirSync(evidence, { recursive: true });
 
 test('overview is the single home for NAV, chart, positions and five recent fills, with no duplicate links', async ({ page }) => {
@@ -18,6 +18,13 @@ test('overview is the single home for NAV, chart, positions and five recent fill
   await expect(page.getByText('查看更多', { exact: true })).toHaveCount(0);
   await expect(page.getByRole('img', { name: /当前 Paper 账户资产曲线/ })).toBeVisible();
   await expect(page.getByText('此快照未记录风控锁')).toBeVisible();
+  await expect(page.getByRole('heading', { name: '账户资产' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '今日盈亏' })).toBeVisible();
+  await expect(page.getByText('交易预留', { exact: true })).toBeVisible();
+  await expect(page.locator('.risk-card')).not.toContainText(/累计盈亏|累计收益率|最大日回撤|累计费用/);
+  await expect(page.locator('.account-card')).not.toContainText('可用现金');
+  await expect(page.locator('.account-card')).not.toContainText('最后估值');
+  await expect(page.locator('.recent-fills-card .card__foot')).toHaveText('点击查看详情');
 
   // Type floor: body 15-16px, table and secondary text >= ~13.5px.
   const sizes = await page.evaluate(() => {
@@ -55,6 +62,60 @@ test('overview is the single home for NAV, chart, positions and five recent fill
   expect(errors).toEqual([]);
 });
 
+test('overview P&L uses semantic colors and aligns numbers within each unit group', async ({ page }) => {
+  const checkValues = async (tone) => {
+    const rendered = await page.evaluate(() => {
+      const probe = document.createElement('span');
+      document.body.append(probe);
+      const colors = { neutral: getComputedStyle(document.body).color };
+      for (const name of ['gain', 'loss']) {
+        probe.style.color = `var(--${name})`;
+        colors[name] = getComputedStyle(probe).color;
+      }
+      probe.remove();
+      const groups = [...document.querySelectorAll('.account-stat-group')].map((group) =>
+        [...group.querySelectorAll('.account-stat__value')].map((element) => {
+          const parts = [...element.querySelectorAll('[aria-hidden="true"]')];
+          return {
+            color: getComputedStyle(element).color,
+            signX: parts[0].getBoundingClientRect().x,
+            currencyX: parts[1].getBoundingClientRect().x,
+            decimalX: parts[3].getBoundingClientRect().x,
+          };
+        }),
+      );
+      return { colors, groups, daily: getComputedStyle(document.querySelector('.account-delta__value')).color };
+    });
+    const [amounts, ratios] = rendered.groups;
+    expect(amounts[0].color).toBe(rendered.colors[tone]);
+    expect(amounts[1].color).toBe(rendered.colors.neutral);
+    expect(ratios[0].color).toBe(rendered.colors[tone]);
+    expect(ratios[1].color).toBe(rendered.colors.loss);
+    expect(rendered.daily).toBe(rendered.colors[tone]);
+    expect(amounts[0].currencyX).toBeLessThan(ratios[0].currencyX);
+    expect(Math.abs(amounts[0].currencyX - amounts[1].currencyX)).toBeLessThanOrEqual(0.5);
+    for (const values of rendered.groups) {
+      expect(Math.abs(values[0].signX - values[1].signX)).toBeLessThanOrEqual(0.5);
+      expect(Math.abs(values[0].decimalX - values[1].decimalX)).toBeLessThanOrEqual(0.5);
+    }
+  };
+
+  await page.goto('/');
+  await expect(page.getByTestId('nav-value')).toBeVisible();
+  await checkValues('loss');
+  await page.route('**/api/account', async (route) => {
+    const response = await route.fetch();
+    const body = await response.json();
+    body.data.session_pnl_fen = '76';
+    body.data.cumulative_pnl_fen = '7107';
+    body.data.total_return_bps = '71';
+    await route.fulfill({ response, json: body });
+  });
+  await page.reload();
+  await expect(page.locator('.account-delta__value')).toHaveText('+¥0.76');
+  await checkValues('gain');
+});
+
 test('NAV axis tops out at a power of ten, draws five dashed 20% steps and keeps points on hover only', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByTestId('nav-value')).toBeVisible();
@@ -80,16 +141,14 @@ test('NAV axis tops out at a power of ten, draws five dashed 20% steps and keeps
   await expect(page.locator('.chart-card .card__subtitle')).toContainText('4 个报告日');
   await expect(page.getByRole('button', { name: '全部', exact: true })).toHaveAttribute('aria-pressed', 'true');
 
-  // Non-NAV metrics keep their own scale instead of the power-of-ten NAV axis.
-  await page.getByRole('button', { name: '收益率', exact: true }).click();
-  await expect(page.locator('.chart-svg text').filter({ hasText: '%' }).first()).toBeVisible();
+  await expect(page.getByRole('group', { name: '图表指标' })).toHaveCount(0);
 
   await page.getByRole('button', { name: '切换到深色主题' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect(page.getByRole('button', { name: '全部', exact: true })).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByRole('button', { name: '收益率', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('group', { name: '图表指标' })).toHaveCount(0);
 
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
@@ -119,7 +178,7 @@ test('history tabs hold the complete records, daily reconciliation and independe
 
   await page.getByRole('tab', { name: '逐日核对' }).click();
   await expect(page.locator('.daily-table tbody tr')).toHaveCount(4);
-  await expect(page.getByRole('heading', { name: '逐日核对' })).toBeVisible();
+  await expect(page.getByRole('tabpanel', { name: '逐日核对' })).toBeVisible();
   await expect(page.locator('.chart-svg')).toHaveCount(0);
   await expect(page.getByRole('columnheader', { name: '隐含持仓' })).toBeVisible();
   await page.locator('.daily-table tbody tr .row-link').first().click();
@@ -137,8 +196,9 @@ test('history tabs hold the complete records, daily reconciliation and independe
 });
 
 test('notifications are honest and settings show one category at a time with working appearance controls', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/#notifications');
-  await expect(page.getByRole('heading', { name: '通知与审批' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '通知审批' })).toBeVisible();
   await expect(page.getByText('通知渠道', { exact: true })).toBeVisible();
   await expect(page.getByText('审批', { exact: true })).toBeVisible();
   await expect(page.getByText('未接入').first()).toBeVisible();
@@ -146,33 +206,39 @@ test('notifications are honest and settings show one category at a time with wor
 
   await page.goto('/#settings');
   await expect(page.getByRole('tab', { name: '外观' })).toHaveAttribute('aria-selected', 'true');
-  await expect(page.getByRole('heading', { name: '外观' })).toBeVisible();
+  await expect(page.getByRole('tabpanel', { name: '外观' })).toBeVisible();
   await page.locator('[data-theme-choice="dark"]').click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.locator('[data-theme-choice="light"]').click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
-  await page.getByRole('button', { name: '减少动效' }).click();
+  const motionSwitch = page.getByRole('switch', { name: '减弱动态效果' });
+  await expect(motionSwitch).toHaveAttribute('aria-checked', 'false');
+  await motionSwitch.click();
+  await expect(motionSwitch).toHaveAttribute('aria-checked', 'true');
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduce');
-  await page.getByRole('button', { name: '跟随系统' }).click();
+  await page.reload();
+  await expect(motionSwitch).toHaveAttribute('aria-checked', 'true');
+  await motionSwitch.click();
+  await expect(motionSwitch).toHaveAttribute('aria-checked', 'false');
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'full');
 
   // One category at a time: selecting data removes the appearance controls.
   await page.getByRole('tab', { name: '数据连接' }).click();
-  await expect(page.getByRole('heading', { name: '数据连接' })).toBeVisible();
+  await expect(page.getByRole('tabpanel', { name: '数据连接' })).toBeVisible();
   await expect(page.getByRole('tab', { name: '数据连接' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('[data-theme-choice="dark"]')).toHaveCount(0);
   await expect(page.locator('.data-card')).toContainText('snapshot_id');
 
   await page.getByRole('tab', { name: '权限与安全' }).click();
-  await expect(page.getByRole('heading', { name: '权限与安全' })).toBeVisible();
-  await expect(page.getByText('Paper only', { exact: true })).toBeVisible();
+  await expect(page.getByRole('tabpanel', { name: '权限与安全' })).toBeVisible();
+  await expect(page.getByText('Paper 模式', { exact: true })).toBeVisible();
   await expect(page.getByText('Owner 令牌仅内存', { exact: true })).toBeVisible();
 
   // Keyboard navigation keeps the settings categories reachable.
   await page.getByRole('tab', { name: '权限与安全' }).focus();
   await page.keyboard.press('ArrowDown');
   await expect(page.getByRole('tab', { name: '关于' })).toHaveAttribute('aria-selected', 'true');
-  await expect(page.getByRole('heading', { name: '关于' })).toBeVisible();
+  await expect(page.getByRole('tabpanel', { name: '关于' })).toBeVisible();
 });
 
 test('empty, invalid, missing-valuation and offline states stay visible and honest', async ({ page }) => {
@@ -272,7 +338,7 @@ test('real browser screenshots at 1920, 1366 and 375 for light, dark, drawer and
   await settle(page, '.page-frame');
   await page.screenshot({ path: path.join(evidence, 'settings-1366-dark.png'), animations: 'disabled' });
   await page.getByRole('tab', { name: '数据连接' }).click();
-  await expect(page.getByRole('heading', { name: '数据连接' })).toBeVisible();
+  await expect(page.getByRole('tabpanel', { name: '数据连接' })).toBeVisible();
   await page.screenshot({ path: path.join(evidence, 'settings-data-1366-dark.png'), animations: 'disabled' });
   await page.getByRole('button', { name: '切换到浅色主题' }).click();
 

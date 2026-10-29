@@ -14,7 +14,7 @@ export function PageHeader({
   titleRef?: Ref<HTMLHeadingElement>;
 }) {
   return (
-    <header className="page-header">
+    <header className="page-header page-header--compact">
       <div className="page-header__main">
         {eyebrow ? <div className="page-eyebrow">{eyebrow}</div> : null}
         <h1 className="page-title" ref={titleRef} tabIndex={-1}>

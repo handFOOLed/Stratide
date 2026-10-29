@@ -3,9 +3,10 @@ import { mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 const base = 'http://127.0.0.1:8736';
-const evidence = path.resolve('../../state/m2-pr03-browser');
+const evidence = path.resolve(process.env.STRATIDE_UI_EVIDENCE_DIR || '../../state/m2-pr03-browser');
 mkdirSync(evidence, { recursive: true });
 function readToken() {
+  if (process.env.STRATIDE_UI_TEST_TOKEN_FILE) return readFileSync(process.env.STRATIDE_UI_TEST_TOKEN_FILE, 'utf8').trim();
   return JSON.parse(readFileSync(path.resolve('../../state/issue22-browser/session.json'), 'utf8')).token;
 }
 
