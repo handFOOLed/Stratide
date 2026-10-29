@@ -1,86 +1,26 @@
-# Stratide 模拟交易优先路线图｜给 Sol / Terra / ChatGPT 的执行约定
+# Stratide Paper 阶段路线图（当前执行版）
 
-**2026-10-29 Owner 开发节奏更新（[Issue #19](https://github.com/handFOOLed/Stratide/issues/19)、[Issue #20](https://github.com/handFOOLed/Stratide/issues/20)）：Web 与研究 Agent 都在 paper 阶段开发，不等待实盘/mini PC。** M2-PR01 在一个 Draft PR 中完成本地只读 Paper API、总览/历史前端、真实数据展示、测试和 Windows 启动；研究 Agent 自动化作为下一项独立任务，当前尚未实现。每次优先交付可交互的纵向功能包，不以脚手架或占位页结束。仍遵守固定 SHA 独立验收、小猫审查及 Owner 合并授权；本补充不改写 Accepted ADR。操作及验收见 [M2-PR01](M2_PR01.md) 与 [Dashboard](../apps/dashboard/README.md)，以下保留原有阶段历史。
+> 2026-10-29；最新实现与数据边界见 [STATUS](STATUS.md)。旧各 PR 实施/验收细节仍保存在 `docs/M0_*.md`、`docs/M1_*.md`、`docs/M2_PR01.md` 与 `docs/evidence/`，**本页不重复过去的 Draft 状态或整页验收日志**。
 
-**2026-10-29 Owner 排序更新（Issue #11）：** 当前优先做真实历史 EOD 驱动的探索性回测，无需等待新前向交易日或购买集合竞价权限。历史 next-open 仅为隔离的事后执行假设，不进入原 forward journal；Issue #10 独立保持 OPEN。PR05B 的实现、自测与可重复操作见 [M1_PR05B](M1_PR05B.md)，仍待独立验收/审查及 Owner 合并授权。以下保留此前阶段的进度记录。
+## 已完成（已并入 main）
 
-状态：**M0-PR01 [PR #2](https://github.com/handFOOLed/Stratide/pull/2)、PR-02 [PR #4](https://github.com/handFOOLed/Stratide/pull/4)、PR-03 [PR #6](https://github.com/handFOOLed/Stratide/pull/6) 与 M1-PR04A [PR #8](https://github.com/handFOOLed/Stratide/pull/8) 均已合并。** PR04A 经 [Terra Windows 独立技术 PASS（89 测试、真实 journal 离线复验）](https://github.com/handFOOLed/Stratide/pull/8#issuecomment-6471878822) 和 [小猫源码审查 PASS](https://github.com/handFOOLed/Stratide/pull/8#pullrequestreview-5684495112)，以 HEAD `295751cf15bfaa68407dd243f45394b5147e1227` 合并，merge `1ef06eb1d17f8796e3b43d2ad0a903382fa0fd23`。当前仅 **1 个真实有效前向观察日、0 提案/成交，NAV/回撤不可用**；独立验收未重复 HTTP 实际联网，仅对 Sol 本机 raw/journal 复算。**M1 仍未完成，下一步 PR04B 需验证独立开盘证据、持续多日真实观察和可信 Paper 决策/成交。** Owner 接受个人非商业本机使用，供应商正式许可未获独立核实（仅作限制披露、不自动禁止个人开发）；历史执行记录曾包含明文 Token，不能改写为无暴露。禁止公开再分发行情或将观察日志当实盘/盈利证明。关联 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md)。
+1. **M0 Paper Core**：[PR #2](https://github.com/handFOOLed/Stratide/pull/2)、[#4](https://github.com/handFOOLed/Stratide/pull/4)、[#6](https://github.com/handFOOLed/Stratide/pull/6)：单账户 Risk Kernel、模拟撮合、持久账本、回放和六报告。
+2. **M1 已实现部分**：[PR #8](https://github.com/handFOOLed/Stratide/pull/8)、[#9](https://github.com/handFOOLed/Stratide/pull/9)、[#12](https://github.com/handFOOLed/Stratide/pull/12)、[#14](https://github.com/handFOOLed/Stratide/pull/14)、[#18](https://github.com/handFOOLed/Stratide/pull/18)：真实 EOD **observe-only**、68 日历史探索性回测、独立研究评价和长窗口 DATA_BLOCKED 调查。**M1 前向 Paper 成交仍未完成**。
+3. **M2 Web V1**：[PR #21](https://github.com/handFOOLed/Stratide/pull/21)：localhost 同源只读 API 与可启动 Dashboard，Owner 指定一个已发布的报告快照；历史回放不进入前向账户 NAV。
 
-## 完成的样子
+## 当前和下一个完整功能包
 
-**PR04B 已启动（Draft 工程增量，未合并）：** [每日 EOD 操作、完整性摘要、时间视图与证据](M1_PR04B.md) 复用 PR04A；[独立开盘/时段/费用研究](M1_PR04B_OPENING_EVIDENCE.md) 保留尚未实收与未确定项。当前仍 1 个真实有效观察日，无 Paper 提案或成交。连续真实交易日、窗口内开盘证据及完整成交条件未达成；不以合成跨日测试替代。
+| 顺序 | Owner/执行责任 | 任务 / DoD |
+| --- | --- | --- |
+| **当前 #22** | **Sol Max** | [自主研究 Agent V1](https://github.com/handFOOLed/Stratide/issues/22)：Provider、可信日/月 Budget Gate、授权、持久任务、取消/暂停、EOD 触发、API 与可操作基础 UI。未配置授权/预算不付费。不得触碰交易账本或假称独立策略通过。 |
+| **随后 #23** | **DeepSeek** | [完整 Web UI/UX](https://github.com/handFOOLed/Stratide/issues/23)：先完成信息归属/设计系统，再实施五页共享组件、字体、按钮、动效、滚动条稳定布局；**去除跨页面重复资产模块和“查看更多”跳转**。详见 [DS 交接](UI_HANDOFF_DEEPSEEK.md)。 |
+| **后续（尚未授权实现）** | Owner 再定范围 | 独立评价与 Paper-only 策略联动：候选冻结 → 独立 Evaluator → 可信 Risk/Ledger；继续 [#10](https://github.com/handFOOLed/Stratide/issues/10) 真正的前向观察与 [#17](https://github.com/handFOOLed/Stratide/issues/17) 数据缺口。 |
 
-2026-10-28 的真实入库与恢复证据见 [R1](evidence/m1-pr04a-r1/README.md)，晚到缺口修复见 [R2](evidence/m1-pr04a-r2/README.md)。Owner 声明不冒充独立供应商认证；一次真实当日采集加完整测试/报告可以申请 PR04A 验收，多日观察不伪造。
+## 一直有效的边界
 
-**历史（首次提交时）：** 当时自动保存范围未确认，journal 尚无真实日线，因此记录为 BLOCKED。原始失败证据见 [首次记录](evidence/m1-pr04a/README.md)，不会删除或事后改为成功；这一历史状态已由后续 Owner 决定及真实入库事实更新。
+- **数据语义分离**：`synthetic_test` 是测试、`historical_replay` 是事后历史模拟、`forward_paper` 必须是实际时间推进的模拟成交。当前 forward 仅 observe-only，不能制造交易/净值。
+- **研究与交易分权**：Agent 只有研究提案权，没有实盘/模拟账户写入权、风险设置权或独立准入权。平台不可因 UI 或模型故障放松金融安全。
+- **版本与验收**：交可运行的 Draft PR，开发者附真实自测，ChatGPT 固定 HEAD 审查；预算/凭据/账本等高风险点做针对性独立反证，Owner 明确授权后才合并。当前补充见 [AGENTS](../AGENTS.md)，历史 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md) 尚待显式修订。
+- **无真钱交易**：禁止券商委托、实盘、公开远程服务以及冒充真实交易资格。真实历史样本中的 68 日/3 笔成交不能证明收益优势。
 
-Owner 在 Windows 本地能用 CLI 启动一个 paper-only 模拟账户，看到当天模拟账户净值、现金、证券数量、成交记录、费用与风控拒绝。系统能**重复运行同一历史区间而结果一致**、断点重启续算而不重复成交，并把观察数据保存成可读取的 CSV/JSON；后续才以真实数据做持续时间前推的 Paper Trading，每天检查真实已过去行情下的模拟表现。
-
-“完成模拟交易”包括两类**不同等级**成果：
-
-1. **M0：最小确定性交易内核 + 历史回放能力。** 使用有明确数据 provenance 的历史日线或显式合成测试数据，跑通完整单策略模拟订单循环并确保财务安全不变量。不得称其为经过市场验证的盈利模型。
-2. **M1：真实数据驱动的前向模拟观测。** 使用已核验可用、符合使用协议、带有 `available_at` 时间的行情源。按实际取得信息逐日提交模拟策略提案，生成**不可事后篡改的 forward paper 事件日志**，真实时间推进、隔日复核，不用历史回放冒充前向实测。若数据源不可用或延迟/缺失，则明确记录观察缺口、暂停依赖该数据的新增模拟买入。M1 由新的小 PR 实施，不能因 M0 的固定历史样例就宣称 M1 已完成。
-
-## 模拟模式与真实性标签
-
-- `synthetic_test`：明确人工合成的测试用价格，仅做引擎正确性验证。
-- `historical_replay`：带证券、来源、交易所/时区、输入日期范围、复权/价格字段语义、修订版本/哈希的真实历史数据，只做历史模拟；策略产生信号时绝不看到当时尚不可得的价格或交易事实。
-- `forward_paper`：自真实观测开始时起，根据当时实际取得的市场数据驱动模拟下单，持续记录 `observed_at`/`available_at` 和系统决策时间，历史修改不得重写 forward 证据。永远区分模拟成交和真实券商成交。
-- 数据集载入/来源适配优先简单可审计，M0 可只支持从用户提供或核验的本地 CSV 加载，**不为了交第一版同时搭建爬虫/免费全市场供给平台**。
-
-## 首批工程 PR 的交付顺序
-
-### PR-01 — Paper Contract + Trusted Risk Path（Sol）
-
-- 一份清晰事件/交易意图契约，稳定的账户 ID、唯一订单 ID、`group_id`（目前固定一组）、策略/版本、证券、方向、数量、报价可得时间、决策/执行时间和状态。
-- CLI 使用 Owner 明确传入的正数模拟起始本金，不默认把产品假设的十万元当作已授权资金。
-- 单一风险入口：不允许负现金、不允许无持仓/未交收卖出、不可超账户/单策略约束。简单可复现的账户 NAV 与亏损熔断/拒单原因；永久避开真实 broker API。
-- 可观察测试：超现金买入拒绝、T+1 卖出违规拒绝、亏损熔断拒单、溢出/无效数量拒单。无中间挂空模块。
-
-### PR-02 — Deterministic Simulated Fills + Durable Ledger（Sol）
-
-- 真实 A 股日线模拟**窄范围**的保守撮合：尽量次个可交易时段撮合；策略只用已知日线字段，不能以当天收盘信号同日收盘成交。无价格/停牌/一字涨跌停等资料无法支持时拒绝或保守延迟而不假装成交。
-- 实现受支持市场/品种必要的证券买卖单位、交收可卖限制、手续费/印花税等**可配置**成本；来源/生效期间明确，若费率无法确定不编造“精确真实成本”。
-- 定点人民币金额、整数股、资金保留和一次性/部分/拒绝/超时状态的模拟契约；完整成交证据和实付费用进入权威 paper ledger。没有报价不能凭空发成交。
-- 单写入者持久化、模拟重启、订单与事件幂等、防双重成交、期初期末资金与持仓守恒。
-
-### PR-03 — Reproducible Historical Replay + Inspectable Reports（Sol）
-
-- 有固定可复现策略范例（不是承诺盈利策略），选定狭窄日线数据样例，生成订单/成交/拒绝的事件溯源。
-- 命令式工作流（具体语法由 Sol 设计并文档化）：创建 paper 账户、run/replay、status、report，导出持仓与资金记录、交易流水、权益曲线 CSV/JSON。
-- 报表显示：运行模式、数据来源/区间/版本、策略/配置哈希、初始与末期净值、现金、可卖/未交收数量、未完成订单、已实现/未实现 P&L、实际模拟费用、累计收益、最大回撤、风险拒单。比较现金持有或同期限简单买入持有基准，扣成本与无未来函数。
-- Terra 独立复核同一输入重跑完全一致；Owner 能读到真正产生的文件而不只是单元测试的内存对象。
-
-### PR-04 — Forward Paper Observation（Sol；M1，M0 验收后）
-
-- 选用符合授权的真实行情数据源并验证稳定性、时区、市场开闭市/交易日、缺数/断线行为。无来源时明确阻止阶段完成宣称，不自行编造行情或隐藏数据质量问题。
-- 追加写入的前向模拟决策/成交与每日账户快照；避免利用事后修订行情改写旧结果。
-- 日报/对比报告包括净值曲线、资金使用、持仓集中度、手续费、交易次数、相对基准超额表现、最大回撤、连续数据缺口与暂停次数。空仓/不交易是允许且必须如实显示的结果。
-- PR04 的连续前向证据继续独立积累，CLI 的 CSV/JSON 保留。Owner 已在 paper 阶段授权本地 Web 与 Agent；M2-PR01 从一个明确指定的已发布报告快照提供图表，绝不将历史或 observe-only 数据称为前向账户流水。
-
-## 职责与合并条件
-
-**Sol — 写生产代码与自测：** 每个 PR 聚焦单个可审查增量；提供设计取舍、可运行命令、数据来源/假设、变更文件、复现样例、已知限制。Sol 不自行 merge，不通过删测试或伪造行情解释错误。
-
-**Terra — 独立测试、验收（不再负责最终合并）：** 在 PR 指定提交 SHA 下，从干净环境执行或明确记录不能执行的平台测试；复算资金与持仓守恒，验证单次成交/拒单、持久化重启、费用、交易日、数据延迟、时间穿越、指标与导出完整性。写独立验收结果（实际命令、环境、输出摘要、失败/未验证），若测试需补充交给 Sol 修复；不能把 Sol 的自测宣称为独立结果。Terra 将准确 SHA 对应的独立 PASS/FAIL 和证据发布到 PR；未经复验不得替代。最终合并由小猫在审查通过后执行。
-
-**ChatGPT（小猫）— 代码审查与精确 SHA 合并：** Owner 将 PR 链接发送至会话后，我核对 PR diff、对应 ADR、已知风险、测试覆盖和 Terra 证据，按 **Blocker / Major / Minor** 出具审查结果；只有 Blocker 与 Major 全部解决或 Owner 认可有据记录为不阻断的风险，才经 Owner 授权，在最终核对 HEAD、验收 SHA、无新阻断项及 GitHub 实际合并条件后，使用 `expected_head_sha` 执行合并并记录 merge SHA。我不会声称能在聊天之外自动监听全部 PR。
-
-**Owner — 决定范围与观察：** 定期运行或查阅真实导出的 paper 报告，按实际观察结果决定数据源、策略、下一阶段。任何实盘资金/券商接入必须再得到单独授权和合规/风控验收。
-
-### 每个 PR 的验收清单
-
-- [ ] PR 范围独立且以 paper-only 模式运行；未增加可发真实委托的凭据/路径
-- [ ] Sol 附运行命令、数据版本与样例报告；输入价格来源与生成方式如实标注
-- [ ] Terra 复现 `cargo test --workspace`、所需 CLI smoke（Windows / Linux 不可执行项明确列出）
-- [ ] 同输入重放结果稳定，资金/整数持仓及费用守恒，拒单原因透明
-- [ ] 模拟异常/重启/重复事件不导致双重成交、负现金或自动解开熔断
-- [ ] 历史/合成/前向证据标签准确，没有任何未来函数或模拟变实盘的暗示
-- [ ] 小猫已审查完整 diff 与 Terra 验收证据，无未解决的 Blocker/Major
-- [ ] ChatGPT 经 Owner 授权在对应审查 SHA 上执行 merge，并记录合并提交与尚未覆盖的限制
-
-## 非目标
-
-首轮不实现真实券商、LLM 策略生成或研究、复杂多组净额/部分成交、自动晋升、实盘主动公司行为、完整行情抓取平台、桌面 Stockie 风格 K 线 GUI、移动端管理、收费 CI、高可用集群。
-
-**成功标准：不是模拟收益漂亮，而是你能看见真实来源的数据、解释每一笔模拟决策、复现账本和用真实时间持续观察风险与表现。**
+**目标：一次交付完整的可使用功能，证据不够时敢于报告 BLOCKED。**
