@@ -383,6 +383,38 @@ def evaluate(a, out):
     return result
 
 
+def evaluate_synthetic(a, out):
+    """Engineering-only adapter for the already-trusted, byte-fixed v1 fixture.
+
+    No new strategy, fill, money or research-qualification logic is introduced.
+    The historical SMA gate is intentionally NOT relaxed to admit fake history.
+    """
+    require(a.input.read_bytes() == (ROOT / "samples/m0-pr03-synthetic.json").read_bytes(),
+            "synthetic evaluation accepts only the existing repository fixture")
+    dataset = read(a.input)
+    report = verify_reports(a.exe, a.input, a.ledger, a.report, out)
+    require(report["input_sha256"] == sha(a.input)
+            and report["strategy_version"] == "first-buy-second-sell-third-risk-probe-v1"
+            and dataset["mode"] == "synthetic_test", "synthetic identity mismatch")
+    config = report["config"]
+    require((config["initial_capital"], config["account_limits"]["max_order_commitment"],
+             config["account_limits"]["max_exposure"], config["strategy_limits"]["max_exposure"],
+             config["account_limits"]["daily_loss"], config["account_limits"]["drawdown"]) == CAPITAL,
+            "synthetic configuration differs from the fixed protocol")
+    verify_accounting(dataset, report)
+    result = dict(evaluation_schema=1, input_sha256=sha(a.input), strategy_version=report["strategy_version"],
+                  research_evidence="SYNTHETIC_TEST_ONLY", engineering="PASS_SELF_TEST_NOT_INDEPENDENT_ACCEPTANCE",
+                  independent_acceptance="NOT_VERIFIED", data_coverage="NOT_MARKET_DATA",
+                  insufficient_reasons=["artificial fixture is engineering evidence only"],
+                  windows=dict(full=window_metrics(report, 0, len(report["daily"]))),
+                  ledger_head=report["ledger_head"], reports_sha256={name: sha(a.report / name) for name in NAMES},
+                  fee_assumption=dataset["fee"],
+                  limitations=["synthetic_test; no market observations, SMA qualification or forward evidence",
+                               "cash benchmark is a calculation; no historical holdout or buy-hold research claim"])
+    write(out / "evaluation.json", result)
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="action", required=True)
@@ -392,9 +424,17 @@ def main():
     evaluate_parser = commands.add_parser("evaluate")
     for flag in ("input", "split", "audit", "source-dir", "ledger", "report", "exe", "out"):
         evaluate_parser.add_argument("--"+flag, type=Path, required=True)
+    synthetic_parser = commands.add_parser("evaluate-synthetic")
+    for flag in ("input", "ledger", "report", "exe", "out"):
+        synthetic_parser.add_argument("--"+flag, type=Path, required=True)
     args = parser.parse_args()
     out = new_output(args.out)
-    result = audit(args.source_dir, out) if args.action == "audit" else evaluate(args, out)
+    if args.action == "audit":
+        result = audit(args.source_dir, out)
+    elif args.action == "evaluate-synthetic":
+        result = evaluate_synthetic(args, out)
+    else:
+        result = evaluate(args, out)
     # No raw rows, full report/events or credentials printed.
     print(json.dumps({k: result[k] for k in ("data_coverage", "research_evidence", "engineering") if k in result}))
 

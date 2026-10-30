@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "template_id": "sma5-20-cross-fixed100-v1",
+  "parameters": {"fast_sessions": 5, "slow_sessions": 20, "quantity": 100},
+  "hypothesis": "在既有固定历史区间复核 SMA5/20 的成本后表现；允许没有优势的结论。",
+  "limitations": [
+    "已有历史 holdout 已暴露，不是 prospective OOS。",
+    "短样本、历史 PIT 和开盘可得证据不足，不授予前向 Paper 或实盘资格。"
+  ]
+}

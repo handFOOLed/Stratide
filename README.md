@@ -7,9 +7,10 @@
 ## 当前状态
 
 - **已实现：** Paper Risk Kernel、持久账本、六报告、真实历史 EOD 探索性回测、只观察的前向 EOD journal、[Web Dashboard V1](apps/dashboard/README.md)。
-- **本分支 Draft：** [Agent V1](docs/M2_PR02.md) 完成持久任务、日/月预算、受控 HTTPS Provider、本地 fake、EOD 去重和 Web 基础交互；[API](docs/AGENT_API.md) 与 [自测证据](docs/evidence/m2-pr02/README.md) 已保存。真实 Provider **REAL_PROVIDER_NOT_VERIFIED**，未配置 Owner 预算/授权不付费；独立风险核查和同 HEAD 审查待完成。
+- **Agent V1 已在 main：** 持久任务、日/月预算、受控 Provider、本地 fake、EOD 去重及 [API](docs/AGENT_API.md)；真实 Provider **REAL_PROVIDER_NOT_VERIFIED**，未配置 Owner 预算/授权不付费。
+- **本分支 Draft：** [M2-PR04](docs/M2_PR04.md) 提供候选登记 → 冻结 → 独立评价 → 隔离历史回放 CLI；工程自测通过，研究证据不足、资格默认拒绝，同 HEAD 审查及针对性独立反证待完成。
 - **仍受阻：** 仅 68 个历史交易日、3 笔模拟成交，长窗口公司行为/费用证据 `DATA_BLOCKED`；前向观察仅 1 个有效日、**尚无真正前向模拟成交或 NAV**。
-- **下一步：** [#22 Agent 功能与 API（Sol）](https://github.com/handFOOLed/Stratide/issues/22) → [#23 整站 UI/UX（DeepSeek）](https://github.com/handFOOLed/Stratide/issues/23)。细节与证据见 [当前状态](docs/STATUS.md)。
+- **当前顺序：** [#29 核心任务](https://github.com/handFOOLed/Stratide/issues/29) 按 **Core-first、UI-later** 执行；全部核心完成后，Sol 按已合并 PR #28 的视觉基准统一集成 UI。细节与证据见 [当前状态](docs/STATUS.md)。
 
 ## Windows 本地体验
 
