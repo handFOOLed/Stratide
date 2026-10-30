@@ -1,0 +1,14 @@
+fmt --check: exit 0
+
+    Checking stratide-contracts v0.0.1 (<WORKTREE>\crates\contracts)
+    Checking stratide-research v0.0.1 (<WORKTREE>\research\agent)
+    Checking stratide-risk v0.0.1 (<WORKTREE>\crates\risk)
+    Checking stratide-ledger v0.0.1 (<WORKTREE>\crates\ledger)
+    Checking stratided v0.0.1 (<WORKTREE>\apps\stratided)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.48s
+    Checking stratide-contracts v0.0.1 (<WORKTREE>\crates\contracts)
+    Checking stratide-research v0.0.1 (<WORKTREE>\research\agent)
+    Checking stratide-risk v0.0.1 (<WORKTREE>\crates\risk)
+    Checking stratide-ledger v0.0.1 (<WORKTREE>\crates\ledger)
+    Checking stratided v0.0.1 (<WORKTREE>\apps\stratided)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.66s

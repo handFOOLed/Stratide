@@ -1,0 +1,11 @@
+test_actual_fake_saved_task_candidate_cli_and_restart (__main__.EodAgentTests.test_actual_fake_saved_task_candidate_cli_and_restart) ... ok
+test_hash_binding_mode_source_day_quality_and_permission_mutations_reject (__main__.EodAgentTests.test_hash_binding_mode_source_day_quality_and_permission_mutations_reject) ... ok
+test_latest_sync_stale_running_blocked_missing_and_unknown_schema_reject (__main__.EodAgentTests.test_latest_sync_stale_running_blocked_missing_and_unknown_schema_reject) ... ok
+test_name_traversal_and_link_store_rejected (__main__.EodAgentTests.test_name_traversal_and_link_store_rejected) ... ok
+test_store_wal_committed_and_uncommitted_views_and_missing_sidecar (__main__.EodAgentTests.test_store_wal_committed_and_uncommitted_views_and_missing_sidecar) ... ok
+test_task_mismatch_forged_pass_unverified_origin_and_frozen_text (__main__.EodAgentTests.test_task_mismatch_forged_pass_unverified_origin_and_frozen_text) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 16.085s
+
+OK

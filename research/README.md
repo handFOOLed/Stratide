@@ -1,6 +1,6 @@
 # Research / Agent
 
-**Agent V1 与 M2-PR04 候选 CLI 已在 main；本分支新增 M2-PR05 数据快照，Draft 待审。** `candidates.py` 支持已保存研究来源/Owner 固定模板的登记、版本冻结、独立历史回放评价和默认拒绝资格。[候选操作](../docs/M2_PR04.md) 包含无需 Provider 的完整 synthetic_test 样例。Agent 操作见 [M2-PR02](../docs/M2_PR02.md)，字段见 [Agent API](../docs/AGENT_API.md)。
+**Agent V1、M2-PR04 候选 CLI、M2-PR05 快照已在 main；本分支 M2-PR06 接通显式快照 → 本地 fake 任务 → 研究候选来源，Draft 待审。** [M2-PR06](../docs/M2_PR06.md) 提供无 Dashboard 的真实持久化 E2E，新 scope 禁止真实外发和自动 EOD。`candidates.py` 继续支持既有登记、冻结和历史评价，默认拒绝资格。[原候选操作](../docs/M2_PR04.md)、[Agent 操作](../docs/M2_PR02.md)、[Agent API](../docs/AGENT_API.md)。
 
 - `agent/`：可信研究服务与费用闸门；只有文本研究，不执行生成代码或写财务/风控。
 - `eod_journal.py` / `data_snapshot.py`：原 1041 observer 只读核验、独立持久研究快照、状态和 offline 消费 adapter。[M2-PR05 契约](../docs/M2_PR05.md)；入口 `python scripts/research-data.py --store demo-eod sync --fixture`，再执行 `consume`。尚未接线到 Agent 自动调度，所有交易资格为 false。

@@ -1,5 +1,6 @@
 pub mod budget;
 pub mod config;
+pub mod eod_snapshot;
 pub mod provider;
 mod service;
 mod store;
@@ -120,7 +121,7 @@ pub fn parse_day(s: &str) -> Result<chrono::NaiveDate> {
     Ok(d)
 }
 
-/// Constructed only from validated published report projections by the host.
+/// Constructed only from explicitly selected, validated host projections.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct InputSummary {
     pub version: String,
@@ -130,4 +131,10 @@ pub struct InputSummary {
     pub summary: Value,
     // True only for a verified published source session; never inferred weekdays.
     pub eod_eligible: bool,
+}
+
+impl InputSummary {
+    pub fn is_eod_snapshot(&self) -> bool {
+        self.scopes.iter().any(|s| s == eod_snapshot::SCOPE)
+    }
 }

@@ -29,6 +29,8 @@ budget 中包含 currency/timezone/day/month、daily/monthly_limit_micro、daily
 
 result 包含 research.hypothesis/evidence/risks/next_steps，及可信生成的 provider/model、input_summary_version/source_day/input_mode、generated_at、synthetic_provider、qualification、limitations、billing。Provider 文本没有代码、交易、文件或工具权限。详情和列表从持久结果读取，不进行二次推理。
 
+M2-PR06 显式 `--agent-eod-store <name>` 使用独立 `forward_eod_research_summary_v1`，与旧报告/评价输入互斥；未配置时行为不变。输入版本为 `eod-agent-input-v1:<snapshot SHA>`，仅本地 fake/显式任务；真实模型返回 `EOD_SNAPSHOT_LOCAL_FAKE_ONLY`，自动 EOD 为 `EOD_SNAPSHOT_MANUAL_ONLY`，不产生调用。status.input 是最近一次已校验投影，新的任务必须重新读取当前 store；已存详情保留原 frozen input，不代表当前 store 仍可用。没有新增账户 API、Web 路由或前端。完整字段与 headless 操作见 [M2-PR06](M2_PR06.md)。
+
 ## 错误
 
 401 OWNER_TOKEN_REQUIRED；403 LOCAL_ORIGIN_REQUIRED/EXPLICIT_ORIGIN_REQUIRED/SAME_ORIGIN_REQUIRED；413 BODY_LIMIT；415 JSON_REQUIRED；404 AGENT_ROUTE_NOT_FOUND/TASK_NOT_FOUND；405 不支持的方法。Agent 没启动或初始化失败时为 503 AGENT_NOT_CONFIGURED，Paper API 继续可用。

@@ -36,7 +36,7 @@ fn run() -> Result<(), String> {
         return Ok(());
     }
     if args == ["--help"] || args == ["-h"] {
-        println!("Stratide 本地 Paper Dashboard + 研究 Agent\nstratided [--report-dir <六报告目录>] [--evaluation-file <独立 evaluation.json>] [--port 8710] [--assets-dir <构建目录>] [--agent-dir <独立 Agent 目录>] [--agent-config <本机可信 JSON>]\nstratided --agent-init-fake <新目录>\nstratided --agent-settle <目录> <call-id> <actual-micro> <invoice-reference>\n账户快照固定；Agent 没有交易权限。未配置预算/授权时禁止付费调用。");
+        println!("Stratide 本地 Paper Dashboard + 研究 Agent\nstratided [--report-dir <六报告目录>] [--evaluation-file <独立 evaluation.json>] [--port 8710] [--assets-dir <构建目录>] [--agent-dir <独立 Agent 目录>] [--agent-config <本机可信 JSON>] [--agent-eod-store <名称，仅本地fake、显式课题>]\nstratided --agent-init-fake <新目录>\nstratided --agent-settle <目录> <call-id> <actual-micro> <invoice-reference>\n账户快照固定；Agent 没有交易权限。未配置预算/授权时禁止付费调用。");
         return Ok(());
     }
     let config = Config::parse(args.into_iter())?;
@@ -55,6 +55,15 @@ fn run() -> Result<(), String> {
         .agent_dir
         .as_deref()
         .map(|dir| {
+            if let Some(name) = &config.agent_eod_store {
+                let source = stratide_research::eod_snapshot::SnapshotSource::named(name)?;
+                let initial = source.read(chrono::Utc::now().timestamp_millis())?;
+                return Agent::open(dir, config.agent_config.as_deref(), initial).map(|a| {
+                    a.with_summary_source(move || {
+                        source.read(chrono::Utc::now().timestamp_millis())
+                    })
+                });
+            }
             Agent::open(dir, config.agent_config.as_deref(), app.agent_summary()).map(|a| {
                 a.with_summary_source(move || {
                     Ok(

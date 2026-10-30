@@ -200,7 +200,11 @@ impl Settings {
                 grant: Some(Grant {
                     receiver: "local_fake".into(),
                     purpose: PURPOSE.into(),
-                    scopes: SCOPES.map(String::from).to_vec(),
+                    scopes: SCOPES
+                        .into_iter()
+                        .chain([crate::eod_snapshot::SCOPE])
+                        .map(String::from)
+                        .collect(),
                     authorized_at: "synthetic_test".into(),
                     revoked: false,
                 }),
@@ -215,6 +219,12 @@ impl Model {
         hash(&serde_json::to_vec(self).expect("model JSON"))
     }
     pub fn authorize(&self, scopes: &[String], budget: Option<&Budget>) -> Result<()> {
+        // This new data category has no cloud authorization in M2-PR06, even
+        // when a copied/old grant or hand-edited grant claims a matching scope.
+        ensure(
+            self.kind == "fake" || !scopes.iter().any(|s| s == crate::eod_snapshot::SCOPE),
+            "EOD_SNAPSHOT_LOCAL_FAKE_ONLY",
+        )?;
         let b = budget.ok_or("BUDGET_UNCONFIGURED")?;
         let p = self.price.as_ref().ok_or("PRICE_UNCONFIGURED")?;
         ensure(

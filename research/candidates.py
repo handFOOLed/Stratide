@@ -12,9 +12,15 @@ import os
 from pathlib import Path
 import re
 import shutil
+import sqlite3
 import subprocess
 import sys
 import uuid
+
+if __package__:
+    from . import data_snapshot
+else:
+    import data_snapshot
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = "m2-pr04-candidate-v1"
@@ -123,6 +129,49 @@ def handoff(candidate_id=None, evaluation_id=None):
                          "FORWARD_PAPER_NOT_ENABLED", "NO_LIVE_AUTHORIZATION"])
 
 
+def snapshot_provenance(task, store_name):
+    summary = task["input"] if task else {}
+    details = summary.get("summary", {})
+    details = details if isinstance(details, dict) else {}
+    claimed = (str(summary.get("version", "")).startswith(data_snapshot.AGENT_VERSION + ":")
+               or summary.get("mode") == "forward_observed_eod"
+               or data_snapshot.AGENT_SCOPE in summary.get("scopes", [])
+               or str(details.get("snapshot_id", "")).startswith("eod-v1:"))
+    require(store_name is None or claimed, "EOD_SNAPSHOT_TASK_REQUIRED")
+    if not claimed:
+        return None
+    key = details.get("snapshot_sha256")
+    require(isinstance(key, str) and re.fullmatch(r"[0-9a-f]{64}", key)
+            and details.get("snapshot_id") == "eod-v1:" + key
+            and summary.get("version") == data_snapshot.AGENT_VERSION + ":" + key
+            and summary.get("mode") in ("synthetic_test", "forward_observed_eod")
+            and details.get("data_mode") == summary["mode"]
+            and details.get("last_valid_source_day") == summary.get("source_day", "").replace("-", "")
+            and summary.get("scopes") == ["owner_task", data_snapshot.AGENT_SCOPE]
+            and summary.get("eod_eligible") is False
+            and all(details.get(k) is False for k in ("eod_eligible", "can_execute_forward_paper", "live_allowed"))
+            and details.get("restriction") == "RESEARCH_ONLY", "EOD_SNAPSHOT_INPUT_CONTRACT")
+    result = task["result"]
+    require(result.get("provider_kind") == "fake" and result.get("synthetic_provider") is True
+            and result.get("qualification") == "EXPLORATORY_NOT_INDEPENDENT", "EOD_SNAPSHOT_RESEARCH_ONLY")
+    verified = "SOURCE_UNVERIFIED"
+    if store_name is not None:
+        try:
+            expected = data_snapshot.Store(store_name).agent_input()
+        except data_snapshot.Rejected as error:
+            raise Rejected(str(error)) from None
+        require(summary == expected, "EOD_SNAPSHOT_INPUT_MISMATCH")
+        verified = "SNAPSHOT_CONTENT_VERIFIED_AT_REGISTRATION"
+    # The JSON/API export is not an Agent signer. Source-content validation does
+    # not attest who wrote the task/result, nor confer evaluation authority.
+    return dict(snapshot_sha256=key, snapshot_id=details["snapshot_id"],
+                source_day=summary["source_day"], data_mode=summary["mode"],
+                research_task_id=task["id"], input_summary_version=summary["version"],
+                frozen_input_sha256=digest(summary), snapshot_verification=verified,
+                task_origin="TASK_ORIGIN_NOT_ATTESTED", restriction="RESEARCH_ONLY",
+                eod_eligible=False, can_execute_forward_paper=False, live_allowed=False)
+
+
 class Registry:
     def __init__(self, name, create=False):
         require(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}", name), "REGISTRY_NAME_INVALID")
@@ -166,7 +215,7 @@ class Registry:
         no_links(path)
         return path
 
-    def register(self, owner_input, agent_task):
+    def register(self, owner_input, agent_task, snapshot_store=None):
         require(owner_input is not None or agent_task is not None, "INPUT_REQUIRED")
         owner = read(owner_input, 32768) if owner_input else None
         task = read(agent_task, 262144) if agent_task else None
@@ -187,6 +236,7 @@ class Registry:
                         "AGENT_INPUT_IDENTITY_MISMATCH")
             for key in ("model", "billing", "synthetic_provider"):
                 require(key in result, "AGENT_PROVENANCE_MISSING")
+        provenance = snapshot_provenance(task, snapshot_store)
         # No parsing of natural language, no guessed parameters, no provider tools.
         allowed = {"schema_version", "template_id", "parameters", "hypothesis", "limitations"}
         template = TEMPLATES.get(owner.get("template_id")) if isinstance(owner, dict) and isinstance(owner.get("template_id"), str) else None
@@ -200,16 +250,32 @@ class Registry:
         material = dict(schema_version=1, owner_input=owner, saved_agent_task=task,
                         authority="owner_explicit_template" if supported else "research_only",
                         template=template if supported else None)
+        if provenance is not None:
+            material["snapshot_provenance"] = provenance
         identity = digest(material)
         path = self.path("registrations", identity).with_suffix(".json")
         if not path.exists():
             path.parent.mkdir(exist_ok=True)
             write(path, dict(registration_sha256=identity, registered_at=now(), material=material))
         self.registration(identity)
-        return dict(registration_sha256=identity,
+        result = dict(registration_sha256=identity,
                     state="REGISTERED" if supported else "RESEARCH_ONLY",
                     reason=None if supported else "UNSUPPORTED_CANDIDATE", handoff=handoff(),
                     next_step="freeze" if supported else "Owner must explicitly select the fixed template")
+        if provenance is not None:
+            result["snapshot_provenance"] = provenance
+        return result
+
+    def source(self, identity):
+        material = self.registration(identity)["material"]
+        task = material["saved_agent_task"]
+        return dict(registration_sha256=identity, state="RESEARCH_ONLY",
+                    snapshot_provenance=material.get("snapshot_provenance"),
+                    task_origin="TASK_ORIGIN_NOT_ATTESTED" if task else None,
+                    frozen_input=task["input"] if task else None,
+                    frozen_research=task["result"]["research"] if task else None,
+                    evaluation="NOT_EVALUATED", handoff=handoff(),
+                    eod_eligible=False, can_execute_forward_paper=False, live_allowed=False)
 
     def registration(self, identity):
         path = self.path("registrations", identity).with_suffix(".json")
@@ -421,12 +487,16 @@ def now():
 
 
 def main():
+    # Saved research text is a UTF-8 JSON interface, including on Windows pipes.
+    sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--registry", default="default", help="name under ignored state/candidates; no paths")
     commands = parser.add_subparsers(dest="action", required=True)
     register = commands.add_parser("register")
     register.add_argument("--owner-input", type=Path)
     register.add_argument("--agent-task", type=Path, help="saved task detail JSON; never invokes a Provider")
+    register.add_argument("--snapshot-store", help="explicit local PR #33 store name; revalidates EOD task input")
+    commands.add_parser("source", help="frozen registration research and snapshot provenance").add_argument("registration_sha256")
     freeze = commands.add_parser("freeze")
     freeze.add_argument("registration_sha256")
     freeze.add_argument("--source-dir", type=Path)
@@ -439,7 +509,9 @@ def main():
         registry = Registry(args.registry, create=args.action == "register")
         with registry.locked():
             if args.action == "register":
-                result = registry.register(args.owner_input, args.agent_task)
+                result = registry.register(args.owner_input, args.agent_task, args.snapshot_store)
+            elif args.action == "source":
+                result = registry.source(args.registration_sha256)
             elif args.action == "freeze":
                 result = registry.freeze(args.registration_sha256, args.source_dir,
                                          args.evidence_class, args.expected_input_sha256)
@@ -451,7 +523,7 @@ def main():
         compact = {key: value for key, value in result.items() if key not in ("receipt", "summary")}
         print(json.dumps(compact, ensure_ascii=False, sort_keys=True))
         return 0
-    except (OSError, ValueError, KeyError, TypeError) as error:
+    except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as error:
         code = str(error) if isinstance(error, Rejected) else "LOCAL_INPUT_OR_STORAGE_INVALID"
         next_step = {"TRUSTED_CLI_BUILD_REQUIRED": "build stratide-cli in this worktree",
                      "EVALUATOR_PROTOCOL_CHANGED_REFREEZE_REQUIRED": "freeze a new version under current trusted rules",

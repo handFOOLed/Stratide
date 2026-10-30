@@ -9,9 +9,10 @@
 - **已实现：** Paper Risk Kernel、持久账本、六报告、真实历史 EOD 探索性回测、只观察的前向 EOD journal、[Web Dashboard V1](apps/dashboard/README.md)。
 - **Agent V1 已在 main：** 持久任务、日/月预算、受控 Provider、本地 fake、EOD 去重及 [API](docs/AGENT_API.md)；真实 Provider **REAL_PROVIDER_NOT_VERIFIED**，未配置 Owner 预算/授权不付费。
 - **候选链路已合并：** [M2-PR04 / PR #30](docs/M2_PR04.md) 提供登记 → 冻结 → 独立评价 → 隔离历史回放 CLI；#31 双线独立 PASS，研究证据不足、资格默认拒绝继续有效。
-- **本分支 Draft：** [M2-PR05](docs/M2_PR05.md) 提供已有 EOD 的离线只读同步、持久研究快照、状态和消费 CLI；Sol 自测，待固定 HEAD 审查，尚未接线到 Agent 自动输入或 Dashboard。
+- **EOD 快照已合并：** [M2-PR05 / PR #33](docs/M2_PR05.md) 提供离线只读同步、持久研究快照、状态和消费 CLI。
+- **本分支 Draft：** [M2-PR06](docs/M2_PR06.md) 接通显式快照 → 本地 Fake Agent 持久任务 → 候选研究来源；真实两日只读与 synthetic E2E 已跑通。仅 Sol 自测，待固定 HEAD 审查；新 scope 禁止云外发和自动 EOD，资格默认拒绝，无 UI 改动。
 - **仍受阻：** 仅 68 个历史交易日、3 笔模拟成交，长窗口公司行为/费用证据 `DATA_BLOCKED`；真实 EOD 两日 `EOD_CONTINUITY_VERIFIED`，开盘源仍 BLOCKED，**尚无真正前向模拟成交或 NAV**。
-- **当前顺序：** [#32 核心任务](https://github.com/handFOOLed/Stratide/issues/32) 按 **Core-first、UI-later** 执行；全部核心完成后，Sol 按已合并 PR #28 的视觉基准统一集成 UI。细节与证据见 [当前状态](docs/STATUS.md)。
+- **当前顺序：** [#34 核心任务](https://github.com/handFOOLed/Stratide/issues/34) 按 **Core-first、UI-later** 执行；全部核心完成后，Sol 按已合并 PR #28 的视觉基准统一集成 UI。细节与证据见 [当前状态](docs/STATUS.md)。
 
 ## Windows 本地体验
 
