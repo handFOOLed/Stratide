@@ -1,0 +1,16 @@
+test_backfill_never_repairs_missed_forward_day (__main__.SnapshotTests.test_backfill_never_repairs_missed_forward_day) ... ok
+test_concurrent_source_append_and_local_clock_regression_keep_previous_asof (__main__.SnapshotTests.test_concurrent_source_append_and_local_clock_regression_keep_previous_asof) ... ok
+test_conflict_unknown_calendar_clock_fault_and_pending_retain_snapshot (__main__.SnapshotTests.test_conflict_unknown_calendar_clock_fault_and_pending_retain_snapshot) ... ok
+test_consumer_hash_and_synthetic_relabel_rejected_even_with_new_hash (__main__.SnapshotTests.test_consumer_hash_and_synthetic_relabel_rejected_even_with_new_hash) ... ok
+test_corruption_raw_hash_and_database_fail_closed (__main__.SnapshotTests.test_corruption_raw_hash_and_database_fail_closed) ... ok
+test_fixed_fixture_cli_retry_restart_and_readonly_consumer (__main__.SnapshotTests.test_fixed_fixture_cli_retry_restart_and_readonly_consumer) ... ok
+test_new_day_duplicate_revision_and_late_backfill_keep_real_times (__main__.SnapshotTests.test_new_day_duplicate_revision_and_late_backfill_keep_real_times) ... ok
+test_offline_calls_have_no_network_process_or_trading_authority (__main__.SnapshotTests.test_offline_calls_have_no_network_process_or_trading_authority) ... ok
+test_original_bytes_and_directory_preserved_and_wal_not_copied (__main__.SnapshotTests.test_original_bytes_and_directory_preserved_and_wal_not_copied) ... ok
+test_process_kill_unpublished_transaction_and_concurrent_writer (__main__.SnapshotTests.test_process_kill_unpublished_transaction_and_concurrent_writer) ... ok
+test_rollback_rewrite_and_source_switch_rejected (__main__.SnapshotTests.test_rollback_rewrite_and_source_switch_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 3.146s
+
+OK

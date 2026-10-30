@@ -8,14 +8,15 @@
 2. **M1 已实现部分**：[PR #8](https://github.com/handFOOLed/Stratide/pull/8)、[#9](https://github.com/handFOOLed/Stratide/pull/9)、[#12](https://github.com/handFOOLed/Stratide/pull/12)、[#14](https://github.com/handFOOLed/Stratide/pull/14)、[#18](https://github.com/handFOOLed/Stratide/pull/18)：真实 EOD **observe-only**、68 日历史探索性回测、独立研究评价和长窗口 DATA_BLOCKED 调查。**M1 前向 Paper 成交仍未完成**。
 3. **M2 Web V1**：[PR #21](https://github.com/handFOOLed/Stratide/pull/21)：localhost 同源只读 API 与可启动 Dashboard，Owner 指定一个已发布的报告快照；历史回放不进入前向账户 NAV。
 4. **Agent V1 与视觉基准**：#22 核心及 PR #27 状态修复已在 main；[PR #28](https://github.com/handFOOLed/Stratide/pull/28) 确立视觉基准，不代表功能全部完成。真实 Provider 未验证。
+5. **M2-PR04 候选链路**：[PR #30](https://github.com/handFOOLed/Stratide/pull/30) 已合并于 `05ab0b9`；[#31](https://github.com/handFOOLed/Stratide/issues/31#issuecomment-6512910618) A/B 双线独立 PASS。真实两日 `EOD_CONTINUITY_VERIFIED`；`OPENING_SOURCE` 仍 BLOCKED，研究仍不足，不产生前向成交权限。
 
 ## 当前和下一个完整功能包
 
-**本分支 M2-PR04 Draft：** 候选 → 冻结 → 独立评价代码 → 隔离历史回放已有可运行 CLI 与开发自测，见 [操作](M2_PR04.md) 和 [证据](evidence/m2-pr04/README.md)。工程通过与研究/交易资格分开；同 HEAD 审查和针对性独立反证仍待完成。
+**本分支 M2-PR05 Draft：** 原 observer 只读核验 → 原子发布持久研究快照 → 状态查询与 offline 消费已有可运行 CLI，见 [契约/操作](M2_PR05.md) 和 [Sol 自测证据](evidence/m2-pr05/README.md)。Owner 本轮指定 Sol 独立自测，不安排 Terra/其他测试模型；ChatGPT 固定 HEAD 审查，合并仍需 Owner 授权。不是实时采集、Agent 自动同步或交易权限升级。
 
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |
-| **当前 #29** | **Sol** | [M2-PR04](https://github.com/handFOOLed/Stratide/issues/29)：登记/冻结候选、复用可信 Evaluator 与固定回放、独立本地账本/报告、默认拒绝资格；Core-only，不接入 Risk/Ledger 写权限或 forward_paper。 |
+| **当前 #32** | **Sol** | [M2-PR05](https://github.com/handFOOLed/Stratide/issues/32)：已有授权 EOD 的离线同步状态、研究快照和只读消费；Core-only，自测；不改 Risk/权威 Ledger/真实 forward 成交路径。 |
 | **后续核心** | Owner 再定范围 | 继续 [#10](https://github.com/handFOOLed/Stratide/issues/10) 前向证据与 [#17](https://github.com/handFOOLed/Stratide/issues/17) 数据缺口；证据不足保持 BLOCKED，新的交易联动需独立授权。 |
 | **核心全部完成后** | **Sol** | 按 PR #28 已确定的设计体系统一集成全部 UI；当前各功能任务无需同步前端。 |
 

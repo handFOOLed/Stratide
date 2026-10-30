@@ -1,0 +1,113 @@
+{
+  "result": "PASS",
+  "store": "real-eod-selftest-9f66ff8cf21d",
+  "snapshot": {
+    "data_mode": "forward_observed_eod",
+    "last_valid_source_day": "20261029",
+    "journal_head": "28a8f562c7df902ced5fe03a38ceb22f8f44190da3df67944771e075effa8b66",
+    "event_count": 5,
+    "as_of_journal_event_at": 1793281197419,
+    "valid_eod_days": 2,
+    "on_day_valid_eod_days": 2,
+    "coverage": [
+      {
+        "source_day": "20261028",
+        "state": "valid_eod"
+      },
+      {
+        "source_day": "20261029",
+        "state": "valid_eod"
+      }
+    ],
+    "gaps": [],
+    "warnings": [],
+    "blockers": [],
+    "can_research": true,
+    "can_execute_forward_paper": false,
+    "live_allowed": false,
+    "raw_sha256": [
+      {
+        "api": "trade_cal",
+        "received_at": 1793192837756,
+        "sequence": 2,
+        "sha256": "c58a3f22477fcba061ab45ddb3bded36af9d318bc7b959e2e75505512348a6e1"
+      },
+      {
+        "api": "daily",
+        "received_at": 1793192840090,
+        "sequence": 2,
+        "sha256": "04994bab8f4b4e2140c75cb3d66e66de45dbc233c01268eb54214e09ef42306e"
+      },
+      {
+        "api": "trade_cal",
+        "received_at": 1793281197167,
+        "sequence": 4,
+        "sha256": "3fc20abcd3bd9159512b9da8b7d9ea5db53f82f7d188e7d82184937fc2d83526"
+      },
+      {
+        "api": "daily",
+        "received_at": 1793281197419,
+        "sequence": 4,
+        "sha256": "238afb58e7737b6c7c2c4cbd4665ad83031a1ec0f8bb65b4f8a9751eba117eab"
+      }
+    ],
+    "available_at_semantics": "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time",
+    "historical_pit": "NOT_VERIFIED",
+    "opening_source": "BLOCKED",
+    "observed_at": 1793281196805,
+    "received_at": 1793281197419,
+    "available_at": 1793281197419,
+    "provider_published_at": null,
+    "snapshot_id": "eod-v1:3def7bf43e54d889a68db292b09cfe0885782f650438792b01baff70f44cde03",
+    "snapshot_sha256": "3def7bf43e54d889a68db292b09cfe0885782f650438792b01baff70f44cde03",
+    "verified_at": 1793327888010
+  },
+  "consumer": {
+    "version": "eod-research-input-v1",
+    "source_day": "2026-10-29",
+    "data_mode": "forward_observed_eod",
+    "snapshot_sha256": "3def7bf43e54d889a68db292b09cfe0885782f650438792b01baff70f44cde03",
+    "verified_at": 1793327888010,
+    "can_research": true,
+    "eod_eligible": false,
+    "can_execute_forward_paper": false,
+    "live_allowed": false,
+    "quality": {
+      "coverage": [
+        {
+          "source_day": "20261028",
+          "state": "valid_eod"
+        },
+        {
+          "source_day": "20261029",
+          "state": "valid_eod"
+        }
+      ],
+      "gaps": [],
+      "warnings": [],
+      "blockers": [],
+      "historical_pit": "NOT_VERIFIED",
+      "latest_sync": {
+        "blockers": [],
+        "error_code": null,
+        "finished_at": 1793327888161,
+        "journal_head": "28a8f562c7df902ced5fe03a38ceb22f8f44190da3df67944771e075effa8b66",
+        "new_append": false,
+        "source_changed": false,
+        "source_database_sha256": "d4020489f0485554ec092e9e8e84026998aa54248ac3268df46aeb040ee0585e",
+        "started_at": 1793327888128,
+        "state": "succeeded"
+      },
+      "source_day_differs_from_wall_clock": true
+    },
+    "qualification": "RESEARCH_INPUT_ONLY_NOT_PIT_OR_EXECUTION_EVIDENCE"
+  },
+  "protected_files": 9,
+  "before_manifest_sha256": "a1d34fbd41215d1857c83fedfd3cdf6fbd1216aa4a41b09b55f883281bfff781",
+  "after_manifest_sha256": "a1d34fbd41215d1857c83fedfd3cdf6fbd1216aa4a41b09b55f883281bfff781",
+  "original_bytes_unchanged": true,
+  "network_calls": 0,
+  "provider_calls": 0,
+  "new_forward_events": 0,
+  "verification": "developer_selftest_not_independent_acceptance"
+}
