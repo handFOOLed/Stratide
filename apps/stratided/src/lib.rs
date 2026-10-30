@@ -20,6 +20,7 @@ pub struct Config {
     pub port: u16,
     pub agent_dir: Option<PathBuf>,
     pub agent_config: Option<PathBuf>,
+    pub agent_eod_store: Option<String>,
 }
 
 impl Config {
@@ -31,6 +32,7 @@ impl Config {
             port: DEFAULT_PORT,
             agent_dir: None,
             agent_config: None,
+            agent_eod_store: None,
         };
         let mut args = args.peekable();
         let mut seen = std::collections::BTreeSet::new();
@@ -42,6 +44,7 @@ impl Config {
                 "--port",
                 "--agent-dir",
                 "--agent-config",
+                "--agent-eod-store",
             ]
             .contains(&arg.as_str())
                 || !seen.insert(arg.clone())
@@ -55,6 +58,7 @@ impl Config {
                 "--assets-dir" => config.assets_dir = value.into(),
                 "--agent-dir" => config.agent_dir = Some(value.into()),
                 "--agent-config" => config.agent_config = Some(value.into()),
+                "--agent-eod-store" => config.agent_eod_store = Some(value),
                 "--port" => {
                     config.port = value.parse::<u16>().map_err(|_| "端口必须为 1–65535")?;
                     if config.port == 0 {
@@ -62,6 +66,17 @@ impl Config {
                     }
                 }
                 _ => unreachable!(),
+            }
+        }
+        if let Some(name) = &config.agent_eod_store {
+            if config.agent_dir.is_none()
+                || config.report_dir.is_some()
+                || config.evaluation_file.is_some()
+            {
+                return Err("--agent-eod-store 需要 --agent-dir，且不能与 --report-dir/--evaluation-file 混用".into());
+            }
+            if !stratide_research::eod_snapshot::valid_name(name) {
+                return Err("SNAPSHOT_STORE_NAME".into());
             }
         }
         Ok(config)

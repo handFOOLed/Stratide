@@ -1,0 +1,83 @@
+{
+  "after_manifest_sha256": "fc0fb8b88db30191486c5788d43d1dc7940c131612f45601bae090fd3ddd419f",
+  "before_manifest_sha256": "fc0fb8b88db30191486c5788d43d1dc7940c131612f45601bae090fd3ddd419f",
+  "billable_reservations": 0,
+  "can_execute_forward_paper": false,
+  "data_mode": "forward_observed_eod",
+  "eligibility": "ELIGIBILITY_DENIED",
+  "eod_automatic_tasks": 0,
+  "eod_eligible": false,
+  "evaluation": "NOT_EVALUATED",
+  "fake_calls": 1,
+  "input_summary_version": "eod-agent-input-v1:3def7bf43e54d889a68db292b09cfe0885782f650438792b01baff70f44cde03",
+  "live_allowed": false,
+  "market_requests": 0,
+  "protected_bytes_unchanged": true,
+  "protected_files": 11,
+  "real_provider_calls": 0,
+  "registration_sha256": "176166755782b13f4ebd9e680ccc5012c1d4dc0857e754d2e9be57e1dc20c5e6",
+  "research_billing": "synthetic_test_settled",
+  "research_state": "RESEARCH_ONLY",
+  "restart_saved_detail_identical": true,
+  "result": "PASS",
+  "snapshot": {
+    "as_of_journal_event_at": 1793281197419,
+    "available_at": 1793281197419,
+    "available_at_semantics": "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time",
+    "can_execute_forward_paper": false,
+    "data_mode": "forward_observed_eod",
+    "eod_eligible": false,
+    "last_valid_source_day": "20261029",
+    "live_allowed": false,
+    "observed_at": 1793281196805,
+    "on_day_valid_eod_days": 2,
+    "provider_published_at": null,
+    "quality": {
+      "blockers": [],
+      "calendar_after_snapshot": "UNKNOWN_NOT_FETCHED",
+      "coverage": [
+        {
+          "source_day": "20261028",
+          "state": "valid_eod"
+        },
+        {
+          "source_day": "20261029",
+          "state": "valid_eod"
+        }
+      ],
+      "coverage_count": 2,
+      "gap_count": 0,
+      "gaps": [],
+      "historical_pit": "NOT_VERIFIED",
+      "opening_source": "BLOCKED",
+      "source_checked_only_at_latest_sync": true,
+      "sync_policy": "latest_succeeded_within_24h",
+      "warnings": []
+    },
+    "received_at": 1793281197419,
+    "restriction": "RESEARCH_ONLY",
+    "snapshot_id": "eod-v1:3def7bf43e54d889a68db292b09cfe0885782f650438792b01baff70f44cde03",
+    "snapshot_sha256": "3def7bf43e54d889a68db292b09cfe0885782f650438792b01baff70f44cde03",
+    "valid_eod_days": 2
+  },
+  "snapshot_provenance": {
+    "can_execute_forward_paper": false,
+    "data_mode": "forward_observed_eod",
+    "eod_eligible": false,
+    "frozen_input_sha256": "0daca81ba697a92c84566a7cc3d8d9f09a40e52eae72494f54de6fb1f53723d3",
+    "input_summary_version": "eod-agent-input-v1:3def7bf43e54d889a68db292b09cfe0885782f650438792b01baff70f44cde03",
+    "live_allowed": false,
+    "research_task_id": "1",
+    "restriction": "RESEARCH_ONLY",
+    "snapshot_id": "eod-v1:3def7bf43e54d889a68db292b09cfe0885782f650438792b01baff70f44cde03",
+    "snapshot_sha256": "3def7bf43e54d889a68db292b09cfe0885782f650438792b01baff70f44cde03",
+    "snapshot_verification": "SNAPSHOT_CONTENT_VERIFIED_AT_REGISTRATION",
+    "source_day": "2026-10-29",
+    "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+  },
+  "source_day": "2026-10-29",
+  "task_detail_sha256": "db0a56dfe551971ddc8142e4069aced9802dfee0a27158e68590f8c5325af056",
+  "task_id": "1",
+  "task_status": "completed",
+  "verification": "Sol_developer_selftest_not_independent_acceptance"
+}

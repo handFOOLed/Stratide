@@ -9,14 +9,15 @@
 3. **M2 Web V1**：[PR #21](https://github.com/handFOOLed/Stratide/pull/21)：localhost 同源只读 API 与可启动 Dashboard，Owner 指定一个已发布的报告快照；历史回放不进入前向账户 NAV。
 4. **Agent V1 与视觉基准**：#22 核心及 PR #27 状态修复已在 main；[PR #28](https://github.com/handFOOLed/Stratide/pull/28) 确立视觉基准，不代表功能全部完成。真实 Provider 未验证。
 5. **M2-PR04 候选链路**：[PR #30](https://github.com/handFOOLed/Stratide/pull/30) 已合并于 `05ab0b9`；[#31](https://github.com/handFOOLed/Stratide/issues/31#issuecomment-6512910618) A/B 双线独立 PASS。真实两日 `EOD_CONTINUITY_VERIFIED`；`OPENING_SOURCE` 仍 BLOCKED，研究仍不足，不产生前向成交权限。
+6. **M2-PR05 研究快照**：[PR #33](https://github.com/handFOOLed/Stratide/pull/33) 已合并于 `2fdd05d`，#32 完成；既有 EOD 离线只读核验、持久快照、状态和消费，见 [契约](M2_PR05.md)。
 
 ## 当前和下一个完整功能包
 
-**本分支 M2-PR05 Draft：** 原 observer 只读核验 → 原子发布持久研究快照 → 状态查询与 offline 消费已有可运行 CLI，见 [契约/操作](M2_PR05.md) 和 [Sol 自测证据](evidence/m2-pr05/README.md)。Owner 本轮指定 Sol 独立自测，不安排 Terra/其他测试模型；ChatGPT 固定 HEAD 审查，合并仍需 Owner 授权。不是实时采集、Agent 自动同步或交易权限升级。
+**本分支 M2-PR06 Draft：** 显式可信快照 → 本地 fake Agent 实际持久任务 → 候选来源登记/查询已有可运行 CLI，见 [契约/操作](M2_PR06.md) 和 [Sol 自测证据](evidence/m2-pr06/README.md)。固定 synthetic 与真实两日只读输入均完成闭环；新数据 scope 禁止云 Provider 和自动 EOD。保持 `RESEARCH_ONLY / NOT_EVALUATED / ELIGIBILITY_DENIED`，没有可信 forward 交易、真实模型权限或 UI。Owner 本轮指定仅 Sol 自测，`agents=0`；ChatGPT 固定 HEAD 审查，合并仍需 Owner 授权。
 
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |
-| **当前 #32** | **Sol** | [M2-PR05](https://github.com/handFOOLed/Stratide/issues/32)：已有授权 EOD 的离线同步状态、研究快照和只读消费；Core-only，自测；不改 Risk/权威 Ledger/真实 forward 成交路径。 |
+| **当前 #34** | **Sol** | [M2-PR06](https://github.com/handFOOLed/Stratide/issues/34)：显式 EOD 输入、独立外发 scope、本地 fake 任务到研究候选来源；Core-only，仅 Sol 自测，Draft 待审；不改 Risk/权威 Ledger/前向交易权限。 |
 | **后续核心** | Owner 再定范围 | 继续 [#10](https://github.com/handFOOLed/Stratide/issues/10) 前向证据与 [#17](https://github.com/handFOOLed/Stratide/issues/17) 数据缺口；证据不足保持 BLOCKED，新的交易联动需独立授权。 |
 | **核心全部完成后** | **Sol** | 按 PR #28 已确定的设计体系统一集成全部 UI；当前各功能任务无需同步前端。 |
 

@@ -3,6 +3,43 @@ use std::path::PathBuf;
 use stratided::App;
 
 #[test]
+fn eod_snapshot_source_is_opt_in_and_cannot_silently_mix_report_dates_or_modes() {
+    let parse = |args: &[&str]| stratided::Config::parse(args.iter().map(|s| s.to_string()));
+    assert!(parse(&[]).unwrap().agent_eod_store.is_none());
+    assert!(parse(&["--agent-eod-store", "demo"]).is_err());
+    assert!(parse(&[
+        "--agent-dir",
+        "state/new-agent",
+        "--agent-eod-store",
+        "../escape"
+    ])
+    .is_err());
+    for old in ["--report-dir", "--evaluation-file"] {
+        assert!(parse(&[
+            "--agent-dir",
+            "state/new-agent",
+            "--agent-eod-store",
+            "demo",
+            old,
+            "old-source"
+        ])
+        .is_err());
+    }
+    assert_eq!(
+        parse(&[
+            "--agent-dir",
+            "state/new-agent",
+            "--agent-eod-store",
+            "demo"
+        ])
+        .unwrap()
+        .agent_eod_store
+        .as_deref(),
+        Some("demo")
+    );
+}
+
+#[test]
 fn cloud_summary_is_a_versioned_projection_without_account_identity_cash_or_private_strategy_payloads(
 ) {
     let report =

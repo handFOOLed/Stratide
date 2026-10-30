@@ -15,15 +15,18 @@ import sqlite3
 import sys
 
 if __package__:
-    from .eod_journal import (Rejected, canonical, day, loads, no_links, read_observer,
+    from .eod_journal import (AVAILABILITY, Rejected, canonical, day, loads, no_links, read_observer,
                              require, sha, verify_rows)
 else:
-    from eod_journal import (Rejected, canonical, day, loads, no_links, read_observer,
+    from eod_journal import (AVAILABILITY, Rejected, canonical, day, loads, no_links, read_observer,
                             require, sha, verify_rows)
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "samples/m2-pr05-eod-synthetic.json"
 STORE_VERSION = 1050
+AGENT_SCOPE = "forward_eod_research_summary_v1"
+AGENT_VERSION = "eod-agent-input-v1"
+MAX_SYNC_AGE_MS = 24 * 60 * 60 * 1000
 
 
 def now():
@@ -225,6 +228,85 @@ class Store:
                                  blockers=saved["blockers"], historical_pit=saved["historical_pit"],
                                  latest_sync=status["latest_attempt"], source_day_differs_from_wall_clock=status["source_day_differs_from_wall_clock"]),
                     qualification="RESEARCH_INPUT_ONLY_NOT_PIT_OR_EXECUTION_EVIDENCE")
+
+    def agent_input(self):
+        """Same bounded projection as Rust eod_snapshot; no Agent/observer writes.
+
+        Fresh sync permission is checked now, but wall/sync time is deliberately
+        excluded from the frozen content identity. A later resync cannot change
+        a source day or a saved Agent input with the same snapshot SHA.
+        """
+        for suffix in ("", "-wal", "-shm", "-journal"):
+            path = Path(str(self.path) + suffix)
+            no_links(path)
+            if path.exists():
+                require(path.is_file() and path.stat().st_size <= 64 * 1024 * 1024, "SNAPSHOT_STORE_SIZE")
+                require(suffix != "-journal", "SNAPSHOT_STORE_JOURNAL")
+        require(not Path(str(self.path) + "-wal").exists()
+                or Path(str(self.path) + "-shm").is_file(), "SNAPSHOT_WAL_INCOMPLETE")
+        with self.connect() as db:
+            require(db.execute("PRAGMA journal_mode").fetchone()[0] == "wal", "SNAPSHOT_STORE_SCHEMA")
+            size = db.execute("SELECT length(CAST(content AS BLOB)) FROM snapshots WHERE sha="
+                              "(SELECT current_sha FROM control WHERE id=1)").fetchone()
+            require(size and 0 < size[0] <= 8 * 1024 * 1024, "SNAPSHOT_CONTENT_SIZE")
+            binding, saved, attempt = self.current(db)
+            require(saved is not None, "NO_PUBLISHED_SNAPSHOT")
+            payload = db.execute("SELECT content FROM snapshots WHERE sha=?", (saved["snapshot_sha256"],)).fetchone()[0]
+            require(payload == canonical(saved["content"]).decode(), "SNAPSHOT_HASH_MISMATCH")
+        v, key = saved["content"], saved["snapshot_sha256"]
+        require(v["can_research"] is True and v["blockers"] == [] and v["pending_runs"] == 0
+                and v["available_at_semantics"] == AVAILABILITY
+                and v["historical_pit"] == "NOT_VERIFIED", "SNAPSHOT_CONTRACT")
+        mode = v["data_mode"]
+        require(mode in ("synthetic_test", "forward_observed_eod")
+                and binding["source"]["kind"] in ("authorized_observer", "repository_synthetic_fixture")
+                and (binding["source"]["kind"] != "repository_synthetic_fixture" or mode == "synthetic_test"),
+                "SNAPSHOT_SOURCE_BINDING")
+        chain = v["journal_chain"]
+        require(chain and chain[0] == v["journal_genesis"] and chain[-1] == v["journal_head"]
+                and v["event_count"] == len(chain), "SNAPSHOT_SOURCE_BINDING")
+        require(attempt and attempt["state"] == "succeeded" and attempt["error_code"] is None
+                and attempt["blockers"] == [] and attempt["journal_head"] == v["journal_head"],
+                "SNAPSHOT_SYNC_NOT_SUCCEEDED")
+        started, finished = attempt["started_at"], attempt["finished_at"]
+        require(type(started) is int and type(finished) is int
+                and 0 < started <= finished <= now() and now() - started <= MAX_SYNC_AGE_MS,
+                "SNAPSHOT_SYNC_STALE_OR_CLOCK")
+        bars = v["bars"]
+        require(bars and v["valid_eod_days"] == len(bars)
+                and all(a["bar"]["trade_day"] < b["bar"]["trade_day"] for a, b in zip(bars, bars[1:]))
+                and bars[-1]["bar"]["trade_day"] == v["last_valid_source_day"], "SNAPSHOT_SOURCE_DAY")
+        raw_day, last = v["last_valid_source_day"], bars[-1]
+        source_day = dt.datetime.strptime(raw_day, "%Y%m%d").strftime("%Y-%m-%d")
+        require(source_day.replace("-", "") == raw_day, "SNAPSHOT_SOURCE_DAY")
+        observed, received, available, asof = (last["observed_at"], last["received_at"],
+                                              last["available_at"], v["as_of_journal_event_at"])
+        require(all(type(t) is int for t in (observed, received, available, asof))
+                and 0 < observed <= received <= available <= asof <= started
+                and raw_day <= day(available) and last["provider_published_at"] is None, "SNAPSHOT_TIME_INVALID")
+        require(type(v["on_day_valid_eod_days"]) is int
+                and 0 <= v["on_day_valid_eod_days"] <= len(bars), "SNAPSHOT_QUALITY_INVALID")
+        require(all(w in {"INTERRUPTED_COLLECTION", "LATE_BACKFILL", "REVISED_EOD", "COLLECTION_ERROR",
+                          "MISSING_ON_DAY_EOD"} for w in v["warnings"]), "SNAPSHOT_QUALITY_INVALID")
+        for row in [*v["coverage"], *v["gaps"]]:
+            parsed = dt.datetime.strptime(row["source_day"], "%Y%m%d").strftime("%Y%m%d")
+            require(parsed == row["source_day"] and row["state"] in
+                    ("valid_eod", "market_closed", "missing_valid_eod", "calendar_unknown"), "SNAPSHOT_QUALITY_INVALID")
+        safe_rows = lambda rows: [{k: r[k] for k in ("source_day", "state")} for r in rows[-16:]]
+        summary = dict(snapshot_id=saved["snapshot_id"], snapshot_sha256=key, data_mode=mode,
+                       last_valid_source_day=raw_day, as_of_journal_event_at=asof,
+                       observed_at=observed, received_at=received, available_at=available, provider_published_at=None,
+                       available_at_semantics=AVAILABILITY,
+                       valid_eod_days=v["valid_eod_days"], on_day_valid_eod_days=v["on_day_valid_eod_days"],
+                       quality=dict(coverage=safe_rows(v["coverage"]), coverage_count=len(v["coverage"]),
+                                    gaps=safe_rows(v["gaps"]), gap_count=len(v["gaps"]), warnings=v["warnings"], blockers=[],
+                                    historical_pit="NOT_VERIFIED", opening_source="BLOCKED",
+                                    source_checked_only_at_latest_sync=True, calendar_after_snapshot="UNKNOWN_NOT_FETCHED",
+                                    sync_policy="latest_succeeded_within_24h"),
+                       restriction="RESEARCH_ONLY", eod_eligible=False, can_execute_forward_paper=False, live_allowed=False)
+        require(len(canonical(summary)) <= 8192, "SNAPSHOT_SUMMARY_SIZE")
+        return dict(version=f"{AGENT_VERSION}:{key}", source_day=source_day, mode=mode,
+                    scopes=["owner_task", AGENT_SCOPE], summary=summary, eod_eligible=False)
 
 
 def main():

@@ -108,9 +108,10 @@ impl Agent {
             .lock()
             .map_err(|_| "INPUT_CACHE_UNAVAILABLE")?;
         if let Some(source) = &self.0.summary_source {
-            if cached
-                .0
-                .is_none_or(|at| now.signed_duration_since(at).num_seconds() >= 60)
+            if cached.1.is_eod_snapshot()
+                || cached
+                    .0
+                    .is_none_or(|at| now.signed_duration_since(at).num_seconds() >= 60)
             {
                 drop(cached);
                 // Refresh ONLY the explicitly selected published input. Account
@@ -439,6 +440,17 @@ impl Agent {
         c.execute("UPDATE tasks SET status='cancelled',reason='EOD_SUPERSEDED_SKIPPED',finished_at=?1 WHERE status='queued' AND trigger_key IS NOT NULL AND trigger_key!=?2",params![now.to_rfc3339(),current_key])?;
         c.execute("UPDATE eod SET disposition='skipped_superseded' WHERE source_day<?1 AND disposition='queued' AND EXISTS(SELECT 1 FROM tasks WHERE trigger_key='eod-v1:'||eod.source_day AND reason='EOD_SUPERSEDED_SKIPPED')",[market.format("%Y-%m-%d").to_string()])?;
         if self.store().setting("eod_enabled")?.as_deref() != Some("true") {
+            return Ok(());
+        }
+        if self
+            .0
+            .current_summary
+            .lock()
+            .map_err(|_| "INPUT_CACHE_UNAVAILABLE")?
+            .1
+            .is_eod_snapshot()
+        {
+            self.store().set("eod_reason", "EOD_SNAPSHOT_MANUAL_ONLY")?;
             return Ok(());
         }
         if s.budget.is_none() {
