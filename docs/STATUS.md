@@ -1,6 +1,6 @@
 # Stratide 当前状态
 
-> 截至 2026-10-30，基于 `main` `2fdd05d`（[PR #30](https://github.com/handFOOLed/Stratide/pull/30)、[PR #33](https://github.com/handFOOLed/Stratide/pull/33) 已合并），附本分支 M2-PR06 开发自测状态。这是**当前实现快照**，不是实盘承诺。Owner 已决定 **Core-first、UI-later**：后续核心功能先用 CLI/持久报告验收，最后由 Sol 按 PR #28 设计体系统一集成 UI。
+> 截至 2026-10-31，基于 `main` `a522c2925ac3163358bb2b32c84119f2a3ef4a3f`（[PR #35](https://github.com/handFOOLed/Stratide/pull/35) 已合并），附本分支 #37 公司行为证据包自测状态。这是**当前实现快照**，不是实盘承诺。Owner 已决定 **Core-first、UI-later**：后续核心功能先用 CLI/持久报告验收，最后由 Sol 按 PR #28 设计体系统一集成 UI。
 
 ## 已实现
 
@@ -16,10 +16,11 @@
 | UI 视觉基准 | PR #28 已合并，确立设计体系；不代表全部核心功能完成 | [PR #28](https://github.com/handFOOLed/Stratide/pull/28) |
 | 候选冻结与历史评价 | PR #30 已合并；#31 A/B 双线分别独立 PASS；研究不足、长窗口 DATA_BLOCKED 和资格默认拒绝继续有效 | [#31 最终 B 结论](https://github.com/handFOOLed/Stratide/issues/31#issuecomment-6512910618) / [操作](M2_PR04.md) |
 | EOD 研究快照 | PR #33 已合并，#32 完成；既有 observer 离线只读核验、原子持久发布、状态与只读消费 | [操作](M2_PR05.md) / [原自测](evidence/m2-pr05/README.md) |
+| 显式 Fake Agent 闭环 | PR #35 已合并；EOD 快照 → 本地 fake 持久任务 → 候选研究来源；新 scope 禁止云 Provider 与自动 EOD，资格默认拒绝 | [操作](M2_PR06.md) / [原自测](evidence/m2-pr06/README.md) |
 
 ## 仍未实现 / 未验证
 
-- **M2-PR06 本分支 Draft：** [操作/契约](M2_PR06.md) 接通显式 EOD 快照 → Rust 本地 fake Agent → 保存任务 → 候选来源登记/查询。固定 synthetic 与真实 10/28–10/29 两日只读输入均实际跑通；新独立 scope 禁止真实 Provider、禁止自动 EOD。保持 `RESEARCH_ONLY / NOT_EVALUATED / ELIGIBILITY_DENIED`，任务来源 `TASK_ORIGIN_NOT_ATTESTED`；Sol 自测见 [证据](evidence/m2-pr06/README.md)，等待 ChatGPT 固定 HEAD 审查。本期没有 Terra/子代理、自动 Agent EOD、真实模型权限、可信前向交易或 UI。
+- **M1-PR07B / #37 本分支 Draft：** [离线证据包](M1_PR07B.md) 已取得巨潮原始实施公告并实际运行 `audit/status`：12/19 字段有原文支持，事件事实 `FACTS_PARTIAL`，历史 PIT `NOT_VERIFIED`，共享会计 `NOT_IMPLEMENTED`。断点日期和已取金额只作一致性核对；`historical_replay_eligible=false / ELIGIBILITY_DENIED`。Sol 单人自测及旧文件保全见 [证据](evidence/m1-pr07b/README.md)，等待固定 HEAD 审查和 Owner 合并授权。
 - **真实 Provider** 仍为 **REAL_PROVIDER_NOT_VERIFIED**；无 Owner 预算/接收方/数据范围授权不付费。既有 Agent 自测见 [证据](evidence/m2-pr02/README.md)。新增功能无需同步开发 UI，后续统一集成。
 - **真正连续的前向 Paper 成交/NAV**：现有两日 forward 是 observe-only；[#10](https://github.com/handFOOLed/Stratide/issues/10) 的 `OPENING_SOURCE=BLOCKED / NOT VERIFIED`，可信开盘/费用门槛未解锁。历史回放不能计作 forward，EOD 连续性 PASS 不等于 M1 完成。
 - **公司行为处理和历史 PIT 认证**：未完成；不能因审计 PASS 误称长窗口已贯通。真实券商、实盘资金、公共 Web、无人值守策略自动部署均未获授权。
@@ -27,8 +28,8 @@
 
 ## 当前执行顺序
 
-1. **Sol / #34：** M2-PR06 显式 fake 研究闭环已交本分支；仅 Sol 自测，交 Draft PR，等待 ChatGPT 固定 HEAD 审查和 Owner 合并授权。#32 / PR #33 已完成并在 main。
-2. **后续核心任务：** 由 Owner 另定；真正前向 Paper 仍受开盘/时间可得性和研究证据门槛约束，不因本次工程通过解锁。
+1. **Sol / #37：** 公司行为源证据包 V1；独立开发、自测、Draft PR；不改账本、不扩展窗口。#34 / PR #35 已完成并在 main。
+2. **后续核心任务：** 公司行为会计须另行授权；[#36](https://github.com/handFOOLed/Stratide/issues/36) 是未来多模型研究提案。真正前向 Paper 仍受开盘/时间可得性和研究证据门槛约束。
 3. **全部核心功能完成后：** Sol 按 PR #28 的设计体系统一集成全部 UI；旧同步 UI 要求被本 Owner 决定取代。
 
 所有任务由 Owner 定范围。Sol/DeepSeek 不自行合并；ChatGPT 对固定 HEAD 做风险分级审查，Owner 明确批准后 SHA 锁定合并。高风险预算/凭据/财务改动需针对性独立反证；不将开发者自测冒充独立验收。流程现行补充见 [AGENTS.md](../AGENTS.md)，原 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md) 保留历史决策，待显式协调新版验收规则。

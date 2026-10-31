@@ -1,6 +1,6 @@
 # Stratide Paper 阶段路线图（当前执行版）
 
-> 2026-10-30；最新实现与数据边界见 [STATUS](STATUS.md)。Owner 已决定 **Core-first、UI-later**：后续核心功能不要求同期 Dashboard/UI，最终由 Sol 按已合并 PR #28 的视觉基准统一集成。旧各 PR 实施/验收细节仍保存在 `docs/M0_*.md`、`docs/M1_*.md`、`docs/M2_PR01.md` 与 `docs/evidence/`。
+> 2026-10-31；最新实现与数据边界见 [STATUS](STATUS.md)。Owner 已决定 **Core-first、UI-later**：后续核心功能不要求同期 Dashboard/UI，最终由 Sol 按已合并 PR #28 的视觉基准统一集成。旧各 PR 实施/验收细节仍保存在 `docs/M0_*.md`、`docs/M1_*.md`、`docs/M2_PR01.md` 与 `docs/evidence/`。
 
 ## 已完成（已并入 main）
 
@@ -10,15 +10,16 @@
 4. **Agent V1 与视觉基准**：#22 核心及 PR #27 状态修复已在 main；[PR #28](https://github.com/handFOOLed/Stratide/pull/28) 确立视觉基准，不代表功能全部完成。真实 Provider 未验证。
 5. **M2-PR04 候选链路**：[PR #30](https://github.com/handFOOLed/Stratide/pull/30) 已合并于 `05ab0b9`；[#31](https://github.com/handFOOLed/Stratide/issues/31#issuecomment-6512910618) A/B 双线独立 PASS。真实两日 `EOD_CONTINUITY_VERIFIED`；`OPENING_SOURCE` 仍 BLOCKED，研究仍不足，不产生前向成交权限。
 6. **M2-PR05 研究快照**：[PR #33](https://github.com/handFOOLed/Stratide/pull/33) 已合并于 `2fdd05d`，#32 完成；既有 EOD 离线只读核验、持久快照、状态和消费，见 [契约](M2_PR05.md)。
+7. **M2-PR06 显式 Fake Agent 闭环**：[PR #35](https://github.com/handFOOLed/Stratide/pull/35) 已合并于 `a522c29`，#34 完成；显式 EOD 快照 → 本地 fake 持久任务 → 候选研究来源。保留独立 scope、禁止云外发/自动 EOD 和资格拒绝，见 [契约](M2_PR06.md)。
 
 ## 当前和下一个完整功能包
 
-**本分支 M2-PR06 Draft：** 显式可信快照 → 本地 fake Agent 实际持久任务 → 候选来源登记/查询已有可运行 CLI，见 [契约/操作](M2_PR06.md) 和 [Sol 自测证据](evidence/m2-pr06/README.md)。固定 synthetic 与真实两日只读输入均完成闭环；新数据 scope 禁止云 Provider 和自动 EOD。保持 `RESEARCH_ONLY / NOT_EVALUATED / ELIGIBILITY_DENIED`，没有可信 forward 交易、真实模型权限或 UI。Owner 本轮指定仅 Sol 自测，`agents=0`；ChatGPT 固定 HEAD 审查，合并仍需 Owner 授权。
+**本分支 M1-PR07B Draft：** [#37](https://github.com/handFOOLed/Stratide/issues/37) 先交付公司行为源证据及缺口准入，不改共享账本或扩大回测。真实公告得到 `FACTS_PARTIAL / PIT_NOT_VERIFIED / ACCOUNTING_NOT_IMPLEMENTED`，回放资格 false；见 [操作](M1_PR07B.md) 与 [自测](evidence/m1-pr07b/README.md)。Owner 指定 `agents=0`，ChatGPT 固定 HEAD 审查，Owner 明确授权才合并。
 
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |
-| **当前 #34** | **Sol** | [M2-PR06](https://github.com/handFOOLed/Stratide/issues/34)：显式 EOD 输入、独立外发 scope、本地 fake 任务到研究候选来源；Core-only，仅 Sol 自测，Draft 待审；不改 Risk/权威 Ledger/前向交易权限。 |
-| **后续核心** | Owner 再定范围 | 继续 [#10](https://github.com/handFOOLed/Stratide/issues/10) 前向证据与 [#17](https://github.com/handFOOLed/Stratide/issues/17) 数据缺口；证据不足保持 BLOCKED，新的交易联动需独立授权。 |
+| **当前 #37** | **Sol** | [M1-PR07B](https://github.com/handFOOLed/Stratide/issues/37)：离线公司行为证据包和数据缺口准入；仅 Sol 自测，Draft 待审；不改 Risk/权威 Ledger/回测窗口。 |
+| **后续核心** | Owner 再定范围 | [#10](https://github.com/handFOOLed/Stratide/issues/10) 前向证据与公司行为会计继续受阻；[#36](https://github.com/handFOOLed/Stratide/issues/36) 为未来多模型研究提案，未在本期实现。 |
 | **核心全部完成后** | **Sol** | 按 PR #28 已确定的设计体系统一集成全部 UI；当前各功能任务无需同步前端。 |
 
 ## 一直有效的边界

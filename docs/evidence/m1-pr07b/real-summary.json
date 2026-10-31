@@ -1,0 +1,197 @@
+{
+  "accounting_support_status": "NOT_IMPLEMENTED",
+  "blockers": [
+    "ACCOUNTING_NOT_IMPLEMENTED",
+    "ACQUIRED_AFTER_DECISION:cninfo-1225416710",
+    "DISCLOSURE_TIME_NOT_VERIFIED:cninfo-1225416710",
+    "FACT_MISSING:actual_account_cash_received_at",
+    "FACT_MISSING:capitalization_ratio",
+    "FACT_MISSING:net_cash_amount",
+    "FACT_MISSING:rights_ratio",
+    "FACT_MISSING:sellable_date",
+    "FACT_MISSING:stock_dividend_ratio",
+    "FACT_MISSING:stock_listing_date",
+    "INITIAL_DISCLOSURE_NOT_OBTAINED",
+    "PIT_NOT_VERIFIED",
+    "REVISION_HISTORY_NOT_VERIFIED"
+  ],
+  "breakpoint": "2026-07-16",
+  "bundle_sha256": "c9b15d74dd687691e9418742fefa22bf70e4843dc6a066cb5f554df43329b49b",
+  "conflicting_fields": [],
+  "consistency": {
+    "event_ex_date_vs_breakpoint": "DATE_MATCH",
+    "event_within_existing_fee_model": true,
+    "fee_history_recertified": false,
+    "prices_are_not_event_evidence": true,
+    "sourced_cash_vs_price_delta_match": true
+  },
+  "decision_at": "2026-07-16T01:30:00Z",
+  "documents": [
+    {
+      "disclosed_on": "2026-07-09",
+      "disclosure_basis": "document_signed_date",
+      "document_id": "1225416710",
+      "id": "cninfo-1225416710",
+      "public_url": "https://static.cninfo.com.cn/finalpage/2026-07-10/1225416710.PDF",
+      "published_at": null,
+      "review_method": "operator_manual_document_text_crosscheck",
+      "role": "implementation",
+      "sha256": "afe3ee2cf61dcd1e9e76d2b8d4a93a2cc16fd7ea27eb89da815b8a808f8de386",
+      "size_bytes": 108034,
+      "supersedes": null,
+      "text_sha256": "af6d8832c28939476735818780d82d3976ff20af4d023c1cacf370216890ae86",
+      "text_size_bytes": 5516,
+      "transcript_assurance": "operator_attested_not_automatic_pdf_semantic_verification",
+      "version": "observed-cninfo-1225416710-v1"
+    }
+  ],
+  "eligibility": "ELIGIBILITY_DENIED",
+  "event_fact_status": "FACTS_PARTIAL",
+  "events": [
+    {
+      "facts": {
+        "actual_account_cash_received_at": null,
+        "announcement_date": "2026-07-09",
+        "capitalization_ratio": null,
+        "cash_amount": "0.42",
+        "cash_unit": "CNY_PER_SHARE",
+        "currency": "CNY",
+        "event_id": "临2026-021",
+        "event_type": "CASH_DIVIDEND",
+        "ex_date": "2026-07-16",
+        "net_cash_amount": null,
+        "record_date": "2026-07-15",
+        "rights_ratio": null,
+        "scheduled_pay_date": "2026-07-16",
+        "sellable_date": null,
+        "stock_dividend_ratio": null,
+        "stock_listing_date": null,
+        "symbol": "600000.SH",
+        "tax_basis": "GROSS",
+        "tax_terms": "暂不扣缴个人所得税"
+      },
+      "source_id": "cninfo-1225416710"
+    }
+  ],
+  "evidence_kind": "public_document",
+  "field_coverage": {
+    "actual_account_cash_received_at": "MISSING",
+    "announcement_date": "VERIFIED_LITERAL",
+    "capitalization_ratio": "MISSING",
+    "cash_amount": "VERIFIED_LITERAL",
+    "cash_unit": "VERIFIED_LITERAL",
+    "currency": "VERIFIED_LITERAL",
+    "event_id": "VERIFIED_LITERAL",
+    "event_type": "VERIFIED_LITERAL",
+    "ex_date": "VERIFIED_LITERAL",
+    "net_cash_amount": "MISSING",
+    "record_date": "VERIFIED_LITERAL",
+    "rights_ratio": "MISSING",
+    "scheduled_pay_date": "VERIFIED_LITERAL",
+    "sellable_date": "MISSING",
+    "stock_dividend_ratio": "MISSING",
+    "stock_listing_date": "MISSING",
+    "symbol": "VERIFIED_LITERAL",
+    "tax_basis": "VERIFIED_LITERAL",
+    "tax_terms": "VERIFIED_LITERAL"
+  },
+  "historical_baseline": {
+    "breakpoint_present": true,
+    "calendar_rows": 1032,
+    "daily_rows": 681,
+    "discontinuities": [
+      "20240718",
+      "20250716",
+      "20260716"
+    ],
+    "extracted_at": "2026-10-29T05:16:51.993000Z",
+    "fee_model_version": "paper-cost-assumption-20260706-v1",
+    "fee_valid_from": "2026-07-06",
+    "fee_valid_through": "2026-12-31",
+    "history_quality_recertified": false,
+    "original_supported_end": "2026-10-28",
+    "original_supported_sessions": 68,
+    "original_supported_start": "2026-07-17",
+    "raw_sha256": {
+      "calendar": "284cbb28d12f576ae93e54b0bd8abf516a595cc668f56363cd2cfbb68a4d5bf9",
+      "daily": "5689c59e8fa92b5ca2499141c3b4e199b168ea02f70b385c8a24eb81340d2075",
+      "extraction": "5eb1abff2764e414f484d9610807af7544fa672ccf6228056796f4a5337e4075",
+      "limits": "dabd396dc7594bf90c74118d92be256c87667bc0cfd46af08b7c9f1861ceec2f",
+      "suspensions": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "historical_pit_status": "NOT_VERIFIED",
+  "historical_replay_eligible": false,
+  "missing_accounting_primitives": [
+    "record_date_entitlements",
+    "dividend_receivable_and_settlement",
+    "tax_identity_holding_period_and_deferred_liability",
+    "corporate_action_shares_and_sellable_date",
+    "single_ledger_nav_risk_and_report_reconciliation",
+    "idempotent_event_versions"
+  ],
+  "next_required_evidence": [
+    {
+      "blocker": "ACCOUNTING_NOT_IMPLEMENTED",
+      "required": "另行授权共享 v3 ledger 的登记日权益、应收/到账、税务与股份事件及统一 NAV/报告。"
+    },
+    {
+      "blocker": "ACQUIRED_AFTER_DECISION:cninfo-1225416710",
+      "required": "取得该字段的明确原文、适用身份/实际账户证据或历史逐版本实收；保留 null，不从价格补造。"
+    },
+    {
+      "blocker": "DISCLOSURE_TIME_NOT_VERIFIED:cninfo-1225416710",
+      "required": "取得该字段的明确原文、适用身份/实际账户证据或历史逐版本实收；保留 null，不从价格补造。"
+    },
+    {
+      "blocker": "FACT_MISSING:actual_account_cash_received_at",
+      "required": "取得该字段的明确原文、适用身份/实际账户证据或历史逐版本实收；保留 null，不从价格补造。"
+    },
+    {
+      "blocker": "FACT_MISSING:capitalization_ratio",
+      "required": "取得该字段的明确原文、适用身份/实际账户证据或历史逐版本实收；保留 null，不从价格补造。"
+    },
+    {
+      "blocker": "FACT_MISSING:net_cash_amount",
+      "required": "取得该字段的明确原文、适用身份/实际账户证据或历史逐版本实收；保留 null，不从价格补造。"
+    },
+    {
+      "blocker": "FACT_MISSING:rights_ratio",
+      "required": "取得该字段的明确原文、适用身份/实际账户证据或历史逐版本实收；保留 null，不从价格补造。"
+    },
+    {
+      "blocker": "FACT_MISSING:sellable_date",
+      "required": "取得该字段的明确原文、适用身份/实际账户证据或历史逐版本实收；保留 null，不从价格补造。"
+    },
+    {
+      "blocker": "FACT_MISSING:stock_dividend_ratio",
+      "required": "取得该字段的明确原文、适用身份/实际账户证据或历史逐版本实收；保留 null，不从价格补造。"
+    },
+    {
+      "blocker": "FACT_MISSING:stock_listing_date",
+      "required": "取得该字段的明确原文、适用身份/实际账户证据或历史逐版本实收；保留 null，不从价格补造。"
+    },
+    {
+      "blocker": "INITIAL_DISCLOSURE_NOT_OBTAINED",
+      "required": "同一事件的官方首次预案/披露原文及版本关系；搜索摘要不算原文。"
+    },
+    {
+      "blocker": "PIT_NOT_VERIFIED",
+      "required": "历史决策时刻可得的逐版本原始记录及独立 PIT 核验；公告日期不能替代本机实收。"
+    },
+    {
+      "blocker": "REVISION_HISTORY_NOT_VERIFIED",
+      "required": "可核实的历史修订全史与逐版本可得时刻；当前看到的公告不能证明未有更正。"
+    }
+  ],
+  "obtained_at": {
+    "cninfo-1225416710": "2026-10-31T13:50:22.362722Z"
+  },
+  "opening_source": "BLOCKED",
+  "parser_version": "corporate-action-evidence-v1",
+  "schema_version": 1,
+  "status": "PARTIAL",
+  "symbol": "600000.SH",
+  "verification_scope": "trusted_operator_manifest_and_manual_transcript; not_independent_acceptance",
+  "verified_at": "2026-10-31T14:00:46.858000Z"
+}
