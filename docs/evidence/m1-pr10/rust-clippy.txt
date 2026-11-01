@@ -1,0 +1,8 @@
+    Checking stratide-contracts v0.0.1 (<WORKTREE>\crates\contracts)
+    Checking stratide-forward v0.0.1 (<WORKTREE>\crates\forward)
+    Checking stratide-research v0.0.1 (<WORKTREE>\research\agent)
+    Checking stratide-risk v0.0.1 (<WORKTREE>\crates\risk)
+    Checking stratide-ledger v0.0.1 (<WORKTREE>\crates\ledger)
+    Checking stratided v0.0.1 (<WORKTREE>\apps\stratided)
+    Checking stratide-cli v0.0.1 (<WORKTREE>\apps\stratide-cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.72s

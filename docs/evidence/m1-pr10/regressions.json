@@ -1,0 +1,116 @@
+{
+  "verification": "developer_selftest_not_independent_acceptance",
+  "commands": [
+    {
+      "command": "cargo fmt --all --check",
+      "exit_code": 0,
+      "tests_run": null
+    },
+    {
+      "command": "powershell -NoProfile -File scripts/with-msvc.ps1 check --workspace",
+      "exit_code": 0,
+      "tests_run": null
+    },
+    {
+      "command": "powershell -NoProfile -File scripts/with-msvc.ps1 clippy --workspace --all-targets -- -D warnings",
+      "exit_code": 0,
+      "tests_run": null
+    },
+    {
+      "command": "powershell -NoProfile -File scripts/with-msvc.ps1 test --workspace (TEMP/TMP=<NEW_WORKSPACE_TEMP>)",
+      "exit_code": 0,
+      "tests_run": 156
+    },
+    {
+      "command": "powershell -NoProfile -File scripts/with-msvc.ps1 build --workspace",
+      "exit_code": 0,
+      "tests_run": null
+    },
+    {
+      "command": "python -B scripts/test-forward-shadow.py",
+      "exit_code": 0,
+      "tests_run": 9
+    },
+    {
+      "command": "targeted ShadowTests.test_concurrent_alias_watch_disable_restart_and_cwd with physically copied source",
+      "exit_code": 0,
+      "tests_run": 1
+    },
+    {
+      "command": "python -B scripts/test-data-snapshot.py",
+      "exit_code": 0,
+      "tests_run": 11
+    },
+    {
+      "command": "python -B scripts/test-eod-auto.py",
+      "exit_code": 1,
+      "tests_run": 16
+    },
+    {
+      "command": "python -B scripts/test-eod-auto.py --test test_init_existing_directory_binding_and_junction_are_rejected (native permissions)",
+      "exit_code": 0,
+      "tests_run": 1
+    },
+    {
+      "command": "python -B scripts/test-research-review.py",
+      "exit_code": 1,
+      "tests_run": 12
+    },
+    {
+      "command": "targeted ReviewTests.test_owner_parameter_injection_and_junction_never_run (native permissions)",
+      "exit_code": 0,
+      "tests_run": 1
+    },
+    {
+      "command": "python -B scripts/test-research-evaluation.py",
+      "exit_code": 0,
+      "tests_run": 5
+    },
+    {
+      "command": "python -B scripts/test-historical-replay.py --exe target/debug/stratide-cli.exe --input <PRIVATE_68_DAY_INPUT> --source-dir <PRIVATE_SOURCE> --output <NEW_IGNORED_OUTPUT> -- --initial-cash-fen 10000000 --max-order-fen 500000 --account-cap-fen 2000000 --strategy-cap-fen 2000000 --daily-loss-fen 100000 --drawdown-fen 500000",
+      "exit_code": 0,
+      "tests_run": null
+    },
+    {
+      "command": "python -B scripts/test-cash-dividend.py --exe target/debug/stratide-cli.exe --out <NEW_IGNORED_OUTPUT>",
+      "exit_code": 0,
+      "tests_run": 9
+    },
+    {
+      "command": "python -B scripts/test-forward-shadow.py --real-observer <PRIVATE_OBSERVER> --old-snapshot <PRIVATE_PR33_SNAPSHOT>",
+      "exit_code": 0,
+      "tests_run": null
+    },
+    {
+      "command": "python -B scripts/test-forward-shadow.py --preserve-root <ORIGINAL_CHECKOUT> --baseline <PRIVATE_LOCAL_MANIFEST>",
+      "exit_code": 0,
+      "tests_run": null
+    }
+  ],
+  "notes": [
+    "Rust first attempts failed with Windows system Temp permission errors; original tests passed using a new workspace TEMP/TMP.",
+    "PR44 first run: 15 passed and one junction creation failed; only failed case rerun with native permission passed.",
+    "PR46 first run: 11 passed and one junction creation failed; only failed case rerun with native permission passed.",
+    "Initial historical test invocation omitted required arguments (argparse exit 2); full frozen-input command then passed."
+  ],
+  "historical_regression": {
+    "mode": "historical_replay",
+    "input_sha256": "9460155e70947ee3c536cc02ec81d555401f1a2b824198ab660a0e2283c33ff7",
+    "daily_rows": 68,
+    "identical_six_reports": true,
+    "duplicate_events_added": 0,
+    "killed_after_committed_events": 35,
+    "resumed_events_equal": true,
+    "future_mutation_keeps_prior_proposals": true,
+    "financial_conservation": true,
+    "raw_hashes_verified": true
+  },
+  "financial_boundaries": {
+    "shadow_orders": 0,
+    "shadow_fills": 0,
+    "shadow_nav": null,
+    "forward_paper_allowed": false,
+    "live_allowed": false,
+    "real_forward_days_added": 0
+  }
+}

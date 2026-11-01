@@ -1,0 +1,30 @@
+{
+  "actual_decision_clock_ms": 1793520501874,
+  "authority": "NO_ORDERS",
+  "committed_observations": 0,
+  "committed_signals": 0,
+  "fills": 0,
+  "forward_paper_allowed": false,
+  "historical_pit": "NOT_VERIFIED",
+  "limitations": [
+    "CORPORATE_ACTION_PIT_NOT_VERIFIED"
+  ],
+  "live_allowed": false,
+  "nav": null,
+  "new_real_forward_days": 0,
+  "old_pr33_snapshot_on_day_days": 2,
+  "once_reason": "MISSED_OR_STALE",
+  "opening_source": "BLOCKED",
+  "orders": 0,
+  "original_bytes_unchanged": true,
+  "original_journal_head": "28a8f562c7df902ced5fe03a38ceb22f8f44190da3df67944771e075effa8b66",
+  "original_on_day_days": 2,
+  "protected_files": 4,
+  "result": "PASS",
+  "source_database_sha256": "d4020489f0485554ec092e9e8e84026998aa54248ac3268df46aeb040ee0585e",
+  "source_days": [
+    "20261028",
+    "20261029"
+  ],
+  "warmup_reason": "INSUFFICIENT_FORWARD_WARMUP"
+}

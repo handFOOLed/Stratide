@@ -1,0 +1,220 @@
+{
+  "checks": [
+    {
+      "check": "concurrency_alias_restart_cwd",
+      "copied_source_same_identity": true,
+      "process_exits": [
+        2,
+        130
+      ],
+      "signal_count": 1
+    },
+    {
+      "check": "22_day_two_directory_e2e",
+      "independent_decimal": true,
+      "normalized_outcomes": [
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          1
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          2
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          3
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          4
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          5
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          6
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          7
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          8
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          9
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          10
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          11
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          12
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          13
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          14
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          15
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          16
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          17
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          18
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          19
+        ],
+        [
+          "INSUFFICIENT_FORWARD_WARMUP",
+          20
+        ],
+        [
+          "UP_CROSS",
+          21
+        ],
+        [
+          "DOWN_CROSS",
+          22
+        ]
+      ],
+      "readonly_bytes_unchanged": true,
+      "real_forward_days_added": 0
+    },
+    {
+      "check": "known_open_gap",
+      "reason": "FORWARD_COVERAGE_GAP",
+      "signals": 0
+    },
+    {
+      "check": "unknown",
+      "reason": "SOURCE_CHANGED_SINCE_SYNC"
+    },
+    {
+      "check": "conflict",
+      "reason": "SOURCE_CHANGED_SINCE_SYNC"
+    },
+    {
+      "check": "units",
+      "reason": "RAW_BAR_MISMATCH"
+    },
+    {
+      "check": "sha",
+      "reason": "RAW_SHA_MISMATCH"
+    },
+    {
+      "check": "mode",
+      "reason": "SOURCE_CHANGED_SINCE_SYNC"
+    },
+    {
+      "check": "instrument",
+      "reason": "RAW_BAR_IDENTITY"
+    },
+    {
+      "check": "writer_lock_disable",
+      "next_day_disabled": true,
+      "signal_count": 1
+    },
+    {
+      "absent_store_not_created": true,
+      "byte_manifest_equal": true,
+      "check": "strict_readonly"
+    },
+    {
+      "check": "revision_and_future_freeze",
+      "current_source_changed": true,
+      "frozen_commitment": "e1f5db9a5b0a6cf34bb30fa6c325b895b1b24e8d4a241e87dd44e47ef7effd76",
+      "signal_count": 1
+    },
+    {
+      "check": "snapshot_tamper",
+      "committed_signals": 0,
+      "mode": "hash",
+      "reason": "SNAPSHOT_HASH_MISMATCH"
+    },
+    {
+      "check": "snapshot_tamper",
+      "committed_signals": 0,
+      "mode": "historical_replay",
+      "reason": "SHADOW_SOURCE_MODE"
+    },
+    {
+      "check": "snapshot_tamper",
+      "committed_signals": 0,
+      "mode": "EXPLORATORY_EX_POST",
+      "reason": "SHADOW_SOURCE_MODE"
+    },
+    {
+      "check": "actual_process_interrupt",
+      "committed_signals": 1,
+      "exit_code": 86,
+      "point": "before_intent"
+    },
+    {
+      "check": "actual_process_interrupt",
+      "committed_signals": 1,
+      "exit_code": 86,
+      "point": "before_persist"
+    },
+    {
+      "check": "actual_process_interrupt",
+      "committed_signals": 1,
+      "exit_code": 86,
+      "point": "after_persist"
+    },
+    {
+      "check": "time_gates",
+      "reasons": [
+        "MISSED_OR_STALE",
+        "SNAPSHOT_SYNC_STALE_OR_CLOCK",
+        "NO_VALID_CURRENT_ON_DAY_EOD"
+      ],
+      "warmup_result": "INSUFFICIENT_FORWARD_WARMUP"
+    }
+  ],
+  "data_mode": "synthetic_test",
+  "errors": 0,
+  "failures": 0,
+  "market_calls": 0,
+  "new_real_forward_days": 0,
+  "provider_calls": 0,
+  "result": "PASS",
+  "tests_run": 9,
+  "verification": "developer_selftest_not_independent_acceptance",
+  "base_sha": "6c86b872360bcaa1dc92d1a02b760f1b08274295",
+  "additional_targeted_checks": [
+    {
+      "check": "concurrency_alias_restart_cwd",
+      "copied_source_same_identity": true,
+      "process_exits": [
+        2,
+        130
+      ],
+      "signal_count": 1
+    }
+  ]
+}

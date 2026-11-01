@@ -1,0 +1,5083 @@
+[
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-parallel-c3e5acc494",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-parallel-c3e5acc494",
+      "init"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-parallel-c3e5acc494",
+      "enable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-alias-8c353ca4c0",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-alias-8c353ca4c0",
+      "init"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "SHADOW_ALREADY_INITIALIZED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-parallel-c3e5acc494",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "STORE_BUSY",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-alias-8c353ca4c0",
+      "watch",
+      "--interval-seconds",
+      "60"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 130,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260821",
+        "decision_at": 1787306400000,
+        "input_snapshot_sha256": "9676131e3e7d87478bf7e17764f5f5669d79e40f5a5dea7b1a38a5581ce92c06",
+        "result": "UP_CROSS",
+        "local_input_commitment_sha256": "fe94fe7b37d222345fc98164eb100e77d46a6ac3b16b40a10114ea294a82d6d3",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 21
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-parallel-c3e5acc494",
+      "status"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 1,
+      "signal_count": 1,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-alias-8c353ca4c0",
+      "status"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 1,
+      "signal_count": 1,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-alias-8c353ca4c0",
+      "disable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "DISABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-parallel-c3e5acc494",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "SKIPPED",
+      "reason": "OWNER_DISABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-parallel-c3e5acc494",
+      "enable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-alias-8c353ca4c0",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ALREADY_FROZEN",
+      "reason": "ALREADY_FROZEN_NO_RECOMPUTE",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260821",
+        "decision_at": 1787306400000,
+        "input_snapshot_sha256": "9676131e3e7d87478bf7e17764f5f5669d79e40f5a5dea7b1a38a5581ce92c06",
+        "result": "UP_CROSS",
+        "local_input_commitment_sha256": "fe94fe7b37d222345fc98164eb100e77d46a6ac3b16b40a10114ea294a82d6d3",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 21
+      },
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-parallel-c3e5acc494",
+      "status"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 1,
+      "signal_count": 1,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1785578400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "init"
+    ],
+    "test_clock_ms": 1785578400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1785578400000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "SKIPPED",
+      "reason": "OWNER_DISABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "enable"
+    ],
+    "test_clock_ms": 1785578400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1785578400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260801",
+        "decision_at": 1785578400000,
+        "input_snapshot_sha256": "06424be90111c8db34a39a5d8833e34586047a04dfab8fd9a62d88e7c9e50aeb",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "3d5eb06f3998c1f22cb3470d00b245be83d2cc8f4515bbafecc52f83c4635f69",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 1
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260802",
+        "decision_at": 1785664800000,
+        "input_snapshot_sha256": "b128539057cf8454510233a1523c00c090ca06096baff30a8d6a6dfab009b16e",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "549943edb8d56fe2c9a0822111c507f7eae02da8f414e2e5665b33101c8254b6",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 2
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260803",
+        "decision_at": 1785751200000,
+        "input_snapshot_sha256": "cfd510d9c64ab8a076c6320034b95e05ac23897c1db887066d20bb6a36c0839f",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "09d9cc6ca4e127b62360bcb874d815a37d286355f874e99555df4bab5322d821",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 3
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1785837600000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1785837600000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260804",
+        "decision_at": 1785837600000,
+        "input_snapshot_sha256": "f94aaca5f960119f4d77b3ab8976bde66e234f21abd4ca6a6046ccf486ced905",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "cf3f29607c68b577efd04e672be5be42783e2d542ff16dc30e2c6551fd6149bc",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 4
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1785924000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1785924000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260805",
+        "decision_at": 1785924000000,
+        "input_snapshot_sha256": "a4448d9562e2e633718267601f0fb4a8c182f1b693927260a18f9070199d4078",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "7362d0e13466248b606cc0555a32710846a7cad42a94f92e5b76c8c44464c299",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 5
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1786010400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1786010400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260806",
+        "decision_at": 1786010400000,
+        "input_snapshot_sha256": "4d1f9ce04eddd659af10dfea0ea3b8508195805a52a150a62dacb0c0178ae3ad",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "f42e6b190e78ee71524b9379e298dc5bfcf9c1dd16d2dda9ef9703d1af19cd48",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 6
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1786096800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1786096800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260807",
+        "decision_at": 1786096800000,
+        "input_snapshot_sha256": "2eac94ef3da2e117fd1d791799299774f91c47bb5c4bf1c2dc90fa5ad59ce574",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "8593a1a0dd0ab92527e3bcd732c4c28b76203707facc596f19f548944e0094e6",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 7
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1786183200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1786183200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260808",
+        "decision_at": 1786183200000,
+        "input_snapshot_sha256": "7bde2d4eefd2638025e8b1d82e5914f567be851e0591e551f199a5cabbd1f068",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "925169f18a0e76950ac29c7f4680419cf2391c5bc408243bcdb7568678643d4d",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 8
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1786269600000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1786269600000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260809",
+        "decision_at": 1786269600000,
+        "input_snapshot_sha256": "6ab78096c58fcd025613e184b6ddafd72f9a830760bffe8573af3ee5e43c1995",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "e52f32dd88b7bc40942f40a6c13ece11af5e7ddd30433ab0d6c95b6c6516f13c",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 9
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1786356000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1786356000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260810",
+        "decision_at": 1786356000000,
+        "input_snapshot_sha256": "dd0dddfed5b07b004533862d9ae227809d7177a0e0d6a5397d7023de5b4b318c",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "a655a2e31bdda1a7588300decd2c8325d3387ba5b00b7d93a809965c5ec75d0a",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 10
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1786442400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1786442400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260811",
+        "decision_at": 1786442400000,
+        "input_snapshot_sha256": "83148e9576d1d5ce51fed778899692e00074808bbd6c7f97ec13b93cf17ccde7",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "8a05ae9ee70c7a6a972475977fec4e638777a803ef202c98d76116d168c12ea0",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 11
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1786528800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1786528800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260812",
+        "decision_at": 1786528800000,
+        "input_snapshot_sha256": "d992c17ac72d15d63b906bf870bdc1e962fec1937c60dabb1b3ea4149bff53d9",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "8b96f5b86823ce91043a945e86372e6de94b6a83f963c779df95ec9e59577551",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 12
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1786615200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1786615200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260813",
+        "decision_at": 1786615200000,
+        "input_snapshot_sha256": "93337f06ca9d052ff4926b4448b259a169c7474747a520ff621515bfb5187d35",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "5d0ce8cc61444c680e1dda7467f6eff51d2ad6ab733d00e939649c33cf6418db",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 13
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1786701600000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1786701600000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260814",
+        "decision_at": 1786701600000,
+        "input_snapshot_sha256": "1c7230abb6f681368b95bb34c8b60c0ed796dc2241c9a0f13ece4b001e1652cd",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "317b9a43034e9f30a86bc46962163078eec638e20fc1403b65201b2267be963c",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 14
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1786788000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1786788000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260815",
+        "decision_at": 1786788000000,
+        "input_snapshot_sha256": "0681f75ca6b2b131694c20419c5a051318c4d15ad967fa10da29677124a87d64",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "f58410ec24512183c21f7e605b3142fb4b19d06fee39000a64081995c56b4b4e",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 15
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1786874400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1786874400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260816",
+        "decision_at": 1786874400000,
+        "input_snapshot_sha256": "2c6c8214e96552609009d4d722cc689937742501e7b6d3b8b1a38e8718247d20",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "6a9634bc61caeef45a6b093980852adc2471b2a2e4d0058c09b5c2a2e2431316",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 16
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1786960800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1786960800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260817",
+        "decision_at": 1786960800000,
+        "input_snapshot_sha256": "025f7df4388831f75999504c5afd6c901f5f63d2cb9ddceda23bd813d16c5f7a",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "6d6a5702c5b4ce0b0438929247215bb54f5500298a051bcdea171596a8afe08f",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 17
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1787047200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1787047200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260818",
+        "decision_at": 1787047200000,
+        "input_snapshot_sha256": "2eb434e515f498c6b13d751e6804ab022202c9843c59286f855e027b7fc40c7e",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "eeab73ea70d8222291c18e6707d5c5f941e104f0d7445f44451bb30e2a441326",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 18
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1787133600000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1787133600000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260819",
+        "decision_at": 1787133600000,
+        "input_snapshot_sha256": "7d68f713befb78713134ef336382a96fb583cffd83ad08a1219f9debb43d4a42",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "400a558f3b2d95c4cf9f6799024f468df75c7a178753bcf448daf5a92b3ea7ec",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 19
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1787220000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1787220000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260820",
+        "decision_at": 1787220000000,
+        "input_snapshot_sha256": "26af71f5506f04383daf928c98909daddce3192b118cd4c9aed3fc0285076760",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "9fa566ca7fff50969a3129902ea19519816a3eb7d47c00e79cabcd8cc763e6f1",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 20
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260821",
+        "decision_at": 1787306400000,
+        "input_snapshot_sha256": "aadf030e87ad1e39727e93324af9381d0150a3136dab3cf4a57fb8fecb4d0f2d",
+        "result": "UP_CROSS",
+        "local_input_commitment_sha256": "43c8c7a97b632349d7099038734c9f1b32229a16e1fcda6f95170984023b6e71",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 21
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "sync"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "once"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260822",
+        "decision_at": 1787392800000,
+        "input_snapshot_sha256": "6ee5b773ef9af0fd558865b0699dba339fd1173d00ff3f20b9d557e26eddb135",
+        "result": "DOWN_CROSS",
+        "local_input_commitment_sha256": "03f298942f2eeff72451d6386f6a762087883ea1727da89cf8d2f3d7260f7c8f",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 22
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "status"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 22,
+      "signal_count": 2,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "history"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 22,
+      "signal_count": 2,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "verify"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 22,
+      "signal_count": 2,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "report"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 22,
+      "signal_count": 2,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "watch",
+      "--interval-seconds",
+      "60"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 130,
+    "output": {
+      "state": "ALREADY_FROZEN",
+      "reason": "ALREADY_FROZEN_NO_RECOMPUTE",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260822",
+        "decision_at": 1787392800000,
+        "input_snapshot_sha256": "6ee5b773ef9af0fd558865b0699dba339fd1173d00ff3f20b9d557e26eddb135",
+        "result": "DOWN_CROSS",
+        "local_input_commitment_sha256": "03f298942f2eeff72451d6386f6a762087883ea1727da89cf8d2f3d7260f7c8f",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 22
+      },
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-a-79d469ebac",
+      "status"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 22,
+      "signal_count": 2,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1785578400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "init"
+    ],
+    "test_clock_ms": 1785578400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1785578400000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "SKIPPED",
+      "reason": "OWNER_DISABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "enable"
+    ],
+    "test_clock_ms": 1785578400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1785578400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260801",
+        "decision_at": 1785578400000,
+        "input_snapshot_sha256": "8e41a4fc0ca5ab05d5985d800dfb7cf7a5bf404197a704ffa0f51d23b1f3b93f",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "c306edad26682416acb6ee557e5146a5f80d28ec707dd751518f49fcef6ca824",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 1
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260802",
+        "decision_at": 1785664800000,
+        "input_snapshot_sha256": "6173b16a3eec0075cf955eaf6c6db9f8d68801dde2796d0e6b963fea515e64dd",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "6ceaa243fb853862acced28581edfcdb5aa4af9a8664da07907f4f2e8cad108e",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 2
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260803",
+        "decision_at": 1785751200000,
+        "input_snapshot_sha256": "9ff0eff62816640df286551468ab0b5169174634556ebc1885581fd6440babd8",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "63437aa8a790dabd50791a9f83f70e0b95a5b5d56c8db8926d149b4ab0b84531",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 3
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1785837600000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1785837600000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260804",
+        "decision_at": 1785837600000,
+        "input_snapshot_sha256": "eabb68ebd73ad748f8be2d3da1609656381c292d68a79d3519c1cecfecf3a365",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "dea963f55b7e7490e2201a0adea64248b53cc1317be0829038a8a8d8592dee41",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 4
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1785924000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1785924000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260805",
+        "decision_at": 1785924000000,
+        "input_snapshot_sha256": "dcd794660b27c37dae847365309e141ecf67ff402217ef3b348f27d61e05d05b",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "6af4fbecd5dedd0a34c48237b8dbe7fdea1ada017807c13e739901708001d912",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 5
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1786010400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1786010400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260806",
+        "decision_at": 1786010400000,
+        "input_snapshot_sha256": "16d81e767eb1982475a58c9c23f5fa3502e4a2897954c183df9ffc90870abf20",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "69c9b22f8ed4e703c01dcc8eac2acb35106ae7be4655fdf14115d55216c21251",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 6
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1786096800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1786096800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260807",
+        "decision_at": 1786096800000,
+        "input_snapshot_sha256": "a2d781e1cb92a70d03537b3b0c55f3c3a15a7410e5d20d983a4b02eadf54f003",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "e18ef6c4373a2b20356f09d988b8e93a726505ddca446369cb18a31ab569f50b",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 7
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1786183200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1786183200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260808",
+        "decision_at": 1786183200000,
+        "input_snapshot_sha256": "5fe3d237ebf12937988fba370e21b20303375756afbecb873996c016a7b6d282",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "24d8e3cd6da3879c88fd6240cd1dcbb0e59c70836918380fad30bca97ab3442f",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 8
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1786269600000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1786269600000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260809",
+        "decision_at": 1786269600000,
+        "input_snapshot_sha256": "f0819e24944509fbcc14184047197d2ce1ba2e5b36aed6a3bf26d61eb2293c8a",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "b5831b2d0901dbfb9008f6ad3d3f8e913aa20b23ac546062462db4122aa680fe",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 9
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1786356000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1786356000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260810",
+        "decision_at": 1786356000000,
+        "input_snapshot_sha256": "fffdee19ab8123000d854261cacb5958bd68d8a74a15941000f1f2968fea816e",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "2f6344b54900ed039e817cbf83a50862358d5e8b78e774d982eaee39dbf7421a",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 10
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1786442400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1786442400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260811",
+        "decision_at": 1786442400000,
+        "input_snapshot_sha256": "81db758cc57bfe88fb3fe46ebf12662dde6b36c7973434421184d07c2ad7c964",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "0e9b329569e29683bb9e63ea0efaefb54dc992dca2ffdbde60a9083b3e719532",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 11
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1786528800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1786528800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260812",
+        "decision_at": 1786528800000,
+        "input_snapshot_sha256": "c890d44e5302d0884c6ce5536cb114cb5f94d22c41232865b66de0ec83344e59",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "1f04a2a465e0bc04652ef22ac390b33e786543c825e57413b443c738382ddd8d",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 12
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1786615200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1786615200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260813",
+        "decision_at": 1786615200000,
+        "input_snapshot_sha256": "ba1d96b99abde774755bc1063c656b4e28633f54ba2764f8c3d848846d6fa3b2",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "0524d440d67d115c6f527d162780a0bcf6647c2d9eefaf9146eec9ca08eca7ae",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 13
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1786701600000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1786701600000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260814",
+        "decision_at": 1786701600000,
+        "input_snapshot_sha256": "621a621cdbc9adf4fa912056bb94c2f600fae03dd9a920314052f54bbb6ab9fc",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "5d8e36f05d5bafb500926e43e1e9bbc58af4f59a09ab6f4fe553fae58c913878",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 14
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1786788000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1786788000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260815",
+        "decision_at": 1786788000000,
+        "input_snapshot_sha256": "a15da654988818331172962df9ed6ba39c1bbd7796f0df4bd48a6a9b931ca96b",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "3171ff02e6c8a2e6262dad660d325b4c0474a8a3bbec6458a2737eac86896729",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 15
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1786874400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1786874400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260816",
+        "decision_at": 1786874400000,
+        "input_snapshot_sha256": "25dd4fc85d24f782c2b890304c71bb0eb304927de04e2f29775df8c48d39230d",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "649fe6d83f5ffba3332da95016ebbae77f6ace364c5997fd9f4d7ffbc8d2ad94",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 16
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1786960800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1786960800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260817",
+        "decision_at": 1786960800000,
+        "input_snapshot_sha256": "bbe276ba736481e4f94d447fac1992ad733ab80843900e479ccbc75211f15bcc",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "eb762d28c60dd0798e361935a8c3d9cdf1625e6f7437f0d9e215b3a3cc6d4e51",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 17
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1787047200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1787047200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260818",
+        "decision_at": 1787047200000,
+        "input_snapshot_sha256": "cbedd89add9aa71cd269e72f8d2af1c573114a145ff6996b97708ad97c30adc8",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "b7776bdbf0aae214dc01eca114faa3afdf381a2d53059d5797703db8e8d81901",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 18
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1787133600000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1787133600000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260819",
+        "decision_at": 1787133600000,
+        "input_snapshot_sha256": "816d356807b98c6deed0540c0eb8d66c888a9130f02c75bb533c1851272d79e0",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "0206c79d0a19feb7cfe03c5248fdd09ae12542fe9ce92702dfe3358da4d3be8f",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 19
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1787220000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1787220000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260820",
+        "decision_at": 1787220000000,
+        "input_snapshot_sha256": "42c9f39d9e86e4a8fa17dd13f591f3b2ead646cfe2c9785450e845fb04b5e391",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "335a7c887e27f9208dae051303aad29774d6bf2caa2d220c56ee3ed5fc6a7a76",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 20
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260821",
+        "decision_at": 1787306400000,
+        "input_snapshot_sha256": "8ffa4dcb9f7c519322bb8962d38395f548f728e46963589fc871e5b917dfa407",
+        "result": "UP_CROSS",
+        "local_input_commitment_sha256": "10b4ab3b76799e3ceb50c2e35b0309ce8c7676001f28565a77203b05b42931ec",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 21
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "sync"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "once"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260822",
+        "decision_at": 1787392800000,
+        "input_snapshot_sha256": "ae9f21c331dd00a42350d393fe155275424e858f66d8596c579d7d1175f27177",
+        "result": "DOWN_CROSS",
+        "local_input_commitment_sha256": "356598af79e2f29cd2b3b5796e87ac297737c2e3b9c837695a8d5ce5f851f4cf",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 22
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "status"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 22,
+      "signal_count": 2,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "history"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 22,
+      "signal_count": 2,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "verify"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 22,
+      "signal_count": 2,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "report"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 22,
+      "signal_count": 2,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "watch",
+      "--interval-seconds",
+      "60"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 130,
+    "output": {
+      "state": "ALREADY_FROZEN",
+      "reason": "ALREADY_FROZEN_NO_RECOMPUTE",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260822",
+        "decision_at": 1787392800000,
+        "input_snapshot_sha256": "ae9f21c331dd00a42350d393fe155275424e858f66d8596c579d7d1175f27177",
+        "result": "DOWN_CROSS",
+        "local_input_commitment_sha256": "356598af79e2f29cd2b3b5796e87ac297737c2e3b9c837695a8d5ce5f851f4cf",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 22
+      },
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-full-b-246bc02f5d",
+      "status"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 22,
+      "signal_count": 2,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-gap-5c659a407b",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-gap-5c659a407b",
+      "init"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-gap-5c659a407b",
+      "enable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-gap-5c659a407b",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "FORWARD_COVERAGE_GAP",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-backfill-gap-de5dd60f79",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-backfill-gap-de5dd60f79",
+      "init"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-backfill-gap-de5dd60f79",
+      "enable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-backfill-gap-de5dd60f79",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "FORWARD_COVERAGE_GAP",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-backfill-gap-de5dd60f79",
+      "status"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 0,
+      "signal_count": 0,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": [
+        "FORWARD_COVERAGE_GAP",
+        "INSUFFICIENT_FORWARD_WARMUP"
+      ]
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-late-d396fc6758",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1785578400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-late-d396fc6758",
+      "init"
+    ],
+    "test_clock_ms": 1785578400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-late-d396fc6758",
+      "enable"
+    ],
+    "test_clock_ms": 1785578400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-late-d396fc6758",
+      "sync"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-late-d396fc6758",
+      "once"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "MISSED_OR_STALE",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-unknown-18e39ae8cc",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-unknown-18e39ae8cc",
+      "init"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-unknown-18e39ae8cc",
+      "enable"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-unknown-18e39ae8cc",
+      "sync"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "latest_sync": {
+        "state": "blocked",
+        "error_code": "SOURCE_QUALITY_BLOCKED",
+        "blockers": [
+          "CALENDAR_UNKNOWN"
+        ]
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-unknown-18e39ae8cc",
+      "once"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "SOURCE_CHANGED_SINCE_SYNC",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-conflict-8ba2de0a0f",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-conflict-8ba2de0a0f",
+      "init"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-conflict-8ba2de0a0f",
+      "enable"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-conflict-8ba2de0a0f",
+      "sync"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "latest_sync": {
+        "state": "blocked",
+        "error_code": "SOURCE_QUALITY_BLOCKED",
+        "blockers": [
+          "CALENDAR_CONFLICT"
+        ]
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-conflict-8ba2de0a0f",
+      "once"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "SOURCE_CHANGED_SINCE_SYNC",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-units-473024c0e3",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-units-473024c0e3",
+      "init"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-units-473024c0e3",
+      "enable"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-units-473024c0e3",
+      "sync"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "latest_sync": {
+        "state": "blocked",
+        "error_code": "RAW_BAR_MISMATCH",
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-units-473024c0e3",
+      "once"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "RAW_BAR_MISMATCH",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-sha-9f6ce80d37",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-sha-9f6ce80d37",
+      "init"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-sha-9f6ce80d37",
+      "enable"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-sha-9f6ce80d37",
+      "sync"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "latest_sync": {
+        "state": "blocked",
+        "error_code": "RAW_SHA_MISMATCH",
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-sha-9f6ce80d37",
+      "once"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "RAW_SHA_MISMATCH",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-mode-756669a02b",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-mode-756669a02b",
+      "init"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-mode-756669a02b",
+      "enable"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-mode-756669a02b",
+      "sync"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "latest_sync": {
+        "state": "blocked",
+        "error_code": "SOURCE_GENESIS_OR_MODE_CHANGED",
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-mode-756669a02b",
+      "once"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "SOURCE_CHANGED_SINCE_SYNC",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-instrument-5d89f58568",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-instrument-5d89f58568",
+      "init"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-instrument-5d89f58568",
+      "enable"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-instrument-5d89f58568",
+      "sync"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "latest_sync": {
+        "state": "blocked",
+        "error_code": "RAW_BAR_IDENTITY",
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-instrument-5d89f58568",
+      "once"
+    ],
+    "test_clock_ms": 1785751200000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "RAW_BAR_IDENTITY",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-lock-adf5689602",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-lock-adf5689602",
+      "init"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-lock-adf5689602",
+      "enable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-lock-adf5689602",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "STORE_BUSY",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-lock-adf5689602",
+      "disable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "STORE_BUSY",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-lock-adf5689602",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260821",
+        "decision_at": 1787306400000,
+        "input_snapshot_sha256": "9d5607a6a4e93102d1166e2643e681509319720eac7dce0065ec3fde84435550",
+        "result": "UP_CROSS",
+        "local_input_commitment_sha256": "63be2ede3cf7a6fec35295e82393df2306a1a1ec12488b55abb2c7b49f84b645",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 21
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-lock-adf5689602",
+      "disable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "DISABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-lock-adf5689602",
+      "sync"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-lock-adf5689602",
+      "once"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "SKIPPED",
+      "reason": "OWNER_DISABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-lock-adf5689602",
+      "status"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": false,
+      "observation_count": 1,
+      "signal_count": 1,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-readonly-62d3325c3a",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-readonly-62d3325c3a",
+      "init"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-readonly-62d3325c3a",
+      "enable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-readonly-62d3325c3a",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260821",
+        "decision_at": 1787306400000,
+        "input_snapshot_sha256": "be266dce55d0a9bf00f4d40d7c0bffdbef84d4c24b4e9491c53f1511bf16c92e",
+        "result": "UP_CROSS",
+        "local_input_commitment_sha256": "e08b79b9efb8e4682f29f5188f0583acf748e45b40ef52c2e6a6a25266bb3e91",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 21
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-missing-fdf91acd57",
+      "status"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "STORE_NOT_INITIALIZED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-uninitialized-6d21d3a422",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-no-init-52e43b05a3",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1793095200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-no-init-52e43b05a3",
+      "status"
+    ],
+    "test_clock_ms": 1793095200000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "STORE_NOT_INITIALIZED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-no-init-52e43b05a3",
+      "history"
+    ],
+    "test_clock_ms": 1793095200000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "STORE_NOT_INITIALIZED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-no-init-52e43b05a3",
+      "verify"
+    ],
+    "test_clock_ms": 1793095200000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "STORE_NOT_INITIALIZED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-no-init-52e43b05a3",
+      "report"
+    ],
+    "test_clock_ms": 1793095200000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "STORE_NOT_INITIALIZED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-revision-5338ca3b21",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-revision-5338ca3b21",
+      "init"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-revision-5338ca3b21",
+      "enable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-revision-5338ca3b21",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260821",
+        "decision_at": 1787306400000,
+        "input_snapshot_sha256": "b1259acc356a018ee3314da697d20da93b6007664e466edccecb408fe65cddf0",
+        "result": "UP_CROSS",
+        "local_input_commitment_sha256": "e1f5db9a5b0a6cf34bb30fa6c325b895b1b24e8d4a241e87dd44e47ef7effd76",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 21
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-revision-5338ca3b21",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "SOURCE_CHANGED_SINCE_SYNC",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-revision-5338ca3b21",
+      "sync"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-revision-5338ca3b21",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ALREADY_FROZEN",
+      "reason": "ALREADY_FROZEN_NO_RECOMPUTE",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260821",
+        "decision_at": 1787306400000,
+        "input_snapshot_sha256": "b1259acc356a018ee3314da697d20da93b6007664e466edccecb408fe65cddf0",
+        "result": "UP_CROSS",
+        "local_input_commitment_sha256": "e1f5db9a5b0a6cf34bb30fa6c325b895b1b24e8d4a241e87dd44e47ef7effd76",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 21
+      },
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-revision-5338ca3b21",
+      "sync"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-revision-5338ca3b21",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "MISSED_OR_STALE",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-revision-5338ca3b21",
+      "report"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 1,
+      "signal_count": 1,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-snapshot-hash-12a21d9b3d",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-snapshot-hash-12a21d9b3d",
+      "init"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-snapshot-hash-12a21d9b3d",
+      "enable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-snapshot-hash-12a21d9b3d",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "SNAPSHOT_HASH_MISMATCH",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-snapshot-historical-replay-55e59ff18e",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-snapshot-historical-replay-55e59ff18e",
+      "init"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-snapshot-historical-replay-55e59ff18e",
+      "enable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-snapshot-historical-replay-55e59ff18e",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "SHADOW_SOURCE_MODE",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-snapshot-exploratory-ex-post-30ffbbdcb2",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-snapshot-exploratory-ex-post-30ffbbdcb2",
+      "init"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-snapshot-exploratory-ex-post-30ffbbdcb2",
+      "enable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-snapshot-exploratory-ex-post-30ffbbdcb2",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "SHADOW_SOURCE_MODE",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-kill-before-intent-33adcc5cdc",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-before-intent-33adcc5cdc",
+      "init"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-before-intent-33adcc5cdc",
+      "enable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-before-intent-33adcc5cdc",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": "before_intent",
+    "exit_code": 86,
+    "output": {}
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-before-intent-33adcc5cdc",
+      "status"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 0,
+      "signal_count": 0,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-before-intent-33adcc5cdc",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260821",
+        "decision_at": 1787306400000,
+        "input_snapshot_sha256": "cbd4abf60dc030ba04f2bcf98244664424101e79f7bb8c771eb61f915b544ba9",
+        "result": "UP_CROSS",
+        "local_input_commitment_sha256": "f844b62437aa84382ae6c4b0a14421ef2830ee808e04f1443dd3a48891267251",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 21
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-before-intent-33adcc5cdc",
+      "report"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 1,
+      "signal_count": 1,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-kill-before-persist-22ec32f63a",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-before-persist-22ec32f63a",
+      "init"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-before-persist-22ec32f63a",
+      "enable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-before-persist-22ec32f63a",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": "before_persist",
+    "exit_code": 86,
+    "output": {}
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-before-persist-22ec32f63a",
+      "verify"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "STORE_BUSY_OR_RECOVERY_REQUIRED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-before-persist-22ec32f63a",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260821",
+        "decision_at": 1787306400000,
+        "input_snapshot_sha256": "f701438fc7eda20a846dca5330673d7c82fdae6e8e946eff82baba734e483134",
+        "result": "UP_CROSS",
+        "local_input_commitment_sha256": "5432c8af24a6b51b0715d729ac3b580f709c394f59308a685c12b3cbfd98c314",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 21
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-before-persist-22ec32f63a",
+      "report"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 1,
+      "signal_count": 1,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-kill-after-persist-d3c735506f",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-after-persist-d3c735506f",
+      "init"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-after-persist-d3c735506f",
+      "enable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-after-persist-d3c735506f",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": "after_persist",
+    "exit_code": 86,
+    "output": {}
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-after-persist-d3c735506f",
+      "status"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 1,
+      "signal_count": 1,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-after-persist-d3c735506f",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ALREADY_FROZEN",
+      "reason": "ALREADY_FROZEN_NO_RECOMPUTE",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260821",
+        "decision_at": 1787306400000,
+        "input_snapshot_sha256": "970b6804c8d177dedcff230b4c4455652d4738f00c9e3e84c214cefaac4066af",
+        "result": "UP_CROSS",
+        "local_input_commitment_sha256": "a347aa584779dc4369917c830c111c9538d6916277473f85078fe979f540fcf1",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 21
+      },
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-kill-after-persist-d3c735506f",
+      "report"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 1,
+      "signal_count": 1,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-early-b5b6374818",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787220000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-early-b5b6374818",
+      "init"
+    ],
+    "test_clock_ms": 1787220000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-early-b5b6374818",
+      "enable"
+    ],
+    "test_clock_ms": 1787220000000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-time-2d96b570ff",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-time-2d96b570ff",
+      "init"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-time-2d96b570ff",
+      "enable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-early-b5b6374818",
+      "once"
+    ],
+    "test_clock_ms": 1787295600000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "BEFORE_EOD_WINDOW",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-time-2d96b570ff",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 2,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "SHADOW_CLOCK_REGRESSED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-time-2d96b570ff",
+      "status"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 0,
+      "signal_count": 0,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": []
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-time-2d96b570ff",
+      "once"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260821",
+        "decision_at": 1787306400000,
+        "input_snapshot_sha256": "b8a57ff66f7a2f954382dc474e8127236c168a739391ddcdf0adcf7963625243",
+        "result": "UP_CROSS",
+        "local_input_commitment_sha256": "b79a8cba42988cef50fc1ebe573685ba530f7982e50e5d7ea5b99bf194daf600",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 21
+      }
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-missed-41bc72dbba",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-missed-41bc72dbba",
+      "init"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-missed-41bc72dbba",
+      "enable"
+    ],
+    "test_clock_ms": 1787306400000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-missed-41bc72dbba",
+      "once"
+    ],
+    "test_clock_ms": 1787392800000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "MISSED_OR_STALE",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-missed-41bc72dbba",
+      "once"
+    ],
+    "test_clock_ms": 1787396400000,
+    "fault": null,
+    "exit_code": 3,
+    "output": {
+      "state": "BLOCKED",
+      "reason": "MISSED_OR_STALE",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-missed-41bc72dbba",
+      "status"
+    ],
+    "test_clock_ms": 1787479200000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "VERIFIED",
+      "enabled": true,
+      "observation_count": 0,
+      "signal_count": 0,
+      "source_verified": true,
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "source_blockers": [
+        "MISSED_OR_STALE",
+        "SNAPSHOT_SYNC_STALE_OR_CLOCK",
+        "NO_VALID_CURRENT_ON_DAY_EOD"
+      ]
+    }
+  },
+  {
+    "command": [
+      "research-data.py",
+      "--store",
+      "shadow-test-small-d57e12e6f3",
+      "sync",
+      "--observer",
+      "<SYNTHETIC_OBSERVER>"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "latest_sync": {
+        "state": "succeeded",
+        "error_code": null,
+        "blockers": []
+      }
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-small-d57e12e6f3",
+      "init"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "INITIALIZED_OFF",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-small-d57e12e6f3",
+      "enable"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "ENABLED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null
+    }
+  },
+  {
+    "command": [
+      "forward-shadow.py",
+      "--store",
+      "shadow-test-small-d57e12e6f3",
+      "once"
+    ],
+    "test_clock_ms": 1785664800000,
+    "fault": null,
+    "exit_code": 0,
+    "output": {
+      "state": "COMMITTED",
+      "orders": 0,
+      "fills": 0,
+      "nav": null,
+      "observation": {
+        "mode": "SYNTHETIC_TEST_SHADOW",
+        "source_day": "20260802",
+        "decision_at": 1785664800000,
+        "input_snapshot_sha256": "1d95f22a446657120062485747511e256def7c73915f1743c68365da11b4560f",
+        "result": "INSUFFICIENT_FORWARD_WARMUP",
+        "local_input_commitment_sha256": "ea2594843045afa732ccf6676240bf656567ce826db7e225d2449fd8c7a7d05e",
+        "arithmetic_check": "DECIMAL_RECOMPUTED",
+        "continuous_on_day_count": 2
+      }
+    }
+  }
+]
