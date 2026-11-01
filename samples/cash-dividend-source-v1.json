@@ -1,0 +1,14 @@
+{
+  "schema": "synthetic_cash_dividend_source_v1",
+  "evidence_basis": "synthetic_assumption",
+  "note": "Artificial accounting fixture; not the CNINFO announcement or actual account evidence",
+  "instrument": "600000.SH",
+  "currency": "CNY",
+  "cash_amount_fen": 42,
+  "cash_unit": "per_share",
+  "record_day": 20260715,
+  "ex_day": 20260716,
+  "payment_day": 20260720,
+  "tax_withholding_ppm": 200000,
+  "tax_identity": "modeled_withholding_only_not_real_account"
+}

@@ -1,0 +1,2470 @@
+{
+  "buy_hold_benchmark_nav_fen": null,
+  "buy_hold_benchmark_note": "分红模式须另运行 paper-dividend-benchmark，独立账本使用相同股息/税/风险/成交模型；Python逐日复算，不使用旧无股息近似值",
+  "cash_benchmark_nav_fen": 1000000,
+  "cash_dividend": {
+    "cash_paid_fen": 3360,
+    "gross_income_fen": 4200,
+    "liability_fen": 0,
+    "receivable_fen": 0,
+    "tax_expense_fen": 840
+  },
+  "cash_dividend_actions": [
+    {
+      "at": 1784098801001,
+      "cash_fen": 899969,
+      "day": 20260715,
+      "entitled_shares": 100,
+      "event": {
+        "announcement_at": 1783677600000,
+        "cash_amount_fen": 42,
+        "cash_unit": "per_share",
+        "currency": "CNY",
+        "event_id": "synthetic-600000-202607-v1",
+        "evidence_basis": "synthetic_assumption",
+        "ex_at": 1784165400000,
+        "ex_day": 20260716,
+        "fact_status": "SYNTHETIC_MODEL",
+        "historical_pit": "NOT_VERIFIED",
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "mode": "synthetic_test",
+        "payment_at": 1784511000000,
+        "payment_day": 20260720,
+        "real_account_eligible": false,
+        "record_at": 1784098801001,
+        "record_close_at": 1784098800000,
+        "record_day": 20260715,
+        "schema": "CASH_DIVIDEND_V1",
+        "source_available_at": 1783677600000,
+        "source_sha256": "20e801be6507ea12c974bf6288d75499f9f2b16d15b481e7020551c2e0a4df0e",
+        "tax": {
+          "basis": "synthetic_assumption",
+          "identity": "modeled_withholding_only_not_real_account",
+          "rounding": "ceil_per_event_fen_v1",
+          "version": "synthetic-withholding-v1",
+          "withholding_ppm": 200000
+        },
+        "version": "synthetic-event-v1"
+      },
+      "gross_fen": 4200,
+      "ledger_digest": "ce4b0e1848a4566d111023b758382a2fc55f88102fe13b112e52f8f524793b53",
+      "ledger_event_id": "dividend-synthetic-600000-202607-v1-Record",
+      "ledger_seq": 6,
+      "nav_fen": 999969,
+      "net_fen": 3360,
+      "paid": false,
+      "phase": "record",
+      "recognized": false,
+      "tax_fen": 840,
+      "totals": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 0,
+        "liability_fen": 0,
+        "receivable_fen": 0,
+        "tax_expense_fen": 0
+      },
+      "valuation_error": null
+    },
+    {
+      "at": 1784165400000,
+      "cash_fen": 899969,
+      "day": 20260716,
+      "entitled_shares": 100,
+      "event": {
+        "announcement_at": 1783677600000,
+        "cash_amount_fen": 42,
+        "cash_unit": "per_share",
+        "currency": "CNY",
+        "event_id": "synthetic-600000-202607-v1",
+        "evidence_basis": "synthetic_assumption",
+        "ex_at": 1784165400000,
+        "ex_day": 20260716,
+        "fact_status": "SYNTHETIC_MODEL",
+        "historical_pit": "NOT_VERIFIED",
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "mode": "synthetic_test",
+        "payment_at": 1784511000000,
+        "payment_day": 20260720,
+        "real_account_eligible": false,
+        "record_at": 1784098801001,
+        "record_close_at": 1784098800000,
+        "record_day": 20260715,
+        "schema": "CASH_DIVIDEND_V1",
+        "source_available_at": 1783677600000,
+        "source_sha256": "20e801be6507ea12c974bf6288d75499f9f2b16d15b481e7020551c2e0a4df0e",
+        "tax": {
+          "basis": "synthetic_assumption",
+          "identity": "modeled_withholding_only_not_real_account",
+          "rounding": "ceil_per_event_fen_v1",
+          "version": "synthetic-withholding-v1",
+          "withholding_ppm": 200000
+        },
+        "version": "synthetic-event-v1"
+      },
+      "gross_fen": 4200,
+      "ledger_digest": "66cade4cf90ff438349517438bbca54ad0961af1121e31ffe1081fe9af60ec68",
+      "ledger_event_id": "dividend-synthetic-600000-202607-v1-Ex",
+      "ledger_seq": 7,
+      "nav_fen": 999129,
+      "net_fen": 3360,
+      "paid": false,
+      "phase": "ex",
+      "recognized": true,
+      "tax_fen": 840,
+      "totals": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 4200,
+        "liability_fen": 840,
+        "receivable_fen": 4200,
+        "tax_expense_fen": 840
+      },
+      "valuation_error": null
+    },
+    {
+      "at": 1784511000000,
+      "cash_fen": 999051,
+      "day": 20260720,
+      "entitled_shares": 100,
+      "event": {
+        "announcement_at": 1783677600000,
+        "cash_amount_fen": 42,
+        "cash_unit": "per_share",
+        "currency": "CNY",
+        "event_id": "synthetic-600000-202607-v1",
+        "evidence_basis": "synthetic_assumption",
+        "ex_at": 1784165400000,
+        "ex_day": 20260716,
+        "fact_status": "SYNTHETIC_MODEL",
+        "historical_pit": "NOT_VERIFIED",
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "mode": "synthetic_test",
+        "payment_at": 1784511000000,
+        "payment_day": 20260720,
+        "real_account_eligible": false,
+        "record_at": 1784098801001,
+        "record_close_at": 1784098800000,
+        "record_day": 20260715,
+        "schema": "CASH_DIVIDEND_V1",
+        "source_available_at": 1783677600000,
+        "source_sha256": "20e801be6507ea12c974bf6288d75499f9f2b16d15b481e7020551c2e0a4df0e",
+        "tax": {
+          "basis": "synthetic_assumption",
+          "identity": "modeled_withholding_only_not_real_account",
+          "rounding": "ceil_per_event_fen_v1",
+          "version": "synthetic-withholding-v1",
+          "withholding_ppm": 200000
+        },
+        "version": "synthetic-event-v1"
+      },
+      "gross_fen": 4200,
+      "ledger_digest": "006465da2a0f88fa8eb50961ed2a369525cc96c0b75ca8b5972e82e992f9c727",
+      "ledger_event_id": "dividend-synthetic-600000-202607-v1-Payment",
+      "ledger_seq": 12,
+      "nav_fen": 999051,
+      "net_fen": 3360,
+      "paid": true,
+      "phase": "payment",
+      "recognized": true,
+      "tax_fen": 840,
+      "totals": {
+        "cash_paid_fen": 3360,
+        "gross_income_fen": 4200,
+        "liability_fen": 0,
+        "receivable_fen": 0,
+        "tax_expense_fen": 840
+      },
+      "valuation_error": null
+    }
+  ],
+  "cash_dividend_protocol": "CASH_DIVIDEND_V1",
+  "config": {
+    "account_id": "dividend-model-account",
+    "account_limits": {
+      "daily_loss": 100000,
+      "drawdown": 200000,
+      "max_exposure": 800000,
+      "max_order_commitment": 500000
+    },
+    "authorized_principal": 1000000,
+    "deployment": {
+      "deployment_id": "dividend-lifecycle-v1",
+      "frozen_version": "cash-dividend-lifecycle-v1",
+      "group_id": "replay-group",
+      "strategy_id": "dividend-lifecycle-probe"
+    },
+    "initial_capital": 1000000,
+    "max_mark_age_ms": 604800000,
+    "max_snapshot_age_ms": 604800000,
+    "strategy_limits": {
+      "daily_loss": 100000,
+      "drawdown": 200000,
+      "max_exposure": 500000,
+      "max_order_commitment": 500000
+    }
+  },
+  "config_sha256": "287fec7b9b842fb5855950893502e9cc2fa1acad3862d4ab324ef6f97f6148a4",
+  "daily": [
+    {
+      "available_cash_fen": 899800,
+      "cash_dividend": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 0,
+        "liability_fen": 0,
+        "receivable_fen": 0,
+        "tax_expense_fen": 0
+      },
+      "cash_fen": 1000000,
+      "cumulative_fee_fen": 0,
+      "day": 20260713,
+      "external_flow_total_fen": 0,
+      "held_shares": 0,
+      "nav_fen": 1000000,
+      "pending_orders": 1,
+      "realized_pnl_fen": 0,
+      "remaining_cost_basis_fen": 0,
+      "reserved_cash_fen": 100200,
+      "reserved_sell_shares": 0,
+      "sellable_shares": 0,
+      "unrealized_pnl_fen": 0,
+      "unsettled_shares": 0,
+      "valuation_error": null
+    },
+    {
+      "available_cash_fen": 899969,
+      "cash_dividend": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 0,
+        "liability_fen": 0,
+        "receivable_fen": 0,
+        "tax_expense_fen": 0
+      },
+      "cash_fen": 899969,
+      "cumulative_fee_fen": 31,
+      "day": 20260714,
+      "external_flow_total_fen": 0,
+      "held_shares": 100,
+      "nav_fen": 999969,
+      "pending_orders": 0,
+      "realized_pnl_fen": 0,
+      "remaining_cost_basis_fen": 100031,
+      "reserved_cash_fen": 0,
+      "reserved_sell_shares": 0,
+      "sellable_shares": 0,
+      "unrealized_pnl_fen": -31,
+      "unsettled_shares": 100,
+      "valuation_error": null
+    },
+    {
+      "available_cash_fen": 899969,
+      "cash_dividend": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 0,
+        "liability_fen": 0,
+        "receivable_fen": 0,
+        "tax_expense_fen": 0
+      },
+      "cash_fen": 899969,
+      "cumulative_fee_fen": 31,
+      "day": 20260715,
+      "external_flow_total_fen": 0,
+      "held_shares": 100,
+      "nav_fen": 999969,
+      "pending_orders": 1,
+      "realized_pnl_fen": 0,
+      "remaining_cost_basis_fen": 100031,
+      "reserved_cash_fen": 0,
+      "reserved_sell_shares": 100,
+      "sellable_shares": 0,
+      "unrealized_pnl_fen": -31,
+      "unsettled_shares": 0,
+      "valuation_error": null
+    },
+    {
+      "available_cash_fen": 899969,
+      "cash_dividend": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 4200,
+        "liability_fen": 840,
+        "receivable_fen": 4200,
+        "tax_expense_fen": 840
+      },
+      "cash_fen": 899969,
+      "cumulative_fee_fen": 31,
+      "day": 20260716,
+      "external_flow_total_fen": 0,
+      "held_shares": 100,
+      "nav_fen": 999129,
+      "pending_orders": 1,
+      "realized_pnl_fen": 0,
+      "remaining_cost_basis_fen": 100031,
+      "reserved_cash_fen": 0,
+      "reserved_sell_shares": 100,
+      "sellable_shares": 0,
+      "unrealized_pnl_fen": -4231,
+      "unsettled_shares": 0,
+      "valuation_error": null
+    },
+    {
+      "available_cash_fen": 995691,
+      "cash_dividend": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 4200,
+        "liability_fen": 840,
+        "receivable_fen": 4200,
+        "tax_expense_fen": 840
+      },
+      "cash_fen": 995691,
+      "cumulative_fee_fen": 109,
+      "day": 20260717,
+      "external_flow_total_fen": 0,
+      "held_shares": 0,
+      "nav_fen": 999051,
+      "pending_orders": 0,
+      "realized_pnl_fen": -4309,
+      "remaining_cost_basis_fen": 0,
+      "reserved_cash_fen": 0,
+      "reserved_sell_shares": 0,
+      "sellable_shares": 0,
+      "unrealized_pnl_fen": 0,
+      "unsettled_shares": 0,
+      "valuation_error": null
+    },
+    {
+      "available_cash_fen": 999051,
+      "cash_dividend": {
+        "cash_paid_fen": 3360,
+        "gross_income_fen": 4200,
+        "liability_fen": 0,
+        "receivable_fen": 0,
+        "tax_expense_fen": 840
+      },
+      "cash_fen": 999051,
+      "cumulative_fee_fen": 109,
+      "day": 20260720,
+      "external_flow_total_fen": 0,
+      "held_shares": 0,
+      "nav_fen": 999051,
+      "pending_orders": 0,
+      "realized_pnl_fen": -4309,
+      "remaining_cost_basis_fen": 0,
+      "reserved_cash_fen": 0,
+      "reserved_sell_shares": 0,
+      "sellable_shares": 0,
+      "unrealized_pnl_fen": 0,
+      "unsettled_shares": 0,
+      "valuation_error": null
+    },
+    {
+      "available_cash_fen": 999051,
+      "cash_dividend": {
+        "cash_paid_fen": 3360,
+        "gross_income_fen": 4200,
+        "liability_fen": 0,
+        "receivable_fen": 0,
+        "tax_expense_fen": 840
+      },
+      "cash_fen": 999051,
+      "cumulative_fee_fen": 109,
+      "day": 20260721,
+      "external_flow_total_fen": 0,
+      "held_shares": 0,
+      "nav_fen": 999051,
+      "pending_orders": 0,
+      "realized_pnl_fen": -4309,
+      "remaining_cost_basis_fen": 0,
+      "reserved_cash_fen": 0,
+      "reserved_sell_shares": 0,
+      "sellable_shares": 0,
+      "unrealized_pnl_fen": 0,
+      "unsettled_shares": 0,
+      "valuation_error": null
+    }
+  ],
+  "eligibility": "ELIGIBILITY_DENIED",
+  "ending_available_cash_fen": 999051,
+  "ending_cash_fen": 999051,
+  "ending_held_shares": 0,
+  "ending_nav_fen": 999051,
+  "ending_pending_orders": 0,
+  "ending_sellable_shares": 0,
+  "ending_unsettled_shares": 0,
+  "events": [
+    {
+      "account_as_of": 1783926001000,
+      "cash_dividend": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 0,
+        "liability_fen": 0,
+        "receivable_fen": 0,
+        "tax_expense_fen": 0
+      },
+      "cash_fen": 1000000,
+      "command": {
+        "Match": {
+          "bar": {
+            "available_at": 1783926001000,
+            "capacity_shares": 100,
+            "close": 1000,
+            "closes_at": 1783926000000,
+            "day": 20260713,
+            "high": 1050,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "low": 950,
+            "open": 1000,
+            "opens_at": 1783906200000,
+            "provenance": {
+              "dataset_hash": "e3bed4f9e73bb014fae0cd8d93cd505fb88a23adad7e51b21d0cbb5dad7ee750",
+              "mode": "synthetic_test",
+              "price_semantics": "unadjusted_cny_fen",
+              "source_version": "synthetic_test/cash-dividend-lifecycle-v1 | synthetic-assumptions-only-v1 | generated-in-repository-no-market-data",
+              "timezone": "Asia/Shanghai"
+            },
+            "status_verified": true,
+            "volume_shares": 10000
+          },
+          "day": 20260713,
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "now": 1783926001000,
+          "opening": {
+            "marks": [
+              {
+                "as_of": 1783906200000,
+                "available_at": 1783906200000,
+                "instrument": {
+                  "code": "600000",
+                  "market": "Shanghai"
+                },
+                "price": 1000,
+                "source": "synthetic_test/independent-opening-v1"
+              }
+            ],
+            "rules": {
+              "allow_odd_lot_liquidation": true,
+              "available_at": 1783906200000,
+              "buy_lot": 100,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "max_price": 1200,
+              "min_price": 800,
+              "sell_lot": 100,
+              "settlement": "TPlusOne",
+              "source": "synthetic_test/explicit-rules-v1",
+              "tick_size": 1,
+              "tradable": true,
+              "trading_day": 20260713
+            }
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1783906200000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20260713
+          }
+        }
+      },
+      "event_id": "dividend-session-20260713",
+      "held_shares": 0,
+      "ledger_digest": "b7aa4ca8e1972ea8f2562a9f489680ecddc5cb122747fa074cd629b0f378fc73",
+      "nav_fen": 1000000,
+      "new_fills": [],
+      "new_orders": [],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "dividend-model-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 1,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1783926001000,
+      "cash_dividend": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 0,
+        "liability_fen": 0,
+        "receivable_fen": 0,
+        "tax_expense_fen": 0
+      },
+      "cash_fen": 1000000,
+      "command": {
+        "Submit": {
+          "day": 20260713,
+          "fees": {
+            "commission_ppm": 300,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "minimum_commission": 1,
+            "sell_tax_ppm": 500,
+            "source": "synthetic_test/not-a-real-tariff",
+            "transfer_ppm": 10,
+            "valid_from": 20260701,
+            "valid_through": 20260731,
+            "version": "artificial-fees-v1"
+          },
+          "now": 1783926001000,
+          "proposal": {
+            "account_id": "dividend-model-account",
+            "data_available_at": 1783926001000,
+            "decision_at": 1783926001000,
+            "deployment": {
+              "deployment_id": "dividend-lifecycle-v1",
+              "frozen_version": "cash-dividend-lifecycle-v1",
+              "group_id": "replay-group",
+              "strategy_id": "dividend-lifecycle-probe"
+            },
+            "earliest_execution_at": 1783926001001,
+            "expires_at": 1784530801000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "limit_price": 1000,
+            "proposal_id": 1,
+            "quantity": 100,
+            "side": "Buy"
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1783906200000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20260713
+          }
+        }
+      },
+      "event_id": "dividend-signal-1",
+      "held_shares": 0,
+      "ledger_digest": "43fe402a103f1ed3c16f58728b79a929d192cb17ba047dba51f5372e8501863e",
+      "nav_fen": 1000000,
+      "new_fills": [],
+      "new_orders": [
+        {
+          "accepted_on": 20260713,
+          "fee_schedule": {
+            "commission_ppm": 300,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "minimum_commission": 1,
+            "sell_tax_ppm": 500,
+            "source": "synthetic_test/not-a-real-tariff",
+            "transfer_ppm": 10,
+            "valid_from": 20260701,
+            "valid_through": 20260731,
+            "version": "artificial-fees-v1"
+          },
+          "proposal": {
+            "account_id": "dividend-model-account",
+            "data_available_at": 1783926001000,
+            "decision_at": 1783926001000,
+            "deployment": {
+              "deployment_id": "dividend-lifecycle-v1",
+              "frozen_version": "cash-dividend-lifecycle-v1",
+              "group_id": "replay-group",
+              "strategy_id": "dividend-lifecycle-probe"
+            },
+            "earliest_execution_at": 1783926001001,
+            "expires_at": 1784530801000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "limit_price": 1000,
+            "proposal_id": 1,
+            "quantity": 100,
+            "side": "Buy"
+          },
+          "reason": "最新权威状态通过风控并原子预留",
+          "remaining": 100,
+          "reserved_fee": 200,
+          "status": "Open"
+        }
+      ],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "dividend-model-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 2,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1784012401000,
+      "cash_dividend": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 0,
+        "liability_fen": 0,
+        "receivable_fen": 0,
+        "tax_expense_fen": 0
+      },
+      "cash_fen": 899969,
+      "command": {
+        "Match": {
+          "bar": {
+            "available_at": 1784012401000,
+            "capacity_shares": 100,
+            "close": 1000,
+            "closes_at": 1784012400000,
+            "day": 20260714,
+            "high": 1050,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "low": 950,
+            "open": 1000,
+            "opens_at": 1783992600000,
+            "provenance": {
+              "dataset_hash": "e3bed4f9e73bb014fae0cd8d93cd505fb88a23adad7e51b21d0cbb5dad7ee750",
+              "mode": "synthetic_test",
+              "price_semantics": "unadjusted_cny_fen",
+              "source_version": "synthetic_test/cash-dividend-lifecycle-v1 | synthetic-assumptions-only-v1 | generated-in-repository-no-market-data",
+              "timezone": "Asia/Shanghai"
+            },
+            "status_verified": true,
+            "volume_shares": 10000
+          },
+          "day": 20260714,
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "now": 1784012401000,
+          "opening": {
+            "marks": [
+              {
+                "as_of": 1783992600000,
+                "available_at": 1783992600000,
+                "instrument": {
+                  "code": "600000",
+                  "market": "Shanghai"
+                },
+                "price": 1000,
+                "source": "synthetic_test/independent-opening-v1"
+              }
+            ],
+            "rules": {
+              "allow_odd_lot_liquidation": true,
+              "available_at": 1783992600000,
+              "buy_lot": 100,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "max_price": 1200,
+              "min_price": 800,
+              "sell_lot": 100,
+              "settlement": "TPlusOne",
+              "source": "synthetic_test/explicit-rules-v1",
+              "tick_size": 1,
+              "tradable": true,
+              "trading_day": 20260714
+            }
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1783992600000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20260714
+          }
+        }
+      },
+      "event_id": "dividend-session-20260714",
+      "held_shares": 100,
+      "ledger_digest": "fbe8764cce00ecc495ac2be9f6a3f1381edb9138d6022287bc2ac65e64425483",
+      "nav_fen": 999969,
+      "new_fills": [
+        {
+          "day": 20260714,
+          "event_id": "20260714:1",
+          "evidence": {
+            "available_at": 1784012401000,
+            "capacity_shares": 100,
+            "close": 1000,
+            "closes_at": 1784012400000,
+            "day": 20260714,
+            "high": 1050,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "low": 950,
+            "open": 1000,
+            "opens_at": 1783992600000,
+            "provenance": {
+              "dataset_hash": "e3bed4f9e73bb014fae0cd8d93cd505fb88a23adad7e51b21d0cbb5dad7ee750",
+              "mode": "synthetic_test",
+              "price_semantics": "unadjusted_cny_fen",
+              "source_version": "synthetic_test/cash-dividend-lifecycle-v1 | synthetic-assumptions-only-v1 | generated-in-repository-no-market-data",
+              "timezone": "Asia/Shanghai"
+            },
+            "status_verified": true,
+            "volume_shares": 10000
+          },
+          "fee_version": "artificial-fees-v1",
+          "fees": {
+            "commission": 30,
+            "tax": 0,
+            "transfer": 1
+          },
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "opening_evidence": {
+            "marks": [
+              {
+                "as_of": 1783992600000,
+                "available_at": 1783992600000,
+                "instrument": {
+                  "code": "600000",
+                  "market": "Shanghai"
+                },
+                "price": 1000,
+                "source": "synthetic_test/independent-opening-v1"
+              }
+            ],
+            "rules": {
+              "allow_odd_lot_liquidation": true,
+              "available_at": 1783992600000,
+              "buy_lot": 100,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "max_price": 1200,
+              "min_price": 800,
+              "sell_lot": 100,
+              "settlement": "TPlusOne",
+              "source": "synthetic_test/explicit-rules-v1",
+              "tick_size": 1,
+              "tradable": true,
+              "trading_day": 20260714
+            }
+          },
+          "order_id": 1,
+          "price": 1000,
+          "quantity": 100,
+          "risk_checked_at": 1783992600000,
+          "side": "Buy",
+          "simulated_at": 1784012401000
+        }
+      ],
+      "new_orders": [],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "dividend-model-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 3,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1784098801000,
+      "cash_dividend": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 0,
+        "liability_fen": 0,
+        "receivable_fen": 0,
+        "tax_expense_fen": 0
+      },
+      "cash_fen": 899969,
+      "command": {
+        "Match": {
+          "bar": {
+            "available_at": 1784098801000,
+            "capacity_shares": 100,
+            "close": 1000,
+            "closes_at": 1784098800000,
+            "day": 20260715,
+            "high": 1050,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "low": 950,
+            "open": 1000,
+            "opens_at": 1784079000000,
+            "provenance": {
+              "dataset_hash": "e3bed4f9e73bb014fae0cd8d93cd505fb88a23adad7e51b21d0cbb5dad7ee750",
+              "mode": "synthetic_test",
+              "price_semantics": "unadjusted_cny_fen",
+              "source_version": "synthetic_test/cash-dividend-lifecycle-v1 | synthetic-assumptions-only-v1 | generated-in-repository-no-market-data",
+              "timezone": "Asia/Shanghai"
+            },
+            "status_verified": true,
+            "volume_shares": 10000
+          },
+          "day": 20260715,
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "now": 1784098801000,
+          "opening": {
+            "marks": [
+              {
+                "as_of": 1784079000000,
+                "available_at": 1784079000000,
+                "instrument": {
+                  "code": "600000",
+                  "market": "Shanghai"
+                },
+                "price": 1000,
+                "source": "synthetic_test/independent-opening-v1"
+              }
+            ],
+            "rules": {
+              "allow_odd_lot_liquidation": true,
+              "available_at": 1784079000000,
+              "buy_lot": 100,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "max_price": 1200,
+              "min_price": 800,
+              "sell_lot": 100,
+              "settlement": "TPlusOne",
+              "source": "synthetic_test/explicit-rules-v1",
+              "tick_size": 1,
+              "tradable": true,
+              "trading_day": 20260715
+            }
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1784079000000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20260715
+          }
+        }
+      },
+      "event_id": "dividend-session-20260715",
+      "held_shares": 100,
+      "ledger_digest": "49d79982850b953accc8b1b6d5945b8f5e7e51201f9bcacfbcf00f83963e2ad1",
+      "nav_fen": 999969,
+      "new_fills": [],
+      "new_orders": [],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "dividend-model-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 4,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1784098801000,
+      "cash_dividend": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 0,
+        "liability_fen": 0,
+        "receivable_fen": 0,
+        "tax_expense_fen": 0
+      },
+      "cash_fen": 899969,
+      "command": {
+        "Submit": {
+          "day": 20260715,
+          "fees": {
+            "commission_ppm": 300,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "minimum_commission": 1,
+            "sell_tax_ppm": 500,
+            "source": "synthetic_test/not-a-real-tariff",
+            "transfer_ppm": 10,
+            "valid_from": 20260701,
+            "valid_through": 20260731,
+            "version": "artificial-fees-v1"
+          },
+          "now": 1784098801000,
+          "proposal": {
+            "account_id": "dividend-model-account",
+            "data_available_at": 1784098801000,
+            "decision_at": 1784098801000,
+            "deployment": {
+              "deployment_id": "dividend-lifecycle-v1",
+              "frozen_version": "cash-dividend-lifecycle-v1",
+              "group_id": "replay-group",
+              "strategy_id": "dividend-lifecycle-probe"
+            },
+            "earliest_execution_at": 1784098801001,
+            "expires_at": 1784703601000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "limit_price": 1000,
+            "proposal_id": 2,
+            "quantity": 100,
+            "side": "Sell"
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1784079000000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20260715
+          }
+        }
+      },
+      "event_id": "dividend-signal-2",
+      "held_shares": 100,
+      "ledger_digest": "63e3afe9b2e412ad5fe36553e2d65adf88b1fde56186f6de86ccb7bc2cd6fbc9",
+      "nav_fen": 999969,
+      "new_fills": [],
+      "new_orders": [
+        {
+          "accepted_on": 20260715,
+          "fee_schedule": {
+            "commission_ppm": 300,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "minimum_commission": 1,
+            "sell_tax_ppm": 500,
+            "source": "synthetic_test/not-a-real-tariff",
+            "transfer_ppm": 10,
+            "valid_from": 20260701,
+            "valid_through": 20260731,
+            "version": "artificial-fees-v1"
+          },
+          "proposal": {
+            "account_id": "dividend-model-account",
+            "data_available_at": 1784098801000,
+            "decision_at": 1784098801000,
+            "deployment": {
+              "deployment_id": "dividend-lifecycle-v1",
+              "frozen_version": "cash-dividend-lifecycle-v1",
+              "group_id": "replay-group",
+              "strategy_id": "dividend-lifecycle-probe"
+            },
+            "earliest_execution_at": 1784098801001,
+            "expires_at": 1784703601000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "limit_price": 1000,
+            "proposal_id": 2,
+            "quantity": 100,
+            "side": "Sell"
+          },
+          "reason": "最新权威状态通过风控并原子预留",
+          "remaining": 100,
+          "reserved_fee": 300,
+          "status": "Open"
+        }
+      ],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "dividend-model-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 5,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1784098801001,
+      "cash_dividend": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 0,
+        "liability_fen": 0,
+        "receivable_fen": 0,
+        "tax_expense_fen": 0
+      },
+      "cash_fen": 899969,
+      "command": {
+        "CashDividendV1": {
+          "day": 20260715,
+          "event_id": "synthetic-600000-202607-v1",
+          "marks": [
+            {
+              "as_of": 1784098800000,
+              "available_at": 1784098801000,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "price": 1000,
+              "source": "synthetic_test/record-close-model-v1"
+            }
+          ],
+          "now": 1784098801001,
+          "phase": "record"
+        }
+      },
+      "event_id": "dividend-synthetic-600000-202607-v1-Record",
+      "held_shares": 100,
+      "ledger_digest": "ce4b0e1848a4566d111023b758382a2fc55f88102fe13b112e52f8f524793b53",
+      "nav_fen": 999969,
+      "new_fills": [],
+      "new_orders": [],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "dividend-model-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 6,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1784165400000,
+      "cash_dividend": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 4200,
+        "liability_fen": 840,
+        "receivable_fen": 4200,
+        "tax_expense_fen": 840
+      },
+      "cash_fen": 899969,
+      "command": {
+        "CashDividendV1": {
+          "day": 20260716,
+          "event_id": "synthetic-600000-202607-v1",
+          "marks": [
+            {
+              "as_of": 1784165400000,
+              "available_at": 1784165400000,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "price": 958,
+              "source": "synthetic_test/independent-opening-v1"
+            }
+          ],
+          "now": 1784165400000,
+          "phase": "ex"
+        }
+      },
+      "event_id": "dividend-synthetic-600000-202607-v1-Ex",
+      "held_shares": 100,
+      "ledger_digest": "66cade4cf90ff438349517438bbca54ad0961af1121e31ffe1081fe9af60ec68",
+      "nav_fen": 999129,
+      "new_fills": [],
+      "new_orders": [],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "dividend-model-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 7,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1784185201000,
+      "cash_dividend": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 4200,
+        "liability_fen": 840,
+        "receivable_fen": 4200,
+        "tax_expense_fen": 840
+      },
+      "cash_fen": 899969,
+      "command": {
+        "Match": {
+          "bar": {
+            "available_at": 1784185201000,
+            "capacity_shares": 100,
+            "close": 958,
+            "closes_at": 1784185200000,
+            "day": 20260716,
+            "high": 1008,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "low": 908,
+            "open": 958,
+            "opens_at": 1784165400000,
+            "provenance": {
+              "dataset_hash": "e3bed4f9e73bb014fae0cd8d93cd505fb88a23adad7e51b21d0cbb5dad7ee750",
+              "mode": "synthetic_test",
+              "price_semantics": "unadjusted_cny_fen",
+              "source_version": "synthetic_test/cash-dividend-lifecycle-v1 | synthetic-assumptions-only-v1 | generated-in-repository-no-market-data",
+              "timezone": "Asia/Shanghai"
+            },
+            "status_verified": true,
+            "volume_shares": 10000
+          },
+          "day": 20260716,
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "now": 1784185201000,
+          "opening": {
+            "marks": [
+              {
+                "as_of": 1784165400000,
+                "available_at": 1784165400000,
+                "instrument": {
+                  "code": "600000",
+                  "market": "Shanghai"
+                },
+                "price": 958,
+                "source": "synthetic_test/independent-opening-v1"
+              }
+            ],
+            "rules": {
+              "allow_odd_lot_liquidation": true,
+              "available_at": 1784165400000,
+              "buy_lot": 100,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "max_price": 1200,
+              "min_price": 800,
+              "sell_lot": 100,
+              "settlement": "TPlusOne",
+              "source": "synthetic_test/explicit-rules-v1",
+              "tick_size": 1,
+              "tradable": true,
+              "trading_day": 20260716
+            }
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1784165400000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20260716
+          }
+        }
+      },
+      "event_id": "dividend-session-20260716",
+      "held_shares": 100,
+      "ledger_digest": "f24e1c1dbaccfc3a1314a455406bdd330066cb385855e4037e021684f4594928",
+      "nav_fen": 999129,
+      "new_fills": [],
+      "new_orders": [],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "dividend-model-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 8,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1784185201000,
+      "cash_dividend": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 4200,
+        "liability_fen": 840,
+        "receivable_fen": 4200,
+        "tax_expense_fen": 840
+      },
+      "cash_fen": 899969,
+      "command": {
+        "Submit": {
+          "day": 20260716,
+          "fees": {
+            "commission_ppm": 300,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "minimum_commission": 1,
+            "sell_tax_ppm": 500,
+            "source": "synthetic_test/not-a-real-tariff",
+            "transfer_ppm": 10,
+            "valid_from": 20260701,
+            "valid_through": 20260731,
+            "version": "artificial-fees-v1"
+          },
+          "now": 1784185201000,
+          "proposal": {
+            "account_id": "dividend-model-account",
+            "data_available_at": 1784185201000,
+            "decision_at": 1784185201000,
+            "deployment": {
+              "deployment_id": "dividend-lifecycle-v1",
+              "frozen_version": "cash-dividend-lifecycle-v1",
+              "group_id": "replay-group",
+              "strategy_id": "dividend-lifecycle-probe"
+            },
+            "earliest_execution_at": 1784185201001,
+            "expires_at": 1784790001000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "limit_price": 958,
+            "proposal_id": 3,
+            "quantity": 100,
+            "side": "Sell"
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1784165400000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20260716
+          }
+        }
+      },
+      "event_id": "dividend-signal-3",
+      "held_shares": 100,
+      "ledger_digest": "e487cfde8df704bc60dd0af4560988e68b2db007c90b46578be37bd4636ca8d7",
+      "nav_fen": 999129,
+      "new_fills": [],
+      "new_orders": [
+        {
+          "accepted_on": 20260716,
+          "fee_schedule": {
+            "commission_ppm": 300,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "minimum_commission": 1,
+            "sell_tax_ppm": 500,
+            "source": "synthetic_test/not-a-real-tariff",
+            "transfer_ppm": 10,
+            "valid_from": 20260701,
+            "valid_through": 20260731,
+            "version": "artificial-fees-v1"
+          },
+          "proposal": {
+            "account_id": "dividend-model-account",
+            "data_available_at": 1784185201000,
+            "decision_at": 1784185201000,
+            "deployment": {
+              "deployment_id": "dividend-lifecycle-v1",
+              "frozen_version": "cash-dividend-lifecycle-v1",
+              "group_id": "replay-group",
+              "strategy_id": "dividend-lifecycle-probe"
+            },
+            "earliest_execution_at": 1784185201001,
+            "expires_at": 1784790001000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "limit_price": 958,
+            "proposal_id": 3,
+            "quantity": 100,
+            "side": "Sell"
+          },
+          "reason": "最新权威状态通过风控并原子预留",
+          "remaining": 100,
+          "reserved_fee": 300,
+          "status": "Open"
+        }
+      ],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "dividend-model-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 9,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1784271601000,
+      "cash_dividend": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 4200,
+        "liability_fen": 840,
+        "receivable_fen": 4200,
+        "tax_expense_fen": 840
+      },
+      "cash_fen": 995691,
+      "command": {
+        "Match": {
+          "bar": {
+            "available_at": 1784271601000,
+            "capacity_shares": 100,
+            "close": 958,
+            "closes_at": 1784271600000,
+            "day": 20260717,
+            "high": 1008,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "low": 908,
+            "open": 958,
+            "opens_at": 1784251800000,
+            "provenance": {
+              "dataset_hash": "e3bed4f9e73bb014fae0cd8d93cd505fb88a23adad7e51b21d0cbb5dad7ee750",
+              "mode": "synthetic_test",
+              "price_semantics": "unadjusted_cny_fen",
+              "source_version": "synthetic_test/cash-dividend-lifecycle-v1 | synthetic-assumptions-only-v1 | generated-in-repository-no-market-data",
+              "timezone": "Asia/Shanghai"
+            },
+            "status_verified": true,
+            "volume_shares": 10000
+          },
+          "day": 20260717,
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "now": 1784271601000,
+          "opening": {
+            "marks": [
+              {
+                "as_of": 1784251800000,
+                "available_at": 1784251800000,
+                "instrument": {
+                  "code": "600000",
+                  "market": "Shanghai"
+                },
+                "price": 958,
+                "source": "synthetic_test/independent-opening-v1"
+              }
+            ],
+            "rules": {
+              "allow_odd_lot_liquidation": true,
+              "available_at": 1784251800000,
+              "buy_lot": 100,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "max_price": 1200,
+              "min_price": 800,
+              "sell_lot": 100,
+              "settlement": "TPlusOne",
+              "source": "synthetic_test/explicit-rules-v1",
+              "tick_size": 1,
+              "tradable": true,
+              "trading_day": 20260717
+            }
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1784251800000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20260717
+          }
+        }
+      },
+      "event_id": "dividend-session-20260717",
+      "held_shares": 0,
+      "ledger_digest": "4e6069ec1110b641da75751996d31724d915698b90c6adf5af28a3779b6d4f50",
+      "nav_fen": 999051,
+      "new_fills": [
+        {
+          "day": 20260717,
+          "event_id": "20260717:3",
+          "evidence": {
+            "available_at": 1784271601000,
+            "capacity_shares": 100,
+            "close": 958,
+            "closes_at": 1784271600000,
+            "day": 20260717,
+            "high": 1008,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "low": 908,
+            "open": 958,
+            "opens_at": 1784251800000,
+            "provenance": {
+              "dataset_hash": "e3bed4f9e73bb014fae0cd8d93cd505fb88a23adad7e51b21d0cbb5dad7ee750",
+              "mode": "synthetic_test",
+              "price_semantics": "unadjusted_cny_fen",
+              "source_version": "synthetic_test/cash-dividend-lifecycle-v1 | synthetic-assumptions-only-v1 | generated-in-repository-no-market-data",
+              "timezone": "Asia/Shanghai"
+            },
+            "status_verified": true,
+            "volume_shares": 10000
+          },
+          "fee_version": "artificial-fees-v1",
+          "fees": {
+            "commission": 29,
+            "tax": 48,
+            "transfer": 1
+          },
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "opening_evidence": {
+            "marks": [
+              {
+                "as_of": 1784251800000,
+                "available_at": 1784251800000,
+                "instrument": {
+                  "code": "600000",
+                  "market": "Shanghai"
+                },
+                "price": 958,
+                "source": "synthetic_test/independent-opening-v1"
+              }
+            ],
+            "rules": {
+              "allow_odd_lot_liquidation": true,
+              "available_at": 1784251800000,
+              "buy_lot": 100,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "max_price": 1200,
+              "min_price": 800,
+              "sell_lot": 100,
+              "settlement": "TPlusOne",
+              "source": "synthetic_test/explicit-rules-v1",
+              "tick_size": 1,
+              "tradable": true,
+              "trading_day": 20260717
+            }
+          },
+          "order_id": 3,
+          "price": 958,
+          "quantity": 100,
+          "risk_checked_at": 1784251800000,
+          "side": "Sell",
+          "simulated_at": 1784271601000
+        }
+      ],
+      "new_orders": [],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "dividend-model-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 10,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1784271601000,
+      "cash_dividend": {
+        "cash_paid_fen": 0,
+        "gross_income_fen": 4200,
+        "liability_fen": 840,
+        "receivable_fen": 4200,
+        "tax_expense_fen": 840
+      },
+      "cash_fen": 995691,
+      "command": {
+        "Submit": {
+          "day": 20260717,
+          "fees": {
+            "commission_ppm": 300,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "minimum_commission": 1,
+            "sell_tax_ppm": 500,
+            "source": "synthetic_test/not-a-real-tariff",
+            "transfer_ppm": 10,
+            "valid_from": 20260701,
+            "valid_through": 20260731,
+            "version": "artificial-fees-v1"
+          },
+          "now": 1784271601000,
+          "proposal": {
+            "account_id": "dividend-model-account",
+            "data_available_at": 1784271601000,
+            "decision_at": 1784271601000,
+            "deployment": {
+              "deployment_id": "dividend-lifecycle-v1",
+              "frozen_version": "cash-dividend-lifecycle-v1",
+              "group_id": "replay-group",
+              "strategy_id": "dividend-lifecycle-probe"
+            },
+            "earliest_execution_at": 1784271601001,
+            "expires_at": 1784876401000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "limit_price": 958,
+            "proposal_id": 4,
+            "quantity": 10000,
+            "side": "Buy"
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1784251800000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20260717
+          }
+        }
+      },
+      "event_id": "dividend-signal-4",
+      "held_shares": 0,
+      "ledger_digest": "d1bb1f2b5b5ef0bd69176dc2e3ce4cd7a142d920e38397a53285c8c44c1f9c14",
+      "nav_fen": 999051,
+      "new_fills": [],
+      "new_orders": [
+        {
+          "accepted_on": 20260717,
+          "fee_schedule": {
+            "commission_ppm": 300,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "minimum_commission": 1,
+            "sell_tax_ppm": 500,
+            "source": "synthetic_test/not-a-real-tariff",
+            "transfer_ppm": 10,
+            "valid_from": 20260701,
+            "valid_through": 20260731,
+            "version": "artificial-fees-v1"
+          },
+          "proposal": {
+            "account_id": "dividend-model-account",
+            "data_available_at": 1784271601000,
+            "decision_at": 1784271601000,
+            "deployment": {
+              "deployment_id": "dividend-lifecycle-v1",
+              "frozen_version": "cash-dividend-lifecycle-v1",
+              "group_id": "replay-group",
+              "strategy_id": "dividend-lifecycle-probe"
+            },
+            "earliest_execution_at": 1784271601001,
+            "expires_at": 1784876401000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "limit_price": 958,
+            "proposal_id": 4,
+            "quantity": 10000,
+            "side": "Buy"
+          },
+          "reason": "可用资金不足：需要 96000.00 元，扣除预留后仅有 9956.91 元",
+          "remaining": 10000,
+          "reserved_fee": 0,
+          "status": "Rejected"
+        }
+      ],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "dividend-model-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 11,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1784511000000,
+      "cash_dividend": {
+        "cash_paid_fen": 3360,
+        "gross_income_fen": 4200,
+        "liability_fen": 0,
+        "receivable_fen": 0,
+        "tax_expense_fen": 840
+      },
+      "cash_fen": 999051,
+      "command": {
+        "CashDividendV1": {
+          "day": 20260720,
+          "event_id": "synthetic-600000-202607-v1",
+          "marks": [
+            {
+              "as_of": 1784511000000,
+              "available_at": 1784511000000,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "price": 958,
+              "source": "synthetic_test/independent-opening-v1"
+            }
+          ],
+          "now": 1784511000000,
+          "phase": "payment"
+        }
+      },
+      "event_id": "dividend-synthetic-600000-202607-v1-Payment",
+      "held_shares": 0,
+      "ledger_digest": "006465da2a0f88fa8eb50961ed2a369525cc96c0b75ca8b5972e82e992f9c727",
+      "nav_fen": 999051,
+      "new_fills": [],
+      "new_orders": [],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "dividend-model-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 12,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1784530801000,
+      "cash_dividend": {
+        "cash_paid_fen": 3360,
+        "gross_income_fen": 4200,
+        "liability_fen": 0,
+        "receivable_fen": 0,
+        "tax_expense_fen": 840
+      },
+      "cash_fen": 999051,
+      "command": {
+        "Match": {
+          "bar": {
+            "available_at": 1784530801000,
+            "capacity_shares": 100,
+            "close": 958,
+            "closes_at": 1784530800000,
+            "day": 20260720,
+            "high": 1008,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "low": 908,
+            "open": 958,
+            "opens_at": 1784511000000,
+            "provenance": {
+              "dataset_hash": "e3bed4f9e73bb014fae0cd8d93cd505fb88a23adad7e51b21d0cbb5dad7ee750",
+              "mode": "synthetic_test",
+              "price_semantics": "unadjusted_cny_fen",
+              "source_version": "synthetic_test/cash-dividend-lifecycle-v1 | synthetic-assumptions-only-v1 | generated-in-repository-no-market-data",
+              "timezone": "Asia/Shanghai"
+            },
+            "status_verified": true,
+            "volume_shares": 10000
+          },
+          "day": 20260720,
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "now": 1784530801000,
+          "opening": {
+            "marks": [
+              {
+                "as_of": 1784511000000,
+                "available_at": 1784511000000,
+                "instrument": {
+                  "code": "600000",
+                  "market": "Shanghai"
+                },
+                "price": 958,
+                "source": "synthetic_test/independent-opening-v1"
+              }
+            ],
+            "rules": {
+              "allow_odd_lot_liquidation": true,
+              "available_at": 1784511000000,
+              "buy_lot": 100,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "max_price": 1200,
+              "min_price": 800,
+              "sell_lot": 100,
+              "settlement": "TPlusOne",
+              "source": "synthetic_test/explicit-rules-v1",
+              "tick_size": 1,
+              "tradable": true,
+              "trading_day": 20260720
+            }
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1784511000000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20260720
+          }
+        }
+      },
+      "event_id": "dividend-session-20260720",
+      "held_shares": 0,
+      "ledger_digest": "69e4aa7329ac324f0d290f4f4efa7f45d5e6f791100597660f5cee2bf3a10bde",
+      "nav_fen": 999051,
+      "new_fills": [],
+      "new_orders": [],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "dividend-model-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 13,
+      "valuation_error": null
+    },
+    {
+      "account_as_of": 1784617201000,
+      "cash_dividend": {
+        "cash_paid_fen": 3360,
+        "gross_income_fen": 4200,
+        "liability_fen": 0,
+        "receivable_fen": 0,
+        "tax_expense_fen": 840
+      },
+      "cash_fen": 999051,
+      "command": {
+        "Match": {
+          "bar": {
+            "available_at": 1784617201000,
+            "capacity_shares": 100,
+            "close": 958,
+            "closes_at": 1784617200000,
+            "day": 20260721,
+            "high": 1008,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "low": 908,
+            "open": 958,
+            "opens_at": 1784597400000,
+            "provenance": {
+              "dataset_hash": "e3bed4f9e73bb014fae0cd8d93cd505fb88a23adad7e51b21d0cbb5dad7ee750",
+              "mode": "synthetic_test",
+              "price_semantics": "unadjusted_cny_fen",
+              "source_version": "synthetic_test/cash-dividend-lifecycle-v1 | synthetic-assumptions-only-v1 | generated-in-repository-no-market-data",
+              "timezone": "Asia/Shanghai"
+            },
+            "status_verified": true,
+            "volume_shares": 10000
+          },
+          "day": 20260721,
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "now": 1784617201000,
+          "opening": {
+            "marks": [
+              {
+                "as_of": 1784597400000,
+                "available_at": 1784597400000,
+                "instrument": {
+                  "code": "600000",
+                  "market": "Shanghai"
+                },
+                "price": 958,
+                "source": "synthetic_test/independent-opening-v1"
+              }
+            ],
+            "rules": {
+              "allow_odd_lot_liquidation": true,
+              "available_at": 1784597400000,
+              "buy_lot": 100,
+              "instrument": {
+                "code": "600000",
+                "market": "Shanghai"
+              },
+              "max_price": 1200,
+              "min_price": 800,
+              "sell_lot": 100,
+              "settlement": "TPlusOne",
+              "source": "synthetic_test/explicit-rules-v1",
+              "tick_size": 1,
+              "tradable": true,
+              "trading_day": 20260721
+            }
+          },
+          "rules": {
+            "allow_odd_lot_liquidation": true,
+            "available_at": 1784597400000,
+            "buy_lot": 100,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "max_price": 1200,
+            "min_price": 800,
+            "sell_lot": 100,
+            "settlement": "TPlusOne",
+            "source": "synthetic_test/explicit-rules-v1",
+            "tick_size": 1,
+            "tradable": true,
+            "trading_day": 20260721
+          }
+        }
+      },
+      "event_id": "dividend-session-20260721",
+      "held_shares": 0,
+      "ledger_digest": "336a060a1e379e0dadbb3c25e9cf3795b7119464f5344714c89091ceca893fb3",
+      "nav_fen": 999051,
+      "new_fills": [],
+      "new_orders": [],
+      "risk": {
+        "account_freezes": [],
+        "account_id": "dividend-model-account",
+        "cash_flow_adjusted_peak": 1000000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "strategy_freezes": []
+      },
+      "seq": 14,
+      "valuation_error": null
+    }
+  ],
+  "evidence_class": "engine_test_only",
+  "external_flow_total_fen": 0,
+  "fills": [
+    {
+      "day": 20260714,
+      "event_id": "20260714:1",
+      "evidence": {
+        "available_at": 1784012401000,
+        "capacity_shares": 100,
+        "close": 1000,
+        "closes_at": 1784012400000,
+        "day": 20260714,
+        "high": 1050,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "low": 950,
+        "open": 1000,
+        "opens_at": 1783992600000,
+        "provenance": {
+          "dataset_hash": "e3bed4f9e73bb014fae0cd8d93cd505fb88a23adad7e51b21d0cbb5dad7ee750",
+          "mode": "synthetic_test",
+          "price_semantics": "unadjusted_cny_fen",
+          "source_version": "synthetic_test/cash-dividend-lifecycle-v1 | synthetic-assumptions-only-v1 | generated-in-repository-no-market-data",
+          "timezone": "Asia/Shanghai"
+        },
+        "status_verified": true,
+        "volume_shares": 10000
+      },
+      "fee_version": "artificial-fees-v1",
+      "fees": {
+        "commission": 30,
+        "tax": 0,
+        "transfer": 1
+      },
+      "instrument": {
+        "code": "600000",
+        "market": "Shanghai"
+      },
+      "opening_evidence": {
+        "marks": [
+          {
+            "as_of": 1783992600000,
+            "available_at": 1783992600000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "price": 1000,
+            "source": "synthetic_test/independent-opening-v1"
+          }
+        ],
+        "rules": {
+          "allow_odd_lot_liquidation": true,
+          "available_at": 1783992600000,
+          "buy_lot": 100,
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "max_price": 1200,
+          "min_price": 800,
+          "sell_lot": 100,
+          "settlement": "TPlusOne",
+          "source": "synthetic_test/explicit-rules-v1",
+          "tick_size": 1,
+          "tradable": true,
+          "trading_day": 20260714
+        }
+      },
+      "order_id": 1,
+      "price": 1000,
+      "quantity": 100,
+      "risk_checked_at": 1783992600000,
+      "side": "Buy",
+      "simulated_at": 1784012401000
+    },
+    {
+      "day": 20260717,
+      "event_id": "20260717:3",
+      "evidence": {
+        "available_at": 1784271601000,
+        "capacity_shares": 100,
+        "close": 958,
+        "closes_at": 1784271600000,
+        "day": 20260717,
+        "high": 1008,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "low": 908,
+        "open": 958,
+        "opens_at": 1784251800000,
+        "provenance": {
+          "dataset_hash": "e3bed4f9e73bb014fae0cd8d93cd505fb88a23adad7e51b21d0cbb5dad7ee750",
+          "mode": "synthetic_test",
+          "price_semantics": "unadjusted_cny_fen",
+          "source_version": "synthetic_test/cash-dividend-lifecycle-v1 | synthetic-assumptions-only-v1 | generated-in-repository-no-market-data",
+          "timezone": "Asia/Shanghai"
+        },
+        "status_verified": true,
+        "volume_shares": 10000
+      },
+      "fee_version": "artificial-fees-v1",
+      "fees": {
+        "commission": 29,
+        "tax": 48,
+        "transfer": 1
+      },
+      "instrument": {
+        "code": "600000",
+        "market": "Shanghai"
+      },
+      "opening_evidence": {
+        "marks": [
+          {
+            "as_of": 1784251800000,
+            "available_at": 1784251800000,
+            "instrument": {
+              "code": "600000",
+              "market": "Shanghai"
+            },
+            "price": 958,
+            "source": "synthetic_test/independent-opening-v1"
+          }
+        ],
+        "rules": {
+          "allow_odd_lot_liquidation": true,
+          "available_at": 1784251800000,
+          "buy_lot": 100,
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "max_price": 1200,
+          "min_price": 800,
+          "sell_lot": 100,
+          "settlement": "TPlusOne",
+          "source": "synthetic_test/explicit-rules-v1",
+          "tick_size": 1,
+          "tradable": true,
+          "trading_day": 20260717
+        }
+      },
+      "order_id": 3,
+      "price": 958,
+      "quantity": 100,
+      "risk_checked_at": 1784251800000,
+      "side": "Sell",
+      "simulated_at": 1784271601000
+    }
+  ],
+  "first_day": 20260713,
+  "frozen_cash_dividends": {
+    "events": [
+      {
+        "entitled_shares": 100,
+        "event": {
+          "announcement_at": 1783677600000,
+          "cash_amount_fen": 42,
+          "cash_unit": "per_share",
+          "currency": "CNY",
+          "event_id": "synthetic-600000-202607-v1",
+          "evidence_basis": "synthetic_assumption",
+          "ex_at": 1784165400000,
+          "ex_day": 20260716,
+          "fact_status": "SYNTHETIC_MODEL",
+          "historical_pit": "NOT_VERIFIED",
+          "instrument": {
+            "code": "600000",
+            "market": "Shanghai"
+          },
+          "mode": "synthetic_test",
+          "payment_at": 1784511000000,
+          "payment_day": 20260720,
+          "real_account_eligible": false,
+          "record_at": 1784098801001,
+          "record_close_at": 1784098800000,
+          "record_day": 20260715,
+          "schema": "CASH_DIVIDEND_V1",
+          "source_available_at": 1783677600000,
+          "source_sha256": "20e801be6507ea12c974bf6288d75499f9f2b16d15b481e7020551c2e0a4df0e",
+          "tax": {
+            "basis": "synthetic_assumption",
+            "identity": "modeled_withholding_only_not_real_account",
+            "rounding": "ceil_per_event_fen_v1",
+            "version": "synthetic-withholding-v1",
+            "withholding_ppm": 200000
+          },
+          "version": "synthetic-event-v1"
+        },
+        "paid": true,
+        "recognized": true
+      }
+    ]
+  },
+  "historical_pit": "NOT_VERIFIED",
+  "initial_nav_fen": 1000000,
+  "input_sha256": "e3bed4f9e73bb014fae0cd8d93cd505fb88a23adad7e51b21d0cbb5dad7ee750",
+  "instrument": {
+    "code": "600000",
+    "market": "Shanghai"
+  },
+  "last_day": 20260721,
+  "ledger_head": "336a060a1e379e0dadbb3c25e9cf3795b7119464f5344714c89091ceca893fb3",
+  "ledger_schema": 4,
+  "license": "generated-in-repository-no-market-data",
+  "max_daily_observation_drawdown_bps": 9,
+  "missing_opening_evidence_sessions": 0,
+  "mode": "synthetic_test",
+  "no_fill_sessions": 5,
+  "opening_source": "BLOCKED",
+  "orders": [
+    {
+      "accepted_on": 20260713,
+      "fee_schedule": {
+        "commission_ppm": 300,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "minimum_commission": 1,
+        "sell_tax_ppm": 500,
+        "source": "synthetic_test/not-a-real-tariff",
+        "transfer_ppm": 10,
+        "valid_from": 20260701,
+        "valid_through": 20260731,
+        "version": "artificial-fees-v1"
+      },
+      "proposal": {
+        "account_id": "dividend-model-account",
+        "data_available_at": 1783926001000,
+        "decision_at": 1783926001000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "earliest_execution_at": 1783926001001,
+        "expires_at": 1784530801000,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "limit_price": 1000,
+        "proposal_id": 1,
+        "quantity": 100,
+        "side": "Buy"
+      },
+      "reason": "保守日线限价穿越模型模拟成交；不是交易所成交",
+      "remaining": 0,
+      "reserved_fee": 0,
+      "status": "Filled"
+    },
+    {
+      "accepted_on": 20260715,
+      "fee_schedule": {
+        "commission_ppm": 300,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "minimum_commission": 1,
+        "sell_tax_ppm": 500,
+        "source": "synthetic_test/not-a-real-tariff",
+        "transfer_ppm": 10,
+        "valid_from": 20260701,
+        "valid_through": 20260731,
+        "version": "artificial-fees-v1"
+      },
+      "proposal": {
+        "account_id": "dividend-model-account",
+        "data_available_at": 1784098801000,
+        "decision_at": 1784098801000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "earliest_execution_at": 1784098801001,
+        "expires_at": 1784703601000,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "limit_price": 1000,
+        "proposal_id": 2,
+        "quantity": 100,
+        "side": "Sell"
+      },
+      "reason": "CASH_DIVIDEND_V1/synthetic-600000-202607-v1：除息前旧挂单到期释放；不支持自动调价，须重新提交",
+      "remaining": 100,
+      "reserved_fee": 0,
+      "status": "Expired"
+    },
+    {
+      "accepted_on": 20260716,
+      "fee_schedule": {
+        "commission_ppm": 300,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "minimum_commission": 1,
+        "sell_tax_ppm": 500,
+        "source": "synthetic_test/not-a-real-tariff",
+        "transfer_ppm": 10,
+        "valid_from": 20260701,
+        "valid_through": 20260731,
+        "version": "artificial-fees-v1"
+      },
+      "proposal": {
+        "account_id": "dividend-model-account",
+        "data_available_at": 1784185201000,
+        "decision_at": 1784185201000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "earliest_execution_at": 1784185201001,
+        "expires_at": 1784790001000,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "limit_price": 958,
+        "proposal_id": 3,
+        "quantity": 100,
+        "side": "Sell"
+      },
+      "reason": "保守日线限价穿越模型模拟成交；不是交易所成交",
+      "remaining": 0,
+      "reserved_fee": 0,
+      "status": "Filled"
+    },
+    {
+      "accepted_on": 20260717,
+      "fee_schedule": {
+        "commission_ppm": 300,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "minimum_commission": 1,
+        "sell_tax_ppm": 500,
+        "source": "synthetic_test/not-a-real-tariff",
+        "transfer_ppm": 10,
+        "valid_from": 20260701,
+        "valid_through": 20260731,
+        "version": "artificial-fees-v1"
+      },
+      "proposal": {
+        "account_id": "dividend-model-account",
+        "data_available_at": 1784271601000,
+        "decision_at": 1784271601000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "earliest_execution_at": 1784271601001,
+        "expires_at": 1784876401000,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "limit_price": 958,
+        "proposal_id": 4,
+        "quantity": 10000,
+        "side": "Buy"
+      },
+      "reason": "可用资金不足：需要 96000.00 元，扣除预留后仅有 9956.91 元",
+      "remaining": 10000,
+      "reserved_fee": 0,
+      "status": "Rejected"
+    }
+  ],
+  "paper_only": true,
+  "positions": [],
+  "price_semantics": "unadjusted_cny_fen",
+  "realized_pnl_fen": -4309,
+  "remaining_cost_basis_fen": 0,
+  "report_schema": 2,
+  "risk_rejections": [
+    {
+      "accepted_on": 20260717,
+      "fee_schedule": {
+        "commission_ppm": 300,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "minimum_commission": 1,
+        "sell_tax_ppm": 500,
+        "source": "synthetic_test/not-a-real-tariff",
+        "transfer_ppm": 10,
+        "valid_from": 20260701,
+        "valid_through": 20260731,
+        "version": "artificial-fees-v1"
+      },
+      "proposal": {
+        "account_id": "dividend-model-account",
+        "data_available_at": 1784271601000,
+        "decision_at": 1784271601000,
+        "deployment": {
+          "deployment_id": "dividend-lifecycle-v1",
+          "frozen_version": "cash-dividend-lifecycle-v1",
+          "group_id": "replay-group",
+          "strategy_id": "dividend-lifecycle-probe"
+        },
+        "earliest_execution_at": 1784271601001,
+        "expires_at": 1784876401000,
+        "instrument": {
+          "code": "600000",
+          "market": "Shanghai"
+        },
+        "limit_price": 958,
+        "proposal_id": 4,
+        "quantity": 10000,
+        "side": "Buy"
+      },
+      "reason": "可用资金不足：需要 96000.00 元，扣除预留后仅有 9956.91 元",
+      "remaining": 10000,
+      "reserved_fee": 0,
+      "status": "Rejected"
+    }
+  ],
+  "source": "synthetic_test/cash-dividend-lifecycle-v1",
+  "source_version": "synthetic-assumptions-only-v1",
+  "strategy_spec_sha256": "e7391469620f3f39806191de73cd1830e7d2c702db26389a0a8f19ab12c7d494",
+  "strategy_version": "cash-dividend-lifecycle-v1",
+  "timezone": "Asia/Shanghai",
+  "total_fee_fen": 109,
+  "total_return_bps": -9,
+  "unobserved_calendar_days_including_weekends": 2,
+  "unrealized_pnl_fen": 0,
+  "unverified_status_sessions": 0
+}

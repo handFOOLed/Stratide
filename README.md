@@ -11,9 +11,10 @@
 - **候选链路已合并：** [M2-PR04 / PR #30](docs/M2_PR04.md) 提供登记 → 冻结 → 独立评价 → 隔离历史回放 CLI；#31 双线独立 PASS，研究证据不足、资格默认拒绝继续有效。
 - **EOD 快照已合并：** [M2-PR05 / PR #33](docs/M2_PR05.md) 提供离线只读同步、持久研究快照、状态和消费 CLI。
 - **Fake Agent 闭环已合并：** [M2-PR06 / PR #35](docs/M2_PR06.md) 接通显式快照 → 本地 Fake Agent 持久任务 → 候选研究来源；新 scope 禁止云外发和自动 EOD，资格默认拒绝。
-- **本分支 Draft（#37）：** [公司行为证据包 V1](docs/M1_PR07B.md) 提供离线 `audit/status`。已取得 2026-07-16 对应的官方实施公告，12/19 字段有原文支持，事实 `FACTS_PARTIAL`、历史 PIT `NOT_VERIFIED`、会计 `NOT_IMPLEMENTED`，回放资格仍为 false。
+- **公司行为证据已合并（PR #38）：** [证据包 V1](docs/M1_PR07B.md) 保留真实公告的 `FACTS_PARTIAL / historical_pit=NOT_VERIFIED`，没有真实历史准入。
+- **本分支 Draft（#39）：** [CASH_DIVIDEND_V1](docs/M1_PR08.md) 完成隔离现金分红的登记→应收/税负→到账、统一 NAV/Risk、七报告和独立算法复算；仅 synthetic CLI，旧 v3/68 日不变。
 - **仍受阻：** 仅 68 个历史交易日、3 笔模拟成交，长窗口公司行为/费用证据 `DATA_BLOCKED`；真实 EOD 两日 `EOD_CONTINUITY_VERIFIED`，开盘源仍 BLOCKED，**尚无真正前向模拟成交或 NAV**。
-- **当前顺序：** [#37 源证据任务](https://github.com/handFOOLed/Stratide/issues/37) 按 **Core-first、UI-later** 执行；[#36 多模型研究](https://github.com/handFOOLed/Stratide/issues/36) 是未来提案。全部核心完成后，Sol 按 PR #28 视觉基准统一集成 UI。细节与证据见 [当前状态](docs/STATUS.md)。
+- **当前顺序：** [#39 现金分红会计任务](https://github.com/handFOOLed/Stratide/issues/39) 按 **Core-first、UI-later** 执行；[#36 多模型研究](https://github.com/handFOOLed/Stratide/issues/36) 是未来提案。全部核心完成后，Sol 按 PR #28 视觉基准统一集成 UI。细节与证据见 [当前状态](docs/STATUS.md)。
 
 ## Windows 本地体验
 

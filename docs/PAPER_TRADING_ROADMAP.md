@@ -12,15 +12,17 @@
 6. **M2-PR05 研究快照**：[PR #33](https://github.com/handFOOLed/Stratide/pull/33) 已合并于 `2fdd05d`，#32 完成；既有 EOD 离线只读核验、持久快照、状态和消费，见 [契约](M2_PR05.md)。
 7. **M2-PR06 显式 Fake Agent 闭环**：[PR #35](https://github.com/handFOOLed/Stratide/pull/35) 已合并于 `a522c29`，#34 完成；显式 EOD 快照 → 本地 fake 持久任务 → 候选研究来源。保留独立 scope、禁止云外发/自动 EOD 和资格拒绝，见 [契约](M2_PR06.md)。
 
+8. **M1-PR07B 公司行为证据**：[PR #38](https://github.com/handFOOLed/Stratide/pull/38) 已合并于 `a02a9b0`；真实事实 `FACTS_PARTIAL`、PIT 未核实，原证据包只读保留。
+
 ## 当前和下一个完整功能包
 
-**本分支 M1-PR07B Draft：** [#37](https://github.com/handFOOLed/Stratide/issues/37) 先交付公司行为源证据及缺口准入，不改共享账本或扩大回测。真实公告得到 `FACTS_PARTIAL / PIT_NOT_VERIFIED / ACCOUNTING_NOT_IMPLEMENTED`，回放资格 false；见 [操作](M1_PR07B.md) 与 [自测](evidence/m1-pr07b/README.md)。Owner 指定 `agents=0`，ChatGPT 固定 HEAD 审查，Owner 明确授权才合并。
+**本分支 M1-PR08 Draft：** [#39](https://github.com/handFOOLed/Stratide/issues/39) 一次交付 [CASH_DIVIDEND_V1](M1_PR08.md) 的输入、权益、应收、到账、统一账本/Risk、报告、独立算法及实际 CLI。Sol `agents=0` 开发自测，ChatGPT 固定 HEAD 审查，Owner 明确授权后才合并。原 v3/六报告/68 日及 forward/Agent/候选资格不变；现实源仍不可启用。
 
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |
-| **当前 #37** | **Sol** | [M1-PR07B](https://github.com/handFOOLed/Stratide/issues/37)：离线公司行为证据包和数据缺口准入；仅 Sol 自测，Draft 待审；不改 Risk/权威 Ledger/回测窗口。 |
-| **后续核心** | Owner 再定范围 | [#10](https://github.com/handFOOLed/Stratide/issues/10) 前向证据与公司行为会计继续受阻；[#36](https://github.com/handFOOLed/Stratide/issues/36) 为未来多模型研究提案，未在本期实现。 |
-| **核心全部完成后** | **Sol** | 按 PR #28 已确定的设计体系统一集成全部 UI；当前各功能任务无需同步前端。 |
+| **当前 #39** | **Sol** | 完整现金分红模型、原账本字节兼容、财务反证、真实 CLI E2E 与 Draft PR；证据见 [自测](evidence/m1-pr08/README.md)。 |
+| **后续核心** | Owner 再定范围 | #10 真实开盘、PIT、账户税/到账仍受阻；#36 为未来提案。 |
+| **核心全部完成后** | **Sol** | 按 PR #28 的设计体系统一集成 UI；本期不改 UI。 |
 
 ## 一直有效的边界
 

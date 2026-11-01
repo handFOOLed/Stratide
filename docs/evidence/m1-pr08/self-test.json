@@ -1,0 +1,9 @@
+{
+  "errors": 0,
+  "failures": 0,
+  "input_sha256": "e3bed4f9e73bb014fae0cd8d93cd505fb88a23adad7e51b21d0cbb5dad7ee750",
+  "kind": "Sol self-test, not independent acceptance",
+  "ledger_head": "336a060a1e379e0dadbb3c25e9cf3795b7119464f5344714c89091ceca893fb3",
+  "success": true,
+  "tests": 9
+}

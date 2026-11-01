@@ -1,0 +1,8 @@
+day,nav_fen,cash_fen,available_cash_fen,reserved_cash_fen,held_shares,sellable_shares,unsettled_shares,reserved_sell_shares,pending_orders,cumulative_fee_fen,realized_pnl_fen,unrealized_pnl_fen,remaining_cost_basis_fen,external_flow_total_fen,valuation_error,receivable_fen,liability_fen,dividend_gross_income_fen,dividend_tax_expense_fen,dividend_cash_paid_fen
+20260713,1000000,1000000,899800,100200,0,0,0,0,1,0,0,0,0,0,"",0,0,0,0,0
+20260714,999969,899969,899969,0,100,0,100,0,0,31,0,-31,100031,0,"",0,0,0,0,0
+20260715,999969,899969,899969,0,100,0,0,100,1,31,0,-31,100031,0,"",0,0,0,0,0
+20260716,999129,899969,899969,0,100,0,0,100,1,31,0,-4231,100031,0,"",4200,840,4200,840,0
+20260717,999051,995691,995691,0,0,0,0,0,0,109,-4309,0,0,0,"",4200,840,4200,840,0
+20260720,999051,999051,999051,0,0,0,0,0,0,109,-4309,0,0,0,"",0,0,4200,840,3360
+20260721,999051,999051,999051,0,0,0,0,0,0,109,-4309,0,0,0,"",0,0,4200,840,3360

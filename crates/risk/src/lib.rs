@@ -216,6 +216,8 @@ pub enum RiskDecision {
 pub struct RiskKernel {
     config: PaperAccountConfig,
     state: RiskState,
+    /// Trusted v4 ledger projection only. Never Worker input or spendable cash.
+    dividend_assets: Option<(Cny, Cny)>,
 }
 
 /// Private result of complete account validation and financial-state observation.
@@ -238,7 +240,11 @@ impl RiskKernel {
             account_freezes: BTreeSet::new(),
             strategy_freezes: BTreeSet::new(),
         };
-        Ok(Self { config, state })
+        Ok(Self {
+            config,
+            state,
+            dividend_assets: None,
+        })
     }
 
     pub fn restore(config: PaperAccountConfig, state: RiskState) -> Result<Self, &'static str> {
@@ -246,7 +252,25 @@ impl RiskKernel {
         if state.account_id != config.account_id || state.deployment != config.deployment {
             return Err("风险状态身份不匹配，不可通过重命名/重新部署绕过冻结");
         }
-        Ok(Self { config, state })
+        Ok(Self {
+            config,
+            state,
+            dividend_assets: None,
+        })
+    }
+
+    /// V1 liabilities are modeled withholding fully covered by the same gross
+    /// receivable. Other/unknown liabilities have no supported authorization path.
+    pub fn with_dividend_assets(
+        mut self,
+        receivable: Cny,
+        withholding: Cny,
+    ) -> Result<Self, &'static str> {
+        if withholding > receivable {
+            return Err("股息税负未由可信应收全额覆盖，拒绝新风险");
+        }
+        self.dividend_assets = Some((receivable, withholding));
+        Ok(self)
     }
 
     pub fn state(&self) -> &RiskState {
@@ -368,7 +392,16 @@ impl RiskKernel {
                 return Err(InvalidSnapshot("卖出预留超过实际持仓"));
             }
         }
-        let equity = s.cash.checked_add(exposure)?;
+        let mut equity = s.cash.checked_add(exposure)?;
+        if let Some((receivable, withholding)) = self.dividend_assets {
+            equity = Cny::from_fen(
+                i64::try_from(
+                    i128::from(equity.fen()) + i128::from(receivable.fen())
+                        - i128::from(withholding.fen()),
+                )
+                .map_err(|_| ArithmeticOverflow)?,
+            )?;
+        }
         self.observe_equity(equity, &s.equity_basis)?;
 
         Ok(ObservedAccount {

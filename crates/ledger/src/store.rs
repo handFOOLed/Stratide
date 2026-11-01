@@ -1,3 +1,4 @@
+use crate::cash_dividend::{CashDividendBook, CashDividendV1};
 use crate::model::*;
 use fs2::FileExt;
 use rusqlite::{params, Connection, OpenFlags, TransactionBehavior};
@@ -29,9 +30,34 @@ pub struct AuditEntry {
 }
 
 fn digest(previous: &str, seq: i64, id: &str, payload: &str, state: &State) -> Result<String> {
-    let input =
-        serde_json::to_vec(&(3, previous, seq, id, payload, state)).map_err(|e| e.to_string())?;
+    let version = if state.cash_dividends.is_some() { 4 } else { 3 };
+    let input = serde_json::to_vec(&(version, previous, seq, id, payload, state))
+        .map_err(|e| e.to_string())?;
     Ok(format!("{:x}", Sha256::digest(input)))
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct DividendGenesis {
+    genesis: Genesis,
+    cash_dividends: Vec<CashDividendV1>,
+}
+
+fn initial_state(payload: &str, version: i64) -> Result<State> {
+    if version == 3 {
+        State::new(serde_json::from_str(payload).map_err(|e| format!("本金/配置记录损坏：{e}"))?)
+    } else {
+        let g: DividendGenesis = serde_json::from_str(payload).map_err(|e| e.to_string())?;
+        let book = CashDividendBook::new(
+            g.cash_dividends,
+            &g.genesis.provenance.mode,
+            g.genesis.at,
+            g.genesis.day,
+        )?;
+        let mut state = State::new(g.genesis)?;
+        state.cash_dividends = Some(book);
+        Ok(state)
+    }
 }
 
 fn connection(path: &Path, create: bool) -> Result<(Connection, File)> {
@@ -79,16 +105,34 @@ impl Ledger {
     /// Exclusive first creation. An existing/partly initialized directory is an
     /// error, even when empty: recovery may NEVER silently invent new principal.
     pub fn create(path: impl AsRef<Path>, genesis: Genesis) -> Result<Self> {
-        let path = path.as_ref();
         let state = State::new(genesis.clone())?;
+        let payload = serde_json::to_string(&genesis).map_err(|e| e.to_string())?;
+        Self::create_new(path.as_ref(), payload, state, 3)
+    }
+
+    /// Explicit new isolation account. Never upgrades or opens an existing v3.
+    pub fn create_cash_dividend_v4(
+        path: impl AsRef<Path>,
+        genesis: Genesis,
+        events: Vec<CashDividendV1>,
+    ) -> Result<Self> {
+        let g = DividendGenesis {
+            genesis,
+            cash_dividends: events,
+        };
+        let payload = serde_json::to_string(&g).map_err(|e| e.to_string())?;
+        let state = initial_state(&payload, 4)?;
+        Self::create_new(path.as_ref(), payload, state, 4)
+    }
+
+    fn create_new(path: &Path, payload: String, state: State, version: i64) -> Result<Self> {
         fs::create_dir(path).map_err(|e| format!("首次创建失败（已有目录不得覆盖）：{e}"))?;
         let (mut db, lock) = connection(path, true)?;
-        let payload = serde_json::to_string(&genesis).map_err(|e| e.to_string())?;
         let head = digest("", 0, "genesis", &payload, &state)?;
         let tx = db
             .transaction_with_behavior(TransactionBehavior::Immediate)
             .map_err(|e| e.to_string())?;
-        tx.execute_batch("PRAGMA user_version=3; CREATE TABLE events (seq INTEGER PRIMARY KEY, event_id TEXT NOT NULL UNIQUE, payload TEXT NOT NULL, digest TEXT NOT NULL); CREATE TABLE checkpoint (id INTEGER PRIMARY KEY CHECK(id=1), seq INTEGER NOT NULL, digest TEXT NOT NULL);")
+        tx.execute_batch(&format!("PRAGMA user_version={version}; CREATE TABLE events (seq INTEGER PRIMARY KEY, event_id TEXT NOT NULL UNIQUE, payload TEXT NOT NULL, digest TEXT NOT NULL); CREATE TABLE checkpoint (id INTEGER PRIMARY KEY CHECK(id=1), seq INTEGER NOT NULL, digest TEXT NOT NULL);"))
             .map_err(|e| e.to_string())?;
         tx.execute(
             "INSERT INTO events VALUES (0, 'genesis', ?1, ?2)",
@@ -118,7 +162,7 @@ impl Ledger {
         let check: String = db
             .query_row("PRAGMA integrity_check", [], |r| r.get(0))
             .map_err(|e| e.to_string())?;
-        if version != 3 || check != "ok" {
+        if !matches!(version, 3 | 4) || check != "ok" {
             return Err(
                 "账本匹配模型需 v3 或 SQLite 完整性失败；保留原文件，不自动迁移/重建，禁止新风险"
                     .into(),
@@ -150,9 +194,7 @@ impl Ledger {
                     if id != "genesis" {
                         return Err("缺少初始本金事件".into());
                     }
-                    let genesis = serde_json::from_str(&payload)
-                        .map_err(|e| format!("本金/配置记录损坏：{e}"))?;
-                    state = Some(State::new(genesis)?);
+                    state = Some(initial_state(&payload, version)?);
                 } else {
                     let cmd: Command =
                         serde_json::from_str(&payload).map_err(|e| format!("事件损坏：{e}"))?;
@@ -198,6 +240,14 @@ impl Ledger {
         &self.head
     }
 
+    pub fn schema_version(&self) -> i64 {
+        if self.state.cash_dividends.is_some() {
+            4
+        } else {
+            3
+        }
+    }
+
     pub fn history(&self) -> Result<Vec<AuditEntry>> {
         let mut stmt = self
             .db
@@ -225,9 +275,7 @@ impl Ledger {
                 if event_id != "genesis" {
                     return Err("审计缺少 genesis".into());
                 }
-                current = Some(State::new(
-                    serde_json::from_str(&payload).map_err(|e| e.to_string())?,
-                )?);
+                current = Some(initial_state(&payload, self.schema_version())?);
                 None
             } else {
                 let command: Command = serde_json::from_str(&payload).map_err(|e| e.to_string())?;

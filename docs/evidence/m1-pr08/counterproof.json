@@ -1,0 +1,17 @@
+{
+  "after_payment_nav_fen": 999051,
+  "after_sale_nav_fen": 999051,
+  "ex_nav_fen": 999129,
+  "false_models_rejected": {
+    "dividend_as_owner_deposit": 1003360,
+    "ignore_tax": 999969,
+    "no_receivable": 995769,
+    "payment_double_profit": 1002411
+  },
+  "gross_fen": 4200,
+  "kind": "Sol separate hand-derived counterproof, not independent acceptance",
+  "net_fen": 3360,
+  "pre_ex_nav_fen": 999969,
+  "status": "PASS",
+  "withholding_fen": 840
+}

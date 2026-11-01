@@ -176,6 +176,8 @@ def verify_reports(exe, dataset_path, ledger, report, out):
 
 def verify_accounting(dataset, report):
     """Independent identities, no simulated execution or alternate money ledger."""
+    require("cash_dividends" not in dataset and report.get("ledger_schema", 3) == 3,
+            "CASH_DIVIDEND_V1 requires evaluate-cash-dividend protocol")
     require([r["day"] for r in report["daily"]] == [s["day"] for s in dataset["sessions"]], "daily coverage mismatch")
     require(report["external_flow_total_fen"] == 0, "external flows not supported by this protocol")
     cash, held, fees = report["initial_nav_fen"], 0, 0
@@ -427,9 +429,20 @@ def main():
     synthetic_parser = commands.add_parser("evaluate-synthetic")
     for flag in ("input", "ledger", "report", "exe", "out"):
         synthetic_parser.add_argument("--"+flag, type=Path, required=True)
+    dividend_parser = commands.add_parser("evaluate-cash-dividend")
+    for flag in ("input", "source", "ledger", "report", "exe", "out"):
+        dividend_parser.add_argument("--"+flag, type=Path, required=True)
+    dividend_audit = commands.add_parser("audit-cash-dividend-source")
+    for flag in ("evidence", "out"):
+        dividend_audit.add_argument("--"+flag, type=Path, required=True)
     args = parser.parse_args()
     out = new_output(args.out)
-    if args.action == "audit":
+    if args.action in ("evaluate-cash-dividend", "audit-cash-dividend-source"):
+        spec = importlib.util.spec_from_file_location("dividend", Path(__file__).with_name("cash-dividend-evaluate.py"))
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        result = module.evaluate(args, out) if args.action == "evaluate-cash-dividend" else module.audit_real_source(args.evidence, out)
+    elif args.action == "audit":
         result = audit(args.source_dir, out)
     elif args.action == "evaluate-synthetic":
         result = evaluate_synthetic(args, out)
@@ -437,11 +450,15 @@ def main():
         result = evaluate(args, out)
     # No raw rows, full report/events or credentials printed.
     print(json.dumps({k: result[k] for k in ("data_coverage", "research_evidence", "engineering") if k in result}))
+    if args.action == "audit-cash-dividend-source":
+        print("BLOCKED: real event not eligible; source comparison only")
+        return 2
+    return 0
 
 
 if __name__ == "__main__":
     try:
-        main()
+        sys.exit(main())
     except (ValueError, KeyError, TypeError, OSError, sqlite3.Error, subprocess.TimeoutExpired) as error:
         print("BLOCKED research evaluation: " + str(error), file=sys.stderr)
         sys.exit(2)

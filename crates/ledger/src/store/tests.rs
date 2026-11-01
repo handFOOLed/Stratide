@@ -1,6 +1,7 @@
 use super::*;
 use crate::synthetic::*;
 use std::process::Command as Process;
+mod dividends;
 mod historical;
 mod r1;
 mod r2;
