@@ -103,6 +103,17 @@ impl Store {
     pub fn connect(&self) -> Result<Connection> {
         let c = Connection::open(&self.path)?;
         c.busy_timeout(Duration::from_millis(500))?;
+        if c.query_row(
+            "SELECT value FROM meta WHERE key='eod_auto_binding'",
+            [],
+            |r| r.get::<_, String>(0),
+        )
+        .is_ok()
+        {
+            // Owner-local controls share this WAL with an in-flight fake. Allow
+            // its small FULL commit to finish before recording the fake result.
+            c.busy_timeout(Duration::from_secs(5))?;
+        }
         c.execute_batch("PRAGMA foreign_keys=ON; PRAGMA synchronous=FULL;")?;
         Ok(c)
     }
@@ -164,6 +175,22 @@ impl Store {
             .ok_or("DEFAULT_MODEL_UNAVAILABLE")?;
         let mut c = self.connect()?;
         let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
+        if trigger.is_some_and(|key| key.starts_with("eod-auto-v1:")) {
+            // Serialize Owner disable/pause with creation of the daily task.
+            let enabled: Option<String> = tx
+                .query_row(
+                    "SELECT value FROM meta WHERE key='eod_auto_enabled'",
+                    [],
+                    |r| r.get(0),
+                )
+                .optional()?;
+            let paused: String =
+                tx.query_row("SELECT value FROM meta WHERE key='paused'", [], |r| {
+                    r.get(0)
+                })?;
+            ensure(enabled.as_deref() == Some("true"), "OWNER_DISABLED")?;
+            ensure(paused != "true", "OWNER_PAUSED")?;
+        }
         let count: i64 = tx.query_row("SELECT COUNT(*) FROM tasks", [], |r| r.get(0))?;
         ensure(count < settings.max_tasks as i64, "TASK_STORAGE_LIMIT")?;
         tx.execute("INSERT INTO tasks(request,input,provider_id,provider_hash,status,created_at,trigger_key) VALUES(?1,?2,?3,?4,'queued',?5,?6)",

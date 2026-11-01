@@ -1,0 +1,172 @@
+{
+  "after_manifest_sha256": "1d0ac53c0ba544e15dbb80bd805e5d7505b25fc98f53e9b68f00c14612ceaba2",
+  "before_manifest_sha256": "1d0ac53c0ba544e15dbb80bd805e5d7505b25fc98f53e9b68f00c14612ceaba2",
+  "files": 27,
+  "old_agent_and_snapshot_sidecars_hashed_without_opening_writers": true,
+  "records": [
+    {
+      "after_sha256": "d4020489f0485554ec092e9e8e84026998aa54248ac3268df46aeb040ee0585e",
+      "before_sha256": "d4020489f0485554ec092e9e8e84026998aa54248ac3268df46aeb040ee0585e",
+      "label": "observer",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "9460155e70947ee3c536cc02ec81d555401f1a2b824198ab660a0e2283c33ff7",
+      "before_sha256": "9460155e70947ee3c536cc02ec81d555401f1a2b824198ab660a0e2283c33ff7",
+      "label": "legacy68_input",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "69033aa4889693d16fbba9033f658be7877c9b87f9ffa9ea3419cf0806d2e940",
+      "before_sha256": "69033aa4889693d16fbba9033f658be7877c9b87f9ffa9ea3419cf0806d2e940",
+      "label": "legacy68_ledger",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "1064452dc0874b72c548f94e6b421142b3b9a8e513c924fb8d46f6a2cffbe322",
+      "before_sha256": "1064452dc0874b72c548f94e6b421142b3b9a8e513c924fb8d46f6a2cffbe322",
+      "label": "manual_agent",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "6f4e1c81bba72ab57ae253348fc914b4f8041641c72b12fba885c6298e653940",
+      "before_sha256": "6f4e1c81bba72ab57ae253348fc914b4f8041641c72b12fba885c6298e653940",
+      "label": "manual_snapshot",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "32f37b1eb4e0fa7b7392da8e666fe9b060f2e77205e17488bb7aaab89f602222",
+      "before_sha256": "32f37b1eb4e0fa7b7392da8e666fe9b060f2e77205e17488bb7aaab89f602222",
+      "label": "legacy68_report_daily.csv",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "7f91b44465aba6c83b57e942beea3c0704272466318d53e01de081e0c593ac03",
+      "before_sha256": "7f91b44465aba6c83b57e942beea3c0704272466318d53e01de081e0c593ac03",
+      "label": "legacy68_report_events.json",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "b2f7967e1ccc55816a5e8266d69da0d50533a3cb2811fac98491936bfadfab16",
+      "before_sha256": "b2f7967e1ccc55816a5e8266d69da0d50533a3cb2811fac98491936bfadfab16",
+      "label": "legacy68_report_fills.csv",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "5f4aea457ee32e165bf93ec3585951ce82ac2dbb46b927122182ce716961e4e6",
+      "before_sha256": "5f4aea457ee32e165bf93ec3585951ce82ac2dbb46b927122182ce716961e4e6",
+      "label": "legacy68_report_orders.csv",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "5f2afdb64ebf0a22104e94a221f45a2f22450fcb504ac0ea9e4fced47130204e",
+      "before_sha256": "5f2afdb64ebf0a22104e94a221f45a2f22450fcb504ac0ea9e4fced47130204e",
+      "label": "legacy68_report_positions.csv",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "63cb932b1f050d13029b0d431a44555b5e2d3f2e685a25da8727805716f1aa23",
+      "before_sha256": "63cb932b1f050d13029b0d431a44555b5e2d3f2e685a25da8727805716f1aa23",
+      "label": "legacy68_report_report.json",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "6d1ac48d6340ca96c9f02e921dc222e5eb4dadacb72162c3747c02365b2148d2",
+      "before_sha256": "6d1ac48d6340ca96c9f02e921dc222e5eb4dadacb72162c3747c02365b2148d2",
+      "label": "legacy68_source_calendar.json",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "d479248a0a712e043e7ea533a6e6bc7ab48418798037ad60397bf773400717be",
+      "before_sha256": "d479248a0a712e043e7ea533a6e6bc7ab48418798037ad60397bf773400717be",
+      "label": "legacy68_source_daily.json",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "86f31c79e02d7b4f2b3df2ee21ef9040576cb083ff975498699021c59a97a2b3",
+      "before_sha256": "86f31c79e02d7b4f2b3df2ee21ef9040576cb083ff975498699021c59a97a2b3",
+      "label": "legacy68_source_extraction.json",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "fadbd383650c753e00448054066a4447000aa1e53d497374de5d5e1c0db50598",
+      "before_sha256": "fadbd383650c753e00448054066a4447000aa1e53d497374de5d5e1c0db50598",
+      "label": "legacy68_source_limits.json",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "before_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "label": "legacy68_source_suspensions.json",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "6c7f769e56bb4f6b11cc368824606c46cca4bb9acb606e14bd829cca689f6dc0",
+      "before_sha256": "6c7f769e56bb4f6b11cc368824606c46cca4bb9acb606e14bd829cca689f6dc0",
+      "label": "manual_registration",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "9e89be8812851cc3fb838a2e6413360c26454afea720972ad0b540f70d5a4d2b",
+      "before_sha256": "9e89be8812851cc3fb838a2e6413360c26454afea720972ad0b540f70d5a4d2b",
+      "label": "old_fixed_candidate",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "6a4c0ac9a8691bb445b11e2b6af251c232c07f00995966718a34c6516859edb8",
+      "before_sha256": "6a4c0ac9a8691bb445b11e2b6af251c232c07f00995966718a34c6516859edb8",
+      "label": "v4_ledger",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "a658019c6d0bd8269c63475e6cb3af53847019f8f82bc8d9ec97e4c51c8dc870",
+      "before_sha256": "a658019c6d0bd8269c63475e6cb3af53847019f8f82bc8d9ec97e4c51c8dc870",
+      "label": "v4_report",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "24100408fcc9c5fbbfab00e52870fb5c89084a17366a7e1c855396c1ca3a111f",
+      "before_sha256": "24100408fcc9c5fbbfab00e52870fb5c89084a17366a7e1c855396c1ca3a111f",
+      "label": "historical77_input",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "f3c7d0fa9a0e8a1866f9d6d3a153bec2702d32d1fb23dcd35ce9eefe692462bf",
+      "before_sha256": "f3c7d0fa9a0e8a1866f9d6d3a153bec2702d32d1fb23dcd35ce9eefe692462bf",
+      "label": "historical77_ledger",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "5e563bb4bccf027750871e8d9c097492d340e06f8c2d47ea256e44472743fcb7",
+      "before_sha256": "5e563bb4bccf027750871e8d9c097492d340e06f8c2d47ea256e44472743fcb7",
+      "label": "historical77_report",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "label": "manual_agent-wal",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+      "before_sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+      "label": "manual_agent-shm",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "label": "manual_snapshot-wal",
+      "unchanged": true
+    },
+    {
+      "after_sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+      "before_sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+      "label": "manual_snapshot-shm",
+      "unchanged": true
+    }
+  ],
+  "result": "PASS",
+  "scope": "Only these listed 27 files; not every historical artifact"
+}

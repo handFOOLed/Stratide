@@ -12,6 +12,10 @@ Python 3.12+：`python -B scripts/research-data.py --store <名称> sync --obser
 
 M2-PR06 的 `eod-research summary/run/task` 显式运行本地 fake 研究并保存真实任务，`register --snapshot-store` 复核来源，`research-candidate.py source <registration SHA>` 查询冻结文本与拒绝资格。先构建 `stratide-research`，再运行 `python -B scripts/test-eod-agent.py --evidence` 完成无 UI E2E；故障测试为 `python -B scripts/test-eod-agent.py -v`，Windows junction 测试需要允许创建测试目录链接。详见 [操作/边界](../docs/M2_PR06.md)。
 
+## EOD 自动研究与候选归档
+
+`python -B scripts/eod-auto-research.py --name <新名称> init --snapshot-store <已绑定store>` 创建独立本地 fake 自动研究目录，默认 OFF。Owner 通过 `enable/disable/pause/resume` 控制，`once [--sync]` 与前台 `watch [--sync]` 复用原 Agent 和候选注册；`status/task/candidate` 只读。仅上海当天 16:00 后的原 on-day EOD、新鲜同步可触发，每源日一个任务。`python -B scripts/test-eod-auto.py --evidence` 执行实际 synthetic CLI/中断恢复/并发反证；构建与完整操作见 [M2-PR07](../docs/M2_PR07.md)。
+
 ## 本机 Paper Dashboard
 
 在仓库根目录执行 `pwsh -NoProfile -File scripts/start-dashboard.ps1 -ReportDir '<既有六报告目录>'`，构建并打开 `http://127.0.0.1:8710`；Ctrl+C 停止。没有输入时显示未配置。`test-dashboard.py --historical-report '<本机68日报告目录>'` 对真实进程验证字段、原文件只读及刷新/重启一致性，证据只含结构性摘要。见 [Dashboard 说明](../apps/dashboard/README.md)。

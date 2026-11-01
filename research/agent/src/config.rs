@@ -74,6 +74,42 @@ impl Default for Settings {
     }
 }
 impl Settings {
+    /// Auto EOD has no cloud permission. Inspect the raw configuration before
+    /// normal validation, key lookup, Provider preparation or budget writes.
+    pub fn load_eod_auto(path: &Path) -> Result<Self> {
+        crate::eod_snapshot::no_links(path)?;
+        let meta = fs::metadata(path).map_err(|_| "CONFIG_UNREADABLE")?;
+        ensure(meta.is_file() && meta.len() <= 128 * 1024, "CONFIG_INVALID")?;
+        let raw: serde_json::Value =
+            serde_json::from_slice(&fs::read(path).map_err(|_| "CONFIG_UNREADABLE")?)
+                .map_err(|_| "CONFIG_INVALID")?;
+        ensure(
+            raw["budget"]["currency"] == "TST"
+                && raw["models"].as_array().is_some_and(|models| {
+                    !models.is_empty()
+                        && models.iter().all(|m| {
+                            m["kind"] == "fake"
+                                && m["endpoint"].is_null()
+                                && m["api_key_env"].is_null()
+                                && m["price"]["currency"] == "TST"
+                                && m["price"]["source"] == "synthetic_test"
+                        })
+                }),
+            "EOD_AUTO_LOCAL_FAKE_ONLY",
+        )?;
+        let settings = Self::load(path)?;
+        // The automatic path never invokes the fake safe-retry scenario. An
+        // uncertain/failed attempt stays attached to its original daily task.
+        ensure(
+            settings.models.iter().any(|m| {
+                Some(&m.id) == settings.default_model.as_ref()
+                    && m.fake_scenario.as_deref() != Some("safe_transient")
+            }),
+            "EOD_AUTO_SINGLE_ATTEMPT_REQUIRED",
+        )?;
+        Ok(settings)
+    }
+
     pub fn load(path: &Path) -> Result<Self> {
         let meta = fs::symlink_metadata(path).map_err(|_| "CONFIG_UNREADABLE")?;
         ensure(meta.is_file() && meta.len() <= 128 * 1024, "CONFIG_INVALID")?;

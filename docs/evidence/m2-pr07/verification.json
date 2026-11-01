@@ -1,0 +1,133 @@
+{
+  "after_manifest_sha256": "1d0ac53c0ba544e15dbb80bd805e5d7505b25fc98f53e9b68f00c14612ceaba2",
+  "base": "dd39133d656298d1bef6f5b799e28284f627783f",
+  "before_manifest_sha256": "1d0ac53c0ba544e15dbb80bd805e5d7505b25fc98f53e9b68f00c14612ceaba2",
+  "branch": "codex/issue43-eod-auto-research",
+  "cargo": "1.98.1",
+  "commands": [
+    {
+      "check": "fmt",
+      "command": "cargo fmt --all -- --check",
+      "exit_code": 0,
+      "tests": null
+    },
+    {
+      "check": "check",
+      "command": "pwsh -NoProfile -File scripts/with-msvc.ps1 check --workspace --all-targets --locked --offline",
+      "exit_code": 0,
+      "tests": null
+    },
+    {
+      "check": "clippy",
+      "command": "pwsh -NoProfile -File scripts/with-msvc.ps1 clippy -p stratide-research -p stratided --all-targets --locked --offline -- -D warnings",
+      "exit_code": 0,
+      "tests": null
+    },
+    {
+      "check": "rust-tests",
+      "command": "pwsh -NoProfile -File scripts/with-msvc.ps1 test --workspace --locked --offline",
+      "exit_code": 0,
+      "tests": 156
+    },
+    {
+      "check": "eod-auto",
+      "command": "python -B scripts/test-eod-auto.py --evidence",
+      "exit_code": 0,
+      "tests": 13
+    },
+    {
+      "check": "eod-agent",
+      "command": "python -B scripts/test-eod-agent.py -v",
+      "exit_code": 0,
+      "tests": 6
+    },
+    {
+      "check": "snapshot",
+      "command": "python -B scripts/test-data-snapshot.py -v",
+      "exit_code": 0,
+      "tests": 11
+    },
+    {
+      "check": "candidates",
+      "command": "python -B scripts/test-candidates.py -v",
+      "exit_code": 0,
+      "tests": 13
+    },
+    {
+      "check": "agent",
+      "command": "python -B scripts/test-agent.py --assets-dir state/issue43-validation/assets --output state/issue43-validation/agent-result.json",
+      "exit_code": 0,
+      "tests": null
+    },
+    {
+      "check": "historical-dividend",
+      "command": "python -B scripts/test-historical-dividend.py --exe target/debug/stratide-cli.exe --out state/issue43-validation/historical-dividend",
+      "exit_code": 0,
+      "tests": 11
+    },
+    {
+      "check": "cash-dividend",
+      "command": "python -B scripts/test-cash-dividend.py --exe target/debug/stratide-cli.exe --out state/issue43-validation/cash-dividend",
+      "exit_code": 0,
+      "tests": 9
+    },
+    {
+      "check": "historical-data",
+      "command": "python -B scripts/test-historical-data.py",
+      "exit_code": 0,
+      "tests": 3
+    },
+    {
+      "check": "research-evaluation",
+      "command": "python -B scripts/test-research-evaluation.py",
+      "exit_code": 0,
+      "tests": 5
+    },
+    {
+      "check": "legacy68",
+      "command": "python -B scripts/test-historical-replay.py --exe target/debug/stratide-cli.exe --input <OLD68_DATASET> --source-dir <OLD68_SOURCE> --output state/issue43-validation/legacy68 -- --initial-cash-fen 10000000 --max-order-fen 500000 --account-cap-fen 2000000 --strategy-cap-fen 2000000 --daily-loss-fen 100000 --drawdown-fen 500000",
+      "exit_code": 0,
+      "tests": null
+    },
+    {
+      "check": "real-manual-eod",
+      "command": "python -B scripts/test-eod-agent.py --observer <EXISTING_OBSERVER>",
+      "exit_code": 0,
+      "tests": null
+    },
+    {
+      "check": "real-auto-skip",
+      "command": "research-data sync existing observer + eod-auto init/enable/once/status/disable; actual process clock",
+      "exit_code": 3,
+      "tests": null
+    }
+  ],
+  "env": {
+    "CARGO_INCREMENTAL": "0",
+    "TEMP": "<WORKTREE>/state/issue43-validation/tmp",
+    "TMP": "<WORKTREE>/state/issue43-validation/tmp"
+  },
+  "executables_sha256": {
+    "eod-auto-agent.exe": "1a257e8afd41f9971b09bcd53be058120f7cd372ea4eebdd4b5484bc17c60ec4",
+    "eod-research.exe": "f42529451ecc3825a3a69c578a35fb43b45255461fdb2650cde0e410538b66ee",
+    "stratide-cli.exe": "abda9c5083b1170cd59797ea97854f149b10f4bc525c360b12a3d6eeb1da9e52",
+    "stratided.exe": "4b2144ef2d5f12c9b72b36a887171de4b6b16d529db60e60d559bae50164e383"
+  },
+  "genuine_new_forward_days": 0,
+  "market_requests": 0,
+  "platform": "Windows x64",
+  "protected_files": 27,
+  "python": "3.12.10",
+  "real_provider_calls": 0,
+  "result": "PASS",
+  "unverified": [
+    "New real trading-day automatic EOD research",
+    "Real Provider/DNS/keys/billing",
+    "Real historical PIT and opening source",
+    "Strategy alpha/live/forward-paper execution",
+    "Linux/macOS",
+    "Physical power loss and OS reboot",
+    "Independent acceptance and ChatGPT fixed-HEAD review"
+  ],
+  "verification": "Sol_developer_selftest_not_independent_acceptance"
+}

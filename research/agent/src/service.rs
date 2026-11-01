@@ -145,7 +145,9 @@ impl Agent {
             == 0
     }
     fn settings(&self) -> Result<Settings> {
-        let s = if self.0.config_path.exists() {
+        let s = if self.store().setting("eod_auto_binding")?.is_some() {
+            Settings::load_eod_auto(&self.0.config_path)?
+        } else if self.0.config_path.exists() {
             Settings::load(&self.0.config_path)?
         } else {
             Settings::default()
@@ -437,7 +439,7 @@ impl Agent {
         let c = self.store().connect()?;
         // Expire missed automatic work even while scheduling is OFF or budget
         // configuration is absent. Manual queued work retains its own semantics.
-        c.execute("UPDATE tasks SET status='cancelled',reason='EOD_SUPERSEDED_SKIPPED',finished_at=?1 WHERE status='queued' AND trigger_key IS NOT NULL AND trigger_key!=?2",params![now.to_rfc3339(),current_key])?;
+        c.execute("UPDATE tasks SET status='cancelled',reason='EOD_SUPERSEDED_SKIPPED',finished_at=?1 WHERE status='queued' AND trigger_key LIKE 'eod-v1:%' AND trigger_key!=?2",params![now.to_rfc3339(),current_key])?;
         c.execute("UPDATE eod SET disposition='skipped_superseded' WHERE source_day<?1 AND disposition='queued' AND EXISTS(SELECT 1 FROM tasks WHERE trigger_key='eod-v1:'||eod.source_day AND reason='EOD_SUPERSEDED_SKIPPED')",[market.format("%Y-%m-%d").to_string()])?;
         if self.store().setting("eod_enabled")?.as_deref() != Some("true") {
             return Ok(());
