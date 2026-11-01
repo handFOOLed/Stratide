@@ -107,7 +107,6 @@ fn run(args: &[String], now: DateTime<Utc>) -> Result<Value> {
         "MULTIMODAL_SOURCE_OWNED",
     )?;
     let trigger = format!("multimodal-v1:{}:{}", args[1], args[2]);
-    mm::require_enabled(&agent.store().connect()?, Some(&trigger))?;
     let prior: Option<i64> = agent
         .store()
         .connect()?
@@ -123,10 +122,20 @@ fn run(args: &[String], now: DateTime<Utc>) -> Result<Value> {
             saved["input"] == serde_json::to_value(&input).unwrap(),
             "MULTIMODAL_INPUT_CHANGED",
         )?;
+        if args[0] == "reject" {
+            agent.store().invalidate_queued(id, &trigger, now)?;
+            return agent.store().task(id);
+        }
         if saved["status"] != "queued" || args[0] == "queue" {
             return Ok(saved);
         }
+        ensure(args[0] == "tick", "MULTIMODAL_COMMAND")?;
+        // The original Agent validates THIS persisted task's own source before
+        // reserve and dispatch; existing terminal/unknown tasks are not retried.
+        agent.tick_task(now, id, &trigger)?;
+        return agent.store().task(id);
     }
+    mm::require_enabled(&agent.store().connect()?, Some(&trigger))?;
     // Any NEW inference must still be bound to the current original PR33 SHA.
     let current = eod_snapshot::SnapshotSource::named(
         config["snapshot_store_name"]
@@ -186,7 +195,7 @@ fn run(args: &[String], now: DateTime<Utc>) -> Result<Value> {
         "MULTIMODAL_COMMAND",
     )?;
     if args[0] == "tick" {
-        agent.tick(now)?;
+        agent.tick_task(now, id, &trigger)?;
     }
     agent.store().task(id)
 }
@@ -207,4 +216,81 @@ fn main() {
     ));
     println!("{value}");
     std::process::exit(code);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Read;
+
+    #[test]
+    fn routing_fixture() {
+        if std::env::var("STRATIDE_MM_ROUTING_TEST").as_deref() != Ok("1") {
+            return;
+        }
+        let mut encoded = String::new();
+        std::io::stdin().read_to_string(&mut encoded).unwrap();
+        let request: Value = serde_json::from_str(&encoded).unwrap();
+        let args: Vec<String> = serde_json::from_value(request["args"].clone()).unwrap();
+        assert!(args[1].starts_with("mm-test-"));
+        let root = mm::state_root().unwrap();
+        let config = read(&root.join(&args[1]).join("config.json"), 8192).unwrap();
+        let store = config["snapshot_store_name"].as_str().unwrap();
+        assert!(store.starts_with("mm-test-"));
+        // Clock injection is confined to libtest and a current synthetic PR33
+        // source. The production executable has no clock/global-tick argument.
+        assert_eq!(
+            eod_snapshot::SnapshotSource::named(store)
+                .unwrap()
+                .read(Utc::now().timestamp_millis())
+                .unwrap()
+                .mode,
+            "synthetic_test"
+        );
+        let now = DateTime::from_timestamp_millis(request["now_ms"].as_i64().unwrap()).unwrap();
+        let result = if request["global_tick"] == true {
+            Settings::load_multimodal(&root.join(".agent/settings.json")).unwrap();
+            let blank = InputSummary {
+                version: "routing-test".into(),
+                source_day: String::new(),
+                mode: "no_input".into(),
+                scopes: vec!["owner_task".into()],
+                summary: json!({}),
+                eod_eligible: false,
+            };
+            let agent = Agent::open(&root.join(".agent"), None, blank).unwrap();
+            let trigger = format!("multimodal-v1:{}:{}", args[1], args[2]);
+            // Never let a test/global tick execute an unrelated existing job.
+            let first: String = agent
+                .store()
+                .connect()
+                .unwrap()
+                .query_row(
+                    "SELECT trigger_key FROM tasks WHERE status='queued' ORDER BY id LIMIT 1",
+                    [],
+                    |r| r.get(0),
+                )
+                .unwrap();
+            assert_eq!(first, trigger);
+            agent.tick(now).unwrap();
+            let id: i64 = agent
+                .store()
+                .connect()
+                .unwrap()
+                .query_row(
+                    "SELECT id FROM tasks WHERE trigger_key=?1",
+                    [trigger],
+                    |r| r.get(0),
+                )
+                .unwrap();
+            agent.store().task(id)
+        } else {
+            run(&args, now)
+        };
+        let (code, value) = output(result);
+        println!(
+            "MM_ROUTING_RESULT={}",
+            json!({"exit_code":code,"value":value})
+        );
+    }
 }

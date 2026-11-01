@@ -1,0 +1,17 @@
+test_two_sources_tick_targets_b (__main__.RoutingTests.test_two_sources_tick_targets_b) ... FAIL
+
+======================================================================
+FAIL: test_two_sources_tick_targets_b (__main__.RoutingTests.test_two_sources_tick_targets_b)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>\scripts\test-multimodal-routing.py", line 62, in test_two_sources_tick_targets_b
+    self.assertEqual(actual_b["status"], "completed", "B tick executed a different queued task")
+AssertionError: 'queued' != 'completed'
+- queued
++ completed
+ : B tick executed a different queued task
+
+----------------------------------------------------------------------
+Ran 1 test in 2.752s
+
+FAILED (failures=1)

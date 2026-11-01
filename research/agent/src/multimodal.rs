@@ -4,7 +4,7 @@ use chrono::{DateTime, Utc};
 use rusqlite::{Connection, OptionalExtension};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::{path::PathBuf, process::Command};
+use std::{fs, path::PathBuf, process::Command};
 
 pub const SCOPE: &str = "multimodal_research_v1";
 pub const POLICY: &str = "multimodal-research-v1";
@@ -31,6 +31,112 @@ pub fn state_root() -> Result<PathBuf> {
 
 pub fn is_input(input: &InputSummary) -> bool {
     input.scopes.iter().any(|s| s == SCOPE)
+}
+
+/// Recheck the ACTUAL claimed task at the original reserve/dispatch boundary,
+/// including when it was claimed by the legacy global Agent tick path.
+pub fn validate_source(
+    c: &Connection,
+    trigger: Option<&str>,
+    input: &InputSummary,
+    now: DateTime<Utc>,
+) -> Result<()> {
+    let summary = validate_input(input, now)?;
+    let key = trigger
+        .and_then(|t| t.strip_prefix("multimodal-v1:"))
+        .ok_or("MULTIMODAL_TRIGGER_INVALID")?;
+    let (name, task_key) = key.split_once(':').ok_or("MULTIMODAL_TRIGGER_INVALID")?;
+    ensure(
+        crate::eod_snapshot::valid_name(name) && task_key == summary.task_id,
+        "MULTIMODAL_TRIGGER_INVALID",
+    )?;
+    require_enabled(c, trigger)?;
+    let path = state_root()?.join(name).join("config.json");
+    crate::eod_snapshot::no_links(&path)?;
+    ensure(
+        fs::metadata(&path).is_ok_and(|m| m.is_file() && m.len() <= 8192),
+        "MULTIMODAL_CONFIG",
+    )?;
+    let mut config: Value =
+        serde_json::from_slice(&fs::read(&path).map_err(|_| "MULTIMODAL_CONFIG")?)
+            .map_err(|_| "MULTIMODAL_CONFIG")?;
+    let binding = config["binding_sha256"]
+        .as_str()
+        .ok_or("MULTIMODAL_CONFIG")?
+        .to_string();
+    config
+        .as_object_mut()
+        .ok_or("MULTIMODAL_CONFIG")?
+        .remove("binding_sha256");
+    ensure(
+        hash(&serde_json::to_vec(&config).map_err(|_| "MULTIMODAL_CONFIG")?) == binding
+            && config["schema_version"] == 1
+            && config["policy"] == POLICY
+            && config["name"] == name
+            && config["agent_dir"] == ".agent"
+            && config["source_identity_sha256"] == summary.source_identity
+            && config["checkout_root"]
+                == crate::eod_snapshot::repository_root()
+                    .to_string_lossy()
+                    .as_ref(),
+        "MULTIMODAL_BINDING_CHANGED",
+    )?;
+    for (key, expected) in [
+        (format!("mm_binding:{name}"), binding),
+        (
+            format!("mm_source_owner:{}", summary.source_identity),
+            name.to_string(),
+        ),
+        (
+            format!("mm_task_owner:{}", summary.task_id),
+            name.to_string(),
+        ),
+    ] {
+        let value: Option<String> = c
+            .query_row("SELECT value FROM meta WHERE key=?1", [key], |r| r.get(0))
+            .optional()?;
+        ensure(
+            value.as_deref() == Some(expected.as_str()),
+            "MULTIMODAL_BINDING_CHANGED",
+        )?;
+    }
+    let source = crate::eod_snapshot::SnapshotSource::named(
+        config["snapshot_store_name"]
+            .as_str()
+            .ok_or("MULTIMODAL_CONFIG")?,
+    )?;
+    let (current, identity) = source.read_with_identity(now.timestamp_millis())?;
+    ensure(
+        hash(&serde_json::to_vec(&identity).map_err(|_| "MULTIMODAL_SOURCE_IDENTITY_CHANGED")?)
+            == summary.source_identity,
+        "MULTIMODAL_SOURCE_IDENTITY_CHANGED",
+    )?;
+    ensure(
+        current.summary["snapshot_sha256"] == summary.input_snapshot_sha256
+            && current.source_day == input.source_day
+            && current.mode == input.mode,
+        "MULTIMODAL_SNAPSHOT_CHANGED",
+    )?;
+    let market = now.with_timezone(&chrono_tz::Asia::Shanghai);
+    ensure(
+        chrono::Timelike::hour(&market) >= 16
+            && market.format("%Y%m%d").to_string() == summary.source_day,
+        "MISSED_OR_STALE",
+    )?;
+    for field in ["observed_at", "received_at", "available_at"] {
+        let time = DateTime::from_timestamp_millis(
+            current.summary[field]
+                .as_i64()
+                .ok_or("SNAPSHOT_TIME_INVALID")?,
+        )
+        .ok_or("SNAPSHOT_TIME_INVALID")?
+        .with_timezone(&chrono_tz::Asia::Shanghai);
+        ensure(
+            time.date_naive() == market.date_naive() && chrono::Timelike::hour(&time) >= 16,
+            "MISSED_OR_STALE",
+        )?;
+    }
+    Ok(())
 }
 
 fn sha(value: &str) -> bool {

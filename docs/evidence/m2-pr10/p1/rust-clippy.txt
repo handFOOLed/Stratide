@@ -1,0 +1,57 @@
+    Checking stratide-research v0.0.1 (<checkout>\research\agent)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratide_research-06ki6t9xhkqik\s-hnr8bo2a3s-1hk90cz-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratide_research-2hn8cgcq2n4mh\s-hnr8bo2a3m-1bvngab-working`
+
+warning: `stratide-research` (lib test) generated 1 warning
+warning: `stratide-research` (lib) generated 1 warning
+    Checking stratided v0.0.1 (<checkout>\apps\stratided)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\multimodal_agent-36x6pe0eu2oyh\s-hnr8boekf1-0pb7iw5-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratided-3lz07wgzvpxj6\s-hnr8boeiq8-00xati3-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\eod_auto_agent-2sei1j724l7fw\s-hnr8boel2a-0zz9ge1-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\eod_research-3bo7519sdjzl2\s-hnr8boenbq-0gvtkds-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\status_regression-3gtra0tdhk3ue\s-hnr8boep7u-02jc75y-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\eod_research-33bf0w389pxy7\s-hnr8boesvs-0nnu6zg-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\eod_scope-175ybyhv5ic6i\s-hnr8boeutg-1mzt79x-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\safety-0jbpk3riu12mx\s-hnr8boeuwx-191hvaf-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\eod_auto_agent-3sidb9wfhga57\s-hnr8boeyd5-0v8xbna-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\multimodal_agent-03p6f6x6pf9bx\s-hnr8boezql-1h628y3-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratided-2xpfmalnexi2l\s-hnr8bof44z-11wii9n-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\multimodal_scope-0jf31wqlx9nq8\s-hnr8bof4ml-1lszpax-working`
+
+warning: `stratide-research` (bin "eod-research" test) generated 1 warning
+warning: `stratide-research` (bin "eod-auto-agent") generated 1 warning
+warning: `stratide-research` (bin "eod-research") generated 1 warning
+warning: `stratide-research` (test "multimodal_scope") generated 1 warning
+warning: `stratide-research` (bin "multimodal-agent") generated 1 warning
+warning: `stratide-research` (test "status_regression") generated 1 warning
+warning: `stratide-research` (test "eod_scope") generated 1 warning
+warning: `stratide-research` (bin "eod-auto-agent" test) generated 1 warning
+warning: `stratide-research` (bin "multimodal-agent" test) generated 1 warning
+warning: `stratide-research` (test "safety") generated 1 warning
+warning: `stratided` (lib) generated 1 warning
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\agent-3itwkt53kprke\s-hnr8bopm7j-19froqq-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratided-0cszjd6wugg26\s-hnr8bopnm3-09sknli-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratided-0dm9zfs5o62b1\s-hnr8bopo9b-12n1wul-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\dashboard-0mmwj21y1kf3i\s-hnr8bopqem-0so92qj-working`
+
+warning: `stratided` (test "agent") generated 1 warning
+warning: `stratided` (lib test) generated 1 warning
+warning: `stratided` (bin "stratided" test) generated 1 warning
+warning: `stratided` (bin "stratided") generated 1 warning
+warning: `stratided` (test "dashboard") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.03s

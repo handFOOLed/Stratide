@@ -1,0 +1,19 @@
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratide_research-11ee840rdjkti\s-hnr8bpbfq1-0mrc91w-working`
+
+warning: `stratide-research` (lib) generated 1 warning
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratided-3jbtvib7u7cl9\s-hnr8bpw607-0s5v9cy-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\eod_auto_agent-3ngs2mf1p913m\s-hnr8bqfg95-0jq3ea0-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\multimodal_agent-1i2gyxq2en6oz\s-hnr8bqfx0g-1w9dbcb-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\eod_research-0wayxnef5d84l\s-hnr8bqffzk-19r5j56-working`
+
+warning: `stratided` (lib) generated 1 warning
+warning: `stratide-research` (bin "eod-auto-agent") generated 1 warning
+warning: `stratide-research` (bin "multimodal-agent") generated 1 warning
+warning: `stratide-research` (bin "eod-research") generated 1 warning
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratided-319ewz0qrcxxy\s-hnr8brw7xp-1x4pu33-working`
+
+warning: `stratided` (bin "stratided") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.77s

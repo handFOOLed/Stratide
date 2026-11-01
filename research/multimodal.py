@@ -375,9 +375,15 @@ class Run:
                 self.fault("after_queue")
                 if original["status"] == "queued":
                     # Recheck authoritative original journal before NEW calls.
-                    current = s.source(d.Store(config["snapshot_store_name"]))
-                    e.source_window(current, self.clock())
-                    j.require(current["saved"]["snapshot_sha256"] == frozen["input_snapshot_sha256"], "SOURCE_CHANGED_REVIEW_REQUIRED")
+                    try:
+                        current = s.source(d.Store(config["snapshot_store_name"]))
+                        e.source_window(current, self.clock())
+                        j.require(current["saved"]["snapshot_sha256"] == frozen["input_snapshot_sha256"], "SOURCE_CHANGED_REVIEW_REQUIRED")
+                    except (OSError, ValueError, KeyError, TypeError, sqlite3.Error):
+                        # Finish this original queued intent too; a Python audit
+                        # failure must not leave executable work in Agent SQLite.
+                        self.invoke("reject", self.name, key)
+                        raise
                     self.invoke("tick", self.name, key)
                     original = self.task_for(intent)
                 if original["status"] != "completed":

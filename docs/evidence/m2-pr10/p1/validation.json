@@ -1,0 +1,69 @@
+{
+  "reviewed_head": "be37953f07e6f1bd9b25521151d6e004b3b9ce27",
+  "review_comment": "https://github.com/handFOOLed/Stratide/pull/52#issuecomment-6558243819",
+  "checks": [
+    {
+      "command": "python -B scripts/test-data-snapshot.py",
+      "tests": 11,
+      "seconds": 6.055,
+      "exit_code": 0
+    },
+    {
+      "command": "python -B scripts/test-eod-agent.py",
+      "tests": 6,
+      "seconds": 4.726,
+      "exit_code": 0
+    },
+    {
+      "command": "python -B scripts/test-candidates.py",
+      "tests": 13,
+      "seconds": 8.421,
+      "exit_code": 0
+    },
+    {
+      "command": "python -B scripts/test-eod-auto.py",
+      "tests": 16,
+      "seconds": 80.842,
+      "exit_code": 0
+    },
+    {
+      "command": "python -B scripts/test-research-review.py",
+      "tests": 12,
+      "seconds": 66.599,
+      "exit_code": 0
+    },
+    {
+      "command": "python -X utf8 -B scripts/test-eod-operator.py",
+      "tests": 18,
+      "seconds": 200.278,
+      "exit_code": 0
+    },
+    {
+      "command": "python -B scripts/test-multimodal-research.py --evidence docs/evidence/m2-pr10/p1/multimodal",
+      "tests": 10,
+      "seconds": 66.282,
+      "exit_code": 0
+    },
+    {
+      "command": "python -B scripts/test-multimodal-routing.py --evidence docs/evidence/m2-pr10/p1",
+      "tests": 4,
+      "seconds": 25.805,
+      "exit_code": 0
+    }
+  ],
+  "rust_workspace_passed": 162,
+  "agent_api_checks": 6,
+  "real_paid_calls": 0,
+  "public_requests": 0,
+  "independent_acceptance": "NOT_VERIFIED",
+  "implementation_sha256": {
+    "research/agent/src/service.rs": "ff90c2a666b362650389b22415cf6505337e434becc4fb225d27d97b059e61d2",
+    "research/agent/src/store.rs": "9e14df0c16bd1a695c4f29560791f9b68c225e7eff491ccbed557e1ee0201dce",
+    "research/agent/src/eod_snapshot.rs": "e78a5473904afee1db0e8579b8cb77066cbb8ba5d34fe6aa1abc56974a3b0214",
+    "research/agent/src/multimodal.rs": "fa7bda5bf37a13b16e7ede85211cfdf9e703a896c7059afec6ff696625fa9e81",
+    "research/agent/src/bin/multimodal-agent.rs": "81f030f202b88bb222433f4385dbded54152a1f82723b67f3edc0e93eab5a3da",
+    "research/multimodal.py": "60b4b87f84308801b88962330251af690bc1665756040c1e58bb8e99fa51deb1",
+    "research/agent/tests/task_routing.rs": "20927dfdbb92d316b6f40d430aa6a28417c41b252baa4302e7ff075ef818291d",
+    "scripts/test-multimodal-routing.py": "e43f0a84df568fd9906516fa14f93ca56a3ec32458de137828391aff0c96a549"
+  }
+}

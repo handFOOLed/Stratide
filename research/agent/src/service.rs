@@ -281,10 +281,23 @@ impl Agent {
         self.store().capacity(&s)?;
         self.schedule_eod(&s, now)?;
         if let Some(id) = self.store().claim(now)? {
-            if let Err(error) = self.run_task(id, now) {
-                self.store()
-                    .finish(id, "failed", &error.0, None, Utc::now())?;
-            }
+            self.run_claimed(id, now)?;
+        }
+        Ok(())
+    }
+    /// Targeted consumers must not dispatch an unrelated shared-queue task.
+    pub fn tick_task(&self, now: DateTime<Utc>, id: i64, trigger: &str) -> Result<()> {
+        self.store().capacity(&self.settings()?)?;
+        ensure(
+            self.store().claim_exact(now, id, trigger)? == Some(id),
+            "TASK_NOT_CLAIMED_OR_PAUSED",
+        )?;
+        self.run_claimed(id, now)
+    }
+    fn run_claimed(&self, id: i64, now: DateTime<Utc>) -> Result<()> {
+        if let Err(error) = self.run_task(id, now) {
+            self.store()
+                .finish(id, "failed", &error.0, None, Utc::now())?;
         }
         Ok(())
     }
@@ -321,7 +334,6 @@ impl Agent {
             )?;
             if crate::multimodal::is_input(&input) {
                 crate::multimodal::validate_input(&input, now)?;
-                crate::multimodal::require_enabled(&self.store().connect()?, trigger.as_deref())?;
             }
             let task_limit = request.validate()?;
             m.authorize(&input.scopes, s.budget.as_ref())?;
@@ -348,6 +360,18 @@ impl Agent {
             )?;
             let maximum = m.cost(m.max_input_tokens, m.max_output_tokens)?;
             let reservation_time = if m.kind == "fake" { now } else { Utc::now() };
+            if crate::multimodal::is_input(&input) {
+                if let Err(error) = crate::multimodal::validate_source(
+                    &c,
+                    trigger.as_deref(),
+                    &input,
+                    reservation_time,
+                ) {
+                    return self
+                        .store()
+                        .finish(id, "cancelled", &error.0, None, Utc::now());
+                }
+            }
             let call_id = budget::reserve(
                 &mut c,
                 latest.budget.as_ref().ok_or("BUDGET_UNCONFIGURED")?,
@@ -360,10 +384,22 @@ impl Agent {
                 },
             )?;
             let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
-            if let Err(error) = crate::multimodal::require_enabled(&tx, trigger.as_deref()) {
-                tx.execute("UPDATE calls SET state='no_charge',reason='OWNER_DISABLED_BEFORE_DISPATCH' WHERE id=?1", [call_id])?;
-                tx.commit()?;
-                return Err(error);
+            if crate::multimodal::is_input(&input) {
+                if let Err(error) = crate::multimodal::validate_source(
+                    &tx,
+                    trigger.as_deref(),
+                    &input,
+                    if m.kind == "fake" { now } else { Utc::now() },
+                ) {
+                    tx.execute(
+                        "UPDATE calls SET state='no_charge',reason=?1 WHERE id=?2",
+                        params![error.0, call_id],
+                    )?;
+                    tx.commit()?;
+                    return self
+                        .store()
+                        .finish(id, "cancelled", &error.0, None, Utc::now());
+                }
             }
             let status: String =
                 tx.query_row("SELECT status FROM tasks WHERE id=?1", [id], |r| r.get(0))?;
