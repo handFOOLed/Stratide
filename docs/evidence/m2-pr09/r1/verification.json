@@ -1,0 +1,37 @@
+{
+  "fix_base": "5efcf624ff71a3b95c192b9000432a0ab14f6594",
+  "review": "https://github.com/handFOOLed/Stratide/pull/50#issuecomment-6555880267",
+  "red": {
+    "command": "python -X utf8 -B scripts/test-eod-operator.py --test test_disable_return_before_dispatch_fences_all_four_stages --test test_disable_during_collector_keeps_raw_without_starting_downstream",
+    "exit_code": 1,
+    "tests": 2,
+    "failing_interleavings": 4
+  },
+  "green": {
+    "command": "python -X utf8 -B scripts/test-eod-operator.py",
+    "exit_code": 0,
+    "tests": 18,
+    "new_deterministic_interleavings": 6
+  },
+  "unchanged_original_source_sha256": {
+    "research/data_snapshot.py": "266ad6725d7a75f15d8355e760307489bdf61f07f2b5bea93c0572dc762d0f94",
+    "research/eod_journal.py": "1088597935cf4d433f36abc4be7f1560a90a48a6c03790930c3684c4902c695d",
+    "research/shadow.py": "c4538dc59426c9f0dc1ab2e00c431efb250820c32175ecd9a06b03551eeb6a70",
+    "scripts/eod_auto.py": "b5d9b05a39af5b9d186aa0aa5f8850d771f5a81c48218db7e97cc408c5aac845",
+    "scripts/observe-eod.ps1": "bdc31ebb49d8a33a8781d67f14e623081bd8697ef5d040b782cf75b0849136a6"
+  },
+  "rust_changed": false,
+  "old_evidence_json_preserved": true,
+  "carried_forward_only": "Prior Rust workspace and independent subsystem regressions belong to original HEAD; no rerun this fix.",
+  "verification": "developer_selftest_not_independent_acceptance",
+  "public_market_requests": 0,
+  "real_llm_calls": 0,
+  "genuine_new_forward_days": 0,
+  "orders": 0,
+  "fills": 0,
+  "nav": null,
+  "forward_paper_allowed": false,
+  "live_allowed": false,
+  "historical_pit": "NOT_VERIFIED",
+  "opening_source": "BLOCKED"
+}

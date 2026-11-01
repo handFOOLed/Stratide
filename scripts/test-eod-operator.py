@@ -118,7 +118,7 @@ class HttpFixture:
         self.thread.join()
 
 
-def fixture_cli(request):
+def fixture_cli(request, stage=None):
     name, now = request["name"], request["at"]
     assert name.startswith("auto-test-") and Path(request["observer"]).is_relative_to(WORK.parent)
 
@@ -160,6 +160,7 @@ def fixture_cli(request):
                 outcome["status"] = "market_closed"
             else:
                 rows = fetch("daily")
+                fault("collector_inflight")
                 if not rows:
                     raise o.j.Rejected("missing_daily_not_proof_of_suspension")
                 row = rows[0]
@@ -186,6 +187,18 @@ def fixture_cli(request):
         o.j.require(result["exit_code"] == 0, result["value"].get("error_code", "BRIDGE_TEST_ERROR"))
         return result["value"]
 
+    def spawn(stage, store, observer, reports, auto_name, token):
+        assert store == name and (stage != "collector" or token == "synthetic-token-never-public")
+        if stage == "collector" and request.get("pause_dispatch"):
+            Path(request["marker"] + ".dispatch").write_text("last_enabled_check_completed_before_Popen")
+            while not Path(request["release"] + ".dispatch").exists():
+                time.sleep(0.02)
+        path = Path(request["marker"]).with_suffix(".stage.json")
+        path.write_bytes(o.j.canonical(dict(request=request, stage=stage)))
+        return subprocess.Popen([sys.executable, "-X", "utf8", "-B", str(Path(__file__).absolute()),
+                                 "--fixture-stage", str(path)], cwd=ROOT,
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
     def fault(point):
         if point == "after_fake" and request.get("fault") == "operator_receipt":
             service = o.Operator(name, clock=lambda: now)
@@ -209,6 +222,17 @@ def fixture_cli(request):
     if not request.get("missing_token"):
         env["STRATIDE_TUSHARE_TOKEN"] = "synthetic-token-never-public"
     original_once = o.Operator.once
+    original_start = o.Operator.start
+    original_control = o.Operator.control
+    def checked_control(service, enabled):
+        if not enabled and request.get("mark_control"):
+            Path(request["marker"]).write_text("disable_entered")
+        return original_control(service, enabled)
+
+    def checked_start(service, stage, day):
+        original_start(service, stage, day)
+        fault("before_" + stage + "_dispatch")
+
     def checked_once(service):
         try:
             return original_once(service)
@@ -216,9 +240,20 @@ def fixture_cli(request):
             traceback.print_exc()  # isolated synthetic runner only
             raise
     with patch.dict(os.environ, env, clear=True), patch.object(o.d, "now", return_value=now), \
-         patch.object(o.Operator, "once", checked_once):
+         patch.object(o.Operator, "once", checked_once), patch.object(o.Operator, "start", checked_start), \
+         patch.object(o.Operator, "control", checked_control):
+        if stage == "collector":
+            return collector(Path(request["observer"]), None, env["STRATIDE_TUSHARE_TOKEN"])
+        if stage == "snapshot":
+            return 0 if o.d.Store(name).sync()["can_research"] else 2
+        if stage == "shadow":
+            o.s.Shadow(name, clock=lambda: now).once()
+            return 0
+        if stage == "fake":
+            o.a.Auto(name, clock=lambda: now, invoke=invoke).once()
+            return 0
         return o.main(["--snapshot-store", name, *request["args"]], clock=lambda: now,
-                      collector=collector, invoke=invoke, fault=fault, wait=wait)
+                      spawn=spawn, fault=fault, wait=wait)
 
 
 def launch(name, *args, at=None, port=0, cwd=ROOT, **options):
@@ -235,8 +270,8 @@ def launch(name, *args, at=None, port=0, cwd=ROOT, **options):
     return process
 
 
-def finish(process, code=0):
-    out, err = process.communicate(timeout=90)
+def finish(process, code=0, timeout=90):
+    out, err = process.communicate(timeout=timeout)
     if process.returncode != code:
         raise AssertionError(f"{process.request['args']}: expected {code}, got {process.returncode}: {out[:2200]!r} {err[:2200]!r}")
     values = [json.loads(line) for line in out.splitlines()]
@@ -283,6 +318,22 @@ def fingerprint(paths):
             if path.is_file():
                 result[str(path)] = (path.stat().st_mtime_ns, o.j.sha(path.read_bytes()))
     return result
+
+
+def authorities(name, observer):
+    paths = dict(observer=observer, snapshot=o.d.Store(name).path, shadow=o.s.Shadow(name).path,
+                 agent=o.a.Auto(name).dbpath)
+    hashes = {label: {suffix or "main": o.j.sha(path.read_bytes()) if path.exists() else None
+                       for suffix in ("", "-wal", "-shm", "-journal")
+                       for path in [Path(str(base) + suffix)]} for label, base in paths.items()}
+    counts = {}
+    for label, path in paths.items():
+        tables = dict(observer=("events",), snapshot=("snapshots",), shadow=("inputs",), agent=("tasks", "calls"))[label]
+        with o.s.readonly(path) as db:
+            counts.update({label + "_" + table: db.execute("SELECT count(*) FROM " + table).fetchone()[0]
+                           for table in tables})
+    counts["registrations"] = len(list((ROOT / "state/candidates" / name / "registrations").glob("*.json")))
+    return dict(sha256=hashes, counts=counts)
 
 
 class OperatorTests(unittest.TestCase):
@@ -401,7 +452,8 @@ class OperatorTests(unittest.TestCase):
     def test_kill_after_original_started_is_unknown_no_request(self):
         name, _ = setup("started")
         with HttpFixture() as http:
-            call(name, "once", at=stamp(DAYS[1], 16), port=http.port, fault="collector_started", code=86)
+            killed = call(name, "once", at=stamp(DAYS[1], 16), port=http.port, fault="collector_started", code=3)
+            self.assertEqual(killed["state"], "OUTCOME_UNKNOWN")  # collector child exits 86; parent retains its intent
             value = call(name, "once", at=stamp(DAYS[1], 16, 10), port=http.port, code=3)
             self.assertEqual(value["state"], "OUTCOME_UNKNOWN")
             self.assertEqual(http.calls, [])
@@ -420,9 +472,9 @@ class OperatorTests(unittest.TestCase):
             self.assertEqual(af.counts(name), dict(intents=1, tasks=1, calls=1, registrations=1))
             self.assertTrue(call(name, "verify", at=stamp(DAYS[1], 16, 10))["authoritative_evidence_verified"])
 
-    def wait_marker(self, process):
+    def wait_marker(self, process, suffix=""):
         deadline = time.monotonic() + 30
-        while not Path(process.request["marker"]).exists():
+        while not Path(process.request["marker"] + suffix).exists():
             self.assertIsNone(process.poll())
             self.assertLess(time.monotonic(), deadline)
             time.sleep(0.02)
@@ -440,6 +492,91 @@ class OperatorTests(unittest.TestCase):
             self.assertEqual(af.counts(name), dict(intents=0, tasks=0, calls=0, registrations=0))
             with o.s.readonly(o.s.Shadow(name).path) as db:
                 self.assertEqual(len(o.s.Shadow(name).journal(db)["observations"]), 0)
+
+    def test_disable_return_before_dispatch_fences_all_four_stages(self):
+        for stage in ("collector", "snapshot", "shadow", "fake"):
+            with self.subTest(stage=stage):
+                name, observer = setup("stop-" + stage, auto=True)
+                with HttpFixture() as http:
+                    process = launch(name, "once", at=stamp(DAYS[1], 16), port=http.port,
+                                     pause="before_" + stage + "_dispatch")
+                    self.wait_marker(process)
+                    before = authorities(name, observer)
+                    requests = len(http.calls)
+                    disable = launch(name, "disable", at=stamp(DAYS[1], 16))
+                    try:
+                        self.assertEqual(finish(disable, timeout=10)["state"], "DISABLED")
+                    finally:
+                        Path(process.request["release"]).write_text("release")
+                    result = finish(process)
+                    after = authorities(name, observer)
+                    CHECKS.append(dict(check="disable_before_dispatch", stage=stage, disable_exit=disable.returncode,
+                                       once_exit=process.returncode, before=before, after=after,
+                                       http_before=requests, http_after=len(http.calls)))
+                    self.assertEqual(result["state"], "DISABLED")
+                    self.assertEqual(before, after)
+                    self.assertEqual(requests, len(http.calls))
+
+    def test_disable_during_collector_keeps_raw_without_starting_downstream(self):
+        name, observer = setup("stop-inflight", auto=True)
+        before = authorities(name, observer)
+        with HttpFixture() as http:
+            process = launch(name, "once", at=stamp(DAYS[1], 16), port=http.port, pause="collector_inflight")
+            self.wait_marker(process)
+            self.assertEqual(len(http.calls), 2)
+            disable = launch(name, "disable", at=stamp(DAYS[1], 16))
+            try:
+                self.assertEqual(finish(disable, timeout=10)["state"], "DISABLED")
+            finally:
+                Path(process.request["release"]).write_text("release")
+            self.assertEqual(finish(process)["state"], "DISABLED")
+            after = authorities(name, observer)
+            CHECKS.append(dict(check="disable_inflight_collector", disable_exit=disable.returncode,
+                               once_exit=process.returncode, before=before, after=after, http_calls=len(http.calls)))
+            self.assertEqual(len(http.calls), 2)
+        content, _ = o.j.read_observer(observer)
+        self.assertEqual(content["last_valid_source_day"], DAYS[1])
+        self.assertEqual(content["valid_eod_days"], 2)
+        self.assertEqual(content["raw_sha256"][-2:][0]["api"], "trade_cal")
+        self.assertEqual(after["counts"]["observer_events"], before["counts"]["observer_events"] + 2)
+        for label in ("snapshot", "shadow", "agent"):
+            self.assertEqual(before["sha256"][label], after["sha256"][label])
+        self.assertEqual(after["counts"]["agent_calls"], 0)
+
+    def test_last_enabled_check_through_actual_popen_is_one_transaction(self):
+        name, observer = setup("stop-popen", auto=True)
+        before = authorities(name, observer)
+        with HttpFixture() as http:
+            process = launch(name, "once", at=stamp(DAYS[1], 16), port=http.port,
+                             pause_dispatch=True, pause="collector_inflight")
+            disable, disabled = None, None
+            try:
+                self.wait_marker(process, ".dispatch")  # inside spawn, immediately before actual Popen
+                disable = launch(name, "disable", at=stamp(DAYS[1], 16), mark_control=True)
+                self.wait_marker(disable)
+                with sqlite3.connect(o.Operator(name).path, timeout=0) as probe:
+                    with self.assertRaisesRegex(sqlite3.OperationalError, "locked"):
+                        probe.execute("BEGIN IMMEDIATE")
+                self.assertIsNone(disable.poll())
+                Path(process.request["release"] + ".dispatch").write_text("allow_Popen")
+                self.wait_marker(process)  # actual HTTP issued; collector deliberately still in flight
+                disabled = finish(disable, timeout=10)
+                self.assertEqual(disabled["state"], "DISABLED")
+                self.assertIsNone(process.poll())  # disable did not wait for stage completion
+            finally:
+                Path(process.request["release"] + ".dispatch").write_text("release")
+                Path(process.request["release"]).write_text("release")
+                result = finish(process)
+                if disable is not None and disabled is None:
+                    disable.communicate(timeout=10)
+            self.assertEqual(result["state"], "DISABLED")
+            after = authorities(name, observer)
+            self.assertEqual(len(http.calls), 2)
+            for label in ("snapshot", "shadow", "agent"):
+                self.assertEqual(before["sha256"][label], after["sha256"][label])
+            CHECKS.append(dict(check="actual_Popen_held_transaction_against_disable", dispatch_transaction_locked=True,
+                               disable_returned_before_collector_finished=True, disable_exit=disable.returncode,
+                               once_exit=process.returncode, before=before, after=after, http_calls=len(http.calls)))
 
     def test_child_disabled_and_cross_source_refs(self):
         name, _ = setup("shadow-off", shadow_enabled=False)
@@ -522,7 +659,7 @@ class OperatorTests(unittest.TestCase):
         service = o.Operator(name)
         paths = [service.root, o.d.Store(name).root, o.s.Shadow(name).root]
         before = fingerprint(paths)
-        with patch.object(o, "collect", side_effect=AssertionError("collector")), \
+        with patch.object(o, "spawn", side_effect=AssertionError("dispatch")), \
              patch.object(o, "credential", side_effect=AssertionError("credential")), \
              patch.object(o.d.Store, "sync", side_effect=AssertionError("sync")), \
              patch.object(o.s.Shadow, "once", side_effect=AssertionError("shadow")), \
@@ -612,10 +749,14 @@ class OperatorTests(unittest.TestCase):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--fixture-cli", type=Path)
+    parser.add_argument("--fixture-stage", type=Path)
     parser.add_argument("--test", action="append")
     args = parser.parse_args()
     if args.fixture_cli:
         raise SystemExit(fixture_cli(o.j.loads(args.fixture_cli.read_bytes())))
+    if args.fixture_stage:
+        request = o.j.loads(args.fixture_stage.read_bytes())
+        raise SystemExit(fixture_cli(request["request"], request["stage"]))
     WORK.mkdir(parents=True)
     af.test_exe()
     suite = (unittest.TestSuite(OperatorTests(name) for name in args.test) if args.test else

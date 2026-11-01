@@ -73,24 +73,27 @@ def credential(target, value=None):
         dll.CredFree(entry)
 
 
-def collect(observer, reports, token):
-    exe = ROOT / "target/debug" / ("stratide-cli.exe" if os.name == "nt" else "stratide-cli")
-    j.no_links(exe)
-    j.require(exe.is_file(), "FORWARD_CLI_NOT_BUILT")
-    # The token is inherited only by the existing collector, never argv/output.
-    env = dict(os.environ, STRATIDE_TUSHARE_TOKEN=token)
-    process = subprocess.Popen([str(exe), "forward-eod-step", str(observer.parent), str(reports)],
-                               cwd=ROOT, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    try:
-        process.communicate(timeout=120)
-    except KeyboardInterrupt:
-        process.wait(timeout=120)
-        raise
-    except subprocess.TimeoutExpired:
-        process.kill()
-        process.communicate()
-        raise j.Rejected("OUTCOME_UNKNOWN") from None
-    return process.returncode  # success is established by the original journal, not this code
+def spawn(stage, store, observer, reports, auto_name, token):
+    """Submit one original trusted CLI to the OS; never wait inside the fence."""
+    env = dict(os.environ)
+    env.pop("STRATIDE_TUSHARE_TOKEN", None)
+    if stage == "collector":
+        exe = ROOT / "target/debug" / ("stratide-cli.exe" if os.name == "nt" else "stratide-cli")
+        j.no_links(exe)
+        j.require(exe.is_file(), "FORWARD_CLI_NOT_BUILT")
+        # Only the original collector receives the token, never argv/output.
+        env["STRATIDE_TUSHARE_TOKEN"] = token
+        command = [str(exe), "forward-eod-step", str(observer.parent), str(reports)]
+    else:
+        script, args = {
+            "snapshot": ("research-data.py", ["--store", store, "sync"]),
+            "shadow": ("forward-shadow.py", ["--store", store, "once"]),
+            "fake": ("eod-auto-research.py", ["--name", auto_name, "once"]),
+        }[stage]
+        path = ROOT / "scripts" / script
+        j.no_links(path)
+        command = [sys.executable, "-I", "-B", str(path), *args]
+    return subprocess.Popen(command, cwd=ROOT, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 
 class ReadonlyAuto(a.Auto):
@@ -105,7 +108,7 @@ class ReadonlyAuto(a.Auto):
 
 
 class Operator:
-    def __init__(self, store, *, clock=s.clock_ms, collector=collect, invoke=a.bridge,
+    def __init__(self, store, *, clock=s.clock_ms, spawn=spawn,
                  fault=lambda point: None):
         self.store = d.Store(store)
         self.src = s.published(self.store)
@@ -114,7 +117,7 @@ class Operator:
         self.key = j.sha(j.canonical(self.identity))
         self.root = s.common_root() / "state/eod-operator" / self.key
         self.path = self.root / "operator.sqlite"
-        self.clock, self.collector, self.invoke, self.fault = clock, collector, invoke, fault
+        self.clock, self.spawn, self.fault = clock, spawn, fault
         self.check_paths()
 
     def check_paths(self):
@@ -328,6 +331,27 @@ class Operator:
             j.require(self.journal(db)["enabled"], "OWNER_DISABLED")
             self.append(db, "stage_started", dict(stage=stage, source_day=day))
 
+    def dispatch(self, stage, day, config, token=None):
+        self.start(stage, day)  # durable intent, not permission to execute later
+        # control(False) takes this same BEGIN IMMEDIATE transaction. The last
+        # enabled check AND actual Popen stay together: no check/unlock/spawn gap.
+        # Popen returning is the irreversible OS dispatch boundary; its child is
+        # already in flight. All work/waiting happens after releasing this fence.
+        with self.write() as db:
+            j.require(self.journal(db)["enabled"], "OWNER_DISABLED")
+            process = self.spawn(stage, self.store.root.name, Path(config["observer"]),
+                                 self.root / "collector-reports", config["auto_name"], token)
+        try:
+            process.communicate(timeout=120)
+        except KeyboardInterrupt:
+            process.wait(timeout=120)
+            raise
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.communicate()
+            raise j.Rejected("OUTCOME_UNKNOWN") from None
+        return process.returncode  # original subsystem records remain authority
+
     def receipt(self, state, day, refs, reason=None):
         value = dict(state=state, source_day=day, data_mode=self.identity["source"]["data_mode"], refs=refs, reason=reason)
         with self.write() as db:
@@ -368,8 +392,7 @@ class Operator:
                     if minute > 1035:
                         return self.receipt("DATA_NOT_READY", day, refs, "MISSED_COLLECTION_WINDOW")
                     token = self.token(config)  # missing token must not consume the original slot
-                    self.start("collector", day)
-                    self.collector(Path(config["observer"]), self.root / "collector-reports", token)
+                    self.dispatch("collector", day, config, token)
                     self.fault("after_collect")
                     content, dbsha, events = self.observer(config)
                     refs["observer"] = dict(journal_head=content["journal_head"], database_sha256=dbsha)
@@ -383,9 +406,8 @@ class Operator:
                 if (published["saved"]["content"] != content or not attempt or attempt["state"] != "succeeded"
                         or attempt.get("source_database_sha256") != dbsha
                         or self.clock() - attempt["started_at"] > d.MAX_SYNC_AGE_MS):
-                    self.start("snapshot", day)
-                    result = self.store.sync()
-                    j.require(result["can_research"], "SNAPSHOT_SYNC_BLOCKED")
+                    self.dispatch("snapshot", day, config)
+                    j.require(s.published(self.store)["attempt"]["state"] == "succeeded", "SNAPSHOT_SYNC_BLOCKED")
                     self.fault("after_sync")
                 self.src = s.source(self.store)
                 ready, _ = s.readiness(self.src, self.clock())
@@ -398,8 +420,7 @@ class Operator:
                 enabled, ref = self.shadow_evidence(day)
                 if ref is None:
                     j.require(enabled, "SHADOW_OWNER_DISABLED")
-                    self.start("shadow", day)
-                    s.Shadow(self.store.root.name, clock=self.clock).once()
+                    self.dispatch("shadow", day, config)
                     self.fault("after_shadow")
                     _, ref = self.shadow_evidence(day)
                     j.require(ref is not None, "SHADOW_NOT_COMMITTED")
@@ -409,8 +430,7 @@ class Operator:
                 if config["auto_name"]:
                     if ref is None:
                         j.require(enabled, "AUTO_OWNER_DISABLED_OR_PAUSED")
-                        self.start("fake", day)
-                        a.Auto(config["auto_name"], clock=self.clock, invoke=self.invoke).once()
+                        self.dispatch("fake", day, config)
                         self.fault("after_fake")
                         _, ref = self.auto_evidence(config, day)
                         j.require(ref is not None, "AUTO_NOT_ARCHIVED")
@@ -477,7 +497,7 @@ class Operator:
         return result
 
 
-def main(argv=None, *, clock=s.clock_ms, collector=collect, invoke=a.bridge,
+def main(argv=None, *, clock=s.clock_ms, spawn=spawn,
          fault=lambda point: None, wait=time.sleep):
     parser = argparse.ArgumentParser(description="EOD Operator：一次启用，前台每日自动；NO_ORDERS/NO_FILLS/NO_NAV")
     parser.add_argument("--snapshot-store", required=True, help="已有 PR33 store 名称")
@@ -494,7 +514,7 @@ def main(argv=None, *, clock=s.clock_ms, collector=collect, invoke=a.bridge,
     watch.add_argument("--interval-seconds", type=int, default=300)
     args = parser.parse_args(argv)
     try:
-        service = Operator(args.snapshot_store, clock=clock, collector=collector, invoke=invoke, fault=fault)
+        service = Operator(args.snapshot_store, clock=clock, spawn=spawn, fault=fault)
         if args.command == "init":
             result = service.init(args.observer, args.shadow_store, args.auto_name, args.credential_source)
         elif args.command in ("enable", "disable"):

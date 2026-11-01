@@ -1,0 +1,23 @@
+test_canonical_alias_copy_cwd_and_links (__main__.OperatorTests.test_canonical_alias_copy_cwd_and_links) ... ok
+test_child_disabled_and_cross_source_refs (__main__.OperatorTests.test_child_disabled_and_cross_source_refs) ... ok
+test_disable_during_collector_keeps_raw_without_starting_downstream (__main__.OperatorTests.test_disable_during_collector_keeps_raw_without_starting_downstream) ... ok
+test_disable_return_before_dispatch_fences_all_four_stages (__main__.OperatorTests.test_disable_return_before_dispatch_fences_all_four_stages) ... ok
+test_double_writer_and_disable_during_stage (__main__.OperatorTests.test_double_writer_and_disable_during_stage) ... ok
+test_early_future_late_backfill_and_bad_raw (__main__.OperatorTests.test_early_future_late_backfill_and_bad_raw) ... ok
+test_early_observation_never_becomes_post_16_data (__main__.OperatorTests.test_early_observation_never_becomes_post_16_data) ... ok
+test_failure_responses_are_not_success_or_automatic_retries (__main__.OperatorTests.test_failure_responses_are_not_success_or_automatic_retries) ... ok
+test_four_process_kills_recover_authoritative_commits (__main__.OperatorTests.test_four_process_kills_recover_authoritative_commits) ... ok
+test_kill_after_original_started_is_unknown_no_request (__main__.OperatorTests.test_kill_after_original_started_is_unknown_no_request) ... ok
+test_last_enabled_check_through_actual_popen_is_one_transaction (__main__.OperatorTests.test_last_enabled_check_through_actual_popen_is_one_transaction) ... ok
+test_missing_credential_does_not_spend_slot (__main__.OperatorTests.test_missing_credential_does_not_spend_slot) ... ok
+test_native_windows_credential_roundtrip_synthetic_only (__main__.OperatorTests.test_native_windows_credential_roundtrip_synthetic_only) ... ok
+test_own_hot_receipt_recovers_only_in_writer_without_rerunning_children (__main__.OperatorTests.test_own_hot_receipt_recovers_only_in_writer_without_rerunning_children) ... ok
+test_persisted_enable_foreground_watch_window_disable_and_cutoff (__main__.OperatorTests.test_persisted_enable_foreground_watch_window_disable_and_cutoff) ... ok
+test_readonly_absent_and_no_invocation_or_token_lookup (__main__.OperatorTests.test_readonly_absent_and_no_invocation_or_token_lookup) ... ok
+test_source_revision_does_not_research_again_or_mix_success_refs (__main__.OperatorTests.test_source_revision_does_not_research_again_or_mix_success_refs) ... ok
+test_two_22_day_chains_original_shadow_and_rust_fake (__main__.OperatorTests.test_two_22_day_chains_original_shadow_and_rust_fake) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 190.734s
+
+OK

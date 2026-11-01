@@ -2,6 +2,8 @@
 
 基线 `main` `6e3448d15b6e5fe47678d7aec37f4cf06980fd26`；按 [Issue #49](https://github.com/handFOOLed/Stratide/issues/49) 2026-11-01 09:30:30 UTC 最新正文执行。**开发者自测，不是独立验收。** 操作见 [M2_PR09](../../M2_PR09.md)。
 
+以下保留初始 PR HEAD `5efcf624ff71a3b95c192b9000432a0ab14f6594` 的 15 项开发证据。PR #50 授权撤销竞态的修复、最新实现 SHA 与多进程反证另见 [R1](r1/README.md)，原 JSON/报告不重写。
+
 ## 实际结果
 
 | 验证 | 结果 / 退出码 |
