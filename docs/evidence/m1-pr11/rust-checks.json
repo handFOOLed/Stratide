@@ -1,0 +1,32 @@
+[
+  {
+    "exit_code": 0,
+    "elapsed_seconds": 2.0621443,
+    "name": "fmt",
+    "command": "with-msvc.ps1 fmt --all -- --check"
+  },
+  {
+    "exit_code": 0,
+    "elapsed_seconds": 9.8496007,
+    "name": "check",
+    "command": "with-msvc.ps1 check --workspace --all-targets --locked --offline"
+  },
+  {
+    "exit_code": 0,
+    "elapsed_seconds": 3.932528,
+    "name": "clippy",
+    "command": "with-msvc.ps1 clippy --workspace --all-targets --locked --offline -- -D warnings"
+  },
+  {
+    "exit_code": 0,
+    "elapsed_seconds": 34.5096802,
+    "name": "test",
+    "command": "with-msvc.ps1 test --workspace --locked --offline"
+  },
+  {
+    "exit_code": 0,
+    "elapsed_seconds": 4.7352716,
+    "name": "build",
+    "command": "with-msvc.ps1 build --workspace --locked --offline"
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "checked_at_utc": "2026-11-01T14:22:51.338034+00:00",
+  "public_document_review_only": true,
+  "account_points_or_token_checked": false,
+  "dividend_api_requested": false,
+  "sources": [
+    {
+      "url": "https://tushare.pro/document/2?doc_id=103",
+      "claims_reviewed": [
+        "dividend API needs at least 2000 points",
+        "daily update 20:00-21:00"
+      ],
+      "coverage_conclusion": "NOT_A_FORWARD_COMPLETE_ACTION_OR_REVISION_COVERAGE_ATTESTATION"
+    },
+    {
+      "url": "https://tushare.pro/document/1?doc_id=108",
+      "claims_reviewed": [
+        "permissions differ by API and points are an access threshold"
+      ],
+      "account_permission": "NOT_CHECKED"
+    }
+  ],
+  "existing_grant": "PERSISTED_OBSERVER_LOCAL_AUTOMATION_AND_RAW_STORAGE_AUTHORIZATION",
+  "current_action_feed": "ACTION_FEED_UNAVAILABLE",
+  "window_coverage": "COVERAGE_NOT_ATTESTED",
+  "note": "Public documentation and PR38 ex-post facts do not establish the account feed permission or on-day complete event coverage."
+}

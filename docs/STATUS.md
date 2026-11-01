@@ -21,7 +21,8 @@
 | 候选审阅与评价闭环（PR #46 已合并） | #45：只读 Inbox → Owner 显式固定模板关联 → 原 freeze/evaluate → 持久可复核报告；含 DATA_BLOCKED、内容复用及四节点恢复；68 日研究不足、资格始终拒绝 | [操作](M2_PR08.md) / [自测](evidence/m2-pr08/README.md) |
 | Forward EOD Shadow V1（PR #48 已合并） | #47：Owner 本地启停、固定 SMA5/20、来源/时点门禁、唯一不可回填日志与只读复算；原双目录 22 日 synthetic E2E / 并发 / 三节点恢复证据保留；旧真实源日预热不足 | [操作](M1_PR10.md) / [原自测](evidence/m1-pr10/README.md) |
 | 自动 EOD Operator V1（PR #50 已合并） | #49：一次配置/启用，前台每日采集 → Snapshot → Shadow/可选 Fake、原证据恢复、持久停用及只读审计；15:15 检查、16:00 正式采集的授权回退分支，未知/失败槽不重发 | [操作](M2_PR09.md) / [原证据](evidence/m2-pr09/README.md) |
-| Time-Series + Fusion V1（PR #52 Draft） | #51：原 Snapshot 冻结 → Naive/EWMA + 独立可替换本地时序 Adapter → 原 Rust Agent/Budget Fusion fake → 原 Registry/Inbox；双 25 日 synthetic E2E。按 P1 审查修复精确任务领取、实际执行任务的来源时点门禁与失效 queued 终态；待新 HEAD 复审。默认 OFF，真实时序/云/forward 资格未验证 | [操作/边界](M2_PR10.md) / [原开发自测](evidence/m2-pr10/README.md) / [P1 修复证据](evidence/m2-pr10/p1/README.md) |
+| Time-Series + Fusion V1（PR #52 已合并） | #51：原 Snapshot 冻结 → Naive/EWMA + 独立可替换本地时序 Adapter → 原 Rust Agent/Budget Fusion fake → 原 Registry/Inbox；双 25 日 synthetic E2E。精确任务领取、实际任务 reserve/dispatch 来源复核及失效 queued 终态已并入 main `1b2c903`。默认 OFF，真实时序/云未授权 | [操作/边界](M2_PR10.md) / [原开发自测](evidence/m2-pr10/README.md) / [P1 修复证据](evidence/m2-pr10/p1/README.md) |
+| M1-PR11 前向研究资格 V1（本分支 Draft） | #53：原 observer/PR33/PR38 只读 → 当日公司行为覆盖证据 → 逐日 21 会话收据 → 原 PR52 实际任务双门禁；完整 synthetic 正反 E2E。真实仍只有两日且缺 feed 覆盖/已过期，结果 BLOCKED；研究资格最多 ALLOW_RESEARCH_ONLY，历史 PIT 和交易权限不提升 | [契约/CLI](M1_PR11.md) / [自测及真实审计](evidence/m1-pr11/README.md) |
 
 | 现金分红模型 V1（PR #40 已合并） | 登记权益→应收/扣税负债→到账，ledger v4 / NAV / Risk / 七报告 / Python独立算法 / 双基准；仅隔离 synthetic CLI | [CASH_DIVIDEND_V1](M1_PR08.md) / [原自测](evidence/m1-pr08/README.md) |
 | 历史分红情景桥接 V1（PR #42 已合并） | 原冻结历史行情 + PR38 原证据 + 独立假设 → 原 SMA5/20 / v4 / 七报告 / 独立算法 / 双基准；77 会话 EXPLORATORY_EX_POST，真实准入 DENIED、PIT 新增 0 天 | [模块操作](M1_PR09.md) / [原自测](evidence/m1-pr09/README.md) |
@@ -36,8 +37,8 @@
 
 ## 当前执行顺序
 
-1. **Sol / #51：** Time-Series + Fusion 完整 Core 模块；`agents=0`，唯一 Draft 待固定 HEAD 审查，Owner 明确许可前不 Ready/合并。新 scope 仅本地 fake，未授权真实付费/数据外发/交易。
-2. **后续核心任务：** Owner 再定范围；真实公司行为/PIT/开盘及多模型真实供应商仍未验证。[#36](https://github.com/handFOOLed/Stratide/issues/36) 的完整多模态消融尚未实现，本分支只覆盖时序与 Fusion 核心 V1。
+1. **Sol / #53：** M1-PR11 完整前向 EOD 证据/研究资格门禁；复用已合并 PR33/38/40/52，`agents=0`，唯一 Draft 待固定 HEAD 审查。真实证据不足保持 BLOCKED；Owner 明确许可前不 Ready/合并。
+2. **后续核心任务：** Owner 再定范围；原 Operator 可继续采集，真实连续 21 日/独立事件覆盖/PIT/开盘及真实供应商仍未验证。[#36](https://github.com/handFOOLed/Stratide/issues/36) 的完整多模态消融尚未实现，真实付费、数据外发和交易均未获本期授权。
 3. **全部核心功能完成后：** Sol 按 PR #28 的设计体系统一集成全部 UI；旧同步 UI 要求被本 Owner 决定取代。
 
 所有任务由 Owner 定范围。Sol/DeepSeek 不自行合并；ChatGPT 对固定 HEAD 做风险分级审查，Owner 明确批准后 SHA 锁定合并。高风险预算/凭据/财务改动需针对性独立反证；不将开发者自测冒充独立验收。流程现行补充见 [AGENTS.md](../AGENTS.md)，原 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md) 保留历史决策，待显式协调新版验收规则。

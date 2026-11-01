@@ -1,0 +1,25 @@
+readiness-first.txt (original exit 1; selected output, private paths omitted)
+FAIL: test_01_two_independent_journals_daily_coverage_original_fusion_and_inbox (__main__.ReadinessTests.test_01_two_independent_journals_daily_coverage_original_fusion_and_inbox)
+AssertionError: protected-file byte/mtime comparison failed; original assertion contains private path (omitted)
+Ran 1 test in 10.198s
+FAILED (failures=1)
+
+readiness-test.txt (original exit 1; selected output, private paths omitted)
+FAIL: test_01_two_independent_journals_daily_coverage_original_fusion_and_inbox (__main__.ReadinessTests.test_01_two_independent_journals_daily_coverage_original_fusion_and_inbox)
+AssertionError: expected successful queue/exit 86, got exit 2 with reason SNAPSHOT_STORE_SCHEMA
+FAIL: test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal (__main__.ReadinessTests.test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal) (mutation='receipt')
+AssertionError: expected successful queue/exit 86, got exit 2 with reason SNAPSHOT_STORE_SCHEMA
+FAIL: test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal (__main__.ReadinessTests.test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal) (mutation='raw-journal')
+AssertionError: expected successful queue/exit 86, got exit 2 with reason SNAPSHOT_STORE_SCHEMA
+FAIL: test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal (__main__.ReadinessTests.test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal) (mutation='owner')
+AssertionError: expected successful queue/exit 86, got exit 2 with reason SNAPSHOT_STORE_SCHEMA
+FAIL: test_10_settled_kill_restart_never_recharges_and_other_task_cannot_attest (__main__.ReadinessTests.test_10_settled_kill_restart_never_recharges_and_other_task_cannot_attest)
+AssertionError: expected successful queue/exit 86, got exit 2 with reason SNAPSHOT_STORE_SCHEMA
+Ran 10 tests in 103.917s
+FAILED (failures=5)
+
+dispatch.txt (original exit 1; selected output, private paths omitted)
+FAIL: test_12_original_dispatch_gate_releases_reservation_after_owner_disable (__main__.ReadinessTests.test_12_original_dispatch_gate_releases_reservation_after_owner_disable)
+AssertionError: expected exit 0, got exit 2 with state FUSION_FAILED, reason OWNER_DISABLED
+Ran 1 test in 7.024s
+FAILED (failures=1)

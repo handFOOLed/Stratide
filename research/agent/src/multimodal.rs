@@ -4,7 +4,12 @@ use chrono::{DateTime, Utc};
 use rusqlite::{Connection, OptionalExtension};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::{fs, path::PathBuf, process::Command};
+use std::{
+    fs,
+    io::Write,
+    path::PathBuf,
+    process::{Command, Stdio},
+};
 
 pub const SCOPE: &str = "multimodal_research_v1";
 pub const POLICY: &str = "multimodal-research-v1";
@@ -134,6 +139,52 @@ pub fn validate_source(
         ensure(
             time.date_naive() == market.date_naive() && chrono::Timelike::hour(&time) >= 16,
             "MISSED_OR_STALE",
+        )?;
+    }
+    if let Some(receipt) = &summary.research_readiness_receipt {
+        ensure(
+            config["readiness_store_name"] == receipt.store_name,
+            "MULTIMODAL_READINESS_BINDING",
+        )?;
+        // Fixed read-only verifier, no caller-selected program/path or shell.
+        // Python replays the receipt, retained per-day PR33 versions and raw
+        // original journal. Rust supplies THIS persisted task and its clock at
+        // BOTH existing reserve and dispatch checks. No new Provider scope.
+        let mut child = Command::new("python")
+            .args(["-I", "-B"])
+            .arg(
+                crate::eod_snapshot::repository_root()
+                    .join("scripts/forward-research-readiness.py"),
+            )
+            .arg("gate")
+            .current_dir(crate::eod_snapshot::repository_root())
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::null())
+            .spawn()
+            .map_err(|_| "MULTIMODAL_READINESS_VERIFIER_UNAVAILABLE")?;
+        let bytes = serde_json::to_vec(&json!({
+            "reference": receipt, "now_ms": now.timestamp_millis(),
+            "input_snapshot_sha256":summary.input_snapshot_sha256,
+            "source_identity_sha256":summary.source_identity,
+            "source_day":summary.source_day,"input_mode":input.mode
+        }))
+        .map_err(|_| "MULTIMODAL_READINESS_BINDING")?;
+        let sent = child
+            .stdin
+            .take()
+            .is_some_and(|mut stdin| stdin.write_all(&bytes).is_ok());
+        let output = child
+            .wait_with_output()
+            .map_err(|_| "MULTIMODAL_READINESS_VERIFIER_UNAVAILABLE")?;
+        let checked: Value = serde_json::from_slice(&output.stdout).unwrap_or(Value::Null);
+        ensure(
+            sent && output.status.success()
+                && checked
+                    == json!({"verified":true,"contract":receipt.contract,
+                    "store_name":receipt.store_name,"receipt_sha256":receipt.receipt_sha256,
+                    "evidence_head_sha256":receipt.evidence_head_sha256}),
+            "MULTIMODAL_READINESS_REJECTED",
         )?;
     }
     Ok(())
@@ -274,6 +325,17 @@ pub struct FusionInput {
     uncertainty: String,
     tradable_at: String,
     authority: Authority,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    research_readiness_receipt: Option<ReadinessReference>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ReadinessReference {
+    contract: String,
+    store_name: String,
+    receipt_sha256: String,
+    evidence_head_sha256: String,
 }
 
 pub fn validate_input(input: &InputSummary, now: DateTime<Utc>) -> Result<FusionInput> {
@@ -292,6 +354,19 @@ pub fn validate_input(input: &InputSummary, now: DateTime<Utc>) -> Result<Fusion
         "MULTIMODAL_INPUT_SHA",
     )?;
     let s: FusionInput = serde_json::from_slice(&bytes).map_err(|_| "MULTIMODAL_INPUT_SCHEMA")?;
+    ensure(
+        input.mode != "forward_observed_eod" || s.research_readiness_receipt.is_some(),
+        "CORPORATE_ACTION_PIT_NOT_VERIFIED",
+    )?;
+    if let Some(receipt) = &s.research_readiness_receipt {
+        ensure(
+            receipt.contract == "forward-research-readiness-v1"
+                && crate::eod_snapshot::valid_name(&receipt.store_name)
+                && sha(&receipt.receipt_sha256)
+                && sha(&receipt.evidence_head_sha256),
+            "MULTIMODAL_READINESS_BINDING",
+        )?;
+    }
     s.authority.validate()?;
     ensure(
         s.contract == SCOPE

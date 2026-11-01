@@ -173,6 +173,10 @@ class Run:
         value = read(self.root / "config.json", 8192)
         fields = {"schema_version", "policy", "name", "snapshot_store_name", "agent_dir", "candidate_registry_name",
                   "source_identity_sha256", "checkout_root", "binding_sha256"}
+        if isinstance(value, dict) and "readiness_store_name" in value:
+            import forward_readiness as r
+            r.Store(value["readiness_store_name"])
+            fields.add("readiness_store_name")
         j.require(isinstance(value, dict) and set(value) == fields and value["schema_version"] == 1
                   and value["policy"] == e.POLICY and value["name"] == self.name and value["agent_dir"] == ".agent"
                   and value["candidate_registry_name"] == self.name and value["checkout_root"] == str(ROOT)
@@ -186,8 +190,14 @@ class Run:
         j.require(saved.get("multimodal_agent_v1") == e.POLICY
                   and saved.get("mm_binding:" + self.name) == config["binding_sha256"], "MULTIMODAL_BINDING_CHANGED")
 
-    def init(self, store):
+    def init(self, store, readiness_name=None):
         src = s.source(d.Store(store))
+        if readiness_name is not None:
+            import forward_readiness as r
+            with r.Store(readiness_name).connect() as db:
+                readiness_config = r.Store(readiness_name).control(db)[0]
+            j.require(readiness_config["snapshot_path"] == str(d.Store(store).path.resolve())
+                      and readiness_config["source_identity_sha256"] == e.digest(src["identity"]), "READINESS_TASK_BINDING")
         j.require(not self.root.exists() and not (ROOT / "state/candidates" / self.name).exists(), "NEW_MULTIMODAL_DIRECTORY_REQUIRED")
         base_root().mkdir(parents=True, exist_ok=True)
         with d.writer(base_root() / ".init.lock"):
@@ -198,6 +208,8 @@ class Run:
             config = dict(schema_version=1, policy=e.POLICY, name=self.name, snapshot_store_name=store,
                           agent_dir=".agent", candidate_registry_name=self.name,
                           source_identity_sha256=e.digest(src["identity"]), checkout_root=str(ROOT))
+            if readiness_name is not None:
+                config["readiness_store_name"] = readiness_name
             config["binding_sha256"] = e.digest(config)
             c.write(self.root / "config.json", config)
             self.invoke("init", self.name)
@@ -289,10 +301,13 @@ class Run:
     def freeze(self, config, plan, at):
         src = s.source(d.Store(config["snapshot_store_name"]))
         j.require(e.digest(src["identity"]) == config["source_identity_sha256"], "MULTIMODAL_SOURCE_IDENTITY_CHANGED")
-        ready, window = e.source_window(src, at)
+        receipt = self.readiness_reference(config, src, at)
+        ready, window = e.source_window(src, at, receipt)
         value = src["saved"]["content"]
         spec = dict(source_identity_sha256=e.digest(src["identity"]), input_snapshot_sha256=src["saved"]["snapshot_sha256"],
                     source_day=value["last_valid_source_day"], target=e.TARGET, horizon_sessions=1, plan=plan, policy=e.POLICY)
+        if receipt is not None:
+            spec["research_readiness_receipt"] = receipt
         key = e.experiment_key(spec)
         day_key = "mm_day_plan:" + spec["source_identity_sha256"] + ":" + spec["source_day"] + ":" + e.digest(plan)
         saved = meta()
@@ -316,6 +331,12 @@ class Run:
             self.progress(key, "FROZEN", source_day=frozen["source_day"], input_snapshot_sha256=frozen["input_snapshot_sha256"],
                           frozen_input_sha256=e.digest(frozen), plan_sha256=e.digest(plan))
         return frozen
+
+    def readiness_reference(self, config, src, at):
+        if "readiness_store_name" not in config:
+            return None
+        import forward_readiness as r
+        return r.reference(config["readiness_store_name"], src, at)
 
     def once(self):
         config = self.config()
@@ -377,7 +398,9 @@ class Run:
                     # Recheck authoritative original journal before NEW calls.
                     try:
                         current = s.source(d.Store(config["snapshot_store_name"]))
-                        e.source_window(current, self.clock())
+                        receipt = self.readiness_reference(config, current, self.clock())
+                        e.source_window(current, self.clock(), receipt)
+                        j.require(receipt == frozen["readiness"].get("research_readiness_receipt"), "READINESS_EVIDENCE_CHANGED")
                         j.require(current["saved"]["snapshot_sha256"] == frozen["input_snapshot_sha256"], "SOURCE_CHANGED_REVIEW_REQUIRED")
                     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error):
                         # Finish this original queued intent too; a Python audit
@@ -461,7 +484,9 @@ class Run:
         frozen = read(path / "input.json")
         base, temporal = read(path / "baseline.json"), read(path / "time-series.json")
         result.update(baseline=base, time_series=temporal,
-                      comparison=e.walk_forward(frozen["snapshot_content"], frozen["plan"]["time_series"]),
+                      comparison=(e.walk_forward(frozen["snapshot_content"], frozen["plan"]["time_series"])
+                                  if frozen["input_mode"] == "synthetic_test" else
+                                  dict(status="NOT_EVALUATED_FORWARD_RESEARCH_ONLY", authority=e.SAFE)),
                       external_timeseries="EXTERNAL_TIMESERIES_NOT_CONFIGURED", holdout="EXPLORATORY_EX_POST",
                       actual_tradable_at="UNKNOWN_OPENING_SOURCE_BLOCKED", text_event_expert="NOT_IMPLEMENTED",
                       evaluation="NOT_EVALUATED", independent_acceptance="NOT_VERIFIED",
@@ -514,13 +539,16 @@ def provenance(value, store_name):
         saved = db.execute("SELECT content FROM snapshots WHERE sha=?", (frozen["input_snapshot_sha256"],)).fetchone()
     j.require(saved and j.loads(saved[0]) == frozen["snapshot_content"] and j.sha(saved[0].encode()) == frozen["input_snapshot_sha256"],
               "MULTIMODAL_ORIGINAL_SNAPSHOT_MISMATCH")
-    return dict(snapshot_sha256=frozen["input_snapshot_sha256"], snapshot_id="eod-v1:" + frozen["input_snapshot_sha256"],
+    result = dict(snapshot_sha256=frozen["input_snapshot_sha256"], snapshot_id="eod-v1:" + frozen["input_snapshot_sha256"],
                 source_day=summary["source_day"], data_mode=summary["mode"], research_task_id=value["id"],
                 input_summary_version=summary["version"], frozen_input_sha256=c.digest(summary),
                 expert_input_sha256=e.digest(frozen), baseline_sha256=e.digest(read(path / "baseline.json")),
                 time_series_sha256=e.digest(read(path / "time-series.json")),
                 snapshot_verification="RETAINED_PR33_AND_ORIGINAL_AGENT_VERIFIED", task_origin="ORIGINAL_AGENT_SQLITE_VERIFIED_BY_RUNNER",
                 restriction="RESEARCH_ONLY", eod_eligible=False, can_execute_forward_paper=False, live_allowed=False)
+    if "research_readiness_receipt" in frozen["readiness"]:
+        result["research_readiness_receipt"] = frozen["readiness"]["research_readiness_receipt"]
+    return result
 
 
 class ReviewSource(Run):
@@ -551,6 +579,7 @@ def main(argv=None, *, clock=s.clock_ms, invoke=bridge, fault=lambda point: None
     commands = parser.add_subparsers(dest="command", required=True)
     init = commands.add_parser("init")
     init.add_argument("--snapshot-store", required=True)
+    init.add_argument("--readiness-store", help="Explicit, separately audited forward readiness store")
     for name in ("enable", "disable", "once", "status", "history"):
         commands.add_parser(name)
     for name in ("verify", "report"):
@@ -564,7 +593,7 @@ def main(argv=None, *, clock=s.clock_ms, invoke=bridge, fault=lambda point: None
     try:
         service = Run(args.name, clock=clock, invoke=invoke, fault=fault)
         if args.command == "init":
-            value = service.init(args.snapshot_store)
+            value = service.init(args.snapshot_store, args.readiness_store)
         elif args.command in ("enable", "disable"):
             value = service.control(args.command == "enable")
         elif args.command == "once":

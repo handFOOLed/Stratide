@@ -1,0 +1,303 @@
+{
+  "base_sha": "1b2c9033946e1cb4dc9079115837f3d1c11d21ca",
+  "platform": "Windows x64",
+  "rust_tests_passed": 162,
+  "new_python_tests": 13,
+  "regression_python_unique_tests": 123,
+  "final_status": "PASS_WITH_DOCUMENTED_ENVIRONMENT_RERUNS",
+  "independent_acceptance": "NOT_VERIFIED",
+  "commands": [
+    {
+      "exit_code": 0,
+      "elapsed_seconds": 2.0621443,
+      "name": "fmt",
+      "command": "with-msvc.ps1 fmt --all -- --check",
+      "log_group": "rust-checks.json"
+    },
+    {
+      "exit_code": 0,
+      "elapsed_seconds": 9.8496007,
+      "name": "check",
+      "command": "with-msvc.ps1 check --workspace --all-targets --locked --offline",
+      "log_group": "rust-checks.json"
+    },
+    {
+      "exit_code": 0,
+      "elapsed_seconds": 3.932528,
+      "name": "clippy",
+      "command": "with-msvc.ps1 clippy --workspace --all-targets --locked --offline -- -D warnings",
+      "log_group": "rust-checks.json"
+    },
+    {
+      "exit_code": 0,
+      "elapsed_seconds": 34.5096802,
+      "name": "test",
+      "command": "with-msvc.ps1 test --workspace --locked --offline",
+      "log_group": "rust-checks.json"
+    },
+    {
+      "exit_code": 0,
+      "elapsed_seconds": 4.7352716,
+      "name": "build",
+      "command": "with-msvc.ps1 build --workspace --locked --offline",
+      "log_group": "rust-checks.json"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-data-snapshot.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.437,
+      "log_group": "python-prerequisite-checks.json"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-corporate-action-evidence.py"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 2.985,
+      "log_group": "python-prerequisite-checks.json",
+      "resolved_by": "original full suite with native permissions; 15/15 exit 0"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-cash-dividend.py",
+        "--exe",
+        "target/debug/stratide-cli.exe",
+        "--out",
+        "state/issue53-validation/cash"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.484,
+      "log_group": "python-prerequisite-checks.json"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-forward-shadow.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 97.985,
+      "log_group": "python-prerequisite-checks.json"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-multimodal-research.py",
+        "--evidence",
+        "state\\issue53-validation\\mm-regression"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 50.515,
+      "log_group": "python-consumer-checks.json"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-multimodal-routing.py",
+        "--evidence",
+        "state\\issue53-validation\\routing-regression"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 21.329,
+      "log_group": "python-consumer-checks.json",
+      "resolved_by": "isolated Git authority, original cap unchanged; 4/4 exit 0"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-eod-agent.py"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 3.39,
+      "log_group": "python-consumer-checks.json",
+      "resolved_by": "original junction test with native permissions; exit 0"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-candidates.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.922,
+      "log_group": "python-consumer-checks.json"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-eod-auto.py"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 75.313,
+      "log_group": "python-consumer-checks.json",
+      "resolved_by": "original junction test with native permissions; exit 0"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-research-review.py"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 72.25,
+      "log_group": "python-consumer-checks.json",
+      "resolved_by": "original ReviewTests.test_owner_parameter_injection_and_junction_never_run with native permissions; exit 0"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-eod-operator.py"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 259.046,
+      "log_group": "python-consumer-checks.json",
+      "resolved_by": "original two native junction/synthetic credential tests; exit 0"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-eod-agent.py",
+        "EodAgentTests.test_name_traversal_and_link_store_rejected"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.234,
+      "log_group": "native-targeted-checks.json"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-eod-auto.py",
+        "--test",
+        "test_init_existing_directory_binding_and_junction_are_rejected"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.094,
+      "log_group": "native-targeted-checks.json"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-eod-operator.py",
+        "--test",
+        "test_canonical_alias_copy_cwd_and_links",
+        "--test",
+        "test_native_windows_credential_roundtrip_synthetic_only"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.359,
+      "log_group": "native-targeted-checks.json"
+    },
+    {
+      "command": "python -X utf8 -B scripts/test-multimodal-routing.py --evidence state/issue53-validation/routing-isolated",
+      "exit_code": 0,
+      "tests": 4,
+      "log": "routing-isolated.txt",
+      "environment": {
+        "GIT_DIR": "<NEW_IGNORED_AUTHORITY>/.git",
+        "GIT_WORK_TREE": "<checkout>"
+      }
+    },
+    {
+      "command": "python -X utf8 -B scripts/test-corporate-action-evidence.py",
+      "exit_code": 0,
+      "tests": 15,
+      "log": "test-corporate-action-evidence-native.txt",
+      "permission_context": "native permissions for original junction/synthetic credential tests"
+    },
+    {
+      "command": "import original scripts/test-research-review.py; unittest ReviewTests.test_owner_parameter_injection_and_junction_never_run",
+      "exit_code": 0,
+      "tests": 1,
+      "log": "review-junction-native.txt",
+      "permission_context": "native permissions for original junction/synthetic credential tests"
+    },
+    {
+      "command": "python -X utf8 -B scripts/test-forward-readiness.py --evidence state/issue53-validation/readiness-delivery",
+      "exit_code": 0,
+      "tests": 13,
+      "elapsed_seconds": 158.256,
+      "log": "readiness-tests.txt",
+      "environment": {
+        "GIT_DIR": "<NEW_IGNORED_AUTHORITY>/.git",
+        "GIT_WORK_TREE": "<checkout>"
+      }
+    },
+    {
+      "command": "python -X utf8 -B scripts/test-forward-readiness.py --case ReadinessTests.test_08_freshness_asof_label_clock_and_malicious_paths --evidence state/issue53-validation/quality-final",
+      "exit_code": 0,
+      "tests": 1,
+      "elapsed_seconds": 6.124,
+      "log": "quality-final.json"
+    },
+    {
+      "command": "python -X utf8 -B scripts/test-forward-readiness.py --real-snapshot <PRIVATE_PR33_STORE> --real-observer <PRIVATE_OBSERVER> --real-corporate-action-bundle <PRIVATE_PR38_BUNDLE> --evidence state/issue53-validation/real-final",
+      "exit_code": 0,
+      "inner_audit_status_exit_code": 2,
+      "log": "real-audit.json"
+    }
+  ],
+  "original_test_definitions_unchanged": true,
+  "budget_caps_raised": false,
+  "existing_calls_deleted_or_rebilled": false,
+  "source_original_byte_and_mtime_unchanged": true,
+  "real_market_requests": 0,
+  "real_paid_model_calls": 0,
+  "real_forward_days_added": 0,
+  "live_or_forward_paper_orders": 0,
+  "implementation_sha256": {
+    "research/forward_evidence.py": "19944afe156aaefddb9601d65807ab3afd38b03577bd528e899867ce53862569",
+    "research/forward_readiness.py": "f143c3dbcd4f9fa4844951d5916a87d44ac4bfea51ffef83b7e4f1f2c01ada7f",
+    "research/multimodal.py": "e627d480273de8b469275a129d8280edc59322b34445e6c9aaddf1a1253ae3cd",
+    "research/multimodal_experts.py": "fd72fbf6e8a22d2321ead22a3da14be18795856d1d1b73a8fa9e4b4357f19efb",
+    "research/corporate_actions.py": "c3c31cf6f597d22dfde60b7990373a73e8371fe5e30c81d3d9f3106cca074074",
+    "research/agent/src/multimodal.rs": "e82454a83b45f54b6fc5e07dc646b7292d3de83c561b416d53bbb2516e9b47f2",
+    "research/agent/src/eod_snapshot.rs": "7183c1560cf782ddba6777eceb8464a92927a434b3907f1bbeb7ec195e89ab8c",
+    "scripts/forward-research-readiness.py": "452424c407e21c5d190a49a4c2b795404cb18fb1b6226972fc505f8cf75014a1",
+    "scripts/test-forward-readiness.py": "ec2b733dad11613bc509e3841a01c93ff23a3b0bf6074f6ba61cb5cfe70a2e59"
+  },
+  "targeted_original_review_test_python_stdin": "import importlib.util,sys,unittest\nfrom pathlib import Path\nroot=Path.cwd();sys.path.insert(0,str(root/'scripts'));sys.path.insert(0,str(root/'research'))\nspec=importlib.util.spec_from_file_location('pr53_native_review',root/'scripts/test-research-review.py')\nmodule=importlib.util.module_from_spec(spec);sys.modules[spec.name]=module;spec.loader.exec_module(module)\nmodule.WORK.mkdir(parents=True,exist_ok=True)\nresult=unittest.TextTestRunner(verbosity=2).run(unittest.TestSuite([module.ReviewTests('test_owner_parameter_injection_and_junction_never_run')]))\nsys.exit(0 if result.wasSuccessful() else 1)\n"
+}
