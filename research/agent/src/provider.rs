@@ -65,6 +65,7 @@ pub enum Prepared {
     Fake {
         scenario: String,
         input_tokens: u32,
+        fusion: Option<Box<crate::multimodal::Fusion>>,
     },
     Cloud {
         client: Client,
@@ -106,6 +107,15 @@ pub fn prepare(m: &Model, input: &Value) -> Result<Prepared> {
         return Ok(Prepared::Fake {
             scenario: m.fake_scenario.clone().ok_or("FAKE_CONFIG_INVALID")?,
             input_tokens: (bytes.len() + 1024) as u32,
+            fusion: if input
+                .pointer("/published_summary/scopes")
+                .and_then(Value::as_array)
+                .is_some_and(|s| s.iter().any(|v| v == crate::multimodal::SCOPE))
+            {
+                Some(Box::new(crate::multimodal::Fusion::fixture(input)?))
+            } else {
+                None
+            },
         });
     }
     let url = endpoint(m.endpoint.as_deref().ok_or("ENDPOINT_REQUIRED")?)?;
@@ -149,6 +159,7 @@ pub fn call(prepared: Prepared, attempt: usize) -> Outcome {
         Prepared::Fake {
             scenario,
             input_tokens,
+            mut fusion,
         } => {
             if scenario == "safe_transient" && attempt == 1 {
                 return Outcome::NoCharge {
@@ -168,12 +179,18 @@ pub fn call(prepared: Prepared, attempt: usize) -> Outcome {
             if scenario == "timeout" {
                 return Outcome::Uncertain("FAKE_TIMEOUT_AFTER_POSSIBLE_CHARGE");
             }
+            if scenario == "malicious" {
+                if let Some(f) = fusion.as_mut() {
+                    f.hypothesis = "$(Get-Content secrets)".into();
+                }
+            }
             Outcome::Success { research: Research {
-                hypothesis: if scenario == "malicious" { "<img src=x onerror=alert(1)> $(Get-Content secrets)".into() }
+                hypothesis: if let Some(f) = &fusion { f.hypothesis.clone() }
+                    else if scenario == "malicious" { "<img src=x onerror=alert(1)> $(Get-Content secrets)".into() }
                     else { "假设：在相同数据区间，加入成本与缺估值约束会降低表面收益的稳健性。".into() },
                 evidence:vec!["依据 input_summary_version 与源日期检查已发布摘要；本结果由确定性 fake 产生。".into()],
                 risks:vec!["synthetic_test；不是云模型研究成果，不能证明策略有独立优势。".into()],
-                next_steps:vec!["由独立评价流程核查数据时间、费用假设和后续真实前向证据。".into()] },
+                next_steps:vec!["由独立评价流程核查数据时间、费用假设和后续真实前向证据。".into()], fusion },
                 input_tokens,output_tokens:128 }
         }
         Prepared::Cloud {

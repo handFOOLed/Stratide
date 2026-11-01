@@ -1,5 +1,9 @@
 # Local development helpers
 
+## Time-Series + Fusion 本机研究
+
+`python -B scripts/multimodal-research.py --name <名称> init --snapshot-store <已有store>` 默认 OFF，`enable/disable/once/status/history/verify/report` 提供完整离线核心链路。`experiment --label <版本> --time-series-model local-test-momentum` 显式新建模型实验，`--without-fusion` 提供数值对照；复用原 Rust Agent、Budget 与 Registry/Inbox，不外发原始数据、不执行代码或模板。`python -B scripts/test-multimodal-research.py --evidence docs/evidence/m2-pr10` 运行双 25 日 synthetic 生产 CLI 与反证；生产 CLI 使用当天真实盘后时钟。见 [M2-PR10](../docs/M2_PR10.md)。
+
 Avoid mandatory Python/Node/Docker tooling for the trading core. Prefer a few transparent scripts over an elaborate build orchestrator. Local scripts for M0 are intentionally deferred until needed.
 
 ## 离线候选与独立历史评价

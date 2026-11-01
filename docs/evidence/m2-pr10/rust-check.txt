@@ -1,0 +1,20 @@
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratide_research-3stae4suwoee2\s-hnr7c3a0pb-13ev9tj-working`
+
+warning: `stratide-research` (lib) generated 1 warning
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratided-02mx3apmy2wpe\s-hnr7c3g52l-0l7gg83-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\eod_research-31r9zqjgymob2\s-hnr7c3g4t9-067fpuc-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\eod_auto_agent-0o7kzn69bn8zx\s-hnr7c3g5jb-10kjoiw-working`
+
+    Checking stratide-research v0.0.1 (<checkout>\research\agent)
+warning: `stratided` (lib) generated 1 warning
+warning: `stratide-research` (bin "eod-research") generated 1 warning
+warning: `stratide-research` (bin "eod-auto-agent") generated 1 warning
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratided-3tixsm64k7ktm\s-hnr7c3kfxc-0x5mhvx-working`
+
+warning: `stratided` (bin "stratided") generated 1 warning
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\multimodal_agent-37bzktfp0kh58\s-hnr7fm6xm6-1o4tjm2-working`
+
+warning: `stratide-research` (bin "multimodal-agent") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.42s

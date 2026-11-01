@@ -1,0 +1,72 @@
+{
+  "base_main": "c3904a5eb31f40209b32beba559e82ba4e47fd8a",
+  "regressions": [
+    {
+      "command": "python -B scripts/test-data-snapshot.py",
+      "unique_tests": 11,
+      "exit_code": 0,
+      "elapsed_seconds": 3.947,
+      "result": "PASS"
+    },
+    {
+      "command": "python -B scripts/test-eod-agent.py",
+      "unique_tests": 6,
+      "exit_code": 0,
+      "elapsed_seconds": 3.975,
+      "result": "PASS"
+    },
+    {
+      "command": "python -B scripts/test-candidates.py",
+      "unique_tests": 13,
+      "exit_code": 0,
+      "elapsed_seconds": 6.832,
+      "result": "PASS"
+    },
+    {
+      "command": "python -B scripts/test-eod-auto.py",
+      "unique_tests": 16,
+      "exit_code": 0,
+      "elapsed_seconds": 68.706,
+      "result": "PASS"
+    },
+    {
+      "command": "python -B scripts/test-research-review.py",
+      "unique_tests": 12,
+      "exit_code": 0,
+      "elapsed_seconds": 58.945,
+      "result": "PASS"
+    },
+    {
+      "command": "python -B scripts/test-forward-shadow.py",
+      "unique_tests": 9,
+      "exit_code": 0,
+      "elapsed_seconds": 66.617,
+      "result": "PASS"
+    },
+    {
+      "command": "python -B scripts/test-eod-operator.py",
+      "unique_tests": 18,
+      "exit_code": 1,
+      "elapsed_seconds": 250.625,
+      "result": "16/18 in sandbox; 2 sandbox-blocked native cases passed unsandboxed; 18/18 unique cases passed"
+    },
+    {
+      "command": "python -B scripts/test-eod-operator.py --test test_canonical_alias_copy_cwd_and_links --test test_native_windows_credential_roundtrip_synthetic_only",
+      "tests": 2,
+      "exit_code": 0,
+      "result": "PASS, isolated synthetic junction and Windows credential only; unsandboxed"
+    },
+    {
+      "command": "python -B scripts/test-agent.py --assets-dir state/agent-api-assets --output state/agent-regression.json",
+      "exit_code": 0,
+      "result": "PASS",
+      "checks": 6,
+      "assets": "three isolated static stubs; no UI build",
+      "temporary_directory": "state/rust-temp"
+    }
+  ],
+  "rust_workspace_passed": 160,
+  "independent_acceptance": "NOT_VERIFIED",
+  "new_real_forward_days": 0,
+  "real_paid_calls": 0
+}

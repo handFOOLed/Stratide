@@ -191,6 +191,7 @@ impl Store {
             ensure(enabled.as_deref() == Some("true"), "OWNER_DISABLED")?;
             ensure(paused != "true", "OWNER_PAUSED")?;
         }
+        crate::multimodal::require_enabled(&tx, trigger)?;
         let count: i64 = tx.query_row("SELECT COUNT(*) FROM tasks", [], |r| r.get(0))?;
         ensure(count < settings.max_tasks as i64, "TASK_STORAGE_LIMIT")?;
         tx.execute("INSERT INTO tasks(request,input,provider_id,provider_hash,status,created_at,trigger_key) VALUES(?1,?2,?3,?4,'queued',?5,?6)",

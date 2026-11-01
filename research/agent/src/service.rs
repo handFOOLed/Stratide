@@ -145,7 +145,9 @@ impl Agent {
             == 0
     }
     fn settings(&self) -> Result<Settings> {
-        let s = if self.store().setting("eod_auto_binding")?.is_some() {
+        let s = if self.store().setting("multimodal_agent_v1")?.is_some() {
+            Settings::load_multimodal(&self.0.config_path)?
+        } else if self.store().setting("eod_auto_binding")?.is_some() {
             Settings::load_eod_auto(&self.0.config_path)?
         } else if self.0.config_path.exists() {
             Settings::load(&self.0.config_path)?
@@ -312,6 +314,15 @@ impl Agent {
                 serde_json::from_value(task["input"].clone()).map_err(|_| "INPUT_INVALID")?;
             let request: TaskRequest = serde_json::from_value(task["request"].clone())
                 .map_err(|_| "TASK_INPUT_INVALID")?;
+            let trigger: Option<String> = self.store().connect()?.query_row(
+                "SELECT trigger_key FROM tasks WHERE id=?1",
+                [id],
+                |r| r.get(0),
+            )?;
+            if crate::multimodal::is_input(&input) {
+                crate::multimodal::validate_input(&input, now)?;
+                crate::multimodal::require_enabled(&self.store().connect()?, trigger.as_deref())?;
+            }
             let task_limit = request.validate()?;
             m.authorize(&input.scopes, s.budget.as_ref())?;
             let provider_input = json!({"owner_task":request,"published_summary":input});
@@ -349,6 +360,11 @@ impl Agent {
                 },
             )?;
             let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
+            if let Err(error) = crate::multimodal::require_enabled(&tx, trigger.as_deref()) {
+                tx.execute("UPDATE calls SET state='no_charge',reason='OWNER_DISABLED_BEFORE_DISPATCH' WHERE id=?1", [call_id])?;
+                tx.commit()?;
+                return Err(error);
+            }
             let status: String =
                 tx.query_row("SELECT status FROM tasks WHERE id=?1", [id], |r| r.get(0))?;
             if status == "cancel_requested" {
@@ -401,7 +417,16 @@ impl Agent {
                     input_tokens,
                     output_tokens,
                 } => {
-                    research.validate()?;
+                    if let Err(error) = research.validate() {
+                        if crate::multimodal::is_input(&input) {
+                            c.execute("UPDATE calls SET state='charged_failure',reason=?1,input_tokens=?2,output_tokens=?3,finished_at=?4 WHERE id=?5",
+                                params![error.0, input_tokens, output_tokens, finished.to_rfc3339(), call_id])?;
+                        }
+                        return Err(error);
+                    }
+                    if crate::multimodal::is_input(&input) {
+                        ensure(research.fusion.is_some(), "FUSION_OUTPUT_REQUIRED")?;
+                    }
                     let usage = m.cost(input_tokens, output_tokens)?;
                     let valid = input_tokens <= m.max_input_tokens
                         && output_tokens <= m.max_output_tokens

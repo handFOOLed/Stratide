@@ -131,6 +131,9 @@ def handoff(candidate_id=None, evaluation_id=None):
 
 def snapshot_provenance(task, store_name):
     summary = task["input"] if task else {}
+    if "multimodal_research_v1" in summary.get("scopes", []):
+        import multimodal
+        return multimodal.provenance(task, store_name)
     details = summary.get("summary", {})
     details = details if isinstance(details, dict) else {}
     claimed = (str(summary.get("version", "")).startswith(data_snapshot.AGENT_VERSION + ":")

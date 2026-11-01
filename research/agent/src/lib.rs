@@ -1,6 +1,7 @@
 pub mod budget;
 pub mod config;
 pub mod eod_snapshot;
+pub mod multimodal;
 pub mod provider;
 mod service;
 mod store;
@@ -57,9 +58,14 @@ pub struct Research {
     pub evidence: Vec<String>,
     pub risks: Vec<String>,
     pub next_steps: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fusion: Option<Box<multimodal::Fusion>>,
 }
 impl Research {
     pub fn validate(&self) -> Result<()> {
+        if let Some(fusion) = &self.fusion {
+            fusion.validate()?;
+        }
         ensure(
             !self.hypothesis.trim().is_empty()
                 && self.hypothesis.len() <= 4096

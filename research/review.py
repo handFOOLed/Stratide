@@ -32,8 +32,13 @@ def read(path, limit):
 
 
 class Review:
-    def __init__(self, name, *, fault=lambda point: None):
-        self.auto = a.Auto(name)
+    def __init__(self, name, *, fault=lambda point: None, multimodal=False):
+        self.multimodal = multimodal
+        if multimodal:
+            from multimodal import ReviewSource
+            self.auto = ReviewSource(name)
+        else:
+            self.auto = a.Auto(name)
         self.config = self.auto.config()
         self.registry = c.Registry(self.config["candidate_registry_name"])
         self.root = self.registry.root / "reviews"
@@ -58,10 +63,14 @@ class Review:
                  if a.j.loads(value).get("registration_sha256") == identity]
         c.require(len(found) == 1, "ARCHIVED_PARENT_NOT_FOUND")
         key, archive = found[0]
-        day = key.removeprefix("eod_auto_archive:")
-        intent = a.j.loads(meta["eod_auto_intent:" + day])
-        c.require(intent["trigger_key"] == a.POLICY + ":" + self.config["binding_sha256"] + ":" + day
-                  and intent["input"]["source_day"] == day, "AUTO_BINDING_CHANGED")
+        source_key = key.removeprefix("eod_auto_archive:")
+        intent = a.j.loads(meta["eod_auto_intent:" + source_key])
+        day = intent["input"]["source_day"]
+        if self.multimodal:
+            self.auto.validate_intent(source_key, intent)
+        else:
+            c.require(intent["trigger_key"] == a.POLICY + ":" + self.config["binding_sha256"] + ":" + source_key
+                      and day == source_key, "AUTO_BINDING_CHANGED")
         task = self.auto.task_for(intent)
         self.auto.completed(task, intent)
         c.require(len(c.canonical(task)) <= 262144, "INPUT_SIZE_LIMIT")
@@ -286,7 +295,9 @@ def main(argv=None, *, fault=lambda point: None):
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(description="只读研究 Inbox；Owner 显式固定模板 → 原冻结/独立评价/持久报告")
-    parser.add_argument("--auto", required=True, help="original EOD auto name; no review directory override")
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--auto", help="original EOD auto name; no review directory override")
+    source.add_argument("--multimodal", help="original Time-Series + Fusion run name")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("inbox")
     status = commands.add_parser("status")
@@ -300,7 +311,7 @@ def main(argv=None, *, fault=lambda point: None):
     review.add_argument("--source-dir", type=Path)
     args = parser.parse_args(argv)
     try:
-        service = Review(args.auto, fault=fault)
+        service = Review(args.multimodal or args.auto, fault=fault, multimodal=args.multimodal is not None)
         if args.command == "review":
             value = service.run(args.parent_registration_sha256, args.owner_input, args.evidence_class, args.source_dir)
         else:
