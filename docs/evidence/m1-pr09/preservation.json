@@ -1,0 +1,96 @@
+{
+  "files": {
+    "audit.json": {
+      "sha256": "0b82c878749bb44d0d06101fcaa9aab17ec7ed172fe7d5ef3e86e3b40bf83941",
+      "unchanged": true
+    },
+    "dataset68.json": {
+      "sha256": "ccf8eceb5e5844b32c4f6470c4dc29637c05612f779c1fcef79218ba3d5879a2",
+      "unchanged": true
+    },
+    "evaluation/evaluation.csv": {
+      "sha256": "c17d1effee018b2838e29b831c9afa63e7d3c145f55c0fbf7830a131112c17f6",
+      "unchanged": true
+    },
+    "evaluation/evaluation.json": {
+      "sha256": "b870bfca427b50809fb4ac1e843a936ea1954053d9ef3037cdeebbe450a9aa17",
+      "unchanged": true
+    },
+    "pr38-source-summary.json": {
+      "sha256": "7c5edb8a49c73115e9882cec458b2d95f13d944225108f656fb434889a5fe93c",
+      "unchanged": true
+    },
+    "report/daily.csv": {
+      "sha256": "32f37b1eb4e0fa7b7392da8e666fe9b060f2e77205e17488bb7aaab89f602222",
+      "unchanged": true
+    },
+    "report/events.json": {
+      "sha256": "b5d8edb443d97f1088e76bf750aeb73467025dd33e3cf6c4f236ea0cc912a762",
+      "unchanged": true
+    },
+    "report/fills.csv": {
+      "sha256": "0bd3e0545098dd9cc08c9f19d997ba4cb7348627049d4d1dd470a8814b72c48a",
+      "unchanged": true
+    },
+    "report/orders.csv": {
+      "sha256": "5f4aea457ee32e165bf93ec3585951ce82ac2dbb46b927122182ce716961e4e6",
+      "unchanged": true
+    },
+    "report/positions.csv": {
+      "sha256": "5f2afdb64ebf0a22104e94a221f45a2f22450fcb504ac0ea9e4fced47130204e",
+      "unchanged": true
+    },
+    "report/report.json": {
+      "sha256": "3729b4fe6ff08591d5bbec581f18089a814dbd4dbbccf76ef1c2484608f3e9da",
+      "unchanged": true
+    },
+    "source/calendar.json": {
+      "sha256": "284cbb28d12f576ae93e54b0bd8abf516a595cc668f56363cd2cfbb68a4d5bf9",
+      "unchanged": true
+    },
+    "source/daily.json": {
+      "sha256": "5689c59e8fa92b5ca2499141c3b4e199b168ea02f70b385c8a24eb81340d2075",
+      "unchanged": true
+    },
+    "source/extraction.json": {
+      "sha256": "5eb1abff2764e414f484d9610807af7544fa672ccf6228056796f4a5337e4075",
+      "unchanged": true
+    },
+    "source/limits.json": {
+      "sha256": "dabd396dc7594bf90c74118d92be256c87667bc0cfd46af08b7c9f1861ceec2f",
+      "unchanged": true
+    },
+    "source/suspensions.json": {
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "unchanged": true
+    },
+    "split.json": {
+      "sha256": "6238463f729633bca10b0a11a9bf50142a7d382ad6e00256af4aad607288fcba",
+      "unchanged": true
+    }
+  },
+  "legacy_byte_comparisons": {
+    "evaluation/evaluation.csv": true,
+    "evaluation/evaluation.json": true,
+    "report/daily.csv": true,
+    "report/events.json": true,
+    "report/fills.csv": true,
+    "report/orders.csv": true,
+    "report/positions.csv": true,
+    "report/report.json": true
+  },
+  "legacy_ending_nav_fen": 9996651,
+  "legacy_fills": 3,
+  "legacy_sessions": 68,
+  "original_ledgers_opened": false,
+  "pr40_seven_reports_byte_identical": {
+    "cash-dividends.json": true,
+    "daily.csv": true,
+    "events.json": true,
+    "fills.csv": true,
+    "orders.csv": true,
+    "positions.csv": true,
+    "report.json": true
+  },
+  "protected_files_unchanged": 17
+}

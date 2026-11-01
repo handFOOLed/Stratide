@@ -2,7 +2,7 @@ use super::*;
 
 pub(super) const AVAILABILITY: &str = "assumed_historical_eod_availability_not_pit_verified";
 pub(super) const EXECUTION: &str = "historical_ex_post_execution_assumption";
-const VERSION: &str = "sma5-20-cross-fixed100-v1";
+pub(super) const VERSION: &str = "sma5-20-cross-fixed100-v1";
 pub(super) const SPEC: &str = "sma5/20;integer-sums;20-session-warmup;strict-relation-cross;buy100-on-up;sell100-on-down;no-optimization;limit=close+/-ceil(2%)-clamped-to-known-day-band-interior;expiry=decision+14d;next-session-IOC;next-open+/-1fen;capacity100-fixed-not-daily-volume";
 
 #[derive(Clone, Deserialize, Serialize)]
@@ -31,7 +31,7 @@ pub(super) fn validate(dataset: &Dataset) -> Result<(), String> {
             Err("schema v2 必须带历史假设".into())
         };
     };
-    if dataset.schema_version != 2
+    if !(dataset.schema_version == 2 || (dataset.schema_version == 4 && dataset.scenario.is_some()))
         || dataset.mode != DataMode::HistoricalReplay
         || dataset.instrument.market != Market::Shanghai
         || dataset.instrument.code != "600000"
@@ -94,7 +94,7 @@ pub(super) fn commands(
             continue;
         }
         let side = if above { Side::Buy } else { Side::Sell };
-        let offset = (s.close_fen + 49) / 50;
+        let offset = s.close_fen.checked_add(49).ok_or("限价溢出")? / 50;
         let limit = if above {
             s.close_fen
                 .checked_add(offset)

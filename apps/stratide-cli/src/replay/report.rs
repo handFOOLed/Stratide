@@ -433,6 +433,30 @@ pub(super) fn export(
         summary["forward_opening_evidence_claimed"] = json!(false);
         summary["historical_model_sessions"] = json!(dataset.sessions.len());
     }
+    if let Some(scenario) = &dataset.scenario {
+        summary["historical_dividend_scenario"] =
+            serde_json::to_value(scenario).map_err(|e| e.to_string())?;
+        summary["evidence_class"] = json!("EXPLORATORY_EX_POST");
+        summary["scenario_engineering_status"] = json!("REPLAY_COMPLETE_PENDING_PYTHON_AUDIT");
+        summary["real_historical_eligibility"] = json!("DENIED");
+        summary["real_blockers"] = json!([
+            "PIT_NOT_VERIFIED",
+            "TAX_ACCOUNT_UNKNOWN",
+            "PAYMENT_UNKNOWN",
+            "REAL_PROVIDER_NOT_VERIFIED",
+            "OPENING_SOURCE_BLOCKED"
+        ]);
+        summary["research_evidence"] = json!("INSUFFICIENT_EVIDENCE");
+        summary["real_pit_days_added"] = json!(0);
+        summary["strategy_version"] = json!(final_state.config.deployment.frozen_version);
+        summary["strategy_spec_sha256"] = json!(format!(
+            "{:x}",
+            Sha256::digest(
+                super::historical_dividend::strategy_spec(&final_state.config).as_bytes()
+            )
+        ));
+        summary["buy_hold_benchmark_note"] = json!("独立 paper-historical-dividend-benchmark/cash-benchmark v4账本；首日收盘仅提交一次、下一开盘不利一分；全部为EX_POST_MODEL_ONLY");
+    }
     let report_json = serde_json::to_vec_pretty(&summary).map_err(|e| e.to_string())?;
     let events_json = serde_json::to_vec_pretty(&events).map_err(|e| e.to_string())?;
     let mut daily_csv = String::from("day,nav_fen,cash_fen,available_cash_fen,reserved_cash_fen,held_shares,sellable_shares,unsettled_shares,reserved_sell_shares,pending_orders,cumulative_fee_fen,realized_pnl_fen,unrealized_pnl_fen,remaining_cost_basis_fen,external_flow_total_fen,valuation_error\n");

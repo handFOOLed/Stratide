@@ -1,0 +1,43 @@
+{
+  "acceptance": "Sol self-test; no independent reviewer acceptance",
+  "accounting_identity": "cash + shares*mark + receivable - tax_liability = NAV",
+  "assumption_sha256": "270ef5dcfe49bc48e9627b84d5eefa6eea42138ba0cb836aaec0dec635edd6af",
+  "benchmark_entitled_shares": 100,
+  "blockers": [
+    "PIT_NOT_VERIFIED",
+    "TAX_ACCOUNT_UNKNOWN",
+    "PAYMENT_UNKNOWN",
+    "REVISION_HISTORY_NOT_VERIFIED",
+    "OPENING_SOURCE_BLOCKED",
+    "REAL_PROVIDER_NOT_VERIFIED"
+  ],
+  "eligibility": "ELIGIBILITY_DENIED",
+  "evidence_bundle_sha256": "c9b15d74dd687691e9418742fefa22bf70e4843dc6a066cb5f554df43329b49b",
+  "evidence_class": "EXPLORATORY_EX_POST",
+  "first_day": 20260706,
+  "historical_pit": "PIT_NOT_VERIFIED",
+  "income_identity": "NAV - initial = realized + unrealized + dividend_gross - dividend_tax; external_flow=0",
+  "independent_python_accounting_and_time_audit": "PASS",
+  "input_kind": "frozen_authorized_history",
+  "input_sha256": "213e63578695cbecd1e782d31d5930fe98a9f97d5447ae38434614f8bcdbd956",
+  "last_day": 20261028,
+  "live_trading_allowed": false,
+  "observed_breakpoint": "20260716",
+  "opening_source": "BLOCKED",
+  "original_sources_unchanged": true,
+  "protocol": "historical_dividend_scenario_v1",
+  "real_historical_eligibility": "DENIED",
+  "real_pit_days_added": 0,
+  "real_provider": "NOT_VERIFIED",
+  "research_evidence": "INSUFFICIENT_EVIDENCE",
+  "scenario_engineering_status": "ENGINEERING_RUNNABLE",
+  "sessions": 77,
+  "source_sha256": {
+    "calendar": "284cbb28d12f576ae93e54b0bd8abf516a595cc668f56363cd2cfbb68a4d5bf9",
+    "daily": "5689c59e8fa92b5ca2499141c3b4e199b168ea02f70b385c8a24eb81340d2075",
+    "extraction": "5eb1abff2764e414f484d9610807af7544fa672ccf6228056796f4a5337e4075",
+    "limits": "dabd396dc7594bf90c74118d92be256c87667bc0cfd46af08b7c9f1861ceec2f",
+    "suspensions": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "two_fresh_runs_identical": true
+}

@@ -9,6 +9,7 @@ use stratide_ledger::{
 pub(super) mod benchmark;
 mod cash_dividend;
 mod historical;
+mod historical_dividend;
 mod report;
 
 const DAY_MS: i64 = 86_400_000;
@@ -32,6 +33,8 @@ struct Dataset {
     historical: Option<historical::HistoricalMetadata>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     cash_dividends: Option<Vec<stratide_ledger::cash_dividend::CashDividendV1>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    scenario: Option<historical_dividend::Scenario>,
 }
 
 #[derive(Clone, Deserialize, Serialize)]
@@ -140,7 +143,7 @@ impl RulesInput {
 
 impl Dataset {
     fn validate(&self) -> Result<(), String> {
-        if !matches!(self.schema_version, 1..=3)
+        if !matches!(self.schema_version, 1..=4)
             || self.sessions.is_empty()
             || !self.instrument.is_valid()
             || self.source.trim().is_empty()
@@ -151,7 +154,12 @@ impl Dataset {
         {
             return Err("输入 schema/来源/许可/证券/时区/未复权价格语义不完整".into());
         }
-        if self.schema_version == 3 {
+        if self.schema_version != 4 && self.scenario.is_some() {
+            return Err("历史分红情景须显式 schema4".into());
+        }
+        if self.schema_version == 4 {
+            historical_dividend::validate(self)?;
+        } else if self.schema_version == 3 {
             cash_dividend::validate(self)?;
         } else {
             if self.cash_dividends.is_some() {
@@ -310,24 +318,34 @@ fn load(path: &str, expected: &str) -> Result<(Dataset, Provenance), String> {
 }
 
 pub fn run(args: &[String]) -> Result<(), String> {
+    let is_scenario = args
+        .first()
+        .is_some_and(|s| s.starts_with("paper-historical-dividend-"));
     let is_dividend = args
         .first()
-        .is_some_and(|s| s.starts_with("paper-dividend-"));
-    let is_benchmark = args
-        .first()
-        .is_some_and(|s| s == "paper-dividend-benchmark");
-    let is_cash_benchmark = args
-        .first()
-        .is_some_and(|s| s == "paper-dividend-cash-benchmark");
-    let is_replay = args
-        .first()
-        .is_some_and(|s| s == "paper-replay" || s == "paper-dividend-replay")
-        || is_benchmark
+        .is_some_and(|s| s.starts_with("paper-dividend-"))
+        || is_scenario;
+    let is_benchmark = args.first().is_some_and(|s| {
+        s == "paper-dividend-benchmark" || s == "paper-historical-dividend-benchmark"
+    });
+    let is_cash_benchmark = args.first().is_some_and(|s| {
+        s == "paper-dividend-cash-benchmark" || s == "paper-historical-dividend-cash-benchmark"
+    });
+    let is_replay = args.first().is_some_and(|s| {
+        s == "paper-replay"
+            || s == "paper-dividend-replay"
+            || s == "paper-historical-dividend-replay"
+    }) || is_benchmark
         || is_cash_benchmark;
     if args.len() < 6 || args[4] != "--sha256" {
         return Err("用法：paper-replay/paper-report <输入JSON> <账本目录> <报表目录> --sha256 <SHA256> [六项资金风险参数]".into());
     }
     let (dataset, provenance) = load(&args[1], &args[5])?;
+    if is_scenario != dataset.scenario.is_some() {
+        return Err(
+            "historical_dividend_scenario_v1 仅允许显式 paper-historical-dividend-* 路径".into(),
+        );
+    }
     if is_dividend != dataset.cash_dividends.is_some() {
         return Err(
             "分红隔离输入须使用 paper-dividend-replay/report/benchmark；旧模式禁止注入".into(),
@@ -382,6 +400,9 @@ pub fn run(args: &[String]) -> Result<(), String> {
             }
             .into();
         }
+        if is_scenario {
+            historical_dividend::configure(&mut c, is_benchmark, is_cash_benchmark)?;
+        }
         Some(c)
     } else {
         if args.len() != 6 {
@@ -422,7 +443,9 @@ pub fn run(args: &[String]) -> Result<(), String> {
     {
         return Err("账本输入哈希/来源或本金/风险配置不匹配，禁止续算".into());
     }
-    let commands = if is_dividend {
+    let commands = if is_scenario {
+        historical_dividend::commands(&dataset, &provenance, &ledger.state().config)?
+    } else if is_dividend {
         cash_dividend::commands(&dataset, &provenance, &ledger.state().config)?
     } else {
         commands(&dataset, &provenance, &ledger.state().config)?

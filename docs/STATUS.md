@@ -1,6 +1,6 @@
 # Stratide 当前状态
 
-> 截至 2026-11-01，基于 `main` `a02a9b0105cdadab615a6358fa32a57225669d19`（PR #35、[PR #38](https://github.com/handFOOLed/Stratide/pull/38) 已合并），附本分支 #39 现金分红会计 V1 开发自测状态。这是**当前实现快照**，不是实盘承诺。Owner 已决定 **Core-first、UI-later**：后续核心功能先用 CLI/持久报告验收，最后由 Sol 按 PR #28 设计体系统一集成 UI。
+> 截至 2026-11-01，基于 `main` `287dfe8583fe63f199215d0fb2f440864572974a`（[PR #40](https://github.com/handFOOLed/Stratide/pull/40) 已合并），附本分支 #41 历史分红情景桥接 V1 开发自测状态。这是**当前实现快照**，不是实盘承诺。Owner 已决定 **Core-first、UI-later**：后续核心功能先用 CLI/持久报告验收，最后由 Sol 按 PR #28 设计体系统一集成 UI。
 
 ## 已实现
 
@@ -18,7 +18,8 @@
 | EOD 研究快照 | PR #33 已合并，#32 完成；既有 observer 离线只读核验、原子持久发布、状态与只读消费 | [操作](M2_PR05.md) / [原自测](evidence/m2-pr05/README.md) |
 | 显式 Fake Agent 闭环 | PR #35 已合并；EOD 快照 → 本地 fake 持久任务 → 候选研究来源；新 scope 禁止云 Provider 与自动 EOD，资格默认拒绝 | [操作](M2_PR06.md) / [原自测](evidence/m2-pr06/README.md) |
 
-| 现金分红模型 V1（本分支 Draft） | 登记权益→应收/扣税负债→到账，ledger v4 / NAV / Risk / 七报告 / Python独立算法 / 双基准；仅隔离 synthetic CLI | [CASH_DIVIDEND_V1](M1_PR08.md) / [自测](evidence/m1-pr08/README.md) |
+| 现金分红模型 V1（PR #40 已合并） | 登记权益→应收/扣税负债→到账，ledger v4 / NAV / Risk / 七报告 / Python独立算法 / 双基准；仅隔离 synthetic CLI | [CASH_DIVIDEND_V1](M1_PR08.md) / [原自测](evidence/m1-pr08/README.md) |
+| 历史分红情景桥接 V1（本分支 Draft） | 原冻结历史行情 + PR38 原证据 + 独立假设 → 原 SMA5/20 / v4 / 七报告 / 独立算法 / 双基准；77 会话 EXPLORATORY_EX_POST，真实准入 DENIED、PIT 新增 0 天 | [模块操作](M1_PR09.md) / [自测](evidence/m1-pr09/README.md) |
 
 ## 仍未实现 / 未验证
 

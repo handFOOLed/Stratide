@@ -1,0 +1,83 @@
+{
+  "agents": 0,
+  "base": "287dfe8583fe63f199215d0fb2f440864572974a",
+  "branch": "codex/issue41-historical-dividend",
+  "commands": [
+    {
+      "command": "cargo fmt --all -- --check",
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    {
+      "command": "./scripts/with-msvc.ps1 check --workspace --locked --offline",
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    {
+      "command": "./scripts/with-msvc.ps1 @('clippy','--workspace','--all-targets','--locked','--offline','--','-D','warnings')",
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    {
+      "command": "./scripts/with-msvc.ps1 test --workspace --locked --offline",
+      "exit_code": 0,
+      "result": "155 tests PASS"
+    },
+    {
+      "command": "./scripts/with-msvc.ps1 build -p stratide-cli --locked --offline",
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    {
+      "command": "python scripts/test-historical-dividend.py --exe target/debug/stratide-cli.exe --out state/issue41-delivery-tests",
+      "exit_code": 0,
+      "result": "11 tests + actual two-freeze/replay/evaluation CLI PASS"
+    },
+    {
+      "command": "python scripts/test-cash-dividend.py --exe target/debug/stratide-cli.exe --out state/issue41-pr40-regression",
+      "exit_code": 0,
+      "result": "9 tests PASS; PR40 seven reports byte-identical"
+    },
+    {
+      "command": "python scripts/test-historical-data.py",
+      "exit_code": 0,
+      "result": "3 tests PASS"
+    },
+    {
+      "command": "python scripts/test-corporate-action-evidence.py",
+      "exit_code": 1,
+      "result": "14 PASS; junction sandbox denied; exact failing test separately PASS"
+    },
+    {
+      "command": "python scripts/test-corporate-action-evidence.py EvidenceTests.test_actual_directory_junction_or_symlink_is_rejected",
+      "exit_code": 0,
+      "result": "PASS under approved local test junction operation"
+    },
+    {
+      "command": "python scripts/test-research-evaluation.py --exe target/debug/stratide-cli.exe --audit-dir <original-audit> --source-dir <original-source> --out state/issue41-legacy68-regression",
+      "exit_code": 0,
+      "result": "5 tests and actual legacy68 CLI E2E PASS; six reports/evaluation JSON+CSV byte-identical"
+    },
+    {
+      "command": "python scripts/historical-dividend.py run --source-dir <original-source> --evidence-bundle <original-PR38-bundle> --assumptions samples/historical-dividend/real-assumptions.example.json --exe target/debug/stratide-cli.exe --out state/issue41-commit-real",
+      "exit_code": 0,
+      "result": "77-session real-price EX_POST_ONLY; two fresh freezes/replays/evaluations PASS"
+    }
+  ],
+  "exe_sha256": "982950e9081e2ceb70f170161e9ead498b4996cee1c29cb66ab3595e70dc0456",
+  "kind": "Sol self-test; no independent reviewer acceptance",
+  "limitations": [
+    "EXPLORATORY_EX_POST",
+    "PIT_NOT_VERIFIED",
+    "ELIGIBILITY_DENIED",
+    "OPENING_SOURCE=BLOCKED",
+    "REAL_PROVIDER_NOT_VERIFIED",
+    "No actual account tax/payment certification",
+    "Other OS and physical power-loss not verified"
+  ],
+  "merged": false,
+  "platform": "Windows x64; Python 3.12; existing Rust/MSVC",
+  "real_pit_days_added": 0,
+  "rust_test_count": 155,
+  "terra_invoked": false
+}

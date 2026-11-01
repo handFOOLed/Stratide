@@ -12,7 +12,7 @@ pub(crate) fn run(args: &[String]) -> Result<(), String> {
         return Err("paper-benchmark <input> <new-dir> --sha256 <sha> --start-index <inclusive> --end-index <exclusive> <six capital/risk flags>".into());
     }
     let (dataset, mut provenance) = load(&args[1], &args[4])?;
-    if dataset.historical.is_none() {
+    if dataset.historical.is_none() || dataset.scenario.is_some() {
         return Err("研究基准仅支持带历史假设的 v2 输入".into());
     }
     let start: usize = args[6].parse().map_err(|_| "invalid start index")?;

@@ -511,3 +511,149 @@ fn crash_before_and_after_each_dividend_commit_is_atomic_and_idempotent() {
         }
     }
 }
+
+fn historical_setup(mut e: CashDividendV1) -> (tempfile::TempDir, Ledger, CashDividendV1) {
+    e.mode = DataMode::HistoricalReplay;
+    e.evidence_basis = "historical_ex_post_assumption".into();
+    e.fact_status = "EX_POST_MODEL_ONLY".into();
+    e.tax.basis = "historical_ex_post_assumption".into();
+    e.source_available_at = Timestamp(e.payment_at.0 + DAY); // Actual late acquisition, never PIT.
+    let t = tempfile::tempdir().unwrap();
+    let mut g = genesis(config());
+    g.config.max_mark_age_ms = 7 * DAY;
+    g.config.max_snapshot_age_ms = 7 * DAY;
+    g.provenance.mode = DataMode::HistoricalReplay;
+    g.at = Timestamp(e.record_close_at.0 - 2 * DAY);
+    g.day = TradingDay(20260713);
+    let l = Ledger::create_cash_dividend_v4(t.path().join("account"), g, vec![e.clone()]).unwrap();
+    (t, l, e)
+}
+
+fn historical_open(l: &Ledger, day: TradingDay, opens: Timestamp, price: i64) -> Command {
+    let mut b = bar(day, 1);
+    b.provenance = l.state.provenance.clone();
+    b.opens_at = opens;
+    b.closes_at = Timestamp(opens.0 + 19_800_000);
+    b.available_at = Timestamp(b.closes_at.0 + 1);
+    b.open = c(price);
+    b.close = c(price);
+    b.high = c(price + 10);
+    b.low = c(price - 10);
+    Command::HistoricalNextOpenV1 {
+        now: b.available_at,
+        rules: rules(day, b.available_at),
+        bar: b,
+    }
+}
+
+fn historical_buy(l: &mut Ledger, e: &CashDividendV1) {
+    let cmd = proposal_at(
+        l,
+        1,
+        Side::Buy,
+        100,
+        l.state.snapshot.as_of,
+        TradingDay(20260713),
+        1020,
+    );
+    apply(l, "historical-buy", cmd);
+    let cmd = historical_open(
+        l,
+        TradingDay(20260714),
+        Timestamp(e.ex_at.0 - 2 * DAY),
+        1000,
+    );
+    apply(l, "historical-fill", cmd);
+    assert_eq!(l.state.fills.len(), 1);
+    assert_eq!(l.state.fills[0].price, c(1001));
+}
+
+#[test]
+fn historical_v4_open_boundary_cancels_pre_ex_orders_and_preserves_net_assets() {
+    let (t, mut l, e) = historical_setup(event());
+    historical_buy(&mut l, &e);
+    apply(&mut l, "record", phase(&e, DividendPhase::Record, 1000));
+    let cmd = proposal_at(&l, 2, Side::Sell, 100, e.record_at, e.record_day, 950);
+    apply(&mut l, "stale-sell", cmd);
+    assert_eq!(l.state.snapshot.pending_orders.len(), 1);
+    let cash = l.state.snapshot.cash.fen();
+    apply(&mut l, "ex", phase(&e, DividendPhase::Ex, 958));
+    assert_eq!(l.state.equity, Some(c(cash + 100 * 958 + 4200 - 840)));
+    assert_eq!(l.state.orders[1].status, OrderStatus::Expired);
+    drop(l);
+    let mut l = Ledger::open(t.path().join("account")).unwrap();
+    let cmd = historical_open(&l, e.ex_day, e.ex_at, 958);
+    apply(&mut l, "ex-session", cmd.clone()); // equality permitted only at v4 ex/payment
+    assert_eq!(l.state.fills.len(), 1); // no pre-ex stale sell
+    assert!(l.execute("duplicate-session", cmd).is_err());
+    let nav = l.state.equity;
+    apply(&mut l, "pay", phase(&e, DividendPhase::Payment, 958));
+    let cmd = historical_open(&l, e.payment_day, e.payment_at, 958);
+    apply(&mut l, "payment-session", cmd);
+    assert_eq!(l.state.equity, nav);
+    assert_eq!(l.state.snapshot.cash, c(cash + 3360));
+    assert_eq!(l.state.snapshot.equity_basis.net_external_flow_total_fen, 0);
+    assert!(l.history().is_ok());
+}
+
+#[test]
+fn historical_v3_still_rejects_same_open_state_without_frozen_dividend_boundary() {
+    let t = tempfile::tempdir().unwrap();
+    let e = event();
+    let mut g = genesis(config());
+    g.provenance.mode = DataMode::HistoricalReplay;
+    g.at = e.ex_at;
+    g.day = e.ex_day;
+    let mut l = Ledger::create(t.path().join("account"), g).unwrap();
+    let cmd = historical_open(&l, e.ex_day, e.ex_at, 958);
+    assert!(l.execute("same-opening", cmd).is_err());
+    assert_eq!(l.schema_version(), 3);
+}
+
+#[test]
+fn historical_v4_crash_commit_recovery_then_same_open_replay_uses_one_reducer() {
+    for (name, target) in [
+        ("ex", DividendPhase::Ex),
+        ("payment", DividendPhase::Payment),
+    ] {
+        for point in ["before_commit", "after_commit"] {
+            let (t, mut l, e) = historical_setup(event());
+            historical_buy(&mut l, &e);
+            apply(&mut l, "record", phase(&e, DividendPhase::Record, 1000));
+            if target == DividendPhase::Payment {
+                apply(&mut l, "ex", phase(&e, DividendPhase::Ex, 958));
+            }
+            let path = t.path().join("account");
+            drop(l);
+            let output = Process::new(std::env::current_exe().unwrap())
+                .args(["--exact", "store::tests::dividends::dividend_crash_child"])
+                .env("STRATIDE_DIVIDEND_CRASH_PATH", &path)
+                .env("STRATIDE_DIVIDEND_PHASE", name)
+                .env("STRATIDE_TEST_CRASH_AT", point)
+                .output()
+                .unwrap();
+            assert_eq!(output.status.code(), Some(86), "{name}/{point}: {output:?}");
+            let mut l = Ledger::open(&path).unwrap();
+            let cmd = phase(&e, target.clone(), 958);
+            assert_eq!(
+                l.execute("crashed-phase", cmd.clone()).unwrap(),
+                point == "before_commit"
+            );
+            assert!(!l.execute("crashed-phase", cmd).unwrap());
+            let (at, day) = if target == DividendPhase::Ex {
+                (e.ex_at, e.ex_day)
+            } else {
+                (e.payment_at, e.payment_day)
+            };
+            let cmd = historical_open(&l, day, at, 958);
+            apply(&mut l, "recovered-historical-opening", cmd);
+            assert_eq!(
+                l.state.equity,
+                Some(c(l.state.snapshot.cash.fen()
+                    + 100 * 958
+                    + if target == DividendPhase::Ex { 3360 } else { 0 }))
+            );
+            assert!(l.history().is_ok());
+        }
+    }
+}

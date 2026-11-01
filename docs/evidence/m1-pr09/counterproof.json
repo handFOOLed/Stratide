@@ -1,0 +1,9 @@
+{
+  "cash_fen_before_payment": 9899398,
+  "ex_price_move_plus_net_dividend_fen": -1640,
+  "kind": "Sol hand-derived arithmetic, not independent reviewer acceptance",
+  "liability_fen": 840,
+  "payment_income_increment_fen": 0,
+  "receivable_fen": 4200,
+  "status": "PASS"
+}

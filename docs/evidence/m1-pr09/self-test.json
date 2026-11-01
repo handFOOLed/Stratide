@@ -1,0 +1,10 @@
+{
+  "errors": 0,
+  "failures": 0,
+  "kind": "Sol self-test; not independent reviewer acceptance",
+  "protocol": "historical_dividend_scenario_v1",
+  "real_historical_eligibility": "DENIED",
+  "real_pit_days_added": 0,
+  "success": true,
+  "tests": 11
+}

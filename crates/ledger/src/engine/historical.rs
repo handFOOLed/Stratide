@@ -10,12 +10,22 @@ impl State {
         rules: &TradingRules,
         now: Timestamp,
     ) -> Result<()> {
+        // A v4 ex/payment reducer may have just valued this exact opening.
+        // Permit that clock boundary only; v3's strict-before-open rule remains.
+        let dividend_open = self.cash_dividends.as_ref().is_some_and(|book| {
+            book.events.iter().any(|a| {
+                a.event.instrument == b.instrument
+                    && ((a.recognized && a.event.ex_at == b.opens_at)
+                        || (a.paid && a.event.payment_at == b.opens_at))
+            })
+        });
         if self.provenance.mode != DataMode::HistoricalReplay
             || b.provenance != self.provenance
             || b.instrument != rules.instrument
             || b.day != rules.trading_day
             || !b.day.is_valid()
-            || self.snapshot.as_of >= b.opens_at
+            || self.snapshot.as_of > b.opens_at
+            || (self.snapshot.as_of == b.opens_at && !dividend_open)
             || self.snapshot.trading_day > b.day
             || b.opens_at >= b.closes_at
             || b.closes_at > b.available_at
