@@ -1,0 +1,121 @@
+{
+  "kind": "Sol development/self-test; no independent reviewer acceptance",
+  "base_sha": "a02a9b0105cdadab615a6358fa32a57225669d19",
+  "branch": "codex/issue39-cash-dividend-v1",
+  "environment": {
+    "os": "Windows x64",
+    "rustc": "1.98.1",
+    "python": "3.12.10",
+    "timezone": "Asia/Singapore",
+    "agents": 0,
+    "external_provider_or_market_requests": 0
+  },
+  "commands": [
+    {
+      "command": "cargo fmt --all -- --check",
+      "exit_code": 0
+    },
+    {
+      "command": "scripts/with-msvc.ps1 check --workspace --all-targets --locked --offline",
+      "exit_code": 0
+    },
+    {
+      "command": "scripts/with-msvc.ps1 clippy --workspace --all-targets --locked --offline -- -D warnings",
+      "exit_code": 0
+    },
+    {
+      "command": "scripts/with-msvc.ps1 test --workspace --locked --offline",
+      "exit_code": 0
+    },
+    {
+      "command": "scripts/with-msvc.ps1 build -p stratide-cli --locked --offline",
+      "exit_code": 0
+    },
+    {
+      "command": "python scripts/test-cash-dividend.py --exe target/debug/stratide-cli.exe --out state/issue39-e2e-final",
+      "exit_code": 0
+    },
+    {
+      "command": "scripts/with-msvc.ps1 test -p stratide-ledger dividends --locked --offline",
+      "exit_code": 0
+    },
+    {
+      "command": "python scripts/test-historical-data.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python scripts/test-corporate-action-evidence.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python scripts/test-research-evaluation.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python scripts/test-research-evaluation.py --exe target/debug/stratide-cli.exe --audit-dir <FROZEN_AUDIT> --source-dir <FROZEN_SOURCE> --out state/issue39-legacy68-01 --preserve-dir <ORIGINAL_REPORT>",
+      "exit_code": 0
+    },
+    {
+      "command": "python scripts/research-evaluate.py audit-cash-dividend-source --evidence docs/evidence/m1-pr07b/real-summary.json --out <NEW_IGNORED_OUTPUT>",
+      "exit_code": 2
+    },
+    {
+      "command": "python scripts/cash-dividend-counterproof.py --report state/issue39-e2e-final/a/report/report.json",
+      "exit_code": 0
+    }
+  ],
+  "rust_workspace_tests": 152,
+  "dividend_rust_tests_including_child_entry": 11,
+  "actual_cli_python_e2e_tests": 9,
+  "old_python_tests": {
+    "historical_data": 3,
+    "corporate_action_evidence": 15,
+    "research_evaluation": 5
+  },
+  "fixture_sha256": "e3bed4f9e73bb014fae0cd8d93cd505fb88a23adad7e51b21d0cbb5dad7ee750",
+  "source_sha256": "20e801be6507ea12c974bf6288d75499f9f2b16d15b481e7020551c2e0a4df0e",
+  "evaluator_sha256": "1263f4d1764746277c062192c02ca2fd659c677ea87f3529deedd576fb3b56f8",
+  "executable_sha256": "b909973d33480186643eba8632071717c2fa33047a6424381c88dd9f0e2ddac5",
+  "v4_ledger_head": "336a060a1e379e0dadbb3c25e9cf3795b7119464f5344714c89091ceca893fb3",
+  "v3_golden_head": "2df95c387f82ec0399537ee7cd43e0abe06208a6c5c7aba08f1484c6ff458740",
+  "two_new_ledgers_sqlite_bytes_identical": true,
+  "seven_reports_and_evaluations_identical": true,
+  "identical_replay_new_events": 0,
+  "crash_injections": {
+    "phases": [
+      "record",
+      "ex",
+      "payment"
+    ],
+    "points": [
+      "before_commit",
+      "after_commit"
+    ],
+    "exit_code": 86,
+    "subprocesses": 6
+  },
+  "protected_files_unchanged": 17,
+  "legacy_68_report_and_evaluation_bytes_unchanged": true,
+  "legacy_ledger_head": "87a12d081d69acfb2379b8ed01376b497259d355a319ed7faccee76eaeadc556",
+  "financial_counterproof": "PASS",
+  "research_evidence": "INSUFFICIENT_EVIDENCE",
+  "real_historical_pit": "NOT_VERIFIED",
+  "opening_source": "BLOCKED",
+  "eligibility": "ELIGIBILITY_DENIED",
+  "real_history_days_added": 0,
+  "artifacts_sha256": {
+    "counterproof.json": "5df79d94ea004b3b8dffb66946b9107feb12a9e1b43c05c6b8d671c448704d4f",
+    "evaluation.json": "e5271f964f92c70cdb664b73ffff5c592520ca9ae60ef9ce59db9ca5b8c51361",
+    "preservation.json": "d1108e5deaa6c5bdeb121b6fc2b8c7557ac674186ac222cc4dffdc1185eaafc0",
+    "self-test.json": "9d15f9a5180d4ff5f05e48ffb61737a2a8ab70344da0f14b04244fbd35837383",
+    "source-audit.json": "620b536369ddae35f5ef5c655e9b484e341326087d285e0e7c5cc7833bf61ccd",
+    "test-results.txt": "36e310b2e015a6e7992264a8f276c5bc699c55afa49f9a8b54ac8a61b85b161e",
+    "sample-report/cash-dividends.json": "9d5144f89ea240e7ac8aab2dea3f6463bf1d64d31b33223720685d2d06c6db75",
+    "sample-report/daily.csv": "8325ddfa50e37df171e099ecda3f92d7b92d9f6fae419741b561638fc0712651",
+    "sample-report/events.json": "47fc9444dba6bb08c88d06cb7cfca566e68881eaca931e6bfc89b4fc38db63d5",
+    "sample-report/fills.csv": "2ce05b9674073cee69cf299d2644ee4367f6ef1c9272ffd8de8ddae67108dc92",
+    "sample-report/orders.csv": "61ccbdac0c348cf02540ad355c66113f58efbd41331aaacbee659322c83d54ad",
+    "sample-report/positions.csv": "31a794e77e2be648c5e0e7d318b5d60a947d802a1d6a035eb31a27e0c7f150d6",
+    "sample-report/report.json": "a658019c6d0bd8269c63475e6cb3af53847019f8f82bc8d9ec97e4c51c8dc870"
+  }
+}

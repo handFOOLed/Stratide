@@ -7,6 +7,7 @@ use stratide_ledger::{
 };
 
 pub(super) mod benchmark;
+mod cash_dividend;
 mod historical;
 mod report;
 
@@ -29,6 +30,8 @@ struct Dataset {
     sessions: Vec<Session>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     historical: Option<historical::HistoricalMetadata>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    cash_dividends: Option<Vec<stratide_ledger::cash_dividend::CashDividendV1>>,
 }
 
 #[derive(Clone, Deserialize, Serialize)]
@@ -137,7 +140,7 @@ impl RulesInput {
 
 impl Dataset {
     fn validate(&self) -> Result<(), String> {
-        if !matches!(self.schema_version, 1 | 2)
+        if !matches!(self.schema_version, 1..=3)
             || self.sessions.is_empty()
             || !self.instrument.is_valid()
             || self.source.trim().is_empty()
@@ -148,7 +151,14 @@ impl Dataset {
         {
             return Err("输入 schema/来源/许可/证券/时区/未复权价格语义不完整".into());
         }
-        historical::validate(self)?;
+        if self.schema_version == 3 {
+            cash_dividend::validate(self)?;
+        } else {
+            if self.cash_dividends.is_some() {
+                return Err("分红必须显式 opt-in schema v3 / ledger v4".into());
+            }
+            historical::validate(self)?;
+        }
         if self.mode == DataMode::HistoricalReplay && self.source.contains("synthetic") {
             return Err("人工合成来源不得标为 historical_replay".into());
         }
@@ -300,11 +310,29 @@ fn load(path: &str, expected: &str) -> Result<(Dataset, Provenance), String> {
 }
 
 pub fn run(args: &[String]) -> Result<(), String> {
-    let is_replay = args.first().is_some_and(|s| s == "paper-replay");
+    let is_dividend = args
+        .first()
+        .is_some_and(|s| s.starts_with("paper-dividend-"));
+    let is_benchmark = args
+        .first()
+        .is_some_and(|s| s == "paper-dividend-benchmark");
+    let is_cash_benchmark = args
+        .first()
+        .is_some_and(|s| s == "paper-dividend-cash-benchmark");
+    let is_replay = args
+        .first()
+        .is_some_and(|s| s == "paper-replay" || s == "paper-dividend-replay")
+        || is_benchmark
+        || is_cash_benchmark;
     if args.len() < 6 || args[4] != "--sha256" {
         return Err("用法：paper-replay/paper-report <输入JSON> <账本目录> <报表目录> --sha256 <SHA256> [六项资金风险参数]".into());
     }
     let (dataset, provenance) = load(&args[1], &args[5])?;
+    if is_dividend != dataset.cash_dividends.is_some() {
+        return Err(
+            "分红隔离输入须使用 paper-dividend-replay/report/benchmark；旧模式禁止注入".into(),
+        );
+    }
     let ledger_path = Path::new(&args[2]);
     let config = if is_replay {
         let mut c = super::config(&args[6..])?;
@@ -327,6 +355,33 @@ pub fn run(args: &[String]) -> Result<(), String> {
         };
         c.max_snapshot_age_ms = 7 * DAY_MS;
         c.max_mark_age_ms = 7 * DAY_MS;
+        if is_dividend {
+            c.account_id = if is_cash_benchmark {
+                "dividend-cash-account"
+            } else if is_benchmark {
+                "dividend-benchmark-account"
+            } else {
+                "dividend-model-account"
+            }
+            .into();
+            c.deployment.strategy_id = if is_cash_benchmark {
+                "dividend-cash"
+            } else if is_benchmark {
+                "dividend-buy-hold"
+            } else {
+                "dividend-lifecycle-probe"
+            }
+            .into();
+            c.deployment.frozen_version = cash_dividend::VERSION.into();
+            c.deployment.deployment_id = if is_cash_benchmark {
+                "dividend-cash-v1"
+            } else if is_benchmark {
+                "dividend-buy-hold-v1"
+            } else {
+                "dividend-lifecycle-v1"
+            }
+            .into();
+        }
         Some(c)
     } else {
         if args.len() != 6 {
@@ -340,24 +395,38 @@ pub fn run(args: &[String]) -> Result<(), String> {
         if let Some(parent) = ledger_path.parent() {
             fs::create_dir_all(parent).map_err(|e| format!("账本父目录不可用：{e}"))?;
         }
-        Ledger::create(
-            ledger_path,
-            Genesis {
-                config: c.clone(),
-                provenance: provenance.clone(),
-                at: Timestamp(dataset.sessions[0].opens_at.0 - 1),
-                day: dataset.sessions[0].day,
-            },
-        )?
+        let genesis = Genesis {
+            config: c.clone(),
+            provenance: provenance.clone(),
+            at: Timestamp(dataset.sessions[0].opens_at.0 - 1),
+            day: dataset.sessions[0].day,
+        };
+        if let Some(events) = &dataset.cash_dividends {
+            Ledger::create_cash_dividend_v4(ledger_path, genesis, events.clone())?
+        } else {
+            Ledger::create(ledger_path, genesis)?
+        }
     } else {
         return Err("报告账本不存在".into());
     };
     if ledger.state().provenance != provenance
         || config.as_ref().is_some_and(|c| ledger.state().config != *c)
+        || is_dividend != (ledger.schema_version() == 4)
+        || dataset.cash_dividends.as_ref().is_some_and(|events| {
+            ledger
+                .state()
+                .cash_dividends
+                .as_ref()
+                .is_none_or(|b| b.events.iter().map(|a| &a.event).ne(events.iter()))
+        })
     {
         return Err("账本输入哈希/来源或本金/风险配置不匹配，禁止续算".into());
     }
-    let commands = commands(&dataset, &provenance, &ledger.state().config)?;
+    let commands = if is_dividend {
+        cash_dividend::commands(&dataset, &provenance, &ledger.state().config)?
+    } else {
+        commands(&dataset, &provenance, &ledger.state().config)?
+    };
     if is_replay {
         for (id, command) in &commands {
             ledger.execute(id, command.clone())?;

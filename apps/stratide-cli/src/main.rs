@@ -25,7 +25,7 @@ fn run(args: Vec<String>) -> Result<(), String> {
         }
         "risk-demo" => demo(&args[1..])?,
         command if command.starts_with("forward-") => forward::run(&args)?,
-        "paper-replay" | "paper-report" => replay::run(&args)?,
+        "paper-replay" | "paper-report" | "paper-dividend-replay" | "paper-dividend-report" | "paper-dividend-benchmark" | "paper-dividend-cash-benchmark" => replay::run(&args)?,
         "paper-benchmark" => replay::benchmark::run(&args)?,
         command if command.starts_with("paper-") => paper::run(command, &args[1..])?,
         "help" | "--help" | "-h" => println!(
@@ -46,6 +46,10 @@ paper-status <目录>
 paper-apply <目录> <唯一事件ID> <可信命令JSON文件>
 paper-replay <输入JSON> <账本目录> <报表目录> --sha256 <输入文件SHA256> <上述全部六项参数>
 paper-report <输入JSON> <账本目录> <报表目录> --sha256 <输入文件SHA256>
+paper-dividend-replay <schema3模型JSON> <新v4账本目录> <报表目录> --sha256 <SHA256> <六项参数>
+paper-dividend-report <同一JSON> <v4账本目录> <报表目录> --sha256 <SHA256>
+paper-dividend-benchmark <同一JSON> <新v4基准账本目录> <报表目录> --sha256 <SHA256> <六项参数>
+paper-dividend-cash-benchmark <同一JSON> <新v4现金基准账本目录> <报表目录> --sha256 <SHA256> <六项参数>
 paper-benchmark <输入JSON> <新目录> --sha256 <SHA256> --start-index <含> --end-index <不含> <上述六项参数>
 \
 Paper 演示使用 synthetic_test 人工行情/费率，绝非真实市场数据。

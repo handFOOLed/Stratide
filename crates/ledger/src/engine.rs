@@ -1,6 +1,7 @@
 use crate::model::*;
 use stratide_contracts::*;
 use stratide_risk::{RiskDecision, RiskKernel};
+mod cash_dividend;
 mod historical;
 
 struct FillContext<'a> {
@@ -31,14 +32,23 @@ impl State {
             sessions: vec![],
             equity,
             valuation_error: None,
+            cash_dividends: None,
         })
     }
 
     fn nav(&self) -> Result<Cny> {
+        let totals = self.dividend_totals()?;
+        let cash_and_receivable = money(
+            i64::try_from(
+                i128::from(self.snapshot.cash.fen()) + i128::from(totals.receivable_fen)
+                    - i128::from(totals.liability_fen),
+            )
+            .map_err(|_| "净资产溢出")?,
+        )?;
         self.snapshot
             .positions
             .iter()
-            .try_fold(self.snapshot.cash, |v, l| {
+            .try_fold(cash_and_receivable, |v, l| {
                 let m = self
                     .snapshot
                     .marks
@@ -70,7 +80,7 @@ impl State {
     }
 
     fn observe(&mut self) -> Result<()> {
-        let mut kernel = RiskKernel::restore(self.config.clone(), self.risk.clone())?;
+        let mut kernel = self.risk_kernel()?;
         let observed = kernel.observe_account(
             &self.snapshot,
             self.snapshot.as_of,
@@ -112,7 +122,43 @@ impl State {
     }
 
     pub(crate) fn apply(&mut self, cmd: &Command) -> Result<()> {
+        if let Some(book) = &self.cash_dividends {
+            if matches!(cmd, Command::Observe { external_flow_fen, .. } if *external_flow_fen != 0)
+            {
+                return Err(
+                    "CASH_DIVIDEND_V1 隔离模型禁止外部资金流；股息只能走冻结事件路径".into(),
+                );
+            }
+            if let Command::Submit { proposal, .. } = cmd {
+                if book.events.iter().any(|a| {
+                    a.recognized
+                        && a.event.instrument == proposal.instrument
+                        && proposal.decision_at < a.event.ex_at
+                }) {
+                    return Err("除息前旧提案不得换 ID 重放；须用除息后可信价格重新决策".into());
+                }
+            }
+            let now = match cmd {
+                Command::Observe { now, .. }
+                | Command::Submit { now, .. }
+                | Command::Match { now, .. }
+                | Command::HistoricalNextOpenV1 { now, .. } => Some(*now),
+                _ => None,
+            };
+            if let Some(now) = now {
+                book.guard_clock(now)?;
+            }
+        }
         match cmd {
+            Command::CashDividendV1 {
+                event_id,
+                phase,
+                now,
+                day,
+                marks,
+            } => {
+                self.apply_dividend(event_id, phase, *now, *day, marks)?;
+            }
             Command::HistoricalNextOpenV1 { now, bar, rules } => {
                 self.historical_next_open(bar, rules, *now)?;
             }
@@ -171,7 +217,7 @@ impl State {
                 }
                 self.advance(*now, *day)?;
                 let context = self.context(p, rules.clone(), fees.as_ref(), None);
-                let mut kernel = RiskKernel::restore(self.config.clone(), self.risk.clone())?;
+                let mut kernel = self.risk_kernel()?;
                 let decision = kernel.review(&self.snapshot, p, &context);
                 self.risk = kernel.state().clone();
                 self.snapshot.equity_basis.cash_flow_adjusted_peak = self.risk.peak();
@@ -245,7 +291,7 @@ impl State {
                 }
             }
             Command::Freeze { scope, reason } => {
-                let mut k = RiskKernel::restore(self.config.clone(), self.risk.clone())?;
+                let mut k = self.risk_kernel()?;
                 k.freeze(*scope, *reason);
                 self.risk = k.state().clone();
             }
@@ -387,7 +433,7 @@ impl State {
             {
                 *self = before_order;
                 capacity = before_capacity;
-                let mut kernel = RiskKernel::restore(self.config.clone(), self.risk.clone())?;
+                let mut kernel = self.risk_kernel()?;
                 kernel.freeze(
                     stratide_risk::RiskScope::Account,
                     stratide_risk::FreezeReason::Manual,
@@ -520,7 +566,7 @@ impl State {
             Some(schedule),
             Some(order.reserved_fee),
         );
-        let mut kernel = RiskKernel::restore(self.config.clone(), self.risk.clone())?;
+        let mut kernel = self.risk_kernel()?;
         let decision = kernel.review(&available, &p, &c);
         self.risk = kernel.state().clone();
         self.snapshot.equity_basis.cash_flow_adjusted_peak = self.risk.peak();
@@ -650,6 +696,7 @@ impl State {
     pub(crate) fn validate(&self) -> Result<()> {
         let mut expected_cash = i128::from(self.config.initial_capital.fen())
             + i128::from(self.snapshot.equity_basis.net_external_flow_total_fen);
+        expected_cash += i128::from(self.dividend_totals()?.cash_paid_fen);
         let mut quantities: Vec<(Instrument, i64)> = vec![];
         for f in &self.fills {
             let gross = i128::from(f.price.fen()) * i128::from(f.quantity);

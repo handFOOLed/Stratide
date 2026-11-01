@@ -29,6 +29,8 @@ struct Daily {
     remaining_cost_basis_fen: Option<i128>,
     external_flow_total_fen: i64,
     valuation_error: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    cash_dividend: Option<stratide_ledger::cash_dividend::DividendTotals>,
 }
 
 struct Lot {
@@ -173,6 +175,11 @@ fn daily(
         unrealized_pnl_fen: if completed { unrealized } else { None },
         remaining_cost_basis_fen: basis,
         external_flow_total_fen: state.snapshot.equity_basis.net_external_flow_total_fen,
+        cash_dividend: if state.cash_dividends.is_some() {
+            Some(state.dividend_totals()?)
+        } else {
+            None
+        },
         valuation_error: if completed {
             state.valuation_error.clone()
         } else {
@@ -218,6 +225,7 @@ pub(super) fn export(
     let mut events = Vec::new();
     let mut previous_fills = 0;
     let mut previous_orders = 0;
+    let mut dividend_actions = Vec::new();
     for entry in &history {
         if let Some(command) = &entry.command {
             match command {
@@ -235,20 +243,55 @@ pub(super) fn export(
                             .contains(&(bar.instrument.clone(), bar.day));
                     final_by_day.insert(bar.day.0, (&entry.state, completed));
                 }
-                Command::Submit { day, .. } => {
+                Command::Submit { day, .. } | Command::CashDividendV1 { day, .. } => {
                     let completed = final_by_day.get(&day.0).is_some_and(|(_, c)| *c);
                     final_by_day.insert(day.0, (&entry.state, completed));
                 }
                 _ => {}
             }
-            events.push(json!({
+            let mut event = json!({
                 "seq": entry.seq, "event_id": entry.event_id, "ledger_digest": entry.digest,
                 "command": command, "account_as_of": entry.state.snapshot.as_of,
                 "cash_fen": entry.state.snapshot.cash.fen(), "nav_fen": entry.state.equity.map(Cny::fen),
                 "new_orders": &entry.state.orders[previous_orders..],
                 "new_fills": &entry.state.fills[previous_fills..],
                 "risk": entry.state.risk, "valuation_error": entry.state.valuation_error,
-            }));
+            });
+            if let Some(book) = &entry.state.cash_dividends {
+                event["cash_dividend"] = serde_json::to_value(entry.state.dividend_totals()?)
+                    .map_err(|e| e.to_string())?;
+                event["held_shares"] = json!(entry
+                    .state
+                    .snapshot
+                    .positions
+                    .iter()
+                    .map(|p| p.quantity)
+                    .sum::<i64>());
+                if let Command::CashDividendV1 {
+                    event_id,
+                    phase,
+                    now,
+                    day,
+                    ..
+                } = command
+                {
+                    let a = book
+                        .events
+                        .iter()
+                        .find(|a| a.event.event_id == *event_id)
+                        .ok_or("审计缺公司行为")?;
+                    let (gross, tax) = a.event.amounts(a.entitled_shares.ok_or("审计缺权益")?)?;
+                    dividend_actions.push(json!({
+                        "ledger_seq": entry.seq, "ledger_event_id": entry.event_id, "ledger_digest": entry.digest,
+                        "event": a.event, "phase": phase, "at": now, "day": day,
+                        "entitled_shares": a.entitled_shares, "gross_fen": gross, "tax_fen": tax, "net_fen": gross - tax,
+                        "recognized": a.recognized, "paid": a.paid,
+                        "totals": entry.state.dividend_totals()?, "cash_fen": entry.state.snapshot.cash,
+                        "nav_fen": entry.state.equity, "valuation_error": entry.state.valuation_error,
+                    }));
+                }
+            }
+            events.push(event);
             previous_orders = entry.state.orders.len();
             previous_fills = entry.state.fills.len();
         }
@@ -292,7 +335,7 @@ pub(super) fn export(
     }
     let total_fees = last.cumulative_fee_fen;
     let first_buy: Option<&Fill> = final_state.fills.iter().find(|f| f.side == Side::Buy);
-    let buy_hold_nav = if flow == 0 && last.nav_fen.is_some() {
+    let buy_hold_nav = if dataset.cash_dividends.is_none() && flow == 0 && last.nav_fen.is_some() {
         first_buy.and_then(|f| {
             let final_mark = final_state
                 .snapshot
@@ -343,8 +386,8 @@ pub(super) fn export(
         "timezone": dataset.timezone, "price_semantics": dataset.price_semantics,
         "instrument": dataset.instrument, "first_day": dataset.sessions.first().unwrap().day,
         "last_day": dataset.sessions.last().unwrap().day,
-        "strategy_version": historical::strategy_version(dataset),
-        "strategy_spec_sha256": format!("{:x}", Sha256::digest(if dataset.historical.is_some() { historical::SPEC } else { STRATEGY_SPEC }.as_bytes())),
+        "strategy_version": if dataset.cash_dividends.is_some() { super::cash_dividend::VERSION } else { historical::strategy_version(dataset) },
+        "strategy_spec_sha256": format!("{:x}", Sha256::digest(if dataset.cash_dividends.is_some() { super::cash_dividend::SPEC } else if dataset.historical.is_some() { historical::SPEC } else { STRATEGY_SPEC }.as_bytes())),
         "config_sha256": config_hash,
         "config": final_state.config, "ledger_head": ledger.head(),
         "initial_nav_fen": initial, "ending_nav_fen": last.nav_fen,
@@ -368,6 +411,19 @@ pub(super) fn export(
         "positions": final_state.snapshot.positions, "events": events,
     });
     let mut summary = summary;
+    if let Some(book) = &final_state.cash_dividends {
+        summary["report_schema"] = json!(2);
+        summary["ledger_schema"] = json!(4);
+        summary["cash_dividend_protocol"] = json!("CASH_DIVIDEND_V1");
+        summary["cash_dividend"] =
+            serde_json::to_value(final_state.dividend_totals()?).map_err(|e| e.to_string())?;
+        summary["frozen_cash_dividends"] = serde_json::to_value(book).map_err(|e| e.to_string())?;
+        summary["cash_dividend_actions"] = json!(dividend_actions);
+        summary["historical_pit"] = json!("NOT_VERIFIED");
+        summary["eligibility"] = json!("ELIGIBILITY_DENIED");
+        summary["opening_source"] = json!("BLOCKED");
+        summary["buy_hold_benchmark_note"] = json!("分红模式须另运行 paper-dividend-benchmark，独立账本使用相同股息/税/风险/成交模型；Python逐日复算，不使用旧无股息近似值");
+    }
     if let Some(historical) = &dataset.historical {
         summary["historical_assumptions"] =
             serde_json::to_value(historical).map_err(|e| e.to_string())?;
@@ -380,6 +436,10 @@ pub(super) fn export(
     let report_json = serde_json::to_vec_pretty(&summary).map_err(|e| e.to_string())?;
     let events_json = serde_json::to_vec_pretty(&events).map_err(|e| e.to_string())?;
     let mut daily_csv = String::from("day,nav_fen,cash_fen,available_cash_fen,reserved_cash_fen,held_shares,sellable_shares,unsettled_shares,reserved_sell_shares,pending_orders,cumulative_fee_fen,realized_pnl_fen,unrealized_pnl_fen,remaining_cost_basis_fen,external_flow_total_fen,valuation_error\n");
+    if dataset.cash_dividends.is_some() {
+        daily_csv.pop();
+        daily_csv.push_str(",receivable_fen,liability_fen,dividend_gross_income_fen,dividend_tax_expense_fen,dividend_cash_paid_fen\n");
+    }
     for d in &daily_rows {
         daily_csv.push_str(&format!(
             "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n",
@@ -400,6 +460,17 @@ pub(super) fn export(
             d.external_flow_total_fen,
             csv_cell(d.valuation_error.as_deref().unwrap_or(""))
         ));
+        if let Some(t) = d.cash_dividend {
+            daily_csv.pop();
+            daily_csv.push_str(&format!(
+                ",{},{},{},{},{}\n",
+                t.receivable_fen,
+                t.liability_fen,
+                t.gross_income_fen,
+                t.tax_expense_fen,
+                t.cash_paid_fen
+            ));
+        }
     }
     let mut orders_csv =
         String::from("proposal_id,day,side,quantity,limit_fen,status,remaining,reason\n");
@@ -457,7 +528,7 @@ pub(super) fn export(
             p.instrument.market, p.instrument.code, p.acquired_on.0, p.quantity
         ));
     }
-    let files = [
+    let mut files = vec![
         ("events.json", events_json),
         ("daily.csv", daily_csv.into_bytes()),
         ("orders.csv", orders_csv.into_bytes()),
@@ -465,5 +536,11 @@ pub(super) fn export(
         ("positions.csv", positions_csv.into_bytes()),
         ("report.json", report_json),
     ];
+    if dataset.cash_dividends.is_some() {
+        files.push((
+            "cash-dividends.json",
+            serde_json::to_vec_pretty(&dividend_actions).map_err(|e| e.to_string())?,
+        ));
+    }
     publish::publish(out, &files)
 }

@@ -1,0 +1,5 @@
+proposal_id,day,side,quantity,limit_fen,status,remaining,reason
+1,20260713,Buy,100,1000,Filled,0,"保守日线限价穿越模型模拟成交；不是交易所成交"
+2,20260715,Sell,100,1000,Expired,100,"CASH_DIVIDEND_V1/synthetic-600000-202607-v1：除息前旧挂单到期释放；不支持自动调价，须重新提交"
+3,20260716,Sell,100,958,Filled,0,"保守日线限价穿越模型模拟成交；不是交易所成交"
+4,20260717,Buy,10000,958,Rejected,10000,"可用资金不足：需要 96000.00 元，扣除预留后仅有 9956.91 元"

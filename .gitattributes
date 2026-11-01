@@ -1,3 +1,7 @@
 # The replay input hash is over raw bytes and must survive Windows checkout.
 samples/m0-pr03-synthetic.json text eol=lf
 docs/evidence/m0-pr03/sample-report/* text eol=lf
+samples/cash-dividend-v1.json text eol=lf
+samples/cash-dividend-source-v1.json text eol=lf
+scripts/cash-dividend-evaluate.py text eol=lf
+docs/evidence/m1-pr08/** -text whitespace=cr-at-eol

@@ -193,11 +193,22 @@ pub struct State {
     pub sessions: Vec<(Instrument, TradingDay)>,
     pub equity: Option<Cny>,
     pub valuation_error: Option<String>,
+    /// Present only in explicitly created v4 isolation ledgers. Omitted v3 bytes
+    /// and hashes are unchanged; no existing ledger is migrated.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cash_dividends: Option<crate::cash_dividend::CashDividendBook>,
 }
 
 /// Trusted-core commands. No Worker/control-network API is exposed by this crate.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Command {
+    CashDividendV1 {
+        event_id: String,
+        phase: crate::cash_dividend::DividendPhase,
+        now: Timestamp,
+        day: TradingDay,
+        marks: Vec<PositionMark>,
+    },
     /// Ex-post historical model, NOT a prospective opening observation. Fixed
     /// v1: next-open +/- one adverse tick, 100-share session capacity, no OHLC
     /// crossing or full-day volume eligibility. Never accepted in synthetic mode.
