@@ -1,0 +1,555 @@
+{
+  "authority": "NO_ORDERS/NO_FILLS/NO_NAV",
+  "checks": [
+    {
+      "after": {
+        "counts": {
+          "agent_calls": 0,
+          "agent_tasks": 0,
+          "observer_events": 5,
+          "registrations": 0,
+          "shadow_inputs": 0,
+          "snapshot_snapshots": 1
+        },
+        "sha256": {
+          "agent": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "99f7a220d9b6b592eed2a25701912b812345e7e31721a85918601a45c8b3dc4b"
+          },
+          "observer": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "6f92b5661f0a12f54154c687f2d8c71dd62fb2f975075e8a3131e2ca0084a5df"
+          },
+          "shadow": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "71cf5d0a17543d91af500e9c928c63ed3b30f426b1cfac019e56199c60082e7f"
+          },
+          "snapshot": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "194e8bfdb9783c58bb377476dc746eeb637a3be5b5491537c86f77e32fcfef63"
+          }
+        }
+      },
+      "before": {
+        "counts": {
+          "agent_calls": 0,
+          "agent_tasks": 0,
+          "observer_events": 3,
+          "registrations": 0,
+          "shadow_inputs": 0,
+          "snapshot_snapshots": 1
+        },
+        "sha256": {
+          "agent": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "99f7a220d9b6b592eed2a25701912b812345e7e31721a85918601a45c8b3dc4b"
+          },
+          "observer": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "0c4840b473f2cde0f3c4928b6a2ffb5be00099ac2b153b78df4168258bcf69c2"
+          },
+          "shadow": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "71cf5d0a17543d91af500e9c928c63ed3b30f426b1cfac019e56199c60082e7f"
+          },
+          "snapshot": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "194e8bfdb9783c58bb377476dc746eeb637a3be5b5491537c86f77e32fcfef63"
+          }
+        }
+      },
+      "check": "disable_inflight_collector",
+      "disable_exit": 0,
+      "http_calls": 2,
+      "once_exit": 0
+    },
+    {
+      "after": {
+        "counts": {
+          "agent_calls": 0,
+          "agent_tasks": 0,
+          "observer_events": 3,
+          "registrations": 0,
+          "shadow_inputs": 0,
+          "snapshot_snapshots": 1
+        },
+        "sha256": {
+          "agent": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "9bd9aa49e1f232fc7ed709e806e42b34141eec72c0a7dda73cbcda8c47acb494"
+          },
+          "observer": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "9ccccadc22dd070cd14a1768e08b36c0987ce8e4c2a5d962dc2e6c116d5b758d"
+          },
+          "shadow": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "b7dc322e99bfd4b8e5421c939a36c3118a24b0dcefc5c84ad5d97f872c70530e"
+          },
+          "snapshot": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "9951a39ffbe4964d275a93141fae91c0ed7e47645dec309bd44cd6ddab8d3494"
+          }
+        }
+      },
+      "before": {
+        "counts": {
+          "agent_calls": 0,
+          "agent_tasks": 0,
+          "observer_events": 3,
+          "registrations": 0,
+          "shadow_inputs": 0,
+          "snapshot_snapshots": 1
+        },
+        "sha256": {
+          "agent": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "9bd9aa49e1f232fc7ed709e806e42b34141eec72c0a7dda73cbcda8c47acb494"
+          },
+          "observer": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "9ccccadc22dd070cd14a1768e08b36c0987ce8e4c2a5d962dc2e6c116d5b758d"
+          },
+          "shadow": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "b7dc322e99bfd4b8e5421c939a36c3118a24b0dcefc5c84ad5d97f872c70530e"
+          },
+          "snapshot": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "9951a39ffbe4964d275a93141fae91c0ed7e47645dec309bd44cd6ddab8d3494"
+          }
+        }
+      },
+      "check": "disable_before_dispatch",
+      "disable_exit": 0,
+      "http_after": 0,
+      "http_before": 0,
+      "once_exit": 0,
+      "stage": "collector"
+    },
+    {
+      "after": {
+        "counts": {
+          "agent_calls": 0,
+          "agent_tasks": 0,
+          "observer_events": 5,
+          "registrations": 0,
+          "shadow_inputs": 0,
+          "snapshot_snapshots": 1
+        },
+        "sha256": {
+          "agent": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "f9c0105e286860522f6aa8521a2f83c586868c7f470ae539ffd6d14df3b88a4f"
+          },
+          "observer": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "853b2d1c433fcee0e574e0f1098836c716526ec57f56211e768ffa80da78af7e"
+          },
+          "shadow": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "77e10773ef5974aa690779573ebbaad23b8082379635d15536478e635132e92b"
+          },
+          "snapshot": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "558301eee37eee72a09557cfa5a9dc612a51824ef57c9b0ea1b5fdcd12604ccc"
+          }
+        }
+      },
+      "before": {
+        "counts": {
+          "agent_calls": 0,
+          "agent_tasks": 0,
+          "observer_events": 5,
+          "registrations": 0,
+          "shadow_inputs": 0,
+          "snapshot_snapshots": 1
+        },
+        "sha256": {
+          "agent": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "f9c0105e286860522f6aa8521a2f83c586868c7f470ae539ffd6d14df3b88a4f"
+          },
+          "observer": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "853b2d1c433fcee0e574e0f1098836c716526ec57f56211e768ffa80da78af7e"
+          },
+          "shadow": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "77e10773ef5974aa690779573ebbaad23b8082379635d15536478e635132e92b"
+          },
+          "snapshot": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "558301eee37eee72a09557cfa5a9dc612a51824ef57c9b0ea1b5fdcd12604ccc"
+          }
+        }
+      },
+      "check": "disable_before_dispatch",
+      "disable_exit": 0,
+      "http_after": 2,
+      "http_before": 2,
+      "once_exit": 0,
+      "stage": "snapshot"
+    },
+    {
+      "after": {
+        "counts": {
+          "agent_calls": 0,
+          "agent_tasks": 0,
+          "observer_events": 5,
+          "registrations": 0,
+          "shadow_inputs": 0,
+          "snapshot_snapshots": 2
+        },
+        "sha256": {
+          "agent": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "206cc9195f1184668e50004bd3df647813e387f457d0cded1be63b8ff83e9649"
+          },
+          "observer": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "5c2cd783aea0f45f06388f3f2f8a9e35ea62e95b3582f42a6a053fd66be46e05"
+          },
+          "shadow": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "5f742533e13fb66bdf99c3a2406c2c7cd6ce55bfd2ac10073f351ef725cf7eee"
+          },
+          "snapshot": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "68246085220a9363b3e3e6d2721cdf29e231362f758799c7f5fcf8157dec4e80"
+          }
+        }
+      },
+      "before": {
+        "counts": {
+          "agent_calls": 0,
+          "agent_tasks": 0,
+          "observer_events": 5,
+          "registrations": 0,
+          "shadow_inputs": 0,
+          "snapshot_snapshots": 2
+        },
+        "sha256": {
+          "agent": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "206cc9195f1184668e50004bd3df647813e387f457d0cded1be63b8ff83e9649"
+          },
+          "observer": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "5c2cd783aea0f45f06388f3f2f8a9e35ea62e95b3582f42a6a053fd66be46e05"
+          },
+          "shadow": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "5f742533e13fb66bdf99c3a2406c2c7cd6ce55bfd2ac10073f351ef725cf7eee"
+          },
+          "snapshot": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "68246085220a9363b3e3e6d2721cdf29e231362f758799c7f5fcf8157dec4e80"
+          }
+        }
+      },
+      "check": "disable_before_dispatch",
+      "disable_exit": 0,
+      "http_after": 2,
+      "http_before": 2,
+      "once_exit": 0,
+      "stage": "shadow"
+    },
+    {
+      "after": {
+        "counts": {
+          "agent_calls": 0,
+          "agent_tasks": 0,
+          "observer_events": 5,
+          "registrations": 0,
+          "shadow_inputs": 1,
+          "snapshot_snapshots": 2
+        },
+        "sha256": {
+          "agent": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "576a0e7293ac3f4fd98f3c6868cacbd8c109d39113a7b7fce2ed97b3cfea1f81"
+          },
+          "observer": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "7462542ac0e9a7310f4e27a590881aec897d2e1dc677492b5bdedf47c47f7b26"
+          },
+          "shadow": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "51e6f3c05792b12fc719a29ce0c0039a5fe0f10f87779576b5b8f1cc605475e7"
+          },
+          "snapshot": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "2f3bf29910e52bd7e504c30f61c0e488abbbb210f83464475af4b0cf0e823b87"
+          }
+        }
+      },
+      "before": {
+        "counts": {
+          "agent_calls": 0,
+          "agent_tasks": 0,
+          "observer_events": 5,
+          "registrations": 0,
+          "shadow_inputs": 1,
+          "snapshot_snapshots": 2
+        },
+        "sha256": {
+          "agent": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "576a0e7293ac3f4fd98f3c6868cacbd8c109d39113a7b7fce2ed97b3cfea1f81"
+          },
+          "observer": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "7462542ac0e9a7310f4e27a590881aec897d2e1dc677492b5bdedf47c47f7b26"
+          },
+          "shadow": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "51e6f3c05792b12fc719a29ce0c0039a5fe0f10f87779576b5b8f1cc605475e7"
+          },
+          "snapshot": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "2f3bf29910e52bd7e504c30f61c0e488abbbb210f83464475af4b0cf0e823b87"
+          }
+        }
+      },
+      "check": "disable_before_dispatch",
+      "disable_exit": 0,
+      "http_after": 2,
+      "http_before": 2,
+      "once_exit": 0,
+      "stage": "fake"
+    },
+    {
+      "check": "four_actual_process_kills",
+      "collector_attempts_each": 1,
+      "exits": 86,
+      "fake_settlements_each": 1,
+      "points": [
+        "after_collect",
+        "after_sync",
+        "after_shadow",
+        "after_fake"
+      ]
+    },
+    {
+      "after": {
+        "counts": {
+          "agent_calls": 0,
+          "agent_tasks": 0,
+          "observer_events": 5,
+          "registrations": 0,
+          "shadow_inputs": 0,
+          "snapshot_snapshots": 1
+        },
+        "sha256": {
+          "agent": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "ec0be5f0a2d6f38aa354c7f87efa6f767870836d2cbe79694837a317bf53134e"
+          },
+          "observer": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "6568aec66b2a45ec67bfad2d413aeee563108f51788297e2f0d86441c822491e"
+          },
+          "shadow": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "70e355c0f0d8396d48e0be7b014c50d6d931b90dab41de9a7ba71b6ba4b2a7cf"
+          },
+          "snapshot": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "dc6bc6d9053ecffbd39bb229d7dfd29ad03824c3a18480dde47d0726dc1eaa89"
+          }
+        }
+      },
+      "before": {
+        "counts": {
+          "agent_calls": 0,
+          "agent_tasks": 0,
+          "observer_events": 3,
+          "registrations": 0,
+          "shadow_inputs": 0,
+          "snapshot_snapshots": 1
+        },
+        "sha256": {
+          "agent": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "ec0be5f0a2d6f38aa354c7f87efa6f767870836d2cbe79694837a317bf53134e"
+          },
+          "observer": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "d00943678d7e969dbd47059b2546b0d59365fb9ae413a44d80e5f9a59e2d7a2d"
+          },
+          "shadow": {
+            "-journal": null,
+            "-shm": null,
+            "-wal": null,
+            "main": "70e355c0f0d8396d48e0be7b014c50d6d931b90dab41de9a7ba71b6ba4b2a7cf"
+          },
+          "snapshot": {
+            "-journal": null,
+            "-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+            "-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "main": "dc6bc6d9053ecffbd39bb229d7dfd29ad03824c3a18480dde47d0726dc1eaa89"
+          }
+        }
+      },
+      "check": "actual_Popen_held_transaction_against_disable",
+      "disable_exit": 0,
+      "disable_returned_before_collector_finished": true,
+      "dispatch_transaction_locked": true,
+      "http_calls": 2,
+      "once_exit": 0
+    },
+    {
+      "check": "two_22_day_original_subsystems",
+      "independent_decimal": true,
+      "loopback_requests": 84,
+      "outcomes": [
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "UP_CROSS",
+        "DOWN_CROSS"
+      ],
+      "readonly_bytes_and_mtimes_unchanged": true,
+      "registrations": 44,
+      "settled_fake_calls": 44,
+      "tasks": 44
+    }
+  ],
+  "clock": "test_only_dependency_injection_and_original_Rust_cfg_test",
+  "collection_policy": "16h_fallback_EARLY_SOURCE_UNVERIFIED_no_early_retry",
+  "collector": "loopback_HTTP_schema1041_protocol_fixture_original_collector_unchanged",
+  "data_mode": "synthetic_test",
+  "errors": 0,
+  "failures": 0,
+  "fills": 0,
+  "forward_paper_allowed": false,
+  "genuine_new_forward_days": 0,
+  "historical_pit": "NOT_VERIFIED",
+  "implementation_sha256": {
+    "research/eod_operator.py": "9a26e83235c5703dca53eea3fd29eecd125cbfeb126a792d0d41c98166eb29d4",
+    "scripts/eod-operator.py": "51184fa6deaee05c262384b77e3bf10d73164b67a80a3f79f44dd8faa8ead489",
+    "scripts/test-eod-operator.py": "f9284ada73c61dccc02bb901df201e7d0d8f5d7d5aab255784d522304b77b983"
+  },
+  "live_allowed": false,
+  "nav": null,
+  "opening_source": "BLOCKED",
+  "orders": 0,
+  "public_market_requests": 0,
+  "real_llm_calls": 0,
+  "result": "PASS",
+  "tests_run": 18,
+  "verification": "developer_selftest_not_independent_acceptance",
+  "fix_base": "5efcf624ff71a3b95c192b9000432a0ab14f6594",
+  "command": "python -X utf8 -B scripts/test-eod-operator.py",
+  "exit_code": 0
+}

@@ -20,11 +20,13 @@
 
 PR #42 的[历史公司行为桥接 V1](M1_PR09.md)、PR #44 的[EOD 自动研究](M2_PR07.md)、PR #46 的[候选审阅评价](M2_PR08.md) 均已并入 main。77 个历史会话仍为 EXPLORATORY_EX_POST，真实 PIT 新增 0 天；原证据保留。
 
-**本分支 M1-PR10 Draft：** [#47](https://github.com/handFOOLed/Stratide/issues/47) 一次交付 [Forward EOD Shadow V1](M1_PR10.md)：Owner 本机启停 → 已实收当日 EOD / 连续 21 日固定 SMA5/20 → 不可回填来源/决策日志 → 只读 Decimal 复算报告。双目录 22 日 synthetic E2E、并发、三处真实进程中断/恢复和旧路径回归为开发自测。真实 observer/PR33 快照仍只有 10/28–10/29 两日，MISSED_OR_STALE、预热不足，新增真实信号 0；**NO_ORDERS / NO_FILLS / NO_NAV**。
+**M1-PR10 已合并（PR #48）：** [Forward EOD Shadow V1](M1_PR10.md) 提供 Owner 本机启停、原当日 EOD/连续 21 日固定 SMA5/20、不可回填决策与只读 Decimal 复算。原真实两日证据及暖机不足限制保留。
+
+**本分支 M2-PR09 Draft：** [#49](https://github.com/handFOOLed/Stratide/issues/49) 交付 [自动 EOD Operator V1](M2_PR09.md)：一次安全配置/enable → 前台每日检查/原采集器 → Snapshot → Shadow/可选 Fake → 原提交 ref 审计。15:15 检查并报告 `EARLY_SOURCE_UNVERIFIED`，按 Issue 允许的回退保留 16:00 正式单槽；不改变原未知/失败重发语义。默认 OFF、持久 disable、四阶段恢复、只读查询；synthetic 测试不增加真实前向日。**NO_ORDERS / NO_FILLS / NO_NAV**。
 
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |
-| **当前 #47** | **Sol** | 完整 Shadow 启停/固定规则/唯一日志/恢复/只读审计；[自测](evidence/m1-pr10/README.md)，唯一 Draft，ChatGPT 固定 HEAD 审查，Owner 明确许可后才合并。 |
+| **当前 #49** | **Sol** | 完整 Operator 一次授权/安全凭据/前台采集接线/分阶段恢复/只读审计；[开发证据](evidence/m2-pr09/README.md)，唯一 Draft，ChatGPT 固定 HEAD 审查，Owner 明确许可后才合并。 |
 | **后续核心** | Owner 再定范围 | #10 真实开盘、PIT、账户税/到账仍受阻；#36 为未来提案。 |
 | **核心全部完成后** | **Sol** | 按 PR #28 的设计体系统一集成 UI；本期不改 UI。 |
 

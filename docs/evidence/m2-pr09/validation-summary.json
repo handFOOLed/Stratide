@@ -1,0 +1,110 @@
+{
+  "base": "6e3448d15b6e5fe47678d7aec37f4cf06980fd26",
+  "issue": 49,
+  "issue_updated_at": "2026-11-01T09:30:30Z",
+  "verification": "developer_selftest_not_independent_acceptance",
+  "production_rust_changed": false,
+  "checks": [
+    {
+      "command": "python -X utf8 -B scripts/test-eod-operator.py",
+      "tests": 15,
+      "exit_code": 0,
+      "result": "PASS",
+      "session": "normal_Windows_user_for_native_test_credential"
+    },
+    {
+      "command": "python -X utf8 -B scripts/test-data-snapshot.py -v",
+      "tests": 11,
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    {
+      "command": "python -X utf8 -B scripts/test-forward-shadow.py --evidence",
+      "tests": 9,
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    {
+      "command": "python -X utf8 -B scripts/test-eod-auto.py --evidence",
+      "tests": 16,
+      "exit_code": 1,
+      "result": "15_PASS_1_JUNCTION_CREATION_DENIED_IN_SANDBOX"
+    },
+    {
+      "command": "python -X utf8 -B scripts/test-eod-auto.py --test test_init_existing_directory_binding_and_junction_are_rejected",
+      "tests": 1,
+      "exit_code": 0,
+      "result": "PASS_normal_Windows_permissions"
+    },
+    {
+      "command": "python -X utf8 -B scripts/test-research-review.py --evidence",
+      "tests": 12,
+      "exit_code": 0,
+      "result": "PASS_normal_Windows_permissions"
+    },
+    {
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/with-msvc.ps1 test --workspace --locked --offline",
+      "exit_code": 0,
+      "result": "PASS",
+      "temp": "workspace/state/test-tmp"
+    },
+    {
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/with-msvc.ps1 build -p stratide-cli -p stratide-research --bins --locked --offline",
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    {
+      "command": "python -I -B scripts/eod-operator.py --help",
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "PASS"
+    }
+  ],
+  "red_green": [
+    {
+      "before_command": "python -I -B scripts/eod-operator.py --help",
+      "before_exit": 1,
+      "before": "entry_missing",
+      "after_exit": 0
+    },
+    {
+      "test": "test_own_hot_receipt_recovers_only_in_writer_without_rerunning_children",
+      "before_suite_exit": 1,
+      "before_once_exit": 2,
+      "before": "STORE_BUSY_OR_RECOVERY_REQUIRED",
+      "after_suite_exit": 0,
+      "after": "COMPLETE_original_collector_and_fake_settled_once"
+    }
+  ],
+  "environment_recovery": [
+    "Default TEMP caused Access denied in original Rust report tests; workspace-local TEMP/TMP passed full workspace.",
+    "Sandbox denies native Windows Credential Manager and some test junction creation; normal user session verified synthetic credential roundtrip and junction cases."
+  ],
+  "not_run": [
+    "Rust fmt/check/clippy: no Rust modifications; actual build and full workspace safety tests ran."
+  ],
+  "collection_policy": "15:15_local_check_16:00_original_collector_fallback_no_automatic_failed_slot_retry",
+  "not_verified": [
+    "real_Tushare_account_availability",
+    "early_15:15_formal_collection_and_bounded_NOT_READY_retry",
+    "uninterrupted_long_running_watch",
+    "Linux",
+    "macOS",
+    "physical_power_loss",
+    "new_genuine_21_day_forward_observation"
+  ],
+  "public_market_requests": 0,
+  "real_llm_calls": 0,
+  "genuine_new_forward_days": 0,
+  "orders": 0,
+  "fills": 0,
+  "nav": null,
+  "forward_paper_allowed": false,
+  "live_allowed": false,
+  "historical_pit": "NOT_VERIFIED",
+  "opening_source": "BLOCKED"
+}
