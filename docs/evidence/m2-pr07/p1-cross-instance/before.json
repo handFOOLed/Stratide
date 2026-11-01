@@ -1,0 +1,41 @@
+{
+  "can_execute_forward_paper": false,
+  "checks": [
+    {
+      "check": "distinct_instances_same_binding",
+      "enable_exits": [
+        0,
+        0
+      ],
+      "global_counts": {
+        "calls": 2,
+        "intents": 2,
+        "registrations": 2,
+        "tasks": 2
+      },
+      "once_exits": [
+        0,
+        0
+      ]
+    }
+  ],
+  "clock": "cfg(test)_Rust_and_test_only_Python_dependency_injection",
+  "data_mode": "synthetic_test",
+  "eligibility": "ELIGIBILITY_DENIED",
+  "errors": 0,
+  "evaluation": "NOT_EVALUATED",
+  "failures": 1,
+  "fixture_source_day": "2026-10-27",
+  "genuine_new_forward_days": 0,
+  "live_allowed": false,
+  "market_requests": 0,
+  "mode": "LOCAL_FAKE_ONLY",
+  "production_clock_override": false,
+  "production_code_head": "625a175065122a883dae69bd7b95d36097288203",
+  "real_provider_calls": 0,
+  "restriction": "RESEARCH_ONLY",
+  "result": "FAIL",
+  "source_clock_ms": 1793095200000,
+  "tests_run": 1,
+  "verification": "Sol_developer_selftest_not_independent_acceptance"
+}

@@ -4,6 +4,8 @@
 
 本目录只含 synthetic 自动研究过程、脱敏命令/结果、计数与 SHA。实际 SQLite/WAL、原行情、Owner token、来源路径及未脱敏命令保留在新 ignored `state/`。完整操作与恢复规则见 [M2-PR07](../../M2_PR07.md)。
 
+**PR #44 P1 修复补充：** [跨实例唯一归属与真实双实例 CLI E2E](p1-cross-instance/README.md) 修复同一 binding 在不同 `--name` 下重复触发的问题。下文 13 项/156 项和原 JSON 是首版固定 HEAD `625a175065122a883dae69bd7b95d36097288203` 的历史开发证据；新 HEAD 的 16 项自动化 E2E、定向 Rust 检查、修复前后反例与命令记录单独保留，不把旧结果改写为新审查结论。
+
 ## 完整 CLI E2E 与重复触发
 
 [cli-e2e.json](cli-e2e.json) 保留两个新隔离目录的完整纵向命令与 JSON 结果：原 PR33 synthetic observer → 原 sync → init 默认 OFF → once 拒绝 → enable → watch 单轮/原 Agent `tick` → 保存 fake calls/result → 原候选 register → task/candidate/status 查询 → 进程重启后 once → 不变 sync → 同日修订 sync → 再次 once。没有人工制造 completed/result，也没有新策略执行能力。

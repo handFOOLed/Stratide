@@ -1,0 +1,423 @@
+### fmt
+
+
+### check
+    Checking stratide-ledger v0.0.1 (<WORKTREE>\crates\ledger)
+    Checking stratide-research v0.0.1 (<WORKTREE>\research\agent)
+    Checking stratided v0.0.1 (<WORKTREE>\apps\stratided)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.56s
+
+
+### clippy
+    Checking stratide-research v0.0.1 (<WORKTREE>\research\agent)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.44s
+
+
+### rust-tests
+   Compiling stratide-research v0.0.1 (<WORKTREE>\research\agent)
+   Compiling stratided v0.0.1 (<WORKTREE>\apps\stratided)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.14s
+     Running unittests src\lib.rs (target\debug\deps\stratide_research-498c998167a2474e.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\bin\eod-auto-agent.rs (target\debug\deps\eod_auto_agent-259a7ab3b9b62c44.exe)
+
+running 1 test
+test tests::fixture_cli ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\bin\eod-research.rs (target\debug\deps\eod_research-6c3a343b8e056f00.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\eod_scope.rs (target\debug\deps\eod_scope-a36b63f137aabf5f.exe)
+
+running 3 tests
+test snapshot_new_tasks_recheck_within_cache_interval_while_queued_input_stays_frozen ... ok
+test local_fake_frozen_task_survives_restart_and_snapshot_never_schedules_eod ... ok
+test new_scope_cannot_use_cloud_even_with_copied_or_matching_grant_and_reserves_nothing ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.75s
+
+     Running tests\safety.rs (target\debug\deps\safety-85f8683efb55495b.exe)
+
+running 11 tests
+test price_rounding_invoice_overrun_and_resource_capacity_are_enforced_outside_provider ... ok
+test concurrent_reservations_use_one_cap_and_each_period_enforces_its_own_limit ... ok
+test queued_old_eod_expires_while_switch_off_without_discarding_manual_work ... ok
+test malicious_text_is_data_network_targets_and_generated_tool_payloads_are_rejected ... ok
+test unsettled_commitments_carry_across_midnight_month_and_restart_without_currency_timezone_reset ... ok
+test new_default_does_not_migrate_queued_tasks_config_revocation_blocks_send_and_task_cap_applies ... ok
+test crash_before_dispatch_is_recoverable_after_dispatch_is_uncertain ... ok
+test eod_off_stale_synthetic_pause_latest_only_and_crash_marker_deduplication ... ok
+test safe_no_charge_retries_once_unknown_charge_never_retries_even_after_switch_or_restart ... ok
+test missing_budget_grant_price_and_scope_prevent_any_dispatch ... ok
+test queue_cancel_pause_persist_and_running_cancel_keeps_result_and_charges ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.79s
+
+     Running tests\status_regression.rs (target\debug\deps\status_regression-4572a41f5357ac2b.exe)
+
+running 8 tests
+test provider_dns_preparation_failure_is_distinct_from_local_policy_rejection ... ok
+test confirmed_no_charge_provider_rejection_still_marks_provider_unavailable ... ok
+test eod_latest_reflects_running_cancel_requested_and_cancelled ... ok
+test eod_latest_reflects_completed_task_and_restart_does_not_schedule_another_call ... ok
+test safe_not_sent_attempt_then_lower_owner_budget_preserves_prior_provider_health ... ok
+test eod_failure_and_uncertainty_follow_actual_task_without_releasing_holds ... ok
+test local_denial_and_queued_cancellation_preserve_prior_provider_success_or_uncertainty ... ok
+test local_budget_authorization_and_price_rejections_are_not_provider_failures ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.56s
+
+     Running unittests src\lib.rs (target\debug\deps\stratided-160ff76ff22d7923.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\main.rs (target\debug\deps\stratided-362298c5ee704589.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\agent.rs (target\debug\deps\agent-3091e04e9e504c52.exe)
+
+running 2 tests
+test eod_snapshot_source_is_opt_in_and_cannot_silently_mix_report_dates_or_modes ... ok
+test cloud_summary_is_a_versioned_projection_without_account_identity_cash_or_private_strategy_payloads ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\dashboard.rs (target\debug\deps\dashboard-4355c27ef834e063.exe)
+
+running 7 tests
+test no_input_is_an_honest_empty_state_with_healthy_service ... ok
+test sample_fields_fills_and_unfilled_orders_are_separate ... ok
+test real_loopback_http_has_no_write_file_or_cross_origin_routes ... ok
+test exact_integer_transport_and_research_never_change_account_nav ... ok
+test null_valuation_is_unavailable_and_not_zero_or_skipped_for_daily_pnl ... ok
+test pinning_refresh_and_restart_are_readonly_even_with_busy_writer_lock ... ok
+test invalid_incomplete_or_mixed_publications_fail_closed ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+   Doc-tests stratide_research
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests stratided
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+
+### before
+test_distinct_instances_same_binding_concurrent_enable_and_restart (__main__.AutoTests.test_distinct_instances_same_binding_concurrent_enable_and_restart) ... FAIL
+
+======================================================================
+FAIL: test_distinct_instances_same_binding_concurrent_enable_and_restart (__main__.AutoTests.test_distinct_instances_same_binding_concurrent_enable_and_restart)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-eod-auto.py", line 157, in test_distinct_instances_same_binding_concurrent_enable_and_restart
+    self.assertEqual(aggregate, dict(intents=1, tasks=1, calls=1, registrations=1))
+AssertionError: {'intents': 2, 'tasks': 2, 'calls': 2, 'registrations': 2} != {'intents': 1, 'tasks': 1, 'calls': 1, 'registrations': 1}
+- {'calls': 2, 'intents': 2, 'registrations': 2, 'tasks': 2}
+?           ^             ^                   ^           ^
+
++ {'calls': 1, 'intents': 1, 'registrations': 1, 'tasks': 1}
+?           ^             ^                   ^           ^
+
+
+----------------------------------------------------------------------
+Ran 1 test in 1.914s
+
+FAILED (failures=1)
+{
+  "result": "FAIL",
+  "tests_run": 1,
+  "failures": 1,
+  "errors": 0,
+  "verification": "Sol_developer_selftest_not_independent_acceptance",
+  "data_mode": "synthetic_test",
+  "fixture_source_day": "2026-10-27",
+  "source_clock_ms": 1793095200000,
+  "clock": "cfg(test)_Rust_and_test_only_Python_dependency_injection",
+  "production_clock_override": false,
+  "real_provider_calls": 0,
+  "market_requests": 0,
+  "genuine_new_forward_days": 0,
+  "checks": [
+    {
+      "check": "distinct_instances_same_binding",
+      "enable_exits": [
+        0,
+        0
+      ],
+      "once_exits": [
+        0,
+        0
+      ],
+      "global_counts": {
+        "intents": 2,
+        "tasks": 2,
+        "calls": 2,
+        "registrations": 2
+      }
+    }
+  ],
+  "mode": "LOCAL_FAKE_ONLY",
+  "restriction": "RESEARCH_ONLY",
+  "evaluation": "NOT_EVALUATED",
+  "eligibility": "ELIGIBILITY_DENIED",
+  "can_execute_forward_paper": false,
+  "live_allowed": false
+}
+
+
+### after
+test_archived_but_not_recorded_recovers_after_source_revision (__main__.AutoTests.test_archived_but_not_recorded_recovers_after_source_revision) ... ok
+test_cloud_settings_real_currency_and_bad_grant_never_reserve_or_call (__main__.AutoTests.test_cloud_settings_real_currency_and_bad_grant_never_reserve_or_call) ... ok
+test_distinct_instances_same_binding_concurrent_enable_and_restart (__main__.AutoTests.test_distinct_instances_same_binding_concurrent_enable_and_restart) ... ok
+test_five_process_interruption_nodes_resume_without_duplicates (__main__.AutoTests.test_five_process_interruption_nodes_resume_without_duplicates) ... ok
+test_full_cli_two_isolated_runs_repeat_revision_and_readonly_queries (__main__.AutoTests.test_full_cli_two_isolated_runs_repeat_revision_and_readonly_queries) ... ok
+test_init_existing_directory_binding_and_junction_are_rejected (__main__.AutoTests.test_init_existing_directory_binding_and_junction_are_rejected) ... ok
+test_legacy_conflicting_intents_block_without_rewriting_evidence (__main__.AutoTests.test_legacy_conflicting_intents_block_without_rewriting_evidence) ... ok
+test_legacy_enabled_instances_claim_once_and_preserve_original_work (__main__.AutoTests.test_legacy_enabled_instances_claim_once_and_preserve_original_work) ... ok
+test_new_observed_day_continues_and_missed_intent_never_backfills (__main__.AutoTests.test_new_observed_day_continues_and_missed_intent_never_backfills) ... ok
+test_parallel_once_and_watch_only_one_daily_task (__main__.AutoTests.test_parallel_once_and_watch_only_one_daily_task) ... ok
+test_partial_or_forged_export_and_budget_failure_not_archived (__main__.AutoTests.test_partial_or_forged_export_and_budget_failure_not_archived) ... ok
+test_pause_resume_cancel_and_disabled_restart (__main__.AutoTests.test_pause_resume_cancel_and_disabled_restart) ... ok
+test_snapshot_corruption_wal_identity_permissions_and_quality (__main__.AutoTests.test_snapshot_corruption_wal_identity_permissions_and_quality) ... ok
+test_source_changed_before_and_after_sync_no_task_replacement (__main__.AutoTests.test_source_changed_before_and_after_sync_no_task_replacement) ... ok
+test_time_counterexamples_and_production_has_no_clock_override (__main__.AutoTests.test_time_counterexamples_and_production_has_no_clock_override) ... ok
+test_uncommitted_trigger_is_not_a_success_and_rollback_allows_one_intent (__main__.AutoTests.test_uncommitted_trigger_is_not_a_success_and_rollback_allows_one_intent) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 56.065s
+
+OK
+{
+  "result": "PASS",
+  "tests_run": 16,
+  "failures": 0,
+  "errors": 0,
+  "verification": "Sol_developer_selftest_not_independent_acceptance",
+  "data_mode": "synthetic_test",
+  "fixture_source_day": "2026-10-27",
+  "source_clock_ms": 1793095200000,
+  "clock": "cfg(test)_Rust_and_test_only_Python_dependency_injection",
+  "production_clock_override": false,
+  "real_provider_calls": 0,
+  "market_requests": 0,
+  "genuine_new_forward_days": 0,
+  "checks": [
+    {
+      "check": "distinct_instances_same_binding",
+      "enable_exits": [
+        0,
+        2
+      ],
+      "once_exits": [
+        0,
+        2
+      ],
+      "global_counts": {
+        "intents": 1,
+        "tasks": 1,
+        "calls": 1,
+        "registrations": 1
+      }
+    },
+    {
+      "check": "binding_owner_persists_after_disable_and_restart",
+      "global_counts": {
+        "intents": 1,
+        "tasks": 1,
+        "calls": 1,
+        "registrations": 1
+      },
+      "different_source_counts": {
+        "intents": 1,
+        "tasks": 1,
+        "calls": 1,
+        "registrations": 1
+      }
+    },
+    {
+      "check": "process_interruption",
+      "point": "after_intent",
+      "before_restart": {
+        "intents": 1,
+        "tasks": 0,
+        "calls": 0,
+        "registrations": 0
+      },
+      "after_restart": {
+        "intents": 1,
+        "tasks": 1,
+        "calls": 1,
+        "registrations": 1
+      }
+    },
+    {
+      "check": "process_interruption",
+      "point": "after_task",
+      "before_restart": {
+        "intents": 1,
+        "tasks": 1,
+        "calls": 0,
+        "registrations": 0
+      },
+      "after_restart": {
+        "intents": 1,
+        "tasks": 1,
+        "calls": 1,
+        "registrations": 1
+      }
+    },
+    {
+      "check": "process_interruption",
+      "point": "after_research",
+      "before_restart": {
+        "intents": 1,
+        "tasks": 1,
+        "calls": 1,
+        "registrations": 0
+      },
+      "after_restart": {
+        "intents": 1,
+        "tasks": 1,
+        "calls": 1,
+        "registrations": 1
+      }
+    },
+    {
+      "check": "process_interruption",
+      "point": "after_registration",
+      "before_restart": {
+        "intents": 1,
+        "tasks": 1,
+        "calls": 1,
+        "registrations": 1
+      },
+      "after_restart": {
+        "intents": 1,
+        "tasks": 1,
+        "calls": 1,
+        "registrations": 1
+      }
+    },
+    {
+      "check": "process_interruption",
+      "point": "after_archive",
+      "before_restart": {
+        "intents": 1,
+        "tasks": 1,
+        "calls": 1,
+        "registrations": 1
+      },
+      "after_restart": {
+        "intents": 1,
+        "tasks": 1,
+        "calls": 1,
+        "registrations": 1
+      }
+    },
+    {
+      "check": "two_isolated_full_cli",
+      "logical_evidence_equal": true,
+      "ignored_fields": [
+        "directory/source identity",
+        "task/candidate SHA",
+        "process timestamps"
+      ],
+      "counts": {
+        "intents": 1,
+        "tasks": 1,
+        "calls": 1,
+        "registrations": 1
+      },
+      "source_day": "2026-10-27",
+      "data_mode": "synthetic_test"
+    },
+    {
+      "check": "legacy_conflicting_intents",
+      "reason": "EOD_AUTO_BINDING_REVIEW_REQUIRED",
+      "original_db_sha_unchanged": true,
+      "new_tasks": 0,
+      "new_calls": 0,
+      "new_registrations": 0
+    },
+    {
+      "check": "legacy_enabled_without_claim",
+      "once_exits": [
+        0,
+        2
+      ],
+      "global_counts": {
+        "intents": 1,
+        "tasks": 1,
+        "calls": 1,
+        "registrations": 1
+      }
+    },
+    {
+      "check": "legacy_original_intent_retains_ownership",
+      "original_db_sha_unchanged_during_claim": true,
+      "global_counts": {
+        "intents": 1,
+        "tasks": 1,
+        "calls": 1,
+        "registrations": 1
+      }
+    },
+    {
+      "check": "next_observed_source_day",
+      "old_day_missed": false,
+      "counts": {
+        "intents": 2,
+        "tasks": 2,
+        "calls": 2,
+        "registrations": 2
+      }
+    },
+    {
+      "check": "next_observed_source_day",
+      "old_day_missed": true,
+      "counts": {
+        "intents": 2,
+        "tasks": 2,
+        "calls": 1,
+        "registrations": 1
+      }
+    },
+    {
+      "check": "concurrent_once_watch_and_disable",
+      "competing_reason": "STORE_BUSY",
+      "counts": {
+        "intents": 1,
+        "tasks": 1,
+        "calls": 1,
+        "registrations": 1
+      }
+    }
+  ],
+  "mode": "LOCAL_FAKE_ONLY",
+  "restriction": "RESEARCH_ONLY",
+  "evaluation": "NOT_EVALUATED",
+  "eligibility": "ELIGIBILITY_DENIED",
+  "can_execute_forward_paper": false,
+  "live_allowed": false
+}

@@ -1,0 +1,797 @@
+{
+  "checks": [
+    {
+      "check": "distinct_instances_same_binding",
+      "enable_exits": [
+        0,
+        2
+      ],
+      "global_counts": {
+        "calls": 1,
+        "intents": 1,
+        "registrations": 1,
+        "tasks": 1
+      },
+      "once_exits": [
+        0,
+        2
+      ]
+    },
+    {
+      "check": "binding_owner_persists_after_disable_and_restart",
+      "different_source_counts": {
+        "calls": 1,
+        "intents": 1,
+        "registrations": 1,
+        "tasks": 1
+      },
+      "global_counts": {
+        "calls": 1,
+        "intents": 1,
+        "registrations": 1,
+        "tasks": 1
+      }
+    },
+    {
+      "check": "legacy_conflicting_intents",
+      "new_calls": 0,
+      "new_registrations": 0,
+      "new_tasks": 0,
+      "original_db_sha_unchanged": true,
+      "reason": "EOD_AUTO_BINDING_REVIEW_REQUIRED"
+    },
+    {
+      "check": "legacy_enabled_without_claim",
+      "global_counts": {
+        "calls": 1,
+        "intents": 1,
+        "registrations": 1,
+        "tasks": 1
+      },
+      "once_exits": [
+        0,
+        2
+      ]
+    },
+    {
+      "check": "legacy_original_intent_retains_ownership",
+      "global_counts": {
+        "calls": 1,
+        "intents": 1,
+        "registrations": 1,
+        "tasks": 1
+      },
+      "original_db_sha_unchanged_during_claim": true
+    }
+  ],
+  "clock": "test-only 2026-10-27 18:00 Asia/Shanghai",
+  "commands": [
+    {
+      "command": [
+        "fixture-cli",
+        "sync",
+        "--observer",
+        "<WORKTREE>\\state\\eod-auto-tests\\auto-test-7cdcad22b4\\auto-test-binding-a-4518b09ed7\\forward.sqlite"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-binding-a-4518b09ed7",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "init",
+        "--snapshot-store",
+        "auto-test-binding-a-4518b09ed7"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-binding-a-4518b09ed7",
+      "result": {
+        "binding_owner": null,
+        "binding_sha256": "0d71d92d90443fec112318df933db24895970045d9f435f076a1166ece4a7393",
+        "can_execute_forward_paper": false,
+        "enabled": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "ownership_state": "UNCLAIMED",
+        "paused": false,
+        "restriction": "RESEARCH_ONLY",
+        "snapshot_store_name": "auto-test-binding-a-4518b09ed7"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "init",
+        "--snapshot-store",
+        "auto-test-binding-a-4518b09ed7"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-binding-b-2af0277228",
+      "result": {
+        "binding_owner": null,
+        "binding_sha256": "0d71d92d90443fec112318df933db24895970045d9f435f076a1166ece4a7393",
+        "can_execute_forward_paper": false,
+        "enabled": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "ownership_state": "UNCLAIMED",
+        "paused": false,
+        "restriction": "RESEARCH_ONLY",
+        "snapshot_store_name": "auto-test-binding-a-4518b09ed7"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "enable"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-binding-a-4518b09ed7",
+      "result": {
+        "binding_owner": "auto-test-binding-a-4518b09ed7",
+        "binding_sha256": "0d71d92d90443fec112318df933db24895970045d9f435f076a1166ece4a7393",
+        "can_execute_forward_paper": false,
+        "enabled": true,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "ownership_state": "OWNER",
+        "paused": false,
+        "restriction": "RESEARCH_ONLY",
+        "snapshot_store_name": "auto-test-binding-a-4518b09ed7"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "enable"
+      ],
+      "exit_code": 2,
+      "name": "auto-test-binding-b-2af0277228",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "EOD_AUTO_BINDING_BUSY",
+        "restriction": "RESEARCH_ONLY",
+        "state": "BLOCKED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-binding-a-4518b09ed7",
+      "result": {
+        "can_execute_forward_paper": false,
+        "fake_calls": 1,
+        "input_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "CANDIDATE_ARCHIVED",
+        "registration_sha256": "be29bf484a146e3f9b20350b24f34de5aa3216e33a27a5547b427ddb8a9d6fe1",
+        "restriction": "RESEARCH_ONLY",
+        "source_day": "2026-10-27",
+        "state": "COMPLETED",
+        "task_id": "1"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 2,
+      "name": "auto-test-binding-b-2af0277228",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "EOD_AUTO_BINDING_OWNED",
+        "restriction": "RESEARCH_ONLY",
+        "state": "BLOCKED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "enable"
+      ],
+      "exit_code": 2,
+      "name": "auto-test-binding-b-2af0277228",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "EOD_AUTO_BINDING_OWNED",
+        "restriction": "RESEARCH_ONLY",
+        "state": "BLOCKED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-binding-a-4518b09ed7",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "ALREADY_ARCHIVED_INPUT_FROZEN",
+        "registration_sha256": "be29bf484a146e3f9b20350b24f34de5aa3216e33a27a5547b427ddb8a9d6fe1",
+        "restriction": "RESEARCH_ONLY",
+        "source_day": "2026-10-27",
+        "state": "SKIPPED",
+        "task_id": "1"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 2,
+      "name": "auto-test-binding-b-2af0277228",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "EOD_AUTO_BINDING_OWNED",
+        "restriction": "RESEARCH_ONLY",
+        "state": "BLOCKED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "disable"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-binding-a-4518b09ed7",
+      "result": {
+        "binding_owner": "auto-test-binding-a-4518b09ed7",
+        "binding_sha256": "0d71d92d90443fec112318df933db24895970045d9f435f076a1166ece4a7393",
+        "can_execute_forward_paper": false,
+        "enabled": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "ownership_state": "OWNER",
+        "paused": false,
+        "restriction": "RESEARCH_ONLY",
+        "snapshot_store_name": "auto-test-binding-a-4518b09ed7"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "enable"
+      ],
+      "exit_code": 2,
+      "name": "auto-test-binding-b-2af0277228",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "EOD_AUTO_BINDING_OWNED",
+        "restriction": "RESEARCH_ONLY",
+        "state": "BLOCKED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "enable"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-binding-a-4518b09ed7",
+      "result": {
+        "binding_owner": "auto-test-binding-a-4518b09ed7",
+        "binding_sha256": "0d71d92d90443fec112318df933db24895970045d9f435f076a1166ece4a7393",
+        "can_execute_forward_paper": false,
+        "enabled": true,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "ownership_state": "OWNER",
+        "paused": false,
+        "restriction": "RESEARCH_ONLY",
+        "snapshot_store_name": "auto-test-binding-a-4518b09ed7"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-binding-a-4518b09ed7",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "ALREADY_ARCHIVED_INPUT_FROZEN",
+        "registration_sha256": "be29bf484a146e3f9b20350b24f34de5aa3216e33a27a5547b427ddb8a9d6fe1",
+        "restriction": "RESEARCH_ONLY",
+        "source_day": "2026-10-27",
+        "state": "SKIPPED",
+        "task_id": "1"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "sync",
+        "--observer",
+        "<WORKTREE>\\state\\eod-auto-tests\\auto-test-7cdcad22b4\\auto-test-binding-independent-9177821d94\\forward.sqlite"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-binding-independent-9177821d94",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "init",
+        "--snapshot-store",
+        "auto-test-binding-independent-9177821d94"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-binding-independent-9177821d94",
+      "result": {
+        "binding_owner": null,
+        "binding_sha256": "9081bfda098b54286eb1bdf432ac724b4c01a4024b45803deb75d36243ede45c",
+        "can_execute_forward_paper": false,
+        "enabled": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "ownership_state": "UNCLAIMED",
+        "paused": false,
+        "restriction": "RESEARCH_ONLY",
+        "snapshot_store_name": "auto-test-binding-independent-9177821d94"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "enable"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-binding-independent-9177821d94",
+      "result": {
+        "binding_owner": "auto-test-binding-independent-9177821d94",
+        "binding_sha256": "9081bfda098b54286eb1bdf432ac724b4c01a4024b45803deb75d36243ede45c",
+        "can_execute_forward_paper": false,
+        "enabled": true,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "ownership_state": "OWNER",
+        "paused": false,
+        "restriction": "RESEARCH_ONLY",
+        "snapshot_store_name": "auto-test-binding-independent-9177821d94"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-binding-independent-9177821d94",
+      "result": {
+        "can_execute_forward_paper": false,
+        "fake_calls": 1,
+        "input_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "CANDIDATE_ARCHIVED",
+        "registration_sha256": "03cafe61afe920a7e6d7012015b9239cdbc055b6a730893568e5a63df02e11de",
+        "restriction": "RESEARCH_ONLY",
+        "source_day": "2026-10-27",
+        "state": "COMPLETED",
+        "task_id": "1"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "sync",
+        "--observer",
+        "<WORKTREE>\\state\\eod-auto-tests\\auto-test-7cdcad22b4\\auto-test-legacy-conflict-a-68fb57ac03\\forward.sqlite"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-legacy-conflict-a-68fb57ac03",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "init",
+        "--snapshot-store",
+        "auto-test-legacy-conflict-a-68fb57ac03"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-legacy-conflict-a-68fb57ac03",
+      "result": {
+        "binding_owner": null,
+        "binding_sha256": "47b1c6c4a7828c2cca8fa303701027f292af1efb3339c7297a7688f6ba4520d9",
+        "can_execute_forward_paper": false,
+        "enabled": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "ownership_state": "UNCLAIMED",
+        "paused": false,
+        "restriction": "RESEARCH_ONLY",
+        "snapshot_store_name": "auto-test-legacy-conflict-a-68fb57ac03"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "init",
+        "--snapshot-store",
+        "auto-test-legacy-conflict-a-68fb57ac03"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-legacy-conflict-b-b386d383f8",
+      "result": {
+        "binding_owner": null,
+        "binding_sha256": "47b1c6c4a7828c2cca8fa303701027f292af1efb3339c7297a7688f6ba4520d9",
+        "can_execute_forward_paper": false,
+        "enabled": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "ownership_state": "UNCLAIMED",
+        "paused": false,
+        "restriction": "RESEARCH_ONLY",
+        "snapshot_store_name": "auto-test-legacy-conflict-a-68fb57ac03"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "enable"
+      ],
+      "exit_code": 2,
+      "name": "auto-test-legacy-conflict-a-68fb57ac03",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "EOD_AUTO_BINDING_REVIEW_REQUIRED",
+        "restriction": "RESEARCH_ONLY",
+        "state": "BLOCKED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 2,
+      "name": "auto-test-legacy-conflict-a-68fb57ac03",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "EOD_AUTO_BINDING_REVIEW_REQUIRED",
+        "restriction": "RESEARCH_ONLY",
+        "state": "BLOCKED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "enable"
+      ],
+      "exit_code": 2,
+      "name": "auto-test-legacy-conflict-b-b386d383f8",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "EOD_AUTO_BINDING_REVIEW_REQUIRED",
+        "restriction": "RESEARCH_ONLY",
+        "state": "BLOCKED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 2,
+      "name": "auto-test-legacy-conflict-b-b386d383f8",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "EOD_AUTO_BINDING_REVIEW_REQUIRED",
+        "restriction": "RESEARCH_ONLY",
+        "state": "BLOCKED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "sync",
+        "--observer",
+        "<WORKTREE>\\state\\eod-auto-tests\\auto-test-7cdcad22b4\\auto-test-legacy-enabled-a-e211866499\\forward.sqlite"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-legacy-enabled-a-e211866499",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "init",
+        "--snapshot-store",
+        "auto-test-legacy-enabled-a-e211866499"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-legacy-enabled-a-e211866499",
+      "result": {
+        "binding_owner": null,
+        "binding_sha256": "0969414318947334f24d3c70a849810d364c77dd83b11f38593f981351e7ae04",
+        "can_execute_forward_paper": false,
+        "enabled": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "ownership_state": "UNCLAIMED",
+        "paused": false,
+        "restriction": "RESEARCH_ONLY",
+        "snapshot_store_name": "auto-test-legacy-enabled-a-e211866499"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "init",
+        "--snapshot-store",
+        "auto-test-legacy-enabled-a-e211866499"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-legacy-enabled-b-d5e7c4aa67",
+      "result": {
+        "binding_owner": null,
+        "binding_sha256": "0969414318947334f24d3c70a849810d364c77dd83b11f38593f981351e7ae04",
+        "can_execute_forward_paper": false,
+        "enabled": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "ownership_state": "UNCLAIMED",
+        "paused": false,
+        "restriction": "RESEARCH_ONLY",
+        "snapshot_store_name": "auto-test-legacy-enabled-a-e211866499"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-legacy-enabled-a-e211866499",
+      "result": {
+        "can_execute_forward_paper": false,
+        "fake_calls": 1,
+        "input_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "CANDIDATE_ARCHIVED",
+        "registration_sha256": "6107911cdc31aaba6e3773548ac6237083e27b66993fe6430c030863bc6847bb",
+        "restriction": "RESEARCH_ONLY",
+        "source_day": "2026-10-27",
+        "state": "COMPLETED",
+        "task_id": "1"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 2,
+      "name": "auto-test-legacy-enabled-b-d5e7c4aa67",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "EOD_AUTO_BINDING_BUSY",
+        "restriction": "RESEARCH_ONLY",
+        "state": "BLOCKED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "sync",
+        "--observer",
+        "<WORKTREE>\\state\\eod-auto-tests\\auto-test-7cdcad22b4\\auto-test-legacy-prior-a-f06c534802\\forward.sqlite"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-legacy-prior-a-f06c534802",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "init",
+        "--snapshot-store",
+        "auto-test-legacy-prior-a-f06c534802"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-legacy-prior-a-f06c534802",
+      "result": {
+        "binding_owner": null,
+        "binding_sha256": "ea92da975b45d49613f9429dd12bfffdf707c093d6338b808b4331bbc1266090",
+        "can_execute_forward_paper": false,
+        "enabled": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "ownership_state": "UNCLAIMED",
+        "paused": false,
+        "restriction": "RESEARCH_ONLY",
+        "snapshot_store_name": "auto-test-legacy-prior-a-f06c534802"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "enable"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-legacy-prior-a-f06c534802",
+      "result": {
+        "binding_owner": "auto-test-legacy-prior-a-f06c534802",
+        "binding_sha256": "ea92da975b45d49613f9429dd12bfffdf707c093d6338b808b4331bbc1266090",
+        "can_execute_forward_paper": false,
+        "enabled": true,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "ownership_state": "OWNER",
+        "paused": false,
+        "restriction": "RESEARCH_ONLY",
+        "snapshot_store_name": "auto-test-legacy-prior-a-f06c534802"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 86,
+      "name": "auto-test-legacy-prior-a-f06c534802",
+      "result": {},
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "init",
+        "--snapshot-store",
+        "auto-test-legacy-prior-a-f06c534802"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-legacy-prior-b-2eae75b162",
+      "result": {
+        "binding_owner": null,
+        "binding_sha256": "ea92da975b45d49613f9429dd12bfffdf707c093d6338b808b4331bbc1266090",
+        "can_execute_forward_paper": false,
+        "enabled": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "ownership_state": "UNCLAIMED",
+        "paused": false,
+        "restriction": "RESEARCH_ONLY",
+        "snapshot_store_name": "auto-test-legacy-prior-a-f06c534802"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "enable"
+      ],
+      "exit_code": 2,
+      "name": "auto-test-legacy-prior-b-2eae75b162",
+      "result": {
+        "can_execute_forward_paper": false,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "EOD_AUTO_BINDING_OWNED",
+        "restriction": "RESEARCH_ONLY",
+        "state": "BLOCKED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 0,
+      "name": "auto-test-legacy-prior-a-f06c534802",
+      "result": {
+        "can_execute_forward_paper": false,
+        "fake_calls": 1,
+        "input_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "CANDIDATE_ARCHIVED",
+        "registration_sha256": "8cf1d6e11488d16051e72f15ec01955b500ec27c6a5eb917daeaa7f7bb63338e",
+        "restriction": "RESEARCH_ONLY",
+        "source_day": "2026-10-27",
+        "state": "COMPLETED",
+        "task_id": "1"
+      },
+      "source_clock_ms": 1793095200000
+    }
+  ],
+  "data_mode": "synthetic_test"
+}

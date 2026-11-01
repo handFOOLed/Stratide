@@ -125,6 +125,67 @@ class Auto:
                           for m in raw["models"]), "EOD_AUTO_LOCAL_FAKE_ONLY")
         return raw
 
+    def binding_paths(self, config):
+        root = self.root.parent / ".bindings"
+        record = root / (config["binding_sha256"] + ".json")
+        lock = record.with_suffix(".lock")
+        for path in (root, record, lock):
+            j.no_links(path)
+        return root, record, lock
+
+    def binding_owner(self, config):
+        _, path, _ = self.binding_paths(config)
+        if not path.exists():
+            return None
+        value = c.read(path, 4096)
+        j.require(set(value) == {"schema_version", "binding_sha256", "owner_name"}
+                  and value["schema_version"] == 1 and value["binding_sha256"] == config["binding_sha256"]
+                  and isinstance(value["owner_name"], str)
+                  and re.fullmatch(r"[a-z0-9][a-z0-9_-]{0,63}", value["owner_name"]),
+                  "EOD_AUTO_BINDING_RECORD_INVALID")
+        return value["owner_name"]
+
+    def claim_binding(self, config):
+        root, path, lock = self.binding_paths(config)
+        root.mkdir(parents=True, exist_ok=True)
+        try:
+            with d.writer(lock):
+                owner = self.binding_owner(config)
+                if owner is None:
+                    # Upgrade pre-claim instances read-only. A prior intent owns
+                    # this binding even if that instance is currently disabled.
+                    used = []
+                    for entry in self.root.parent.iterdir():
+                        if not re.fullmatch(r"[a-z0-9][a-z0-9_-]{0,63}", entry.name):
+                            continue
+                        try:
+                            j.no_links(entry / "config.json")
+                            raw = c.read(entry / "config.json", 8192)
+                        except (j.Rejected, c.Rejected, OSError, ValueError):
+                            continue  # cannot be an operable automatic instance
+                        if not isinstance(raw, dict) or raw.get("binding_sha256") != config["binding_sha256"]:
+                            continue
+                        try:
+                            peer = Auto(entry.name)
+                            peer.config()
+                            with peer.db() as db:
+                                saved = db.execute("SELECT value FROM meta WHERE key='eod_auto_binding'").fetchone()
+                                j.require(saved and saved[0] == config["binding_sha256"], "AUTO_BINDING_CHANGED")
+                                prior = db.execute("SELECT EXISTS(SELECT 1 FROM tasks) OR "
+                                                   "EXISTS(SELECT 1 FROM meta WHERE key LIKE 'eod_auto_intent:%')").fetchone()[0]
+                            if prior:
+                                used.append(entry.name)
+                        except (j.Rejected, c.Rejected, OSError, sqlite3.Error, ValueError, KeyError, TypeError):
+                            raise j.Rejected("EOD_AUTO_BINDING_REVIEW_REQUIRED") from None
+                    j.require(len(used) <= 1, "EOD_AUTO_BINDING_REVIEW_REQUIRED")
+                    owner = used[0] if used else self.name
+                    c.write(path, dict(schema_version=1, binding_sha256=config["binding_sha256"], owner_name=owner))
+                j.require(owner == self.name, "EOD_AUTO_BINDING_OWNED")
+        except j.Rejected as error:
+            if str(error) == "STORE_BUSY":
+                raise j.Rejected("EOD_AUTO_BINDING_BUSY") from None
+            raise
+
     def init(self, store):
         source = d.Store(store)
         with source.connect() as db:
@@ -148,6 +209,8 @@ class Auto:
     def control(self, action, task_id=None):
         config, meta = self.config(), self.meta()
         self.verify_binding(config, meta)
+        if action == "enable":
+            self.claim_binding(config)
         # Owner-local filesystem authority, like the existing invoice CLI. This
         # writes the original Agent pause bit without waiting on a running fake.
         with self.db(write=True) as db:
@@ -289,8 +352,10 @@ class Auto:
             self.verify_binding(config, meta)
             self.settings()  # fake-only check before sync or any Agent recovery/write
             self.invoke("check", self.name)
+            j.require(self.binding_owner(config) in (None, self.name), "EOD_AUTO_BINDING_OWNED")
             j.require(meta.get("eod_auto_enabled") == "true", "OWNER_DISABLED")
             j.require(meta.get("paused") != "true", "OWNER_PAUSED")
+            self.claim_binding(config)
             if sync:
                 refreshed = d.Store(config["snapshot_store_name"]).sync()
                 j.require(refreshed["can_research"], (refreshed["latest_attempt"] or {}).get("error_code") or "SYNC_BLOCKED")
@@ -367,6 +432,12 @@ class Auto:
                       binding_sha256=config["binding_sha256"], enabled=meta.get("eod_auto_enabled") == "true",
                       paused=meta.get("paused") == "true", last=latest, source=None, tasks=[], **SAFE)
         try:
+            owner = self.binding_owner(config)
+            result["binding_owner"] = owner
+            result["ownership_state"] = "UNCLAIMED" if owner is None else "OWNER" if owner == self.name else "EOD_AUTO_BINDING_OWNED"
+        except (j.Rejected, c.Rejected, OSError, ValueError, KeyError, TypeError):
+            result["ownership_state"] = "EOD_AUTO_BINDING_RECORD_INVALID"
+        try:
             self.settings()
             result["settings_state"] = "LOCAL_FAKE_ONLY"
         except j.Rejected as error:
@@ -393,7 +464,7 @@ class Auto:
                     registration_sha256=j.loads(archive)["registration_sha256"] if archive else None,
                     review_reason=meta.get("eod_auto_review:" + intent["input"]["source_day"]),
                     archive_state="ARCHIVED" if archive else "PENDING"))
-        result["needs_manual_review"] = result["settings_state"] != "LOCAL_FAKE_ONLY" or bool(
+        result["needs_manual_review"] = result["ownership_state"] not in ("UNCLAIMED", "OWNER") or result["settings_state"] != "LOCAL_FAKE_ONLY" or bool(
             latest and latest.get("state") == "BLOCKED") or any(
             t["task_status"] in ("cancelled", "failed", "outcome_uncertain") or t["review_reason"] for t in result["tasks"])
         return result

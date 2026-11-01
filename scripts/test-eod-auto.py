@@ -70,8 +70,14 @@ def launch(name, *args, now=NOW, fault=None, data_sync=False):
     work = WORK / name
     work.mkdir(parents=True, exist_ok=True)
     request = work / ("request-" + os.urandom(5).hex() + ".json")
+    store = name
+    config_path = ROOT / "state/eod-auto" / name / "config.json"
+    if args and args[0] == "init" and "--snapshot-store" in args:
+        store = args[args.index("--snapshot-store") + 1]
+    elif config_path.exists():
+        store = a.c.read(config_path)["snapshot_store_name"]
     a.c.write(request, dict(name=name, now_ms=now, args=list(map(str, args)), fault=fault,
-                           data_sync=data_sync, fixture_source=str(work / "forward.sqlite")))
+                           data_sync=data_sync, fixture_source=str(WORK / store / "forward.sqlite")))
     return subprocess.Popen([sys.executable, "-B", str(Path(__file__).absolute()), "--fixture-cli", str(request)],
                             cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -119,7 +125,112 @@ def sql(name, statements):
             db.execute(query, params)
 
 
+def collect(process, name, *args):
+    out, err = process.communicate(timeout=60)
+    if process.returncode not in (0, 2):
+        raise AssertionError(f"{args}: exit={process.returncode}: {out[:500]!r} {err[:500]!r}")
+    value = json.loads(out)
+    COMMANDS.append(dict(name=name, command=["fixture-cli", *map(str, args)],
+                         source_clock_ms=NOW, exit_code=process.returncode, result=value))
+    return process.returncode, value
+
+
+def total_counts(names):
+    values = [counts(name) for name in names]
+    return {key: sum(v[key] for v in values) for key in values[0]}
+
+
 class AutoTests(unittest.TestCase):
+    def test_distinct_instances_same_binding_concurrent_enable_and_restart(self):
+        first, _ = setup("binding-a", enabled=False)
+        second = "auto-test-binding-b-" + os.urandom(5).hex()
+        call(second, "init", "--snapshot-store", first)
+        names = (first, second)
+        self.assertEqual(a.Auto(first).config()["binding_sha256"], a.Auto(second).config()["binding_sha256"])
+        processes = [launch(name, "enable") for name in names]
+        enabled = [collect(p, name, "enable") for p, name in zip(processes, names)]
+        processes = [launch(name, "once") for name in names]
+        runs = [collect(p, name, "once") for p, name in zip(processes, names)]
+        aggregate = total_counts(names)
+        RESULTS.append(dict(check="distinct_instances_same_binding", enable_exits=[v[0] for v in enabled],
+                            once_exits=[v[0] for v in runs], global_counts=aggregate))
+        self.assertEqual(aggregate, dict(intents=1, tasks=1, calls=1, registrations=1))
+        self.assertEqual(sorted(v[0] for v in enabled), [0, 2])
+        owner = names[next(i for i, value in enumerate(runs) if value[0] == 0)]
+        blocked = next(name for name in names if name != owner)
+        self.assertEqual(call(blocked, "enable", code=2)["reason"], "EOD_AUTO_BINDING_OWNED")
+        self.assertEqual(call(owner, "once")["reason"], "ALREADY_ARCHIVED_INPUT_FROZEN")
+        self.assertEqual(call(blocked, "once", code=2)["reason"], "EOD_AUTO_BINDING_OWNED")
+        raw = subprocess.run([str(a.EXE), "intent", blocked], capture_output=True)
+        self.assertEqual(raw.returncode, 2)
+        self.assertEqual(json.loads(raw.stdout)["error_code"], "EOD_AUTO_BINDING_OWNED")
+        call(owner, "disable")
+        self.assertEqual(call(blocked, "enable", code=2)["reason"], "EOD_AUTO_BINDING_OWNED")
+        call(owner, "enable")
+        call(owner, "once")
+        self.assertEqual(total_counts(names), aggregate)
+        independent, _ = setup("binding-independent")
+        call(independent, "once")
+        self.assertNotEqual(a.Auto(independent).config()["binding_sha256"], a.Auto(owner).config()["binding_sha256"])
+        self.assertEqual(counts(independent), aggregate)
+        RESULTS.append(dict(check="binding_owner_persists_after_disable_and_restart", global_counts=total_counts(names),
+                            different_source_counts=counts(independent)))
+
+    def test_legacy_enabled_instances_claim_once_and_preserve_original_work(self):
+        first, _ = setup("legacy-enabled-a", enabled=False)
+        second = "auto-test-legacy-enabled-b-" + os.urandom(5).hex()
+        call(second, "init", "--snapshot-store", first)
+        # Pre-fix enable had no shared claim. Seed only those original flags;
+        # every research task/call/result below still comes from the actual CLI.
+        for name in (first, second):
+            sql(name, [("UPDATE meta SET value='true' WHERE key='eod_auto_enabled'", ())])
+        processes = [launch(name, "once") for name in (first, second)]
+        runs = [collect(p, name, "once") for p, name in zip(processes, (first, second))]
+        self.assertEqual(sorted(v[0] for v in runs), [0, 2])
+        self.assertEqual(total_counts((first, second)), dict(intents=1, tasks=1, calls=1, registrations=1))
+        RESULTS.append(dict(check="legacy_enabled_without_claim", once_exits=[r[0] for r in runs],
+                            global_counts=total_counts((first, second))))
+
+        prior, _ = setup("legacy-prior-a")
+        call(prior, "once", fault="after_task", code=86)
+        auto = a.Auto(prior)
+        claim = auto.binding_paths(auto.config())[1]
+        self.assertEqual(claim.parent, ROOT / "state/eod-auto/.bindings")
+        claim.unlink()  # newly created synthetic fixture: emulate pre-fix metadata, never delete an Agent DB
+        newcomer = "auto-test-legacy-prior-b-" + os.urandom(5).hex()
+        call(newcomer, "init", "--snapshot-store", prior)
+        before = a.j.sha(auto.dbpath.read_bytes())
+        self.assertEqual(call(newcomer, "enable", code=2)["reason"], "EOD_AUTO_BINDING_OWNED")
+        self.assertEqual(before, a.j.sha(auto.dbpath.read_bytes()))
+        self.assertEqual(a.Auto(newcomer).binding_owner(auto.config()), prior)
+        call(prior, "once")
+        self.assertEqual(total_counts((prior, newcomer)), dict(intents=1, tasks=1, calls=1, registrations=1))
+        RESULTS.append(dict(check="legacy_original_intent_retains_ownership", original_db_sha_unchanged_during_claim=True,
+                            global_counts=total_counts((prior, newcomer))))
+
+    def test_legacy_conflicting_intents_block_without_rewriting_evidence(self):
+        first, _ = setup("legacy-conflict-a", enabled=False)
+        second = "auto-test-legacy-conflict-b-" + os.urandom(5).hex()
+        call(second, "init", "--snapshot-store", first)
+        config = a.Auto(first).config()
+        with patch.object(a.d, "now", return_value=NOW):
+            expected = a.d.Store(first).agent_input()
+        intent = dict(input=expected, trigger_key=a.POLICY + ":" + config["binding_sha256"] + ":" + expected["source_day"])
+        # Negative upgrade fixture contains only pre-task intent records. Never
+        # fabricate a completed task, Provider call or research result.
+        for name in (first, second):
+            sql(name, [("UPDATE meta SET value='true' WHERE key='eod_auto_enabled'", ()),
+                       ("INSERT INTO meta VALUES(?,?)", ("eod_auto_intent:" + expected["source_day"], json.dumps(intent)))])
+        before = {name: a.j.sha(a.Auto(name).dbpath.read_bytes()) for name in (first, second)}
+        for name in (first, second):
+            self.assertEqual(call(name, "enable", code=2)["reason"], "EOD_AUTO_BINDING_REVIEW_REQUIRED")
+            self.assertEqual(call(name, "once", code=2)["reason"], "EOD_AUTO_BINDING_REVIEW_REQUIRED")
+            self.assertEqual(before[name], a.j.sha(a.Auto(name).dbpath.read_bytes()))
+        self.assertEqual(total_counts((first, second)), dict(intents=2, tasks=0, calls=0, registrations=0))
+        self.assertFalse(a.Auto(first).binding_paths(config)[1].exists())
+        RESULTS.append(dict(check="legacy_conflicting_intents", reason="EOD_AUTO_BINDING_REVIEW_REQUIRED",
+                            original_db_sha_unchanged=True, new_tasks=0, new_calls=0, new_registrations=0))
+
     def test_full_cli_two_isolated_runs_repeat_revision_and_readonly_queries(self):
         evidence = []
         for _ in range(2):
@@ -391,12 +502,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--fixture-cli", type=Path)
     parser.add_argument("--evidence", action="store_true")
+    parser.add_argument("--test", action="append", help="只执行指定 AutoTests 方法")
     args, remaining = parser.parse_known_args()
     if args.fixture_cli:
         raise SystemExit(fixture_cli(a.c.read(args.fixture_cli)))
     WORK.mkdir(parents=True)
     test_exe()
-    suite = unittest.defaultTestLoader.loadTestsFromTestCase(AutoTests)
+    suite = (unittest.TestSuite(AutoTests(name) for name in args.test) if args.test else
+             unittest.defaultTestLoader.loadTestsFromTestCase(AutoTests))
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     evidence = dict(result="PASS" if result.wasSuccessful() else "FAIL", tests_run=result.testsRun,
                     failures=len(result.failures), errors=len(result.errors), verification="Sol_developer_selftest_not_independent_acceptance",

@@ -104,6 +104,30 @@ fn run(args: &[String], now: DateTime<Utc>) -> Result<Value> {
     if args[0] == "check" {
         return Ok(json!({"state":"LOCAL_FAKE_ONLY"}));
     }
+    if args[0] != "init" {
+        ensure(
+            binding.len() == 64
+                && binding
+                    .bytes()
+                    .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)),
+            "AUTO_BINDING_INVALID",
+        )?;
+        let claim = dir
+            .parent()
+            .unwrap()
+            .join(".bindings")
+            .join(format!("{binding}.json"));
+        eod_snapshot::no_links(&claim)?;
+        let bytes = fs::read(&claim).map_err(|_| "EOD_AUTO_BINDING_NOT_CLAIMED")?;
+        ensure(bytes.len() <= 4096, "EOD_AUTO_BINDING_RECORD_INVALID")?;
+        let owner: Value =
+            serde_json::from_slice(&bytes).map_err(|_| "EOD_AUTO_BINDING_RECORD_INVALID")?;
+        ensure(
+            owner["schema_version"] == 1 && owner["binding_sha256"] == binding,
+            "EOD_AUTO_BINDING_RECORD_INVALID",
+        )?;
+        ensure(owner["owner_name"] == args[1], "EOD_AUTO_BINDING_OWNED")?;
+    }
     let blank = InputSummary {
         version: "eod-auto:no-input".into(),
         source_day: String::new(),

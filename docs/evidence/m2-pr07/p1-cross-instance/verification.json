@@ -1,0 +1,113 @@
+{
+  "auto_e2e_tests": 16,
+  "commands": [
+    {
+      "check": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "check",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/with-msvc.ps1",
+        "check",
+        "-p",
+        "stratide-research",
+        "-p",
+        "stratided",
+        "--all-targets",
+        "--locked",
+        "--offline"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "clippy",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/with-msvc.ps1",
+        "clippy",
+        "-p",
+        "stratide-research",
+        "-p",
+        "stratided",
+        "--all-targets",
+        "--locked",
+        "--offline",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "rust-tests",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/with-msvc.ps1",
+        "test",
+        "-p",
+        "stratide-research",
+        "-p",
+        "stratided",
+        "--locked",
+        "--offline"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "full-auto-e2e",
+      "command": "python -B scripts/test-eod-auto.py --evidence",
+      "exit_code": 0,
+      "tests": 16
+    },
+    {
+      "check": "before",
+      "command": "python -B scripts/test-eod-auto.py --test test_distinct_instances_same_binding_concurrent_enable_and_restart",
+      "exit_code": 1,
+      "expected_failure": true,
+      "global_counts": {
+        "calls": 2,
+        "intents": 2,
+        "registrations": 2,
+        "tasks": 2
+      }
+    }
+  ],
+  "existing_27_file_manifest_still_unchanged": true,
+  "genuine_new_forward_days": 0,
+  "legacy_agent_databases_migrated_or_deleted": 0,
+  "market_requests": 0,
+  "not_verified": [
+    "ChatGPT review of new HEAD",
+    "New real trading-day automatic research",
+    "Real Provider/billing/PIT/opening/execution/alpha",
+    "Linux/macOS/physical power loss/OS reboot"
+  ],
+  "previous_head": "625a175065122a883dae69bd7b95d36097288203",
+  "real_provider_calls": 0,
+  "restrictions": [
+    "LOCAL_FAKE_ONLY",
+    "RESEARCH_ONLY",
+    "NOT_EVALUATED",
+    "ELIGIBILITY_DENIED"
+  ],
+  "result": "PASS",
+  "review": "https://github.com/handFOOLed/Stratide/pull/44#issuecomment-6553607874",
+  "rust_tests": 32,
+  "snapshot_or_observer_ownership_writes": 0,
+  "verification": "Sol_developer_selftest_not_independent_acceptance"
+}
