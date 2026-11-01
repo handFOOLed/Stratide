@@ -1,0 +1,73 @@
+{
+  "base_sha": "9a981e5e115164b73fe5756d0c8ebb8547a8b3f6",
+  "genuine_new_forward_days": 0,
+  "market_requests": 0,
+  "not_verified": [
+    "fixed_HEAD_ChatGPT_review",
+    "independent_acceptance",
+    "historical_PIT",
+    "alpha",
+    "trusted_forward_opening",
+    "real_provider",
+    "Linux_macOS",
+    "physical_power_loss_OS_restart"
+  ],
+  "original_files_unchanged": 2379,
+  "real_provider_calls": 0,
+  "regressions": {
+    "agent_fake_process_budget": {
+      "exit_code": 0
+    },
+    "candidates": {
+      "exit_code": 0,
+      "tests_run": 13
+    },
+    "cash_dividend": {
+      "exit_code": 0,
+      "tests_run": 9
+    },
+    "eod_agent": {
+      "evidence_e2e_exit_code": 0,
+      "exit_code": 0,
+      "tests_run": 6
+    },
+    "eod_auto": {
+      "exit_code": 0,
+      "tests_run": 16
+    },
+    "historical_data": {
+      "exit_code": 0,
+      "tests_run": 3
+    },
+    "historical_dividend": {
+      "exit_code": 0,
+      "tests_run": 11
+    },
+    "historical_replay": {
+      "exit_code": 0,
+      "sessions": 68
+    },
+    "research_evaluation": {
+      "exit_code": 0,
+      "tests_run": 5
+    },
+    "snapshot": {
+      "exit_code": 0,
+      "tests_run": 11
+    }
+  },
+  "review": {
+    "exit_code": 0,
+    "red_green_checks": 24,
+    "tests_run": 12
+  },
+  "rust": {
+    "check": 0,
+    "clippy": 0,
+    "fmt": 0,
+    "test": 0,
+    "tests_failed": 0,
+    "tests_passed": 156
+  },
+  "verification": "developer_selftest_not_independent_acceptance"
+}

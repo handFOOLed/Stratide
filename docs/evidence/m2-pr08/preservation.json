@@ -1,0 +1,44 @@
+{
+  "historical68": {
+    "changed_count": 0,
+    "files": 103,
+    "manifest_sha256": "403dfb180908f61a241cae420f4d11d6d3c4b2d3efd19be8ca46c1f9b54c4495",
+    "unchanged": true
+  },
+  "historical77_and_ledgers": {
+    "changed_count": 0,
+    "files": 82,
+    "manifest_sha256": "e89a95b77ffbd2d05c772a8e647fe1e2e5d0e3b78f348b2b1696bddcb831eb55",
+    "unchanged": true
+  },
+  "observer": {
+    "changed_count": 0,
+    "files": 34,
+    "manifest_sha256": "93e017d17db53678fd53a22b12997c520aa8d5bf41065b1159ce671e4275af43",
+    "unchanged": true
+  },
+  "old_candidates": {
+    "changed_count": 0,
+    "files": 142,
+    "manifest_sha256": "f2b399ce9c2399bcb98f69c97b10259a8b60bd1ea5f754b9de7084a7b8d193ec",
+    "unchanged": true
+  },
+  "old_eod_auto_agent": {
+    "changed_count": 0,
+    "files": 1319,
+    "manifest_sha256": "d3a4613005434ad48984387cbd554d669943af2539d12a2ff5b9f286a265f428",
+    "unchanged": true
+  },
+  "old_eod_candidates": {
+    "changed_count": 0,
+    "files": 119,
+    "manifest_sha256": "cd37a7712b4950656195f4a671420668f89093c97ca44656cd4dd95beca2883b",
+    "unchanged": true
+  },
+  "old_snapshot": {
+    "changed_count": 0,
+    "files": 580,
+    "manifest_sha256": "906a12b2fa80465a4e44dab212cbd4acd55b998f3a73cd0f9a052698597be75f",
+    "unchanged": true
+  }
+}

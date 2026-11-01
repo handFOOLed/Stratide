@@ -1,0 +1,539 @@
+{
+  "archive_counts": {
+    "calls": 1,
+    "candidates": 0,
+    "evaluation_attempts": 0,
+    "evaluation_receipts": 0,
+    "intents": 1,
+    "registrations": 1,
+    "review_attempts": 0,
+    "review_links": 0,
+    "review_plans": 0,
+    "tasks": 1
+  },
+  "claim": "固定模板的合成评测；不证明 Agent 生成策略或验证了其假设",
+  "completed_counts": {
+    "calls": 1,
+    "candidates": 1,
+    "evaluation_attempts": 1,
+    "evaluation_receipts": 1,
+    "intents": 1,
+    "registrations": 2,
+    "review_attempts": 1,
+    "review_links": 1,
+    "review_plans": 1,
+    "tasks": 1
+  },
+  "inbox": {
+    "count": 1,
+    "eligibility": "ELIGIBILITY_DENIED",
+    "forward_paper_allowed": false,
+    "independent_acceptance": "NOT_VERIFIED",
+    "items": [
+      {
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "forward_paper_allowed": false,
+        "independent_acceptance": "NOT_VERIFIED",
+        "live_allowed": false,
+        "next_step": "review --owner-input with an explicit fixed template",
+        "parent": {
+          "binding_sha256": "5c64073fa8378f0ab9e99101a1aeb73a4bef92858b697f02735db11f4a10870c",
+          "current_source_verification": "NOT_RECHECKED_OFFLINE_REVIEW",
+          "frozen_input_sha256": "d7f467e439ab4048f75600539e86e2f2590610e4708ac882039a8283d0924b53",
+          "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "model_sha256": "a9498fc5e864f17fc710d510d26ef42c3821845a589d6b849cc7cbc1a64f2aa8",
+          "parent_registration_sha256": "27e5b8c26c429522286301e281e1ddc01d621c7a4a8f50fcd17e81004147a83f",
+          "provider_sha256": "4e8f2d9e76856ca0e2ac9031a89337ee7492820901c078f325d19ea467700f62",
+          "snapshot_provenance": {
+            "can_execute_forward_paper": false,
+            "data_mode": "synthetic_test",
+            "eod_eligible": false,
+            "frozen_input_sha256": "d7f467e439ab4048f75600539e86e2f2590610e4708ac882039a8283d0924b53",
+            "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "live_allowed": false,
+            "research_task_id": "1",
+            "restriction": "RESEARCH_ONLY",
+            "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "snapshot_verification": "SNAPSHOT_CONTENT_VERIFIED_AT_REGISTRATION",
+            "source_day": "2026-10-27",
+            "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+          },
+          "source_day": "2026-10-27",
+          "task_detail_sha256": "7abd7ba20ac1a4fa8541b034b5ea94afa1987ff9055bb514a792d769c8df33db",
+          "task_id": "1"
+        },
+        "restriction": "RESEARCH_ONLY",
+        "state": "AWAITING_OWNER_TEMPLATE",
+        "task_origin": "TASK_ORIGIN_NOT_ATTESTED",
+        "versions": []
+      }
+    ],
+    "live_allowed": false,
+    "restriction": "RESEARCH_ONLY",
+    "schema_version": 1,
+    "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+  },
+  "mode": "synthetic_test",
+  "owner_input": {
+    "hypothesis": "用仓库已有固定 synthetic_test 模板验证候选管线、财务一致性与风险拒绝。",
+    "limitations": [
+      "人工数据只证明工程链路可运行；不产生真实市场研究、SMA 或交易资格。"
+    ],
+    "parameters": {},
+    "schema_version": 1,
+    "template_id": "first-buy-second-sell-third-risk-probe-v1"
+  },
+  "readonly_report": {
+    "count": 1,
+    "eligibility": "ELIGIBILITY_DENIED",
+    "forward_paper_allowed": false,
+    "independent_acceptance": "NOT_VERIFIED",
+    "items": [
+      {
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "SYNTHETIC_TEST_ONLY",
+        "forward_paper_allowed": false,
+        "independent_acceptance": "NOT_VERIFIED",
+        "live_allowed": false,
+        "next_step": "report; resume the same review input if interrupted, or resolve the stated blocker",
+        "parent": {
+          "binding_sha256": "5c64073fa8378f0ab9e99101a1aeb73a4bef92858b697f02735db11f4a10870c",
+          "current_source_verification": "NOT_RECHECKED_OFFLINE_REVIEW",
+          "frozen_input_sha256": "d7f467e439ab4048f75600539e86e2f2590610e4708ac882039a8283d0924b53",
+          "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "model_sha256": "a9498fc5e864f17fc710d510d26ef42c3821845a589d6b849cc7cbc1a64f2aa8",
+          "parent_registration_sha256": "27e5b8c26c429522286301e281e1ddc01d621c7a4a8f50fcd17e81004147a83f",
+          "provider_sha256": "4e8f2d9e76856ca0e2ac9031a89337ee7492820901c078f325d19ea467700f62",
+          "snapshot_provenance": {
+            "can_execute_forward_paper": false,
+            "data_mode": "synthetic_test",
+            "eod_eligible": false,
+            "frozen_input_sha256": "d7f467e439ab4048f75600539e86e2f2590610e4708ac882039a8283d0924b53",
+            "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "live_allowed": false,
+            "research_task_id": "1",
+            "restriction": "RESEARCH_ONLY",
+            "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "snapshot_verification": "SNAPSHOT_CONTENT_VERIFIED_AT_REGISTRATION",
+            "source_day": "2026-10-27",
+            "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+          },
+          "source_day": "2026-10-27",
+          "task_detail_sha256": "7abd7ba20ac1a4fa8541b034b5ea94afa1987ff9055bb514a792d769c8df33db",
+          "task_id": "1"
+        },
+        "restriction": "RESEARCH_ONLY",
+        "state": "EVALUATED",
+        "task_origin": "TASK_ORIGIN_NOT_ATTESTED",
+        "versions": [
+          {
+            "agent_hypothesis_validation": "NOT_ESTABLISHED",
+            "association": "OWNER_EXPLICIT_ASSOCIATION_NOT_HYPOTHESIS_VALIDATION",
+            "binary_sha256": "387ab5dac3b4bf27c533300abd7bc7d5c775c0a32ae259e31b7185e0d0344b47",
+            "candidate_sha256": "26dd99934053eec0b8bf2e0e6014202af69b9cd4e07dc57a6332e2a38a5997c0",
+            "data": {
+              "blockers": [
+                "SYNTHETIC_TEST_ONLY"
+              ],
+              "evidence_class": "synthetic_test",
+              "first_day": "20261028",
+              "historical_PIT": "NOT_APPLICABLE",
+              "input_mode": "synthetic_test",
+              "input_sha256": "e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe",
+              "sessions": 4,
+              "source_day": "20261102",
+              "source_type": "repository_fixed_synthetic_fixture",
+              "status": "COMPLETE",
+              "target_coverage": "NOT_MARKET_DATA"
+            },
+            "eligibility": "ELIGIBILITY_DENIED",
+            "engineering": "ENGINEERING_PASS",
+            "evaluation_report_ref": "candidates/26dd99934053eec0b8bf2e0e6014202af69b9cd4e07dc57a6332e2a38a5997c0/evaluations/77ff0ecaeba8c346a303e564f31e36b2f2b8440299b558210346de66d9cea4d6/result.json",
+            "evaluation_sha256": "77ff0ecaeba8c346a303e564f31e36b2f2b8440299b558210346de66d9cea4d6",
+            "forward_paper_allowed": false,
+            "frozen_files_sha256": {
+              "audit/input/dataset.json": "e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe"
+            },
+            "genuine_new_forward_days": 0,
+            "handoff": {
+              "candidate_sha256": "26dd99934053eec0b8bf2e0e6014202af69b9cd4e07dc57a6332e2a38a5997c0",
+              "contract": "candidate-handoff-v1",
+              "eligibility": "ELIGIBILITY_DENIED",
+              "evaluation_sha256": "77ff0ecaeba8c346a303e564f31e36b2f2b8440299b558210346de66d9cea4d6",
+              "forward_paper_allowed": false,
+              "independent_acceptance": "NOT_VERIFIED",
+              "live_allowed": false,
+              "qualification": "NOT_ELIGIBLE",
+              "reasons": [
+                "HISTORICAL_PIT_NOT_VERIFIED",
+                "NO_TRUSTED_FORWARD_OPENING_EVIDENCE",
+                "FORWARD_PAPER_NOT_ENABLED",
+                "NO_LIVE_AUTHORIZATION"
+              ],
+              "schema_version": 1
+            },
+            "holdout": "NOT_APPLICABLE_SYNTHETIC",
+            "independent_acceptance": "NOT_VERIFIED",
+            "live_allowed": false,
+            "next_step": "Owner review of the fixed template result; trading eligibility remains denied",
+            "owner_input_sha256": "ab10e694c98bbdc1c54a499ed922b14aff351eefd2471500b0349542ad996ba6",
+            "parameters": {},
+            "parent": {
+              "binding_sha256": "5c64073fa8378f0ab9e99101a1aeb73a4bef92858b697f02735db11f4a10870c",
+              "current_source_verification": "NOT_RECHECKED_OFFLINE_REVIEW",
+              "frozen_input_sha256": "d7f467e439ab4048f75600539e86e2f2590610e4708ac882039a8283d0924b53",
+              "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+              "model_sha256": "a9498fc5e864f17fc710d510d26ef42c3821845a589d6b849cc7cbc1a64f2aa8",
+              "parent_registration_sha256": "27e5b8c26c429522286301e281e1ddc01d621c7a4a8f50fcd17e81004147a83f",
+              "provider_sha256": "4e8f2d9e76856ca0e2ac9031a89337ee7492820901c078f325d19ea467700f62",
+              "snapshot_provenance": {
+                "can_execute_forward_paper": false,
+                "data_mode": "synthetic_test",
+                "eod_eligible": false,
+                "frozen_input_sha256": "d7f467e439ab4048f75600539e86e2f2590610e4708ac882039a8283d0924b53",
+                "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+                "live_allowed": false,
+                "research_task_id": "1",
+                "restriction": "RESEARCH_ONLY",
+                "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+                "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+                "snapshot_verification": "SNAPSHOT_CONTENT_VERIFIED_AT_REGISTRATION",
+                "source_day": "2026-10-27",
+                "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+              },
+              "source_day": "2026-10-27",
+              "task_detail_sha256": "7abd7ba20ac1a4fa8541b034b5ea94afa1987ff9055bb514a792d769c8df33db",
+              "task_id": "1"
+            },
+            "protocol_sha256": "13f55fa58a07bf9baa736d3387a7ff1cb820daa9764b80e603a0c8b851bc669a",
+            "reasons": [
+              "artificial fixture is engineering evidence only"
+            ],
+            "receipt_sha256": "9a9b926854308c30010abd6929c3d277e7675742e991f66bcedc92cd156fee67",
+            "registration_sha256": "f98a20d67fc0646bc05e750795b8ca4daf322760934b395e3f070c0fe1979729",
+            "report_ref": "reviews/20953ce41dc137598e1f094a3c8eecca1c9284a1380ab6a8849c836e950718b8/result.json",
+            "report_sha256": "b520fe0a39aa6d0f1b0be89a6578b2d3addfd000ce025d23109d96bb4123bd42",
+            "research_evidence": "SYNTHETIC_TEST_ONLY",
+            "research_status": "RESEARCH_NOT_APPLICABLE",
+            "restriction": "RESEARCH_ONLY",
+            "review_sha256": "20953ce41dc137598e1f094a3c8eecca1c9284a1380ab6a8849c836e950718b8",
+            "schema_version": 1,
+            "source_input": {
+              "files_sha256": {},
+              "fixture_sha256": "e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe",
+              "kind": "repository_fixed_synthetic_fixture"
+            },
+            "state": "EVALUATED",
+            "summary": {
+              "fee_assumption": {
+                "commission_ppm": 300,
+                "minimum_commission_fen": 1,
+                "sell_tax_ppm": 500,
+                "source": "synthetic_test/not-a-real-tariff",
+                "transfer_ppm": 10,
+                "valid_from": 20261028,
+                "valid_through": 20261130,
+                "version": "artificial-fees-v1"
+              },
+              "ledger_head": "6ccbcfadc294817451836dd2bd79585e31547593dcfdf4fac6ebc47c1cda6247",
+              "limitations": [
+                "synthetic_test; no market observations, SMA qualification or forward evidence",
+                "cash benchmark is a calculation; no historical holdout or buy-hold research claim"
+              ],
+              "reports_sha256": {
+                "daily.csv": "1f12a41fba60a151939d3e1aa11bc410b4c00ed7f5fffd38616d14b1a05804a2",
+                "events.json": "b5fe64e91b45c586c4a79cfffb4e57997c3b8b378e11471a68096a71aa2da391",
+                "fills.csv": "830929f7a02cdcd1de18fcb0a7e032a56fe0811bde6b896b57983d215f0ed102",
+                "orders.csv": "a16bb7fcd99fc11c477c3c7f272875637112e53d8a487f86ec2b589af74409e0",
+                "positions.csv": "31a794e77e2be648c5e0e7d318b5d60a947d802a1d6a035eb31a27e0c7f150d6",
+                "report.json": "10c6bac4915cd9d248d5a734e8976ec395ab8bea40ceb303c540315766df3727"
+              },
+              "windows": {
+                "full": {
+                  "accepted_proposals": 2,
+                  "annualized_return": {
+                    "reason": "descriptive protocol; historical/short/dependent sample, no inferential claim",
+                    "value": null
+                  },
+                  "carried_pending_orders": 0,
+                  "carried_shares": 0,
+                  "cash_benchmark": {
+                    "ending_nav_fen": 10000000,
+                    "initial_nav_fen": 10000000,
+                    "net_return": "0.000000000000"
+                  },
+                  "completed_round_trips": 1,
+                  "days": 4,
+                  "end_index": 4,
+                  "ending_cash_fen": 9992893,
+                  "ending_nav_fen": 9992893,
+                  "ending_pending_orders": 0,
+                  "ending_shares": 0,
+                  "excess_vs_cash_return": "-0.000710700000",
+                  "fills": 2,
+                  "fills_per_session": "0.500000000000",
+                  "first_day": 20261028,
+                  "flat_close_fraction": "0.500000000000",
+                  "holding_close_observations": 2,
+                  "initial_cash_fen": 10000000,
+                  "initial_nav_fen": 10000000,
+                  "last_day": 20261102,
+                  "max_drawdown": "0.000710700000",
+                  "missing_nav_days": 0,
+                  "model_fee_fen": 107,
+                  "model_fee_return_drag": "0.000010700000",
+                  "net_pnl_fen": -7107,
+                  "net_return": "-0.000710700000",
+                  "posthoc_cost_bounds": [
+                    {
+                      "extra_fee_fen": 1000,
+                      "extra_fen_per_fill": 500,
+                      "hypothetical_net_pnl_fen": -8107,
+                      "hypothetical_return": "-0.000810700000",
+                      "kind": "posthoc_cost_bound",
+                      "note": "fixed realized fills only; no re-matching/risk/reservation/position changes"
+                    },
+                    {
+                      "extra_fee_fen": 2000,
+                      "extra_fen_per_fill": 1000,
+                      "hypothetical_net_pnl_fen": -9107,
+                      "hypothetical_return": "-0.000910700000",
+                      "kind": "posthoc_cost_bound",
+                      "note": "fixed realized fills only; no re-matching/risk/reservation/position changes"
+                    }
+                  ],
+                  "proposals": 3,
+                  "risk_rejections": 1,
+                  "sharpe": {
+                    "reason": "descriptive protocol; historical/short/dependent sample, no inferential claim",
+                    "value": null
+                  },
+                  "significance": {
+                    "reason": "descriptive protocol; historical/short/dependent sample, no inferential claim",
+                    "value": null
+                  },
+                  "start_index": 0,
+                  "valid_nav_days": 4,
+                  "valuation_reason": null,
+                  "win_rate": {
+                    "reason": "descriptive protocol; historical/short/dependent sample, no inferential claim",
+                    "value": null
+                  }
+                }
+              }
+            },
+            "task_origin": "TASK_ORIGIN_NOT_ATTESTED",
+            "template_id": "first-buy-second-sell-third-risk-probe-v1"
+          }
+        ]
+      }
+    ],
+    "live_allowed": false,
+    "restriction": "RESEARCH_ONLY",
+    "schema_version": 1,
+    "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+  },
+  "review": {
+    "agent_hypothesis_validation": "NOT_ESTABLISHED",
+    "association": "OWNER_EXPLICIT_ASSOCIATION_NOT_HYPOTHESIS_VALIDATION",
+    "binary_sha256": "387ab5dac3b4bf27c533300abd7bc7d5c775c0a32ae259e31b7185e0d0344b47",
+    "candidate_sha256": "26dd99934053eec0b8bf2e0e6014202af69b9cd4e07dc57a6332e2a38a5997c0",
+    "data": {
+      "blockers": [
+        "SYNTHETIC_TEST_ONLY"
+      ],
+      "evidence_class": "synthetic_test",
+      "first_day": "20261028",
+      "historical_PIT": "NOT_APPLICABLE",
+      "input_mode": "synthetic_test",
+      "input_sha256": "e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe",
+      "sessions": 4,
+      "source_day": "20261102",
+      "source_type": "repository_fixed_synthetic_fixture",
+      "status": "COMPLETE",
+      "target_coverage": "NOT_MARKET_DATA"
+    },
+    "eligibility": "ELIGIBILITY_DENIED",
+    "engineering": "ENGINEERING_PASS",
+    "evaluation_report_ref": "candidates/26dd99934053eec0b8bf2e0e6014202af69b9cd4e07dc57a6332e2a38a5997c0/evaluations/77ff0ecaeba8c346a303e564f31e36b2f2b8440299b558210346de66d9cea4d6/result.json",
+    "evaluation_sha256": "77ff0ecaeba8c346a303e564f31e36b2f2b8440299b558210346de66d9cea4d6",
+    "forward_paper_allowed": false,
+    "frozen_files_sha256": {
+      "audit/input/dataset.json": "e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe"
+    },
+    "genuine_new_forward_days": 0,
+    "handoff": {
+      "candidate_sha256": "26dd99934053eec0b8bf2e0e6014202af69b9cd4e07dc57a6332e2a38a5997c0",
+      "contract": "candidate-handoff-v1",
+      "eligibility": "ELIGIBILITY_DENIED",
+      "evaluation_sha256": "77ff0ecaeba8c346a303e564f31e36b2f2b8440299b558210346de66d9cea4d6",
+      "forward_paper_allowed": false,
+      "independent_acceptance": "NOT_VERIFIED",
+      "live_allowed": false,
+      "qualification": "NOT_ELIGIBLE",
+      "reasons": [
+        "HISTORICAL_PIT_NOT_VERIFIED",
+        "NO_TRUSTED_FORWARD_OPENING_EVIDENCE",
+        "FORWARD_PAPER_NOT_ENABLED",
+        "NO_LIVE_AUTHORIZATION"
+      ],
+      "schema_version": 1
+    },
+    "holdout": "NOT_APPLICABLE_SYNTHETIC",
+    "independent_acceptance": "NOT_VERIFIED",
+    "live_allowed": false,
+    "next_step": "Owner review of the fixed template result; trading eligibility remains denied",
+    "owner_input_sha256": "ab10e694c98bbdc1c54a499ed922b14aff351eefd2471500b0349542ad996ba6",
+    "parameters": {},
+    "parent": {
+      "binding_sha256": "5c64073fa8378f0ab9e99101a1aeb73a4bef92858b697f02735db11f4a10870c",
+      "current_source_verification": "NOT_RECHECKED_OFFLINE_REVIEW",
+      "frozen_input_sha256": "d7f467e439ab4048f75600539e86e2f2590610e4708ac882039a8283d0924b53",
+      "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+      "model_sha256": "a9498fc5e864f17fc710d510d26ef42c3821845a589d6b849cc7cbc1a64f2aa8",
+      "parent_registration_sha256": "27e5b8c26c429522286301e281e1ddc01d621c7a4a8f50fcd17e81004147a83f",
+      "provider_sha256": "4e8f2d9e76856ca0e2ac9031a89337ee7492820901c078f325d19ea467700f62",
+      "snapshot_provenance": {
+        "can_execute_forward_paper": false,
+        "data_mode": "synthetic_test",
+        "eod_eligible": false,
+        "frozen_input_sha256": "d7f467e439ab4048f75600539e86e2f2590610e4708ac882039a8283d0924b53",
+        "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+        "live_allowed": false,
+        "research_task_id": "1",
+        "restriction": "RESEARCH_ONLY",
+        "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+        "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+        "snapshot_verification": "SNAPSHOT_CONTENT_VERIFIED_AT_REGISTRATION",
+        "source_day": "2026-10-27",
+        "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+      },
+      "source_day": "2026-10-27",
+      "task_detail_sha256": "7abd7ba20ac1a4fa8541b034b5ea94afa1987ff9055bb514a792d769c8df33db",
+      "task_id": "1"
+    },
+    "protocol_sha256": "13f55fa58a07bf9baa736d3387a7ff1cb820daa9764b80e603a0c8b851bc669a",
+    "reasons": [
+      "artificial fixture is engineering evidence only"
+    ],
+    "receipt_sha256": "9a9b926854308c30010abd6929c3d277e7675742e991f66bcedc92cd156fee67",
+    "registration_sha256": "f98a20d67fc0646bc05e750795b8ca4daf322760934b395e3f070c0fe1979729",
+    "report_ref": "reviews/20953ce41dc137598e1f094a3c8eecca1c9284a1380ab6a8849c836e950718b8/result.json",
+    "report_sha256": "b520fe0a39aa6d0f1b0be89a6578b2d3addfd000ce025d23109d96bb4123bd42",
+    "research_evidence": "SYNTHETIC_TEST_ONLY",
+    "research_status": "RESEARCH_NOT_APPLICABLE",
+    "restriction": "RESEARCH_ONLY",
+    "reused": false,
+    "review_sha256": "20953ce41dc137598e1f094a3c8eecca1c9284a1380ab6a8849c836e950718b8",
+    "schema_version": 1,
+    "source_input": {
+      "files_sha256": {},
+      "fixture_sha256": "e6897a41eedf0a49ea36c4870586cae9b964e05799d4010fd34adcb57fefb5fe",
+      "kind": "repository_fixed_synthetic_fixture"
+    },
+    "state": "EVALUATED",
+    "summary": {
+      "fee_assumption": {
+        "commission_ppm": 300,
+        "minimum_commission_fen": 1,
+        "sell_tax_ppm": 500,
+        "source": "synthetic_test/not-a-real-tariff",
+        "transfer_ppm": 10,
+        "valid_from": 20261028,
+        "valid_through": 20261130,
+        "version": "artificial-fees-v1"
+      },
+      "ledger_head": "6ccbcfadc294817451836dd2bd79585e31547593dcfdf4fac6ebc47c1cda6247",
+      "limitations": [
+        "synthetic_test; no market observations, SMA qualification or forward evidence",
+        "cash benchmark is a calculation; no historical holdout or buy-hold research claim"
+      ],
+      "reports_sha256": {
+        "daily.csv": "1f12a41fba60a151939d3e1aa11bc410b4c00ed7f5fffd38616d14b1a05804a2",
+        "events.json": "b5fe64e91b45c586c4a79cfffb4e57997c3b8b378e11471a68096a71aa2da391",
+        "fills.csv": "830929f7a02cdcd1de18fcb0a7e032a56fe0811bde6b896b57983d215f0ed102",
+        "orders.csv": "a16bb7fcd99fc11c477c3c7f272875637112e53d8a487f86ec2b589af74409e0",
+        "positions.csv": "31a794e77e2be648c5e0e7d318b5d60a947d802a1d6a035eb31a27e0c7f150d6",
+        "report.json": "10c6bac4915cd9d248d5a734e8976ec395ab8bea40ceb303c540315766df3727"
+      },
+      "windows": {
+        "full": {
+          "accepted_proposals": 2,
+          "annualized_return": {
+            "reason": "descriptive protocol; historical/short/dependent sample, no inferential claim",
+            "value": null
+          },
+          "carried_pending_orders": 0,
+          "carried_shares": 0,
+          "cash_benchmark": {
+            "ending_nav_fen": 10000000,
+            "initial_nav_fen": 10000000,
+            "net_return": "0.000000000000"
+          },
+          "completed_round_trips": 1,
+          "days": 4,
+          "end_index": 4,
+          "ending_cash_fen": 9992893,
+          "ending_nav_fen": 9992893,
+          "ending_pending_orders": 0,
+          "ending_shares": 0,
+          "excess_vs_cash_return": "-0.000710700000",
+          "fills": 2,
+          "fills_per_session": "0.500000000000",
+          "first_day": 20261028,
+          "flat_close_fraction": "0.500000000000",
+          "holding_close_observations": 2,
+          "initial_cash_fen": 10000000,
+          "initial_nav_fen": 10000000,
+          "last_day": 20261102,
+          "max_drawdown": "0.000710700000",
+          "missing_nav_days": 0,
+          "model_fee_fen": 107,
+          "model_fee_return_drag": "0.000010700000",
+          "net_pnl_fen": -7107,
+          "net_return": "-0.000710700000",
+          "posthoc_cost_bounds": [
+            {
+              "extra_fee_fen": 1000,
+              "extra_fen_per_fill": 500,
+              "hypothetical_net_pnl_fen": -8107,
+              "hypothetical_return": "-0.000810700000",
+              "kind": "posthoc_cost_bound",
+              "note": "fixed realized fills only; no re-matching/risk/reservation/position changes"
+            },
+            {
+              "extra_fee_fen": 2000,
+              "extra_fen_per_fill": 1000,
+              "hypothetical_net_pnl_fen": -9107,
+              "hypothetical_return": "-0.000910700000",
+              "kind": "posthoc_cost_bound",
+              "note": "fixed realized fills only; no re-matching/risk/reservation/position changes"
+            }
+          ],
+          "proposals": 3,
+          "risk_rejections": 1,
+          "sharpe": {
+            "reason": "descriptive protocol; historical/short/dependent sample, no inferential claim",
+            "value": null
+          },
+          "significance": {
+            "reason": "descriptive protocol; historical/short/dependent sample, no inferential claim",
+            "value": null
+          },
+          "start_index": 0,
+          "valid_nav_days": 4,
+          "valuation_reason": null,
+          "win_rate": {
+            "reason": "descriptive protocol; historical/short/dependent sample, no inferential claim",
+            "value": null
+          }
+        }
+      }
+    },
+    "task_origin": "TASK_ORIGIN_NOT_ATTESTED",
+    "template_id": "first-buy-second-sell-third-risk-probe-v1"
+  }
+}

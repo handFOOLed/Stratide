@@ -1,0 +1,559 @@
+{
+  "base_sha": "9a981e5e115164b73fe5756d0c8ebb8547a8b3f6",
+  "checks": [
+    {
+      "check": "evaluated_tamper_report",
+      "no_rerun": true,
+      "reason": "REVIEW_REPORT_INTEGRITY_MISMATCH"
+    },
+    {
+      "check": "evaluated_tamper_receipt",
+      "no_rerun": true,
+      "reason": "EVALUATION_RECEIPT_INTEGRITY_MISMATCH"
+    },
+    {
+      "check": "evaluated_tamper_qualification",
+      "no_rerun": true,
+      "reason": "EVALUATION_RECEIPT_INTEGRITY_MISMATCH"
+    },
+    {
+      "check": "evaluated_tamper_frozen",
+      "no_rerun": true,
+      "reason": "FROZEN_INPUT_INTEGRITY_MISMATCH"
+    },
+    {
+      "archive_count": 1,
+      "check": "forged_completed_export_ignored",
+      "fake_call_count": 1,
+      "task_count": 1
+    },
+    {
+      "check": "kill_before_registration",
+      "evaluation_reused": false,
+      "exit_code": 87,
+      "interrupted": {
+        "calls": 1,
+        "candidates": 0,
+        "evaluation_attempts": 0,
+        "evaluation_receipts": 0,
+        "intents": 1,
+        "registrations": 1,
+        "review_attempts": 1,
+        "review_links": 0,
+        "review_plans": 1,
+        "tasks": 1
+      },
+      "original_sha_unchanged": true,
+      "recovered": {
+        "calls": 1,
+        "candidates": 1,
+        "evaluation_attempts": 1,
+        "evaluation_receipts": 1,
+        "intents": 1,
+        "registrations": 2,
+        "review_attempts": 2,
+        "review_links": 1,
+        "review_plans": 1,
+        "tasks": 1
+      }
+    },
+    {
+      "check": "kill_after_freeze",
+      "evaluation_reused": false,
+      "exit_code": 87,
+      "interrupted": {
+        "calls": 1,
+        "candidates": 1,
+        "evaluation_attempts": 0,
+        "evaluation_receipts": 0,
+        "intents": 1,
+        "registrations": 2,
+        "review_attempts": 1,
+        "review_links": 0,
+        "review_plans": 1,
+        "tasks": 1
+      },
+      "original_sha_unchanged": true,
+      "recovered": {
+        "calls": 1,
+        "candidates": 1,
+        "evaluation_attempts": 1,
+        "evaluation_receipts": 1,
+        "intents": 1,
+        "registrations": 2,
+        "review_attempts": 2,
+        "review_links": 1,
+        "review_plans": 1,
+        "tasks": 1
+      }
+    },
+    {
+      "check": "kill_before_evaluate",
+      "evaluation_reused": false,
+      "exit_code": 87,
+      "interrupted": {
+        "calls": 1,
+        "candidates": 1,
+        "evaluation_attempts": 0,
+        "evaluation_receipts": 0,
+        "intents": 1,
+        "registrations": 2,
+        "review_attempts": 1,
+        "review_links": 0,
+        "review_plans": 1,
+        "tasks": 1
+      },
+      "original_sha_unchanged": true,
+      "recovered": {
+        "calls": 1,
+        "candidates": 1,
+        "evaluation_attempts": 1,
+        "evaluation_receipts": 1,
+        "intents": 1,
+        "registrations": 2,
+        "review_attempts": 2,
+        "review_links": 1,
+        "review_plans": 1,
+        "tasks": 1
+      }
+    },
+    {
+      "check": "kill_after_evaluate",
+      "evaluation_reused": true,
+      "exit_code": 87,
+      "interrupted": {
+        "calls": 1,
+        "candidates": 1,
+        "evaluation_attempts": 1,
+        "evaluation_receipts": 1,
+        "intents": 1,
+        "registrations": 2,
+        "review_attempts": 1,
+        "review_links": 0,
+        "review_plans": 1,
+        "tasks": 1
+      },
+      "original_sha_unchanged": true,
+      "recovered": {
+        "calls": 1,
+        "candidates": 1,
+        "evaluation_attempts": 1,
+        "evaluation_receipts": 1,
+        "intents": 1,
+        "registrations": 2,
+        "review_attempts": 2,
+        "review_links": 1,
+        "review_plans": 1,
+        "tasks": 1
+      }
+    },
+    {
+      "after": {
+        "calls": 1,
+        "candidates": 1,
+        "evaluation_attempts": 1,
+        "evaluation_receipts": 1,
+        "intents": 1,
+        "registrations": 2,
+        "review_attempts": 1,
+        "review_links": 1,
+        "review_plans": 1,
+        "tasks": 1
+      },
+      "before": {
+        "calls": 1,
+        "candidates": 0,
+        "evaluation_attempts": 0,
+        "evaluation_receipts": 0,
+        "intents": 1,
+        "registrations": 1,
+        "review_attempts": 0,
+        "review_links": 0,
+        "review_plans": 0,
+        "tasks": 1
+      },
+      "check": "full-a",
+      "old_sha_unchanged": true,
+      "state": "EVALUATED",
+      "summary": {
+        "fee_assumption": {
+          "commission_ppm": 300,
+          "minimum_commission_fen": 1,
+          "sell_tax_ppm": 500,
+          "source": "synthetic_test/not-a-real-tariff",
+          "transfer_ppm": 10,
+          "valid_from": 20261028,
+          "valid_through": 20261130,
+          "version": "artificial-fees-v1"
+        },
+        "ledger_head": "6ccbcfadc294817451836dd2bd79585e31547593dcfdf4fac6ebc47c1cda6247",
+        "limitations": [
+          "synthetic_test; no market observations, SMA qualification or forward evidence",
+          "cash benchmark is a calculation; no historical holdout or buy-hold research claim"
+        ],
+        "reports_sha256": {
+          "daily.csv": "1f12a41fba60a151939d3e1aa11bc410b4c00ed7f5fffd38616d14b1a05804a2",
+          "events.json": "b5fe64e91b45c586c4a79cfffb4e57997c3b8b378e11471a68096a71aa2da391",
+          "fills.csv": "830929f7a02cdcd1de18fcb0a7e032a56fe0811bde6b896b57983d215f0ed102",
+          "orders.csv": "a16bb7fcd99fc11c477c3c7f272875637112e53d8a487f86ec2b589af74409e0",
+          "positions.csv": "31a794e77e2be648c5e0e7d318b5d60a947d802a1d6a035eb31a27e0c7f150d6",
+          "report.json": "10c6bac4915cd9d248d5a734e8976ec395ab8bea40ceb303c540315766df3727"
+        },
+        "windows": {
+          "full": {
+            "accepted_proposals": 2,
+            "annualized_return": {
+              "reason": "descriptive protocol; historical/short/dependent sample, no inferential claim",
+              "value": null
+            },
+            "carried_pending_orders": 0,
+            "carried_shares": 0,
+            "cash_benchmark": {
+              "ending_nav_fen": 10000000,
+              "initial_nav_fen": 10000000,
+              "net_return": "0.000000000000"
+            },
+            "completed_round_trips": 1,
+            "days": 4,
+            "end_index": 4,
+            "ending_cash_fen": 9992893,
+            "ending_nav_fen": 9992893,
+            "ending_pending_orders": 0,
+            "ending_shares": 0,
+            "excess_vs_cash_return": "-0.000710700000",
+            "fills": 2,
+            "fills_per_session": "0.500000000000",
+            "first_day": 20261028,
+            "flat_close_fraction": "0.500000000000",
+            "holding_close_observations": 2,
+            "initial_cash_fen": 10000000,
+            "initial_nav_fen": 10000000,
+            "last_day": 20261102,
+            "max_drawdown": "0.000710700000",
+            "missing_nav_days": 0,
+            "model_fee_fen": 107,
+            "model_fee_return_drag": "0.000010700000",
+            "net_pnl_fen": -7107,
+            "net_return": "-0.000710700000",
+            "posthoc_cost_bounds": [
+              {
+                "extra_fee_fen": 1000,
+                "extra_fen_per_fill": 500,
+                "hypothetical_net_pnl_fen": -8107,
+                "hypothetical_return": "-0.000810700000",
+                "kind": "posthoc_cost_bound",
+                "note": "fixed realized fills only; no re-matching/risk/reservation/position changes"
+              },
+              {
+                "extra_fee_fen": 2000,
+                "extra_fen_per_fill": 1000,
+                "hypothetical_net_pnl_fen": -9107,
+                "hypothetical_return": "-0.000910700000",
+                "kind": "posthoc_cost_bound",
+                "note": "fixed realized fills only; no re-matching/risk/reservation/position changes"
+              }
+            ],
+            "proposals": 3,
+            "risk_rejections": 1,
+            "sharpe": {
+              "reason": "descriptive protocol; historical/short/dependent sample, no inferential claim",
+              "value": null
+            },
+            "significance": {
+              "reason": "descriptive protocol; historical/short/dependent sample, no inferential claim",
+              "value": null
+            },
+            "start_index": 0,
+            "valid_nav_days": 4,
+            "valuation_reason": null,
+            "win_rate": {
+              "reason": "descriptive protocol; historical/short/dependent sample, no inferential claim",
+              "value": null
+            }
+          }
+        }
+      }
+    },
+    {
+      "after": {
+        "calls": 1,
+        "candidates": 1,
+        "evaluation_attempts": 1,
+        "evaluation_receipts": 1,
+        "intents": 1,
+        "registrations": 2,
+        "review_attempts": 1,
+        "review_links": 1,
+        "review_plans": 1,
+        "tasks": 1
+      },
+      "before": {
+        "calls": 1,
+        "candidates": 0,
+        "evaluation_attempts": 0,
+        "evaluation_receipts": 0,
+        "intents": 1,
+        "registrations": 1,
+        "review_attempts": 0,
+        "review_links": 0,
+        "review_plans": 0,
+        "tasks": 1
+      },
+      "check": "full-b",
+      "old_sha_unchanged": true,
+      "state": "EVALUATED",
+      "summary": {
+        "fee_assumption": {
+          "commission_ppm": 300,
+          "minimum_commission_fen": 1,
+          "sell_tax_ppm": 500,
+          "source": "synthetic_test/not-a-real-tariff",
+          "transfer_ppm": 10,
+          "valid_from": 20261028,
+          "valid_through": 20261130,
+          "version": "artificial-fees-v1"
+        },
+        "ledger_head": "6ccbcfadc294817451836dd2bd79585e31547593dcfdf4fac6ebc47c1cda6247",
+        "limitations": [
+          "synthetic_test; no market observations, SMA qualification or forward evidence",
+          "cash benchmark is a calculation; no historical holdout or buy-hold research claim"
+        ],
+        "reports_sha256": {
+          "daily.csv": "1f12a41fba60a151939d3e1aa11bc410b4c00ed7f5fffd38616d14b1a05804a2",
+          "events.json": "b5fe64e91b45c586c4a79cfffb4e57997c3b8b378e11471a68096a71aa2da391",
+          "fills.csv": "830929f7a02cdcd1de18fcb0a7e032a56fe0811bde6b896b57983d215f0ed102",
+          "orders.csv": "a16bb7fcd99fc11c477c3c7f272875637112e53d8a487f86ec2b589af74409e0",
+          "positions.csv": "31a794e77e2be648c5e0e7d318b5d60a947d802a1d6a035eb31a27e0c7f150d6",
+          "report.json": "10c6bac4915cd9d248d5a734e8976ec395ab8bea40ceb303c540315766df3727"
+        },
+        "windows": {
+          "full": {
+            "accepted_proposals": 2,
+            "annualized_return": {
+              "reason": "descriptive protocol; historical/short/dependent sample, no inferential claim",
+              "value": null
+            },
+            "carried_pending_orders": 0,
+            "carried_shares": 0,
+            "cash_benchmark": {
+              "ending_nav_fen": 10000000,
+              "initial_nav_fen": 10000000,
+              "net_return": "0.000000000000"
+            },
+            "completed_round_trips": 1,
+            "days": 4,
+            "end_index": 4,
+            "ending_cash_fen": 9992893,
+            "ending_nav_fen": 9992893,
+            "ending_pending_orders": 0,
+            "ending_shares": 0,
+            "excess_vs_cash_return": "-0.000710700000",
+            "fills": 2,
+            "fills_per_session": "0.500000000000",
+            "first_day": 20261028,
+            "flat_close_fraction": "0.500000000000",
+            "holding_close_observations": 2,
+            "initial_cash_fen": 10000000,
+            "initial_nav_fen": 10000000,
+            "last_day": 20261102,
+            "max_drawdown": "0.000710700000",
+            "missing_nav_days": 0,
+            "model_fee_fen": 107,
+            "model_fee_return_drag": "0.000010700000",
+            "net_pnl_fen": -7107,
+            "net_return": "-0.000710700000",
+            "posthoc_cost_bounds": [
+              {
+                "extra_fee_fen": 1000,
+                "extra_fen_per_fill": 500,
+                "hypothetical_net_pnl_fen": -8107,
+                "hypothetical_return": "-0.000810700000",
+                "kind": "posthoc_cost_bound",
+                "note": "fixed realized fills only; no re-matching/risk/reservation/position changes"
+              },
+              {
+                "extra_fee_fen": 2000,
+                "extra_fen_per_fill": 1000,
+                "hypothetical_net_pnl_fen": -9107,
+                "hypothetical_return": "-0.000910700000",
+                "kind": "posthoc_cost_bound",
+                "note": "fixed realized fills only; no re-matching/risk/reservation/position changes"
+              }
+            ],
+            "proposals": 3,
+            "risk_rejections": 1,
+            "sharpe": {
+              "reason": "descriptive protocol; historical/short/dependent sample, no inferential claim",
+              "value": null
+            },
+            "significance": {
+              "reason": "descriptive protocol; historical/short/dependent sample, no inferential claim",
+              "value": null
+            },
+            "start_index": 0,
+            "valid_nav_days": 4,
+            "valuation_reason": null,
+            "win_rate": {
+              "reason": "descriptive protocol; historical/short/dependent sample, no inferential claim",
+              "value": null
+            }
+          }
+        }
+      }
+    },
+    {
+      "check": "local_history",
+      "counts": {
+        "calls": 1,
+        "candidates": 2,
+        "evaluation_attempts": 2,
+        "evaluation_receipts": 2,
+        "intents": 1,
+        "registrations": 2,
+        "review_attempts": 2,
+        "review_links": 2,
+        "review_plans": 2,
+        "tasks": 1
+      },
+      "holdout": "EX_POST",
+      "identical_directory_reused": true,
+      "missing_source_state": "DATA_BLOCKED",
+      "original_source_sha_unchanged": true,
+      "research_evidence": "INSUFFICIENT_EVIDENCE",
+      "sessions": 68,
+      "state": "EVALUATED"
+    },
+    {
+      "check": "history_missing_inadequate_versions",
+      "counts": {
+        "calls": 1,
+        "candidates": 3,
+        "evaluation_attempts": 3,
+        "evaluation_receipts": 3,
+        "intents": 1,
+        "registrations": 3,
+        "review_attempts": 3,
+        "review_links": 3,
+        "review_plans": 3,
+        "tasks": 1
+      },
+      "reasons": [
+        [
+          "LOCAL_SOURCE_REQUIRED"
+        ],
+        [
+          "SMA_REQUIRES_FROZEN_HISTORICAL_SOURCE"
+        ]
+      ],
+      "states": [
+        "DATA_BLOCKED",
+        "DATA_BLOCKED",
+        "EVALUATED"
+      ]
+    },
+    {
+      "check": "moved_review_directory",
+      "counts": {
+        "calls": 1,
+        "candidates": 1,
+        "evaluation_attempts": 1,
+        "evaluation_receipts": 1,
+        "intents": 1,
+        "registrations": 2,
+        "review_attempts": 1,
+        "review_links": 1,
+        "review_plans": 1,
+        "tasks": 1
+      },
+      "original_receipt_reused": true
+    },
+    {
+      "check": "parent_tamper_registration",
+      "no_new_work": true,
+      "reason": "REGISTRATION_INTEGRITY_MISMATCH"
+    },
+    {
+      "check": "parent_tamper_task",
+      "no_new_work": true,
+      "reason": "SAVED_COMPLETED_TASK_REQUIRED"
+    },
+    {
+      "check": "parent_tamper_call",
+      "no_new_work": true,
+      "reason": "AUTO_TASK_ORIGIN_INVALID"
+    },
+    {
+      "check": "parent_tamper_intent",
+      "no_new_work": true,
+      "reason": "LOCAL_REVIEW_EVIDENCE_INVALID"
+    },
+    {
+      "check": "parent_tamper_archive",
+      "no_new_work": true,
+      "reason": "AUTO_ARCHIVE_MISMATCH"
+    },
+    {
+      "check": "parent_tamper_source_sha",
+      "no_new_work": true,
+      "reason": "SAVED_COMPLETED_TASK_REQUIRED"
+    },
+    {
+      "check": "parent_tamper_qualification",
+      "no_new_work": true,
+      "reason": "REGISTRATION_INTEGRITY_MISMATCH"
+    },
+    {
+      "check": "owner_parameter_and_link_injection",
+      "counts_unchanged": true,
+      "rejected": 7
+    },
+    {
+      "check": "stale_changed_missing_eod",
+      "current_source_verification": "NOT_RECHECKED_OFFLINE_REVIEW",
+      "provenance": {
+        "can_execute_forward_paper": false,
+        "data_mode": "synthetic_test",
+        "eod_eligible": false,
+        "frozen_input_sha256": "d7f467e439ab4048f75600539e86e2f2590610e4708ac882039a8283d0924b53",
+        "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+        "live_allowed": false,
+        "research_task_id": "1",
+        "restriction": "RESEARCH_ONLY",
+        "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+        "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+        "snapshot_verification": "SNAPSHOT_CONTENT_VERIFIED_AT_REGISTRATION",
+        "source_day": "2026-10-27",
+        "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+      },
+      "state": "EVALUATED"
+    },
+    {
+      "check": "concurrent_and_cross_name",
+      "counts": {
+        "calls": 1,
+        "candidates": 1,
+        "evaluation_attempts": 1,
+        "evaluation_receipts": 1,
+        "intents": 1,
+        "registrations": 2,
+        "review_attempts": 1,
+        "review_links": 1,
+        "review_plans": 1,
+        "tasks": 1
+      },
+      "exits": [
+        2,
+        0
+      ]
+    }
+  ],
+  "data_mode": "synthetic_test",
+  "errors": 0,
+  "failures": 0,
+  "genuine_new_forward_days": 0,
+  "market_requests": 0,
+  "real_provider_calls": 0,
+  "result": "PASS",
+  "tests_run": 12,
+  "verification": "developer_selftest_not_independent_acceptance"
+}
