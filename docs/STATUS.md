@@ -1,6 +1,6 @@
 # Stratide 当前状态
 
-> 截至 2026-11-01，基于 `main` `9a981e5e115164b73fe5756d0c8ebb8547a8b3f6`（[PR #44](https://github.com/handFOOLed/Stratide/pull/44) 已合并），附本分支 #45 候选 Inbox → Owner 模板关联 → 独立评价与持久报告开发自测状态。这是**当前实现快照**，不是实盘承诺。Owner 已决定 **Core-first、UI-later**：后续核心功能先用 CLI/持久报告验收，最后由 Sol 按 PR #28 设计体系统一集成 UI。
+> 截至 2026-11-01，基于已核验 `main` `6c86b872360bcaa1dc92d1a02b760f1b08274295`（[PR #46](https://github.com/handFOOLed/Stratide/pull/46) 已合并），附本分支 #47 Forward EOD Shadow V1 开发自测状态。这是**当前实现快照**，不是实盘承诺。Owner 已决定 **Core-first、UI-later**：后续核心功能先用 CLI/持久报告验收，最后由 Sol 按 PR #28 设计体系统一集成 UI。
 
 ## 已实现
 
@@ -18,22 +18,23 @@
 | EOD 研究快照 | PR #33 已合并，#32 完成；既有 observer 离线只读核验、原子持久发布、状态与只读消费 | [操作](M2_PR05.md) / [原自测](evidence/m2-pr05/README.md) |
 | 显式 Fake Agent 闭环 | PR #35 已合并；EOD 快照 → 本地 fake 持久任务 → 候选研究来源；原手动路径不自动调度，scope 禁止云 Provider，资格默认拒绝 | [操作](M2_PR06.md) / [原自测](evidence/m2-pr06/README.md) |
 | EOD 自动研究与归档（PR #44 已合并） | Owner 本机 opt-in，默认 OFF，前台 once/watch、原 Agent 唯一日任务/fake 调用、同源跨实例归属、自动候选归档和恢复；LOCAL_FAKE_ONLY / RESEARCH_ONLY | [操作](M2_PR07.md) / [自测](evidence/m2-pr07/README.md) |
-| 候选审阅与评价闭环（本分支 Draft） | #45：只读 Inbox → Owner 显式固定模板关联 → 原 freeze/evaluate → 持久可复核报告；含 DATA_BLOCKED、内容复用及四节点恢复；68 日研究不足、资格始终拒绝 | [操作](M2_PR08.md) / [自测](evidence/m2-pr08/README.md) |
+| 候选审阅与评价闭环（PR #46 已合并） | #45：只读 Inbox → Owner 显式固定模板关联 → 原 freeze/evaluate → 持久可复核报告；含 DATA_BLOCKED、内容复用及四节点恢复；68 日研究不足、资格始终拒绝 | [操作](M2_PR08.md) / [自测](evidence/m2-pr08/README.md) |
+| Forward EOD Shadow V1（本分支 Draft） | #47：Owner 本地启停、固定 SMA5/20、来源/时点门禁、唯一不可回填日志与只读复算；双目录 22 日 synthetic E2E / 并发 / 三节点中断恢复通过；真实仍只有 2 日，旧源日 MISSED_OR_STALE 且预热不足，新增真实信号 0 | [操作](M1_PR10.md) / [自测](evidence/m1-pr10/README.md) |
 
 | 现金分红模型 V1（PR #40 已合并） | 登记权益→应收/扣税负债→到账，ledger v4 / NAV / Risk / 七报告 / Python独立算法 / 双基准；仅隔离 synthetic CLI | [CASH_DIVIDEND_V1](M1_PR08.md) / [原自测](evidence/m1-pr08/README.md) |
 | 历史分红情景桥接 V1（PR #42 已合并） | 原冻结历史行情 + PR38 原证据 + 独立假设 → 原 SMA5/20 / v4 / 七报告 / 独立算法 / 双基准；77 会话 EXPLORATORY_EX_POST，真实准入 DENIED、PIT 新增 0 天 | [模块操作](M1_PR09.md) / [原自测](evidence/m1-pr09/README.md) |
 
 ## 仍未实现 / 未验证
 
-- **M1-PR07B / PR #38 已合并：** [公司行为证据包](M1_PR07B.md) 保留真实 12/19 字段和 `FACTS_PARTIAL / historical_pit=NOT_VERIFIED / ELIGIBILITY_DENIED`。原证据中的 `ACCOUNTING_NOT_IMPLEMENTED` 是冻结历史快照；本分支实现的是隔离现金分红模型，真实账户税务、到账、递延负债、PIT 和开盘仍未验证。
+- **M1-PR07B / PR #38 已合并：** [公司行为证据包](M1_PR07B.md) 保留真实 12/19 字段和 `FACTS_PARTIAL / historical_pit=NOT_VERIFIED / ELIGIBILITY_DENIED`。原证据中的 `ACCOUNTING_NOT_IMPLEMENTED` 是冻结历史快照；PR #40 已实现隔离现金分红模型，真实账户税务、到账、递延负债、PIT 和开盘仍未验证。
 - **真实 Provider** 仍为 **REAL_PROVIDER_NOT_VERIFIED**；无 Owner 预算/接收方/数据范围授权不付费。既有 Agent 自测见 [证据](evidence/m2-pr02/README.md)。新增功能无需同步开发 UI，后续统一集成。
-- **真正连续的前向 Paper 成交/NAV**：现有两日 forward 是 observe-only；[#10](https://github.com/handFOOLed/Stratide/issues/10) 的 `OPENING_SOURCE=BLOCKED / NOT VERIFIED`，可信开盘/费用门槛未解锁。历史回放不能计作 forward，EOD 连续性 PASS 不等于 M1 完成。
+- **真正连续的前向 Paper 成交/NAV**：现有两日 forward 是 observe-only；#47 只增加 NO_ORDERS Shadow 模块，真实 21 日观察尚未累积。[#10](https://github.com/handFOOLed/Stratide/issues/10) 的 `OPENING_SOURCE=BLOCKED / NOT VERIFIED`，可信开盘/费用门槛未解锁。历史回放不能计作 forward，EOD 连续性 PASS 不等于 M1 完成。
 - **真实公司行为处理和历史 PIT 认证**：未完成；隔离模型通过不能开放真实历史长窗口。真实券商、实盘资金、公共 Web、无人值守策略自动部署均未获授权。
 - [PR #15](https://github.com/handFOOLed/Stratide/pull/15) 是尚未合并的 Q01–Q69 访谈**设计参考**，其中“Web/Agent 推迟到 paper 之后”的旧排序已被 Owner [Issue #19](https://github.com/handFOOLed/Stratide/issues/19) 取代。
 
 ## 当前执行顺序
 
-1. **Sol / #45：** 自动研究候选 Inbox、Owner 显式模板关联、原冻结/独立评价与报告完整模块；`agents=0`，开发自测、Draft 待固定 HEAD 审查，Owner 明确许可前不合并。
+1. **Sol / #47：** Forward EOD Shadow 完整 Core 模块；`agents=0`，开发自测、唯一 Draft 待 ChatGPT 固定 HEAD 审查，Owner 明确许可前不合并。
 2. **后续核心任务：** Owner 再定范围；真实公司行为/PIT/开盘证据仍受阻，[#36](https://github.com/handFOOLed/Stratide/issues/36) 仍是未来多模型研究提案。
 3. **全部核心功能完成后：** Sol 按 PR #28 的设计体系统一集成全部 UI；旧同步 UI 要求被本 Owner 决定取代。
 

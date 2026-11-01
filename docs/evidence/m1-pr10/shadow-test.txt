@@ -1,0 +1,15 @@
+test_concurrent_alias_watch_disable_restart_and_cwd (__main__.ShadowTests.test_concurrent_alias_watch_disable_restart_and_cwd) ... ok
+test_full_22_day_two_directory_cli_decimal_and_watch (__main__.ShadowTests.test_full_22_day_two_directory_cli_decimal_and_watch) ... ok
+test_known_gap_late_backfill_unknown_conflict_units_sha_mode (__main__.ShadowTests.test_known_gap_late_backfill_unknown_conflict_units_sha_mode) ... ok
+test_os_lock_and_disable_fences_next_day (__main__.ShadowTests.test_os_lock_and_disable_fences_next_day) ... ok
+test_queries_absent_store_and_no_strategy_sync_network_or_writes (__main__.ShadowTests.test_queries_absent_store_and_no_strategy_sync_network_or_writes) ... ok
+test_revision_future_append_and_unsynced_source_preserve_frozen (__main__.ShadowTests.test_revision_future_append_and_unsynced_source_preserve_frozen) ... ok
+test_snapshot_sha_and_historical_modes_cannot_enter_shadow (__main__.ShadowTests.test_snapshot_sha_and_historical_modes_cannot_enter_shadow) ... ok
+test_three_actual_process_interruptions_and_rollback_recovery (__main__.ShadowTests.test_three_actual_process_interruptions_and_rollback_recovery) ... ok
+test_time_missed_stale_before_16_future_and_no_warmup (__main__.ShadowTests.test_time_missed_stale_before_16_future_and_no_warmup) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 57.421s
+
+OK
+{"result": "PASS", "tests_run": 9, "evidence_ref": "state/forward-shadow-tests/shadow-test-04c1a441eb"}
