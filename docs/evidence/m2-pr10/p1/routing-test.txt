@@ -1,0 +1,9 @@
+test_actual_task_gate_blocks_revision_expiry_and_disabled_global_claims (__main__.RoutingTests.test_actual_task_gate_blocks_revision_expiry_and_disabled_global_claims) ... ok
+test_changed_source_terminates_a_then_new_experiment_b_runs (__main__.RoutingTests.test_changed_source_terminates_a_then_new_experiment_b_runs) ... ok
+test_cross_task_kill_restart_and_settled_recovery_do_not_reexecute (__main__.RoutingTests.test_cross_task_kill_restart_and_settled_recovery_do_not_reexecute) ... ok
+test_two_sources_tick_targets_b (__main__.RoutingTests.test_two_sources_tick_targets_b) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 25.805s
+
+OK

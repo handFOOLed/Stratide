@@ -1,0 +1,21 @@
+    Checking stratide-research v0.0.1 (<checkout>\research\agent)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratide_research-3stae4suwoee2\s-hnr8bn4gf5-0ognrxk-working`
+
+warning: `stratide-research` (lib) generated 1 warning
+    Checking stratided v0.0.1 (<checkout>\apps\stratided)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\multimodal_agent-37bzktfp0kh58\s-hnr8bnerod-0l3cyaw-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\eod_research-31r9zqjgymob2\s-hnr8bnergi-1x2s1u8-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\eod_auto_agent-0o7kzn69bn8zx\s-hnr8bnesj2-0ps72gv-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratided-02mx3apmy2wpe\s-hnr8bnerqc-0bsn930-working`
+
+warning: `stratide-research` (bin "eod-research") generated 1 warning
+warning: `stratide-research` (bin "eod-auto-agent") generated 1 warning
+warning: `stratided` (lib) generated 1 warning
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratided-3tixsm64k7ktm\s-hnr8bnmm4j-01n3tlt-working`
+
+warning: `stratide-research` (bin "multimodal-agent") generated 1 warning
+warning: `stratided` (bin "stratided") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.45s

@@ -1,0 +1,252 @@
+{
+  "actual_tradable_at": "UNKNOWN_OPENING_SOURCE_BLOCKED",
+  "agent_task_id": "73",
+  "arithmetic": "INDEPENDENT_DECIMAL_RECOMPUTED",
+  "baseline": {
+    "as_of": "2026-11-01T09:00:49.030Z",
+    "authority": {
+      "can_execute_forward_paper": false,
+      "eligibility": "ELIGIBILITY_DENIED",
+      "live_allowed": false,
+      "restriction": "RESEARCH_ONLY"
+    },
+    "contract": "expert-result-v1",
+    "cost": {
+      "billing": "LOCAL_NO_BILLING",
+      "cloud_cost": "UNKNOWN_NOT_BILLED",
+      "elapsed_ms": 0,
+      "input_tokens": null,
+      "output_tokens": null
+    },
+    "evidence_refs": [
+      "a69a2ebfe57e178cea05bd0a57c919da0b33b2854fbfc76654e52df4d2fd91d9",
+      "da0ba6e65e46d652ec776e5c0d7d046fe265e94467b2345f9527161b98cb0a97"
+    ],
+    "expert_kind": "baseline",
+    "generated_at": "2026-11-01T13:15:09.811Z",
+    "horizon_sessions": 1,
+    "input_mode": "synthetic_test",
+    "input_snapshot_sha256": "a69a2ebfe57e178cea05bd0a57c919da0b33b2854fbfc76654e52df4d2fd91d9",
+    "instrument": "600000.SH",
+    "limitations": [
+      "EXTERNAL_TIMESERIES_NOT_CONFIGURED",
+      "NO_CALIBRATED_PROBABILITY",
+      "CORPORATE_ACTION_PIT_NOT_VERIFIED",
+      "OPENING_SOURCE_BLOCKED"
+    ],
+    "missing_policy": "REJECT_NO_IMPUTATION",
+    "model_id": "naive-ewma",
+    "model_version": "1",
+    "observed_at": "2026-11-01T09:00:49.000Z",
+    "output_sha256": "35539ed9d41847aef5fb7603239b34cc38538d2d78eea658320826d2be40b31c",
+    "quality": "DETERMINISTIC_BASELINE",
+    "result": {
+      "ewma_mean_ratio": "-0.002791062694",
+      "expected_return_ratio": "0.000000000000",
+      "volatility_ratio": "0.003587513355"
+    },
+    "role": "comparator",
+    "schema_version": 1,
+    "source_identity": "b3c4308274514af1b9cced13322a5e21b9fa764f2148a3757dc75a2518215515",
+    "target": "next_session_return_ratio",
+    "task_id": "863e52f179d4e5a6e97427121021e138ce89571cba204fcac12a3e37da501bd9",
+    "training_range": {
+      "first_day": "20261012",
+      "last_day": "20261101",
+      "samples": 21
+    },
+    "uncertainty": "UNKNOWN_UNCALIBRATED",
+    "units": "ratio_per_exchange_session"
+  },
+  "baseline_sha256": "15d95b0fe0aa667c86a649845963739052941efebc3e60f89474e8f71f498bce",
+  "calls": [
+    {
+      "day": "2026-11-01",
+      "id": "58",
+      "input_tokens": "6634",
+      "maximum_micro": "34816",
+      "month": "2026-11",
+      "output_tokens": "128",
+      "price_version": "synthetic-price-v1",
+      "reason": null,
+      "settled_micro": "6890",
+      "state": "settled",
+      "usage_micro": "6890"
+    }
+  ],
+  "can_execute_forward_paper": false,
+  "cloud_cost": "UNKNOWN_NOT_BILLED",
+  "comparison": {
+    "attempted": 4,
+    "authority": {
+      "can_execute_forward_paper": false,
+      "eligibility": "ELIGIBILITY_DENIED",
+      "live_allowed": false,
+      "restriction": "RESEARCH_ONLY"
+    },
+    "evaluated": 4,
+    "fusion_comparison": "STRUCTURED_HYPOTHESES_ONLY_NO_PRICE_ACCURACY_SCORE",
+    "holdout": "SYNTHETIC_EXPOSED_NOT_BLIND",
+    "mean_absolute_error_ratio": {
+      "naive": "0.002408255894",
+      "time_series": "0.001971238455"
+    },
+    "refusal_rate": "0.000000000000",
+    "refused": 0,
+    "rows": [
+      {
+        "naive": "0.000000000000",
+        "prefix_sha256": "59cf12cbf0e76bc219e626614a1b45dc07031f136f008318aabd8de56dc71577",
+        "revealed_day": "20261029",
+        "revealed_return_ratio": "-0.001923076923",
+        "time_series": "-0.000941221000",
+        "train_through": "20261028"
+      },
+      {
+        "naive": "0.000000000000",
+        "prefix_sha256": "87dad12014512d35d259142e9bc1b7596fbaa342101cd7fe8baf78766419fca6",
+        "revealed_day": "20261030",
+        "revealed_return_ratio": "0.000963391137",
+        "time_series": "-0.001012446071",
+        "train_through": "20261029"
+      },
+      {
+        "naive": "0.000000000000",
+        "prefix_sha256": "e9aa5f2fc198a9d40c9318e252433fe3faedf3e11b92c8b9041ef75e7248e8c5",
+        "revealed_day": "20261031",
+        "revealed_return_ratio": "-0.004812319538",
+        "time_series": "-0.000872727620",
+        "train_through": "20261030"
+      },
+      {
+        "naive": "0.000000000000",
+        "prefix_sha256": "d6e04eb6cb13661b622529cc7fc6a4e317ea22c751c22f10eb28ba2c15e0c5a1",
+        "revealed_day": "20261101",
+        "revealed_return_ratio": "-0.001934235977",
+        "time_series": "-0.000946567207",
+        "train_through": "20261031"
+      }
+    ],
+    "status": "SYNTHETIC_PREFIX_CHECK_NOT_INDEPENDENT"
+  },
+  "eligibility": "ELIGIBILITY_DENIED",
+  "evaluation": "NOT_EVALUATED",
+  "external_timeseries": "EXTERNAL_TIMESERIES_NOT_CONFIGURED",
+  "frozen_input_sha256": "accae618cc0f7202355feec5e145d53fe3f38199638db0f8c8f90e5442cd4262",
+  "fusion": {
+    "evidence_against": [
+      "DIRECTION_DIFFERS_FROM_NAIVE；统计差异未通过独立时间隔离验证。"
+    ],
+    "evidence_for": [
+      "时序下一会话收益比例 -0.001018200574；Naive 比例 0.000000000000；源 SHA a69a2ebfe57e178cea05bd0a57c919da0b33b2854fbfc76654e52df4d2fd91d9。"
+    ],
+    "falsification": [
+      "冻结后续合成标签，若时序误差不低于 Naive 则否定比较假设。"
+    ],
+    "hypothesis": "本地 fake 可证伪假设：该窗口的 local-test-shrinkage 时序统计偏移可在后续合成前缀中比较，不能据此认定 alpha。",
+    "limitations": [
+      "LOCAL_TEST_EXPERT 与原 Agent fake，UNKNOWN_UNCALIBRATED；文本不计价格预测正确率。"
+    ],
+    "next_experiment": [
+      "按时间正序前缀比较绝对误差并记录拒答率；由 Owner 审阅。"
+    ],
+    "risks": [
+      "波动估计有样本误差；公司行为 PIT 与实际开盘未验证。"
+    ]
+  },
+  "fusion_cost": {
+    "billing": "SYNTHETIC_TST_SETTLED_NOT_CLOUD_MONEY",
+    "calls": [
+      {
+        "day": "2026-11-01",
+        "id": "58",
+        "input_tokens": "6634",
+        "maximum_micro": "34816",
+        "month": "2026-11",
+        "output_tokens": "128",
+        "price_version": "synthetic-price-v1",
+        "reason": null,
+        "settled_micro": "6890",
+        "state": "settled",
+        "usage_micro": "6890"
+      }
+    ],
+    "currency": "TST",
+    "elapsed_ms": 187,
+    "finished_at": "2026-11-01T13:15:10.252906400+00:00",
+    "price_version": "synthetic-price-v1",
+    "started_at": "2026-11-01T13:15:10.065626500+00:00",
+    "token_source": "ORIGINAL_RUST_FAKE_PROVIDER_BYTE_BOUND"
+  },
+  "fusion_sha256": "da726d78ae5d03503e3eb3c2c04319850ff4ead4c08c272105ac41e53370f739",
+  "holdout": "EXPLORATORY_EX_POST",
+  "independent_acceptance": "NOT_VERIFIED",
+  "input_mode": "synthetic_test",
+  "input_snapshot_sha256": "a69a2ebfe57e178cea05bd0a57c919da0b33b2854fbfc76654e52df4d2fd91d9",
+  "live_allowed": false,
+  "public_requests": 0,
+  "registration_sha256": "ed09ac3c8d1195ced8bcbc09d949621f4f88053ad3923e3d83adf2b636666c6d",
+  "report_sha256": "98781de871b2e411996bf30fc8c43d85b060f5c068b0d8c81186f0c5e75e659a",
+  "restriction": "RESEARCH_ONLY",
+  "source_day": "20261101",
+  "state": "ARCHIVED",
+  "task_detail_sha256": "3f4cb1787c1054e92bebc61f5ee121f4e2b1c294d590aec50e6ca97532648869",
+  "task_id": "863e52f179d4e5a6e97427121021e138ce89571cba204fcac12a3e37da501bd9",
+  "text_event_expert": "NOT_IMPLEMENTED",
+  "time_series": {
+    "as_of": "2026-11-01T09:00:49.030Z",
+    "authority": {
+      "can_execute_forward_paper": false,
+      "eligibility": "ELIGIBILITY_DENIED",
+      "live_allowed": false,
+      "restriction": "RESEARCH_ONLY"
+    },
+    "contract": "expert-result-v1",
+    "cost": {
+      "billing": "LOCAL_NO_BILLING",
+      "cloud_cost": "UNKNOWN_NOT_BILLED",
+      "elapsed_ms": 0,
+      "input_tokens": null,
+      "output_tokens": null
+    },
+    "evidence_refs": [
+      "a69a2ebfe57e178cea05bd0a57c919da0b33b2854fbfc76654e52df4d2fd91d9",
+      "da0ba6e65e46d652ec776e5c0d7d046fe265e94467b2345f9527161b98cb0a97"
+    ],
+    "expert_kind": "time_series",
+    "generated_at": "2026-11-01T13:15:09.818Z",
+    "horizon_sessions": 1,
+    "input_mode": "synthetic_test",
+    "input_snapshot_sha256": "a69a2ebfe57e178cea05bd0a57c919da0b33b2854fbfc76654e52df4d2fd91d9",
+    "instrument": "600000.SH",
+    "limitations": [
+      "EXTERNAL_TIMESERIES_NOT_CONFIGURED",
+      "NO_CALIBRATED_PROBABILITY",
+      "CORPORATE_ACTION_PIT_NOT_VERIFIED",
+      "OPENING_SOURCE_BLOCKED"
+    ],
+    "missing_policy": "REJECT_NO_IMPUTATION",
+    "model_id": "local-test-shrinkage",
+    "model_version": "1",
+    "observed_at": "2026-11-01T09:00:49.000Z",
+    "output_sha256": "0f554e38a7d64ce5f7f0e673b22c740ef59b50a06bc402aa974daaeca74607f8",
+    "quality": "LOCAL_TEST_EXPERT",
+    "result": {
+      "expected_return_ratio": "-0.001018200574",
+      "volatility_ratio": "0.002344980185"
+    },
+    "role": "temporal_evidence",
+    "schema_version": 1,
+    "source_identity": "b3c4308274514af1b9cced13322a5e21b9fa764f2148a3757dc75a2518215515",
+    "target": "next_session_return_ratio",
+    "task_id": "863e52f179d4e5a6e97427121021e138ce89571cba204fcac12a3e37da501bd9",
+    "training_range": {
+      "first_day": "20261012",
+      "last_day": "20261101",
+      "samples": 21
+    },
+    "uncertainty": "UNKNOWN_UNCALIBRATED",
+    "units": "ratio_per_exchange_session"
+  },
+  "time_series_sha256": "8fe6f8e80b3078086fe33b9c886ed1a58ddaa4d93e9201d2eb5ee7bd5b2eccdd"
+}

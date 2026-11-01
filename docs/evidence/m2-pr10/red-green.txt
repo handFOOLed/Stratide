@@ -1,0 +1,22 @@
+Targeted regression (observed during this implementation; not independent acceptance)
+Base: c3904a5eb31f40209b32beba559e82ba4e47fd8a plus the newly added negative test only.
+Test: multimodal_scope_rejects_cloud_even_with_a_copied_grant_before_key_lookup
+Command: cargo test -p stratide-research --test multimodal_scope
+
+RED, before the new scope gate:
+assertion left == right failed
+  left: "PROVIDER_KEY_MISSING"
+ right: "MULTIMODAL_LOCAL_FAKE_ONLY"
+test result: FAILED. 0 passed; 1 failed
+reported shell exit code: 1
+
+GREEN, after Model::authorize rejects non-fake multimodal_research_v1:
+test multimodal_scope_rejects_cloud_even_with_a_copied_grant_before_key_lookup ... ok
+test result: ok. 1 passed; 0 failed
+exit code: 0
+
+Final workspace run also includes this unchanged test:
+cargo test --workspace
+160 passed, 0 failed, 0 ignored; exit code 0.
+The red path stopped at missing credentials; no Provider preparation, DNS,
+HTTP request or real charge occurred. The green path rejects still earlier.

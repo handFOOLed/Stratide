@@ -1,0 +1,15 @@
+test_01_two_independent_25_day_production_cli_e2e_and_inbox (__main__.MultimodalTests.test_01_two_independent_25_day_production_cli_e2e_and_inbox) ... ok
+test_02_independent_adapter_replacement_and_no_fusion_control (__main__.MultimodalTests.test_02_independent_adapter_replacement_and_no_fusion_control) ... ok
+test_03_four_abrupt_exit_restarts_reuse_original_records (__main__.MultimodalTests.test_03_four_abrupt_exit_restarts_reuse_original_records) ... ok
+test_04_two_processes_and_disable_enable_fence (__main__.MultimodalTests.test_04_two_processes_and_disable_enable_fence) ... ok
+test_05_shared_account_rename_cannot_reset_budget_or_source_claim (__main__.MultimodalTests.test_05_shared_account_rename_cannot_reset_budget_or_source_claim) ... ok
+test_06_insufficient_21_history_forward_does_not_get_synthetic_warmup (__main__.MultimodalTests.test_06_insufficient_21_history_forward_does_not_get_synthetic_warmup) ... ok
+test_07_budget_daily_monthly_revocation_cloud_and_unknown_are_not_retried (__main__.MultimodalTests.test_07_budget_daily_monthly_revocation_cloud_and_unknown_are_not_retried) ... ok
+test_08_external_expert_and_fusion_format_failures_are_structured (__main__.MultimodalTests.test_08_external_expert_and_fusion_format_failures_are_structured) ... ok
+test_09_malicious_expert_identity_numeric_schema_timezone_size (__main__.MultimodalTests.test_09_malicious_expert_identity_numeric_schema_timezone_size) ... ok
+test_10_source_revision_gap_future_label_stale_mode_and_clock (__main__.MultimodalTests.test_10_source_revision_gap_future_label_stale_mode_and_clock) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 66.282s
+
+OK

@@ -64,6 +64,12 @@ impl SnapshotSource {
     }
 
     pub fn read(&self, now_ms: i64) -> Result<InputSummary> {
+        self.read_with_identity(now_ms).map(|(input, _)| input)
+    }
+
+    /// Read identity and projection from the same original PR33 transaction.
+    /// The legacy InputSummary contract and its scope remain unchanged.
+    pub fn read_with_identity(&self, now_ms: i64) -> Result<(InputSummary, Value)> {
         self.read_store(now_ms).map_err(|error| {
             if error.0 == "AGENT_STORAGE_UNAVAILABLE" {
                 "SNAPSHOT_STORE_UNAVAILABLE".into()
@@ -73,7 +79,7 @@ impl SnapshotSource {
         })
     }
 
-    fn read_store(&self, now_ms: i64) -> Result<InputSummary> {
+    fn read_store(&self, now_ms: i64) -> Result<(InputSummary, Value)> {
         no_links(&self.path)?;
         let meta = fs::metadata(&self.path).map_err(|_| "SNAPSHOT_STORE_MISSING")?;
         ensure(
@@ -139,7 +145,11 @@ impl SnapshotSource {
         )?;
         let binding = serde_json::from_str(&binding).map_err(|_| "SNAPSHOT_BINDING_INVALID")?;
         let attempt = serde_json::from_str(&attempt).map_err(|_| "SNAPSHOT_SYNC_INVALID")?;
-        project(&key, &value, &binding, &attempt, now_ms)
+        let input = project(&key, &value, &binding, &attempt, now_ms)?;
+        let identity = json!({"source":value["source"],"instrument":value["instrument"],
+            "endpoint_version":value["endpoint_version"],"journal_genesis":value["journal_genesis"],
+            "data_mode":value["data_mode"]});
+        Ok((input, identity))
     }
 }
 

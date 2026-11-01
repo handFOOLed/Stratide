@@ -74,6 +74,24 @@ impl Default for Settings {
     }
 }
 impl Settings {
+    /// Separate V1 scope; no receiving vendor or outbound fields are authorized.
+    pub fn load_multimodal(path: &Path) -> Result<Self> {
+        let settings = Self::load_eod_auto(path).map_err(|e| {
+            if e.0.starts_with("EOD_AUTO_") {
+                crate::Error("MULTIMODAL_LOCAL_FAKE_ONLY".into())
+            } else {
+                e
+            }
+        })?;
+        ensure(
+            settings
+                .models
+                .iter()
+                .all(|m| m.fake_scenario.as_deref() != Some("safe_transient")),
+            "MULTIMODAL_SINGLE_ATTEMPT_REQUIRED",
+        )?;
+        Ok(settings)
+    }
     /// Auto EOD has no cloud permission. Inspect the raw configuration before
     /// normal validation, key lookup, Provider preparation or budget writes.
     pub fn load_eod_auto(path: &Path) -> Result<Self> {
@@ -239,6 +257,7 @@ impl Settings {
                     scopes: SCOPES
                         .into_iter()
                         .chain([crate::eod_snapshot::SCOPE])
+                        .chain([crate::multimodal::SCOPE])
                         .map(String::from)
                         .collect(),
                     authorized_at: "synthetic_test".into(),
@@ -255,6 +274,10 @@ impl Model {
         hash(&serde_json::to_vec(self).expect("model JSON"))
     }
     pub fn authorize(&self, scopes: &[String], budget: Option<&Budget>) -> Result<()> {
+        ensure(
+            self.kind == "fake" || !scopes.iter().any(|s| s == crate::multimodal::SCOPE),
+            "MULTIMODAL_LOCAL_FAKE_ONLY",
+        )?;
         // This new data category has no cloud authorization in M2-PR06, even
         // when a copied/old grant or hand-edited grant claims a matching scope.
         ensure(

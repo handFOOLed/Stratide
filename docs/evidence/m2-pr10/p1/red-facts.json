@@ -1,0 +1,32 @@
+[
+  {
+    "id": 48,
+    "trigger_key": "multimodal-v1:mm-test-2cd5da40-route-a-87d7:e4e3d5c261175311ba4047efbf0f7a52de01a6c85b03d4503a1be5202b11225b",
+    "status": "completed",
+    "source_day": "2026-11-01",
+    "input_snapshot_sha256": "99cf016a6aec96e811482a112f3c401c4d8a8d46417b8e1902da5ca9590452c5",
+    "calls": [
+      {
+        "state": "settled",
+        "price_version": "synthetic-price-v1",
+        "reason": null,
+        "day": "2026-11-01",
+        "month": "2026-11",
+        "id": "40",
+        "maximum_micro": "34816",
+        "settled_micro": "6888",
+        "usage_micro": "6888",
+        "input_tokens": "6632",
+        "output_tokens": "128"
+      }
+    ]
+  },
+  {
+    "id": 49,
+    "trigger_key": "multimodal-v1:mm-test-2cd5da40-route-b-02ea:fb07d2dbfe94e9443a5e89ae4807112061df96f44212d41beae99a241bdf279a",
+    "status": "queued",
+    "source_day": "2026-11-01",
+    "input_snapshot_sha256": "81ad5a5d3937d80c438f6671fabad99ade8fc6f738577aa1b8e7a50541bd3cc1",
+    "calls": []
+  }
+]

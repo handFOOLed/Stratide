@@ -1,0 +1,22 @@
+{
+  "provider": "local_fake_only",
+  "real_provider": "REAL_PROVIDER_NOT_VERIFIED",
+  "checks": [
+    "Owner-token + explicit Origin + fetch-site + narrow routes reject forgery/CSRF/commands/URLs",
+    "Persistent queue, graceful pause, queued cancellation and pinned default survive real process restart",
+    "Running cancellation keeps actual fake result/cost; slow Provider does not block Paper GETs",
+    "Hard process kill after dispatch preserves both unknown holds, no retry/fallback/reset; independent SQLite sum agrees",
+    "List/details do not infer; pinned NAV and original six-file bytes unchanged",
+    "Invalid research configuration fails research closed while Paper API remains online"
+  ],
+  "paper_gets_during_research_ms": 16,
+  "frozen_report_sha256": {
+    "daily.csv": "3274ce85b2f7f533b381aac4e369b21bd57d12a05a4da3454f9c550458c93780",
+    "events.json": "578385d656d8a60a01997aa1e7444db6379299b1c8f1928919be75c0da18820b",
+    "fills.csv": "830929f7a02cdcd1de18fcb0a7e032a56fe0811bde6b896b57983d215f0ed102",
+    "orders.csv": "eb721d96f39991dd53474471362848b949f223841d2992e9158214147abafd86",
+    "positions.csv": "31a794e77e2be648c5e0e7d318b5d60a947d802a1d6a035eb31a27e0c7f150d6",
+    "report.json": "ab7438455f5b61e96e26ae272d61587cb73e45463d072cd1a51425e0eafc4f45"
+  },
+  "result": "PASS"
+}

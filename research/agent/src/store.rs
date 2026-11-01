@@ -191,6 +191,7 @@ impl Store {
             ensure(enabled.as_deref() == Some("true"), "OWNER_DISABLED")?;
             ensure(paused != "true", "OWNER_PAUSED")?;
         }
+        crate::multimodal::require_enabled(&tx, trigger)?;
         let count: i64 = tx.query_row("SELECT COUNT(*) FROM tasks", [], |r| r.get(0))?;
         ensure(count < settings.max_tasks as i64, "TASK_STORAGE_LIMIT")?;
         tx.execute("INSERT INTO tasks(request,input,provider_id,provider_hash,status,created_at,trigger_key) VALUES(?1,?2,?3,?4,'queued',?5,?6)",
@@ -200,6 +201,16 @@ impl Store {
         Ok(result)
     }
     pub fn claim(&self, now: DateTime<Utc>) -> Result<Option<i64>> {
+        self.claim_matching(now, None)
+    }
+    pub fn claim_exact(&self, now: DateTime<Utc>, id: i64, trigger: &str) -> Result<Option<i64>> {
+        self.claim_matching(now, Some((id, trigger)))
+    }
+    fn claim_matching(
+        &self,
+        now: DateTime<Utc>,
+        target: Option<(i64, &str)>,
+    ) -> Result<Option<i64>> {
         let mut c = self.connect()?;
         let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
         let paused: String =
@@ -211,8 +222,9 @@ impl Store {
         }
         let id: Option<i64> = tx
             .query_row(
-                "SELECT id FROM tasks WHERE status='queued' ORDER BY id LIMIT 1",
-                [],
+                "SELECT id FROM tasks WHERE status='queued'
+                 AND (?1 IS NULL OR (id=?1 AND trigger_key=?2)) ORDER BY id LIMIT 1",
+                params![target.map(|v| v.0), target.map(|v| v.1)],
                 |r| r.get(0),
             )
             .optional()?;
@@ -224,6 +236,19 @@ impl Store {
         }
         tx.commit()?;
         Ok(id)
+    }
+    /// Reject only this undispatched multimodal intent. Keep every task/call,
+    /// including uncertain outcomes; never repurpose another task's authority.
+    pub fn invalidate_queued(&self, id: i64, trigger: &str, now: DateTime<Utc>) -> Result<()> {
+        ensure(
+            trigger.starts_with("multimodal-v1:"),
+            "MULTIMODAL_TRIGGER_INVALID",
+        )?;
+        self.connect()?.execute("UPDATE tasks SET status='cancelled',reason='MULTIMODAL_SOURCE_RECHECK_FAILED',finished_at=?1
+            WHERE id=?2 AND trigger_key=?3 AND status='queued'
+              AND NOT EXISTS(SELECT 1 FROM calls WHERE task_id=?2 AND state!='no_charge')",
+            params![now.to_rfc3339(),id,trigger])?;
+        Ok(())
     }
     pub fn cancel(&self, id: i64, now: DateTime<Utc>) -> Result<()> {
         let changed=self.connect()?.execute("UPDATE tasks SET status=CASE WHEN status='queued' THEN 'cancelled' ELSE 'cancel_requested' END,
