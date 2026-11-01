@@ -1,0 +1,18 @@
+{
+  "can_execute_forward_paper": false,
+  "candidate_registrations": 0,
+  "enabled_after_test": false,
+  "fake_calls": 0,
+  "live_allowed": false,
+  "market_requests": 0,
+  "mode": "LOCAL_FAKE_ONLY",
+  "new_forward_events": 0,
+  "production_actual_clock": true,
+  "real_provider_calls": 0,
+  "reason": "BEFORE_EOD_WINDOW",
+  "result": "PASS",
+  "source_data_mode": "forward_observed_eod",
+  "source_day": "20261029",
+  "tasks": 0,
+  "verification": "Sol_developer_selftest_not_independent_acceptance"
+}

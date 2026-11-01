@@ -1,0 +1,2227 @@
+{
+  "commands": [
+    {
+      "command": [
+        "fixture-cli",
+        "sync",
+        "--observer",
+        "<WORKTREE>\\state\\eod-auto-tests\\auto-test-05f564268c\\auto-test-full-8ac6a638e5\\forward.sqlite"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-8ac6a638e5",
+      "result": {
+        "calendar_after_snapshot": "UNKNOWN_NOT_FETCHED",
+        "can_execute_forward_paper": false,
+        "can_research": true,
+        "latest_attempt": {
+          "blockers": [],
+          "error_code": null,
+          "finished_at": 1793095200000,
+          "journal_head": "d729e4fdbd72ec8882d68b1962f9ded6d703e5af9a319607941fb94c191d3f76",
+          "new_append": false,
+          "source_changed": true,
+          "source_database_sha256": "19714e511df141e1c565bd87849d1c9be1edbea089c8b7fccb133a67a6793dac",
+          "started_at": 1793095200000,
+          "state": "succeeded"
+        },
+        "live_allowed": false,
+        "opening_source": "BLOCKED",
+        "schema_version": 1,
+        "snapshot": {
+          "as_of_journal_event_at": 1793091603030,
+          "available_at": 1793091603030,
+          "available_at_semantics": "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time",
+          "blockers": [],
+          "can_execute_forward_paper": false,
+          "can_research": true,
+          "coverage": [
+            {
+              "source_day": "20261026",
+              "state": "valid_eod"
+            },
+            {
+              "source_day": "20261027",
+              "state": "valid_eod"
+            }
+          ],
+          "data_mode": "synthetic_test",
+          "event_count": 5,
+          "gaps": [],
+          "historical_pit": "NOT_VERIFIED",
+          "journal_head": "d729e4fdbd72ec8882d68b1962f9ded6d703e5af9a319607941fb94c191d3f76",
+          "last_valid_source_day": "20261027",
+          "live_allowed": false,
+          "observed_at": 1793091603000,
+          "on_day_valid_eod_days": 2,
+          "opening_source": "BLOCKED",
+          "provider_published_at": null,
+          "raw_sha256": [
+            {
+              "api": "trade_cal",
+              "received_at": 1793005201010,
+              "sequence": 2,
+              "sha256": "b080e50aab363afff480d6cbeb168c0028773c94fce7b671406e1fc0aecdb0f9"
+            },
+            {
+              "api": "daily",
+              "received_at": 1793005201020,
+              "sequence": 2,
+              "sha256": "2dc1bbcf34ee45b8e08d79d10ea3c6847893834fa13172ce8307fc4463c96ceb"
+            },
+            {
+              "api": "trade_cal",
+              "received_at": 1793091603010,
+              "sequence": 4,
+              "sha256": "60b6ff9bb0357debbebd168989fab6c7a6ac67b9c40e11eab918945ea7b63e77"
+            },
+            {
+              "api": "daily",
+              "received_at": 1793091603020,
+              "sequence": 4,
+              "sha256": "e31dab44d473c8901de3c5052e7cf7881820f36521b74c06cba7d159ba312862"
+            }
+          ],
+          "received_at": 1793091603020,
+          "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "valid_eod_days": 2,
+          "verified_at": 1793095200000,
+          "warnings": []
+        },
+        "source_checked_only_at_latest_sync": true,
+        "source_day_differs_from_wall_clock": false,
+        "wall_clock_day": "20261027"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "init",
+        "--snapshot-store",
+        "auto-test-full-8ac6a638e5"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-8ac6a638e5",
+      "result": {
+        "agent_dir": "agent",
+        "binding_sha256": "75ba8b6ddcf65832c4ecee8ff66aef5b334e7c8f9ae5f865bef76aa57063987e",
+        "can_execute_forward_paper": false,
+        "candidate_registry_name": "auto-test-full-8ac6a638e5",
+        "eligibility": "ELIGIBILITY_DENIED",
+        "enabled": false,
+        "evaluation": "NOT_EVALUATED",
+        "last": null,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "paused": false,
+        "policy": "eod-auto-v1",
+        "restriction": "RESEARCH_ONLY",
+        "schema_version": 1,
+        "settings_state": "LOCAL_FAKE_ONLY",
+        "snapshot_store_name": "auto-test-full-8ac6a638e5",
+        "source": {
+          "as_of_journal_event_at": 1793091603030,
+          "available_at": 1793091603030,
+          "data_mode": "synthetic_test",
+          "last_valid_source_day": "20261027",
+          "latest_sync": {
+            "error_code": null,
+            "finished_at": 1793095200000,
+            "started_at": 1793095200000,
+            "state": "succeeded"
+          },
+          "observed_at": 1793091603000,
+          "received_at": 1793091603020,
+          "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b"
+        },
+        "tasks": []
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 3,
+      "fault": null,
+      "name": "auto-test-full-8ac6a638e5",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "OWNER_DISABLED",
+        "restriction": "RESEARCH_ONLY",
+        "state": "SKIPPED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-8ac6a638e5",
+      "result": {
+        "agent_dir": "agent",
+        "binding_sha256": "75ba8b6ddcf65832c4ecee8ff66aef5b334e7c8f9ae5f865bef76aa57063987e",
+        "can_execute_forward_paper": false,
+        "candidate_registry_name": "auto-test-full-8ac6a638e5",
+        "eligibility": "ELIGIBILITY_DENIED",
+        "enabled": true,
+        "evaluation": "NOT_EVALUATED",
+        "last": {
+          "at": "2026-10-27T10:00:00+00:00",
+          "can_execute_forward_paper": false,
+          "eligibility": "ELIGIBILITY_DENIED",
+          "evaluation": "NOT_EVALUATED",
+          "live_allowed": false,
+          "mode": "LOCAL_FAKE_ONLY",
+          "reason": "OWNER_DISABLED",
+          "restriction": "RESEARCH_ONLY",
+          "state": "SKIPPED"
+        },
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "paused": false,
+        "policy": "eod-auto-v1",
+        "restriction": "RESEARCH_ONLY",
+        "schema_version": 1,
+        "settings_state": "LOCAL_FAKE_ONLY",
+        "snapshot_store_name": "auto-test-full-8ac6a638e5",
+        "source": {
+          "as_of_journal_event_at": 1793091603030,
+          "available_at": 1793091603030,
+          "data_mode": "synthetic_test",
+          "last_valid_source_day": "20261027",
+          "latest_sync": {
+            "error_code": null,
+            "finished_at": 1793095200000,
+            "started_at": 1793095200000,
+            "state": "succeeded"
+          },
+          "observed_at": 1793091603000,
+          "received_at": 1793091603020,
+          "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b"
+        },
+        "tasks": []
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "watch",
+        "--cycles",
+        "1",
+        "--sync"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-8ac6a638e5",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "fake_calls": 1,
+        "input_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "CANDIDATE_ARCHIVED",
+        "registration_sha256": "11ada3541d63e8f6cd6d1a1ab1a2e9190543cb6197f8f49a3ea0ee857ae757d9",
+        "restriction": "RESEARCH_ONLY",
+        "source_day": "2026-10-27",
+        "state": "COMPLETED",
+        "task_id": "1"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "task",
+        "1"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-8ac6a638e5",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "restriction": "RESEARCH_ONLY",
+        "task": {
+          "calls": [
+            {
+              "day": "2026-10-27",
+              "id": "1",
+              "input_tokens": "3310",
+              "maximum_micro": "34816",
+              "month": "2026-10",
+              "output_tokens": "128",
+              "price_version": "synthetic-price-v1",
+              "reason": null,
+              "settled_micro": "3566",
+              "state": "settled",
+              "usage_micro": "3566"
+            }
+          ],
+          "cancel_requested_at": null,
+          "created_at": "2026-10-27T10:00:00+00:00",
+          "finished_at": "2026-11-01T04:36:46.512296700+00:00",
+          "id": "1",
+          "input": {
+            "eod_eligible": false,
+            "mode": "synthetic_test",
+            "scopes": [
+              "owner_task",
+              "forward_eod_research_summary_v1"
+            ],
+            "source_day": "2026-10-27",
+            "summary": {
+              "as_of_journal_event_at": 1793091603030,
+              "available_at": 1793091603030,
+              "available_at_semantics": "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time",
+              "can_execute_forward_paper": false,
+              "data_mode": "synthetic_test",
+              "eod_eligible": false,
+              "last_valid_source_day": "20261027",
+              "live_allowed": false,
+              "observed_at": 1793091603000,
+              "on_day_valid_eod_days": 2,
+              "provider_published_at": null,
+              "quality": {
+                "blockers": [],
+                "calendar_after_snapshot": "UNKNOWN_NOT_FETCHED",
+                "coverage": [
+                  {
+                    "source_day": "20261026",
+                    "state": "valid_eod"
+                  },
+                  {
+                    "source_day": "20261027",
+                    "state": "valid_eod"
+                  }
+                ],
+                "coverage_count": 2,
+                "gap_count": 0,
+                "gaps": [],
+                "historical_pit": "NOT_VERIFIED",
+                "opening_source": "BLOCKED",
+                "source_checked_only_at_latest_sync": true,
+                "sync_policy": "latest_succeeded_within_24h",
+                "warnings": []
+              },
+              "received_at": 1793091603020,
+              "restriction": "RESEARCH_ONLY",
+              "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+              "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+              "valid_eod_days": 2
+            },
+            "version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b"
+          },
+          "provider_hash": "4e8f2d9e76856ca0e2ac9031a89337ee7492820901c078f325d19ea467700f62",
+          "provider_id": "fake",
+          "reason": "RESEARCH_SAVED",
+          "request": {
+            "end_day": "2026-10-27",
+            "goal": "根据冻结 EOD 摘要提出可核查假设、依据、反证和下一研究步骤。",
+            "name": "EOD 自动本地研究 · 2026-10-27",
+            "scope": "LOCAL_FAKE_ONLY / RESEARCH_ONLY / 原始 on-day EOD",
+            "start_day": "2026-10-27",
+            "task_budget_micro": null
+          },
+          "result": {
+            "billing": "synthetic_test_settled",
+            "generated_at": "2026-11-01T04:36:46.512296700+00:00",
+            "input_mode": "synthetic_test",
+            "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "limitations": "研究意见不能作为独立策略资格/收益或实盘部署结论；历史/合成输入保持原标签。",
+            "model": "deterministic-fixture-v1",
+            "provider_id": "fake",
+            "provider_kind": "fake",
+            "qualification": "EXPLORATORY_NOT_INDEPENDENT",
+            "research": {
+              "evidence": [
+                "依据 input_summary_version 与源日期检查已发布摘要；本结果由确定性 fake 产生。"
+              ],
+              "hypothesis": "假设：在相同数据区间，加入成本与缺估值约束会降低表面收益的稳健性。",
+              "next_steps": [
+                "由独立评价流程核查数据时间、费用假设和后续真实前向证据。"
+              ],
+              "risks": [
+                "synthetic_test；不是云模型研究成果，不能证明策略有独立优势。"
+              ]
+            },
+            "source_day": "2026-10-27",
+            "synthetic_provider": true
+          },
+          "retryable": false,
+          "started_at": "2026-10-27T10:00:00+00:00",
+          "status": "completed"
+        }
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "candidate",
+        "11ada3541d63e8f6cd6d1a1ab1a2e9190543cb6197f8f49a3ea0ee857ae757d9"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-8ac6a638e5",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eod_eligible": false,
+        "evaluation": "NOT_EVALUATED",
+        "frozen_input": {
+          "eod_eligible": false,
+          "mode": "synthetic_test",
+          "scopes": [
+            "owner_task",
+            "forward_eod_research_summary_v1"
+          ],
+          "source_day": "2026-10-27",
+          "summary": {
+            "as_of_journal_event_at": 1793091603030,
+            "available_at": 1793091603030,
+            "available_at_semantics": "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time",
+            "can_execute_forward_paper": false,
+            "data_mode": "synthetic_test",
+            "eod_eligible": false,
+            "last_valid_source_day": "20261027",
+            "live_allowed": false,
+            "observed_at": 1793091603000,
+            "on_day_valid_eod_days": 2,
+            "provider_published_at": null,
+            "quality": {
+              "blockers": [],
+              "calendar_after_snapshot": "UNKNOWN_NOT_FETCHED",
+              "coverage": [
+                {
+                  "source_day": "20261026",
+                  "state": "valid_eod"
+                },
+                {
+                  "source_day": "20261027",
+                  "state": "valid_eod"
+                }
+              ],
+              "coverage_count": 2,
+              "gap_count": 0,
+              "gaps": [],
+              "historical_pit": "NOT_VERIFIED",
+              "opening_source": "BLOCKED",
+              "source_checked_only_at_latest_sync": true,
+              "sync_policy": "latest_succeeded_within_24h",
+              "warnings": []
+            },
+            "received_at": 1793091603020,
+            "restriction": "RESEARCH_ONLY",
+            "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "valid_eod_days": 2
+          },
+          "version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b"
+        },
+        "frozen_research": {
+          "evidence": [
+            "依据 input_summary_version 与源日期检查已发布摘要；本结果由确定性 fake 产生。"
+          ],
+          "hypothesis": "假设：在相同数据区间，加入成本与缺估值约束会降低表面收益的稳健性。",
+          "next_steps": [
+            "由独立评价流程核查数据时间、费用假设和后续真实前向证据。"
+          ],
+          "risks": [
+            "synthetic_test；不是云模型研究成果，不能证明策略有独立优势。"
+          ]
+        },
+        "handoff": {
+          "candidate_sha256": null,
+          "contract": "candidate-handoff-v1",
+          "eligibility": "ELIGIBILITY_DENIED",
+          "evaluation_sha256": null,
+          "forward_paper_allowed": false,
+          "independent_acceptance": "NOT_VERIFIED",
+          "live_allowed": false,
+          "qualification": "NOT_ELIGIBLE",
+          "reasons": [
+            "HISTORICAL_PIT_NOT_VERIFIED",
+            "NO_TRUSTED_FORWARD_OPENING_EVIDENCE",
+            "FORWARD_PAPER_NOT_ENABLED",
+            "NO_LIVE_AUTHORIZATION"
+          ],
+          "schema_version": 1
+        },
+        "live_allowed": false,
+        "registration_sha256": "11ada3541d63e8f6cd6d1a1ab1a2e9190543cb6197f8f49a3ea0ee857ae757d9",
+        "snapshot_provenance": {
+          "can_execute_forward_paper": false,
+          "data_mode": "synthetic_test",
+          "eod_eligible": false,
+          "frozen_input_sha256": "d7f467e439ab4048f75600539e86e2f2590610e4708ac882039a8283d0924b53",
+          "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "live_allowed": false,
+          "research_task_id": "1",
+          "restriction": "RESEARCH_ONLY",
+          "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "snapshot_verification": "SNAPSHOT_CONTENT_VERIFIED_AT_REGISTRATION",
+          "source_day": "2026-10-27",
+          "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+        },
+        "state": "RESEARCH_ONLY",
+        "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "status"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-8ac6a638e5",
+      "result": {
+        "agent_dir": "agent",
+        "binding_sha256": "75ba8b6ddcf65832c4ecee8ff66aef5b334e7c8f9ae5f865bef76aa57063987e",
+        "can_execute_forward_paper": false,
+        "candidate_registry_name": "auto-test-full-8ac6a638e5",
+        "eligibility": "ELIGIBILITY_DENIED",
+        "enabled": true,
+        "evaluation": "NOT_EVALUATED",
+        "last": {
+          "at": "2026-10-27T10:00:00+00:00",
+          "can_execute_forward_paper": false,
+          "eligibility": "ELIGIBILITY_DENIED",
+          "evaluation": "NOT_EVALUATED",
+          "fake_calls": 1,
+          "input_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "live_allowed": false,
+          "mode": "LOCAL_FAKE_ONLY",
+          "reason": "CANDIDATE_ARCHIVED",
+          "registration_sha256": "11ada3541d63e8f6cd6d1a1ab1a2e9190543cb6197f8f49a3ea0ee857ae757d9",
+          "restriction": "RESEARCH_ONLY",
+          "source_day": "2026-10-27",
+          "state": "COMPLETED",
+          "task_id": "1"
+        },
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "paused": false,
+        "policy": "eod-auto-v1",
+        "restriction": "RESEARCH_ONLY",
+        "schema_version": 1,
+        "settings_state": "LOCAL_FAKE_ONLY",
+        "snapshot_store_name": "auto-test-full-8ac6a638e5",
+        "source": {
+          "as_of_journal_event_at": 1793091603030,
+          "available_at": 1793091603030,
+          "data_mode": "synthetic_test",
+          "last_valid_source_day": "20261027",
+          "latest_sync": {
+            "error_code": null,
+            "finished_at": 1793095200000,
+            "started_at": 1793095200000,
+            "state": "succeeded"
+          },
+          "observed_at": 1793091603000,
+          "received_at": 1793091603020,
+          "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b"
+        },
+        "tasks": [
+          {
+            "archive_state": "ARCHIVED",
+            "attempts": 1,
+            "input_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "registration_sha256": "11ada3541d63e8f6cd6d1a1ab1a2e9190543cb6197f8f49a3ea0ee857ae757d9",
+            "review_reason": null,
+            "source_day": "2026-10-27",
+            "task_id": "1",
+            "task_reason": "RESEARCH_SAVED",
+            "task_status": "completed"
+          }
+        ]
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "task",
+        "1"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-8ac6a638e5",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "restriction": "RESEARCH_ONLY",
+        "task": {
+          "calls": [
+            {
+              "day": "2026-10-27",
+              "id": "1",
+              "input_tokens": "3310",
+              "maximum_micro": "34816",
+              "month": "2026-10",
+              "output_tokens": "128",
+              "price_version": "synthetic-price-v1",
+              "reason": null,
+              "settled_micro": "3566",
+              "state": "settled",
+              "usage_micro": "3566"
+            }
+          ],
+          "cancel_requested_at": null,
+          "created_at": "2026-10-27T10:00:00+00:00",
+          "finished_at": "2026-11-01T04:36:46.512296700+00:00",
+          "id": "1",
+          "input": {
+            "eod_eligible": false,
+            "mode": "synthetic_test",
+            "scopes": [
+              "owner_task",
+              "forward_eod_research_summary_v1"
+            ],
+            "source_day": "2026-10-27",
+            "summary": {
+              "as_of_journal_event_at": 1793091603030,
+              "available_at": 1793091603030,
+              "available_at_semantics": "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time",
+              "can_execute_forward_paper": false,
+              "data_mode": "synthetic_test",
+              "eod_eligible": false,
+              "last_valid_source_day": "20261027",
+              "live_allowed": false,
+              "observed_at": 1793091603000,
+              "on_day_valid_eod_days": 2,
+              "provider_published_at": null,
+              "quality": {
+                "blockers": [],
+                "calendar_after_snapshot": "UNKNOWN_NOT_FETCHED",
+                "coverage": [
+                  {
+                    "source_day": "20261026",
+                    "state": "valid_eod"
+                  },
+                  {
+                    "source_day": "20261027",
+                    "state": "valid_eod"
+                  }
+                ],
+                "coverage_count": 2,
+                "gap_count": 0,
+                "gaps": [],
+                "historical_pit": "NOT_VERIFIED",
+                "opening_source": "BLOCKED",
+                "source_checked_only_at_latest_sync": true,
+                "sync_policy": "latest_succeeded_within_24h",
+                "warnings": []
+              },
+              "received_at": 1793091603020,
+              "restriction": "RESEARCH_ONLY",
+              "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+              "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+              "valid_eod_days": 2
+            },
+            "version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b"
+          },
+          "provider_hash": "4e8f2d9e76856ca0e2ac9031a89337ee7492820901c078f325d19ea467700f62",
+          "provider_id": "fake",
+          "reason": "RESEARCH_SAVED",
+          "request": {
+            "end_day": "2026-10-27",
+            "goal": "根据冻结 EOD 摘要提出可核查假设、依据、反证和下一研究步骤。",
+            "name": "EOD 自动本地研究 · 2026-10-27",
+            "scope": "LOCAL_FAKE_ONLY / RESEARCH_ONLY / 原始 on-day EOD",
+            "start_day": "2026-10-27",
+            "task_budget_micro": null
+          },
+          "result": {
+            "billing": "synthetic_test_settled",
+            "generated_at": "2026-11-01T04:36:46.512296700+00:00",
+            "input_mode": "synthetic_test",
+            "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "limitations": "研究意见不能作为独立策略资格/收益或实盘部署结论；历史/合成输入保持原标签。",
+            "model": "deterministic-fixture-v1",
+            "provider_id": "fake",
+            "provider_kind": "fake",
+            "qualification": "EXPLORATORY_NOT_INDEPENDENT",
+            "research": {
+              "evidence": [
+                "依据 input_summary_version 与源日期检查已发布摘要；本结果由确定性 fake 产生。"
+              ],
+              "hypothesis": "假设：在相同数据区间，加入成本与缺估值约束会降低表面收益的稳健性。",
+              "next_steps": [
+                "由独立评价流程核查数据时间、费用假设和后续真实前向证据。"
+              ],
+              "risks": [
+                "synthetic_test；不是云模型研究成果，不能证明策略有独立优势。"
+              ]
+            },
+            "source_day": "2026-10-27",
+            "synthetic_provider": true
+          },
+          "retryable": false,
+          "started_at": "2026-10-27T10:00:00+00:00",
+          "status": "completed"
+        }
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "candidate",
+        "11ada3541d63e8f6cd6d1a1ab1a2e9190543cb6197f8f49a3ea0ee857ae757d9"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-8ac6a638e5",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eod_eligible": false,
+        "evaluation": "NOT_EVALUATED",
+        "frozen_input": {
+          "eod_eligible": false,
+          "mode": "synthetic_test",
+          "scopes": [
+            "owner_task",
+            "forward_eod_research_summary_v1"
+          ],
+          "source_day": "2026-10-27",
+          "summary": {
+            "as_of_journal_event_at": 1793091603030,
+            "available_at": 1793091603030,
+            "available_at_semantics": "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time",
+            "can_execute_forward_paper": false,
+            "data_mode": "synthetic_test",
+            "eod_eligible": false,
+            "last_valid_source_day": "20261027",
+            "live_allowed": false,
+            "observed_at": 1793091603000,
+            "on_day_valid_eod_days": 2,
+            "provider_published_at": null,
+            "quality": {
+              "blockers": [],
+              "calendar_after_snapshot": "UNKNOWN_NOT_FETCHED",
+              "coverage": [
+                {
+                  "source_day": "20261026",
+                  "state": "valid_eod"
+                },
+                {
+                  "source_day": "20261027",
+                  "state": "valid_eod"
+                }
+              ],
+              "coverage_count": 2,
+              "gap_count": 0,
+              "gaps": [],
+              "historical_pit": "NOT_VERIFIED",
+              "opening_source": "BLOCKED",
+              "source_checked_only_at_latest_sync": true,
+              "sync_policy": "latest_succeeded_within_24h",
+              "warnings": []
+            },
+            "received_at": 1793091603020,
+            "restriction": "RESEARCH_ONLY",
+            "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "valid_eod_days": 2
+          },
+          "version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b"
+        },
+        "frozen_research": {
+          "evidence": [
+            "依据 input_summary_version 与源日期检查已发布摘要；本结果由确定性 fake 产生。"
+          ],
+          "hypothesis": "假设：在相同数据区间，加入成本与缺估值约束会降低表面收益的稳健性。",
+          "next_steps": [
+            "由独立评价流程核查数据时间、费用假设和后续真实前向证据。"
+          ],
+          "risks": [
+            "synthetic_test；不是云模型研究成果，不能证明策略有独立优势。"
+          ]
+        },
+        "handoff": {
+          "candidate_sha256": null,
+          "contract": "candidate-handoff-v1",
+          "eligibility": "ELIGIBILITY_DENIED",
+          "evaluation_sha256": null,
+          "forward_paper_allowed": false,
+          "independent_acceptance": "NOT_VERIFIED",
+          "live_allowed": false,
+          "qualification": "NOT_ELIGIBLE",
+          "reasons": [
+            "HISTORICAL_PIT_NOT_VERIFIED",
+            "NO_TRUSTED_FORWARD_OPENING_EVIDENCE",
+            "FORWARD_PAPER_NOT_ENABLED",
+            "NO_LIVE_AUTHORIZATION"
+          ],
+          "schema_version": 1
+        },
+        "live_allowed": false,
+        "registration_sha256": "11ada3541d63e8f6cd6d1a1ab1a2e9190543cb6197f8f49a3ea0ee857ae757d9",
+        "snapshot_provenance": {
+          "can_execute_forward_paper": false,
+          "data_mode": "synthetic_test",
+          "eod_eligible": false,
+          "frozen_input_sha256": "d7f467e439ab4048f75600539e86e2f2590610e4708ac882039a8283d0924b53",
+          "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "live_allowed": false,
+          "research_task_id": "1",
+          "restriction": "RESEARCH_ONLY",
+          "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "snapshot_verification": "SNAPSHOT_CONTENT_VERIFIED_AT_REGISTRATION",
+          "source_day": "2026-10-27",
+          "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+        },
+        "state": "RESEARCH_ONLY",
+        "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-8ac6a638e5",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "ALREADY_ARCHIVED_INPUT_FROZEN",
+        "registration_sha256": "11ada3541d63e8f6cd6d1a1ab1a2e9190543cb6197f8f49a3ea0ee857ae757d9",
+        "restriction": "RESEARCH_ONLY",
+        "source_day": "2026-10-27",
+        "state": "SKIPPED",
+        "task_id": "1"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once",
+        "--sync"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-8ac6a638e5",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "ALREADY_ARCHIVED_INPUT_FROZEN",
+        "registration_sha256": "11ada3541d63e8f6cd6d1a1ab1a2e9190543cb6197f8f49a3ea0ee857ae757d9",
+        "restriction": "RESEARCH_ONLY",
+        "source_day": "2026-10-27",
+        "state": "SKIPPED",
+        "task_id": "1"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "sync"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-8ac6a638e5",
+      "result": {
+        "calendar_after_snapshot": "UNKNOWN_NOT_FETCHED",
+        "can_execute_forward_paper": false,
+        "can_research": true,
+        "latest_attempt": {
+          "blockers": [],
+          "error_code": null,
+          "finished_at": 1793095200000,
+          "journal_head": "e848aee8253c960e45495c53bc4ebaa8cde7347f5c0b5c05826f9e8ed32d5fa2",
+          "new_append": true,
+          "source_changed": true,
+          "source_database_sha256": "4f99ed169cff7dbf7c1d748bbb894ca35e4a4d27db6e4f7d6c11bc7c2bc7aa07",
+          "started_at": 1793095200000,
+          "state": "succeeded"
+        },
+        "live_allowed": false,
+        "opening_source": "BLOCKED",
+        "schema_version": 1,
+        "snapshot": {
+          "as_of_journal_event_at": 1793091605030,
+          "available_at": 1793091605030,
+          "available_at_semantics": "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time",
+          "blockers": [],
+          "can_execute_forward_paper": false,
+          "can_research": true,
+          "coverage": [
+            {
+              "source_day": "20261026",
+              "state": "valid_eod"
+            },
+            {
+              "source_day": "20261027",
+              "state": "valid_eod"
+            }
+          ],
+          "data_mode": "synthetic_test",
+          "event_count": 7,
+          "gaps": [],
+          "historical_pit": "NOT_VERIFIED",
+          "journal_head": "e848aee8253c960e45495c53bc4ebaa8cde7347f5c0b5c05826f9e8ed32d5fa2",
+          "last_valid_source_day": "20261027",
+          "live_allowed": false,
+          "observed_at": 1793091605000,
+          "on_day_valid_eod_days": 2,
+          "opening_source": "BLOCKED",
+          "provider_published_at": null,
+          "raw_sha256": [
+            {
+              "api": "trade_cal",
+              "received_at": 1793005201010,
+              "sequence": 2,
+              "sha256": "b080e50aab363afff480d6cbeb168c0028773c94fce7b671406e1fc0aecdb0f9"
+            },
+            {
+              "api": "daily",
+              "received_at": 1793005201020,
+              "sequence": 2,
+              "sha256": "2dc1bbcf34ee45b8e08d79d10ea3c6847893834fa13172ce8307fc4463c96ceb"
+            },
+            {
+              "api": "trade_cal",
+              "received_at": 1793091603010,
+              "sequence": 4,
+              "sha256": "60b6ff9bb0357debbebd168989fab6c7a6ac67b9c40e11eab918945ea7b63e77"
+            },
+            {
+              "api": "daily",
+              "received_at": 1793091603020,
+              "sequence": 4,
+              "sha256": "e31dab44d473c8901de3c5052e7cf7881820f36521b74c06cba7d159ba312862"
+            },
+            {
+              "api": "trade_cal",
+              "received_at": 1793091605010,
+              "sequence": 6,
+              "sha256": "60b6ff9bb0357debbebd168989fab6c7a6ac67b9c40e11eab918945ea7b63e77"
+            },
+            {
+              "api": "daily",
+              "received_at": 1793091605020,
+              "sequence": 6,
+              "sha256": "18e6ecbdb63a42f39dbd77961b8c55f05bac623ef2f467ef01caad6dd5bc1e18"
+            }
+          ],
+          "received_at": 1793091605020,
+          "snapshot_id": "eod-v1:a59053e368257213aaec6cb22dead719a20c5e2fb3e9e2681d8b4dc35df15fcd",
+          "snapshot_sha256": "a59053e368257213aaec6cb22dead719a20c5e2fb3e9e2681d8b4dc35df15fcd",
+          "valid_eod_days": 2,
+          "verified_at": 1793095200000,
+          "warnings": [
+            "REVISED_EOD"
+          ]
+        },
+        "source_checked_only_at_latest_sync": true,
+        "source_day_differs_from_wall_clock": false,
+        "wall_clock_day": "20261027"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-8ac6a638e5",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "ALREADY_ARCHIVED_INPUT_FROZEN",
+        "registration_sha256": "11ada3541d63e8f6cd6d1a1ab1a2e9190543cb6197f8f49a3ea0ee857ae757d9",
+        "restriction": "RESEARCH_ONLY",
+        "source_day": "2026-10-27",
+        "state": "SKIPPED",
+        "task_id": "1"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "task",
+        "1"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-8ac6a638e5",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "restriction": "RESEARCH_ONLY",
+        "task": {
+          "calls": [
+            {
+              "day": "2026-10-27",
+              "id": "1",
+              "input_tokens": "3310",
+              "maximum_micro": "34816",
+              "month": "2026-10",
+              "output_tokens": "128",
+              "price_version": "synthetic-price-v1",
+              "reason": null,
+              "settled_micro": "3566",
+              "state": "settled",
+              "usage_micro": "3566"
+            }
+          ],
+          "cancel_requested_at": null,
+          "created_at": "2026-10-27T10:00:00+00:00",
+          "finished_at": "2026-11-01T04:36:46.512296700+00:00",
+          "id": "1",
+          "input": {
+            "eod_eligible": false,
+            "mode": "synthetic_test",
+            "scopes": [
+              "owner_task",
+              "forward_eod_research_summary_v1"
+            ],
+            "source_day": "2026-10-27",
+            "summary": {
+              "as_of_journal_event_at": 1793091603030,
+              "available_at": 1793091603030,
+              "available_at_semantics": "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time",
+              "can_execute_forward_paper": false,
+              "data_mode": "synthetic_test",
+              "eod_eligible": false,
+              "last_valid_source_day": "20261027",
+              "live_allowed": false,
+              "observed_at": 1793091603000,
+              "on_day_valid_eod_days": 2,
+              "provider_published_at": null,
+              "quality": {
+                "blockers": [],
+                "calendar_after_snapshot": "UNKNOWN_NOT_FETCHED",
+                "coverage": [
+                  {
+                    "source_day": "20261026",
+                    "state": "valid_eod"
+                  },
+                  {
+                    "source_day": "20261027",
+                    "state": "valid_eod"
+                  }
+                ],
+                "coverage_count": 2,
+                "gap_count": 0,
+                "gaps": [],
+                "historical_pit": "NOT_VERIFIED",
+                "opening_source": "BLOCKED",
+                "source_checked_only_at_latest_sync": true,
+                "sync_policy": "latest_succeeded_within_24h",
+                "warnings": []
+              },
+              "received_at": 1793091603020,
+              "restriction": "RESEARCH_ONLY",
+              "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+              "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+              "valid_eod_days": 2
+            },
+            "version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b"
+          },
+          "provider_hash": "4e8f2d9e76856ca0e2ac9031a89337ee7492820901c078f325d19ea467700f62",
+          "provider_id": "fake",
+          "reason": "RESEARCH_SAVED",
+          "request": {
+            "end_day": "2026-10-27",
+            "goal": "根据冻结 EOD 摘要提出可核查假设、依据、反证和下一研究步骤。",
+            "name": "EOD 自动本地研究 · 2026-10-27",
+            "scope": "LOCAL_FAKE_ONLY / RESEARCH_ONLY / 原始 on-day EOD",
+            "start_day": "2026-10-27",
+            "task_budget_micro": null
+          },
+          "result": {
+            "billing": "synthetic_test_settled",
+            "generated_at": "2026-11-01T04:36:46.512296700+00:00",
+            "input_mode": "synthetic_test",
+            "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "limitations": "研究意见不能作为独立策略资格/收益或实盘部署结论；历史/合成输入保持原标签。",
+            "model": "deterministic-fixture-v1",
+            "provider_id": "fake",
+            "provider_kind": "fake",
+            "qualification": "EXPLORATORY_NOT_INDEPENDENT",
+            "research": {
+              "evidence": [
+                "依据 input_summary_version 与源日期检查已发布摘要；本结果由确定性 fake 产生。"
+              ],
+              "hypothesis": "假设：在相同数据区间，加入成本与缺估值约束会降低表面收益的稳健性。",
+              "next_steps": [
+                "由独立评价流程核查数据时间、费用假设和后续真实前向证据。"
+              ],
+              "risks": [
+                "synthetic_test；不是云模型研究成果，不能证明策略有独立优势。"
+              ]
+            },
+            "source_day": "2026-10-27",
+            "synthetic_provider": true
+          },
+          "retryable": false,
+          "started_at": "2026-10-27T10:00:00+00:00",
+          "status": "completed"
+        }
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "sync",
+        "--observer",
+        "<WORKTREE>\\state\\eod-auto-tests\\auto-test-05f564268c\\auto-test-full-75f479060c\\forward.sqlite"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-75f479060c",
+      "result": {
+        "calendar_after_snapshot": "UNKNOWN_NOT_FETCHED",
+        "can_execute_forward_paper": false,
+        "can_research": true,
+        "latest_attempt": {
+          "blockers": [],
+          "error_code": null,
+          "finished_at": 1793095200000,
+          "journal_head": "d729e4fdbd72ec8882d68b1962f9ded6d703e5af9a319607941fb94c191d3f76",
+          "new_append": false,
+          "source_changed": true,
+          "source_database_sha256": "19714e511df141e1c565bd87849d1c9be1edbea089c8b7fccb133a67a6793dac",
+          "started_at": 1793095200000,
+          "state": "succeeded"
+        },
+        "live_allowed": false,
+        "opening_source": "BLOCKED",
+        "schema_version": 1,
+        "snapshot": {
+          "as_of_journal_event_at": 1793091603030,
+          "available_at": 1793091603030,
+          "available_at_semantics": "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time",
+          "blockers": [],
+          "can_execute_forward_paper": false,
+          "can_research": true,
+          "coverage": [
+            {
+              "source_day": "20261026",
+              "state": "valid_eod"
+            },
+            {
+              "source_day": "20261027",
+              "state": "valid_eod"
+            }
+          ],
+          "data_mode": "synthetic_test",
+          "event_count": 5,
+          "gaps": [],
+          "historical_pit": "NOT_VERIFIED",
+          "journal_head": "d729e4fdbd72ec8882d68b1962f9ded6d703e5af9a319607941fb94c191d3f76",
+          "last_valid_source_day": "20261027",
+          "live_allowed": false,
+          "observed_at": 1793091603000,
+          "on_day_valid_eod_days": 2,
+          "opening_source": "BLOCKED",
+          "provider_published_at": null,
+          "raw_sha256": [
+            {
+              "api": "trade_cal",
+              "received_at": 1793005201010,
+              "sequence": 2,
+              "sha256": "b080e50aab363afff480d6cbeb168c0028773c94fce7b671406e1fc0aecdb0f9"
+            },
+            {
+              "api": "daily",
+              "received_at": 1793005201020,
+              "sequence": 2,
+              "sha256": "2dc1bbcf34ee45b8e08d79d10ea3c6847893834fa13172ce8307fc4463c96ceb"
+            },
+            {
+              "api": "trade_cal",
+              "received_at": 1793091603010,
+              "sequence": 4,
+              "sha256": "60b6ff9bb0357debbebd168989fab6c7a6ac67b9c40e11eab918945ea7b63e77"
+            },
+            {
+              "api": "daily",
+              "received_at": 1793091603020,
+              "sequence": 4,
+              "sha256": "e31dab44d473c8901de3c5052e7cf7881820f36521b74c06cba7d159ba312862"
+            }
+          ],
+          "received_at": 1793091603020,
+          "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "valid_eod_days": 2,
+          "verified_at": 1793095200000,
+          "warnings": []
+        },
+        "source_checked_only_at_latest_sync": true,
+        "source_day_differs_from_wall_clock": false,
+        "wall_clock_day": "20261027"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "init",
+        "--snapshot-store",
+        "auto-test-full-75f479060c"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-75f479060c",
+      "result": {
+        "agent_dir": "agent",
+        "binding_sha256": "03ec7f2b1907ab989c9eb0026e48c2686319561c0d57e86ea4ec2df1ff0cffbb",
+        "can_execute_forward_paper": false,
+        "candidate_registry_name": "auto-test-full-75f479060c",
+        "eligibility": "ELIGIBILITY_DENIED",
+        "enabled": false,
+        "evaluation": "NOT_EVALUATED",
+        "last": null,
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "paused": false,
+        "policy": "eod-auto-v1",
+        "restriction": "RESEARCH_ONLY",
+        "schema_version": 1,
+        "settings_state": "LOCAL_FAKE_ONLY",
+        "snapshot_store_name": "auto-test-full-75f479060c",
+        "source": {
+          "as_of_journal_event_at": 1793091603030,
+          "available_at": 1793091603030,
+          "data_mode": "synthetic_test",
+          "last_valid_source_day": "20261027",
+          "latest_sync": {
+            "error_code": null,
+            "finished_at": 1793095200000,
+            "started_at": 1793095200000,
+            "state": "succeeded"
+          },
+          "observed_at": 1793091603000,
+          "received_at": 1793091603020,
+          "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b"
+        },
+        "tasks": []
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 3,
+      "fault": null,
+      "name": "auto-test-full-75f479060c",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "OWNER_DISABLED",
+        "restriction": "RESEARCH_ONLY",
+        "state": "SKIPPED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-75f479060c",
+      "result": {
+        "agent_dir": "agent",
+        "binding_sha256": "03ec7f2b1907ab989c9eb0026e48c2686319561c0d57e86ea4ec2df1ff0cffbb",
+        "can_execute_forward_paper": false,
+        "candidate_registry_name": "auto-test-full-75f479060c",
+        "eligibility": "ELIGIBILITY_DENIED",
+        "enabled": true,
+        "evaluation": "NOT_EVALUATED",
+        "last": {
+          "at": "2026-10-27T10:00:00+00:00",
+          "can_execute_forward_paper": false,
+          "eligibility": "ELIGIBILITY_DENIED",
+          "evaluation": "NOT_EVALUATED",
+          "live_allowed": false,
+          "mode": "LOCAL_FAKE_ONLY",
+          "reason": "OWNER_DISABLED",
+          "restriction": "RESEARCH_ONLY",
+          "state": "SKIPPED"
+        },
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "paused": false,
+        "policy": "eod-auto-v1",
+        "restriction": "RESEARCH_ONLY",
+        "schema_version": 1,
+        "settings_state": "LOCAL_FAKE_ONLY",
+        "snapshot_store_name": "auto-test-full-75f479060c",
+        "source": {
+          "as_of_journal_event_at": 1793091603030,
+          "available_at": 1793091603030,
+          "data_mode": "synthetic_test",
+          "last_valid_source_day": "20261027",
+          "latest_sync": {
+            "error_code": null,
+            "finished_at": 1793095200000,
+            "started_at": 1793095200000,
+            "state": "succeeded"
+          },
+          "observed_at": 1793091603000,
+          "received_at": 1793091603020,
+          "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b"
+        },
+        "tasks": []
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "watch",
+        "--cycles",
+        "1",
+        "--sync"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-75f479060c",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "fake_calls": 1,
+        "input_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "CANDIDATE_ARCHIVED",
+        "registration_sha256": "258314746afbfd61331570e2c86bd65f43cc647eea3ece77c6698f6c02ed94f7",
+        "restriction": "RESEARCH_ONLY",
+        "source_day": "2026-10-27",
+        "state": "COMPLETED",
+        "task_id": "1"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "task",
+        "1"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-75f479060c",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "restriction": "RESEARCH_ONLY",
+        "task": {
+          "calls": [
+            {
+              "day": "2026-10-27",
+              "id": "1",
+              "input_tokens": "3310",
+              "maximum_micro": "34816",
+              "month": "2026-10",
+              "output_tokens": "128",
+              "price_version": "synthetic-price-v1",
+              "reason": null,
+              "settled_micro": "3566",
+              "state": "settled",
+              "usage_micro": "3566"
+            }
+          ],
+          "cancel_requested_at": null,
+          "created_at": "2026-10-27T10:00:00+00:00",
+          "finished_at": "2026-11-01T04:36:49.635959700+00:00",
+          "id": "1",
+          "input": {
+            "eod_eligible": false,
+            "mode": "synthetic_test",
+            "scopes": [
+              "owner_task",
+              "forward_eod_research_summary_v1"
+            ],
+            "source_day": "2026-10-27",
+            "summary": {
+              "as_of_journal_event_at": 1793091603030,
+              "available_at": 1793091603030,
+              "available_at_semantics": "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time",
+              "can_execute_forward_paper": false,
+              "data_mode": "synthetic_test",
+              "eod_eligible": false,
+              "last_valid_source_day": "20261027",
+              "live_allowed": false,
+              "observed_at": 1793091603000,
+              "on_day_valid_eod_days": 2,
+              "provider_published_at": null,
+              "quality": {
+                "blockers": [],
+                "calendar_after_snapshot": "UNKNOWN_NOT_FETCHED",
+                "coverage": [
+                  {
+                    "source_day": "20261026",
+                    "state": "valid_eod"
+                  },
+                  {
+                    "source_day": "20261027",
+                    "state": "valid_eod"
+                  }
+                ],
+                "coverage_count": 2,
+                "gap_count": 0,
+                "gaps": [],
+                "historical_pit": "NOT_VERIFIED",
+                "opening_source": "BLOCKED",
+                "source_checked_only_at_latest_sync": true,
+                "sync_policy": "latest_succeeded_within_24h",
+                "warnings": []
+              },
+              "received_at": 1793091603020,
+              "restriction": "RESEARCH_ONLY",
+              "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+              "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+              "valid_eod_days": 2
+            },
+            "version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b"
+          },
+          "provider_hash": "4e8f2d9e76856ca0e2ac9031a89337ee7492820901c078f325d19ea467700f62",
+          "provider_id": "fake",
+          "reason": "RESEARCH_SAVED",
+          "request": {
+            "end_day": "2026-10-27",
+            "goal": "根据冻结 EOD 摘要提出可核查假设、依据、反证和下一研究步骤。",
+            "name": "EOD 自动本地研究 · 2026-10-27",
+            "scope": "LOCAL_FAKE_ONLY / RESEARCH_ONLY / 原始 on-day EOD",
+            "start_day": "2026-10-27",
+            "task_budget_micro": null
+          },
+          "result": {
+            "billing": "synthetic_test_settled",
+            "generated_at": "2026-11-01T04:36:49.635959700+00:00",
+            "input_mode": "synthetic_test",
+            "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "limitations": "研究意见不能作为独立策略资格/收益或实盘部署结论；历史/合成输入保持原标签。",
+            "model": "deterministic-fixture-v1",
+            "provider_id": "fake",
+            "provider_kind": "fake",
+            "qualification": "EXPLORATORY_NOT_INDEPENDENT",
+            "research": {
+              "evidence": [
+                "依据 input_summary_version 与源日期检查已发布摘要；本结果由确定性 fake 产生。"
+              ],
+              "hypothesis": "假设：在相同数据区间，加入成本与缺估值约束会降低表面收益的稳健性。",
+              "next_steps": [
+                "由独立评价流程核查数据时间、费用假设和后续真实前向证据。"
+              ],
+              "risks": [
+                "synthetic_test；不是云模型研究成果，不能证明策略有独立优势。"
+              ]
+            },
+            "source_day": "2026-10-27",
+            "synthetic_provider": true
+          },
+          "retryable": false,
+          "started_at": "2026-10-27T10:00:00+00:00",
+          "status": "completed"
+        }
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "candidate",
+        "258314746afbfd61331570e2c86bd65f43cc647eea3ece77c6698f6c02ed94f7"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-75f479060c",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eod_eligible": false,
+        "evaluation": "NOT_EVALUATED",
+        "frozen_input": {
+          "eod_eligible": false,
+          "mode": "synthetic_test",
+          "scopes": [
+            "owner_task",
+            "forward_eod_research_summary_v1"
+          ],
+          "source_day": "2026-10-27",
+          "summary": {
+            "as_of_journal_event_at": 1793091603030,
+            "available_at": 1793091603030,
+            "available_at_semantics": "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time",
+            "can_execute_forward_paper": false,
+            "data_mode": "synthetic_test",
+            "eod_eligible": false,
+            "last_valid_source_day": "20261027",
+            "live_allowed": false,
+            "observed_at": 1793091603000,
+            "on_day_valid_eod_days": 2,
+            "provider_published_at": null,
+            "quality": {
+              "blockers": [],
+              "calendar_after_snapshot": "UNKNOWN_NOT_FETCHED",
+              "coverage": [
+                {
+                  "source_day": "20261026",
+                  "state": "valid_eod"
+                },
+                {
+                  "source_day": "20261027",
+                  "state": "valid_eod"
+                }
+              ],
+              "coverage_count": 2,
+              "gap_count": 0,
+              "gaps": [],
+              "historical_pit": "NOT_VERIFIED",
+              "opening_source": "BLOCKED",
+              "source_checked_only_at_latest_sync": true,
+              "sync_policy": "latest_succeeded_within_24h",
+              "warnings": []
+            },
+            "received_at": 1793091603020,
+            "restriction": "RESEARCH_ONLY",
+            "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "valid_eod_days": 2
+          },
+          "version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b"
+        },
+        "frozen_research": {
+          "evidence": [
+            "依据 input_summary_version 与源日期检查已发布摘要；本结果由确定性 fake 产生。"
+          ],
+          "hypothesis": "假设：在相同数据区间，加入成本与缺估值约束会降低表面收益的稳健性。",
+          "next_steps": [
+            "由独立评价流程核查数据时间、费用假设和后续真实前向证据。"
+          ],
+          "risks": [
+            "synthetic_test；不是云模型研究成果，不能证明策略有独立优势。"
+          ]
+        },
+        "handoff": {
+          "candidate_sha256": null,
+          "contract": "candidate-handoff-v1",
+          "eligibility": "ELIGIBILITY_DENIED",
+          "evaluation_sha256": null,
+          "forward_paper_allowed": false,
+          "independent_acceptance": "NOT_VERIFIED",
+          "live_allowed": false,
+          "qualification": "NOT_ELIGIBLE",
+          "reasons": [
+            "HISTORICAL_PIT_NOT_VERIFIED",
+            "NO_TRUSTED_FORWARD_OPENING_EVIDENCE",
+            "FORWARD_PAPER_NOT_ENABLED",
+            "NO_LIVE_AUTHORIZATION"
+          ],
+          "schema_version": 1
+        },
+        "live_allowed": false,
+        "registration_sha256": "258314746afbfd61331570e2c86bd65f43cc647eea3ece77c6698f6c02ed94f7",
+        "snapshot_provenance": {
+          "can_execute_forward_paper": false,
+          "data_mode": "synthetic_test",
+          "eod_eligible": false,
+          "frozen_input_sha256": "d7f467e439ab4048f75600539e86e2f2590610e4708ac882039a8283d0924b53",
+          "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "live_allowed": false,
+          "research_task_id": "1",
+          "restriction": "RESEARCH_ONLY",
+          "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "snapshot_verification": "SNAPSHOT_CONTENT_VERIFIED_AT_REGISTRATION",
+          "source_day": "2026-10-27",
+          "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+        },
+        "state": "RESEARCH_ONLY",
+        "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "status"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-75f479060c",
+      "result": {
+        "agent_dir": "agent",
+        "binding_sha256": "03ec7f2b1907ab989c9eb0026e48c2686319561c0d57e86ea4ec2df1ff0cffbb",
+        "can_execute_forward_paper": false,
+        "candidate_registry_name": "auto-test-full-75f479060c",
+        "eligibility": "ELIGIBILITY_DENIED",
+        "enabled": true,
+        "evaluation": "NOT_EVALUATED",
+        "last": {
+          "at": "2026-10-27T10:00:00+00:00",
+          "can_execute_forward_paper": false,
+          "eligibility": "ELIGIBILITY_DENIED",
+          "evaluation": "NOT_EVALUATED",
+          "fake_calls": 1,
+          "input_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "live_allowed": false,
+          "mode": "LOCAL_FAKE_ONLY",
+          "reason": "CANDIDATE_ARCHIVED",
+          "registration_sha256": "258314746afbfd61331570e2c86bd65f43cc647eea3ece77c6698f6c02ed94f7",
+          "restriction": "RESEARCH_ONLY",
+          "source_day": "2026-10-27",
+          "state": "COMPLETED",
+          "task_id": "1"
+        },
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "needs_manual_review": false,
+        "paused": false,
+        "policy": "eod-auto-v1",
+        "restriction": "RESEARCH_ONLY",
+        "schema_version": 1,
+        "settings_state": "LOCAL_FAKE_ONLY",
+        "snapshot_store_name": "auto-test-full-75f479060c",
+        "source": {
+          "as_of_journal_event_at": 1793091603030,
+          "available_at": 1793091603030,
+          "data_mode": "synthetic_test",
+          "last_valid_source_day": "20261027",
+          "latest_sync": {
+            "error_code": null,
+            "finished_at": 1793095200000,
+            "started_at": 1793095200000,
+            "state": "succeeded"
+          },
+          "observed_at": 1793091603000,
+          "received_at": 1793091603020,
+          "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b"
+        },
+        "tasks": [
+          {
+            "archive_state": "ARCHIVED",
+            "attempts": 1,
+            "input_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "registration_sha256": "258314746afbfd61331570e2c86bd65f43cc647eea3ece77c6698f6c02ed94f7",
+            "review_reason": null,
+            "source_day": "2026-10-27",
+            "task_id": "1",
+            "task_reason": "RESEARCH_SAVED",
+            "task_status": "completed"
+          }
+        ]
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "task",
+        "1"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-75f479060c",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "restriction": "RESEARCH_ONLY",
+        "task": {
+          "calls": [
+            {
+              "day": "2026-10-27",
+              "id": "1",
+              "input_tokens": "3310",
+              "maximum_micro": "34816",
+              "month": "2026-10",
+              "output_tokens": "128",
+              "price_version": "synthetic-price-v1",
+              "reason": null,
+              "settled_micro": "3566",
+              "state": "settled",
+              "usage_micro": "3566"
+            }
+          ],
+          "cancel_requested_at": null,
+          "created_at": "2026-10-27T10:00:00+00:00",
+          "finished_at": "2026-11-01T04:36:49.635959700+00:00",
+          "id": "1",
+          "input": {
+            "eod_eligible": false,
+            "mode": "synthetic_test",
+            "scopes": [
+              "owner_task",
+              "forward_eod_research_summary_v1"
+            ],
+            "source_day": "2026-10-27",
+            "summary": {
+              "as_of_journal_event_at": 1793091603030,
+              "available_at": 1793091603030,
+              "available_at_semantics": "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time",
+              "can_execute_forward_paper": false,
+              "data_mode": "synthetic_test",
+              "eod_eligible": false,
+              "last_valid_source_day": "20261027",
+              "live_allowed": false,
+              "observed_at": 1793091603000,
+              "on_day_valid_eod_days": 2,
+              "provider_published_at": null,
+              "quality": {
+                "blockers": [],
+                "calendar_after_snapshot": "UNKNOWN_NOT_FETCHED",
+                "coverage": [
+                  {
+                    "source_day": "20261026",
+                    "state": "valid_eod"
+                  },
+                  {
+                    "source_day": "20261027",
+                    "state": "valid_eod"
+                  }
+                ],
+                "coverage_count": 2,
+                "gap_count": 0,
+                "gaps": [],
+                "historical_pit": "NOT_VERIFIED",
+                "opening_source": "BLOCKED",
+                "source_checked_only_at_latest_sync": true,
+                "sync_policy": "latest_succeeded_within_24h",
+                "warnings": []
+              },
+              "received_at": 1793091603020,
+              "restriction": "RESEARCH_ONLY",
+              "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+              "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+              "valid_eod_days": 2
+            },
+            "version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b"
+          },
+          "provider_hash": "4e8f2d9e76856ca0e2ac9031a89337ee7492820901c078f325d19ea467700f62",
+          "provider_id": "fake",
+          "reason": "RESEARCH_SAVED",
+          "request": {
+            "end_day": "2026-10-27",
+            "goal": "根据冻结 EOD 摘要提出可核查假设、依据、反证和下一研究步骤。",
+            "name": "EOD 自动本地研究 · 2026-10-27",
+            "scope": "LOCAL_FAKE_ONLY / RESEARCH_ONLY / 原始 on-day EOD",
+            "start_day": "2026-10-27",
+            "task_budget_micro": null
+          },
+          "result": {
+            "billing": "synthetic_test_settled",
+            "generated_at": "2026-11-01T04:36:49.635959700+00:00",
+            "input_mode": "synthetic_test",
+            "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "limitations": "研究意见不能作为独立策略资格/收益或实盘部署结论；历史/合成输入保持原标签。",
+            "model": "deterministic-fixture-v1",
+            "provider_id": "fake",
+            "provider_kind": "fake",
+            "qualification": "EXPLORATORY_NOT_INDEPENDENT",
+            "research": {
+              "evidence": [
+                "依据 input_summary_version 与源日期检查已发布摘要；本结果由确定性 fake 产生。"
+              ],
+              "hypothesis": "假设：在相同数据区间，加入成本与缺估值约束会降低表面收益的稳健性。",
+              "next_steps": [
+                "由独立评价流程核查数据时间、费用假设和后续真实前向证据。"
+              ],
+              "risks": [
+                "synthetic_test；不是云模型研究成果，不能证明策略有独立优势。"
+              ]
+            },
+            "source_day": "2026-10-27",
+            "synthetic_provider": true
+          },
+          "retryable": false,
+          "started_at": "2026-10-27T10:00:00+00:00",
+          "status": "completed"
+        }
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "candidate",
+        "258314746afbfd61331570e2c86bd65f43cc647eea3ece77c6698f6c02ed94f7"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-75f479060c",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eod_eligible": false,
+        "evaluation": "NOT_EVALUATED",
+        "frozen_input": {
+          "eod_eligible": false,
+          "mode": "synthetic_test",
+          "scopes": [
+            "owner_task",
+            "forward_eod_research_summary_v1"
+          ],
+          "source_day": "2026-10-27",
+          "summary": {
+            "as_of_journal_event_at": 1793091603030,
+            "available_at": 1793091603030,
+            "available_at_semantics": "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time",
+            "can_execute_forward_paper": false,
+            "data_mode": "synthetic_test",
+            "eod_eligible": false,
+            "last_valid_source_day": "20261027",
+            "live_allowed": false,
+            "observed_at": 1793091603000,
+            "on_day_valid_eod_days": 2,
+            "provider_published_at": null,
+            "quality": {
+              "blockers": [],
+              "calendar_after_snapshot": "UNKNOWN_NOT_FETCHED",
+              "coverage": [
+                {
+                  "source_day": "20261026",
+                  "state": "valid_eod"
+                },
+                {
+                  "source_day": "20261027",
+                  "state": "valid_eod"
+                }
+              ],
+              "coverage_count": 2,
+              "gap_count": 0,
+              "gaps": [],
+              "historical_pit": "NOT_VERIFIED",
+              "opening_source": "BLOCKED",
+              "source_checked_only_at_latest_sync": true,
+              "sync_policy": "latest_succeeded_within_24h",
+              "warnings": []
+            },
+            "received_at": 1793091603020,
+            "restriction": "RESEARCH_ONLY",
+            "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "valid_eod_days": 2
+          },
+          "version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b"
+        },
+        "frozen_research": {
+          "evidence": [
+            "依据 input_summary_version 与源日期检查已发布摘要；本结果由确定性 fake 产生。"
+          ],
+          "hypothesis": "假设：在相同数据区间，加入成本与缺估值约束会降低表面收益的稳健性。",
+          "next_steps": [
+            "由独立评价流程核查数据时间、费用假设和后续真实前向证据。"
+          ],
+          "risks": [
+            "synthetic_test；不是云模型研究成果，不能证明策略有独立优势。"
+          ]
+        },
+        "handoff": {
+          "candidate_sha256": null,
+          "contract": "candidate-handoff-v1",
+          "eligibility": "ELIGIBILITY_DENIED",
+          "evaluation_sha256": null,
+          "forward_paper_allowed": false,
+          "independent_acceptance": "NOT_VERIFIED",
+          "live_allowed": false,
+          "qualification": "NOT_ELIGIBLE",
+          "reasons": [
+            "HISTORICAL_PIT_NOT_VERIFIED",
+            "NO_TRUSTED_FORWARD_OPENING_EVIDENCE",
+            "FORWARD_PAPER_NOT_ENABLED",
+            "NO_LIVE_AUTHORIZATION"
+          ],
+          "schema_version": 1
+        },
+        "live_allowed": false,
+        "registration_sha256": "258314746afbfd61331570e2c86bd65f43cc647eea3ece77c6698f6c02ed94f7",
+        "snapshot_provenance": {
+          "can_execute_forward_paper": false,
+          "data_mode": "synthetic_test",
+          "eod_eligible": false,
+          "frozen_input_sha256": "d7f467e439ab4048f75600539e86e2f2590610e4708ac882039a8283d0924b53",
+          "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "live_allowed": false,
+          "research_task_id": "1",
+          "restriction": "RESEARCH_ONLY",
+          "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+          "snapshot_verification": "SNAPSHOT_CONTENT_VERIFIED_AT_REGISTRATION",
+          "source_day": "2026-10-27",
+          "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+        },
+        "state": "RESEARCH_ONLY",
+        "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-75f479060c",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "ALREADY_ARCHIVED_INPUT_FROZEN",
+        "registration_sha256": "258314746afbfd61331570e2c86bd65f43cc647eea3ece77c6698f6c02ed94f7",
+        "restriction": "RESEARCH_ONLY",
+        "source_day": "2026-10-27",
+        "state": "SKIPPED",
+        "task_id": "1"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once",
+        "--sync"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-75f479060c",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "ALREADY_ARCHIVED_INPUT_FROZEN",
+        "registration_sha256": "258314746afbfd61331570e2c86bd65f43cc647eea3ece77c6698f6c02ed94f7",
+        "restriction": "RESEARCH_ONLY",
+        "source_day": "2026-10-27",
+        "state": "SKIPPED",
+        "task_id": "1"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "sync"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-75f479060c",
+      "result": {
+        "calendar_after_snapshot": "UNKNOWN_NOT_FETCHED",
+        "can_execute_forward_paper": false,
+        "can_research": true,
+        "latest_attempt": {
+          "blockers": [],
+          "error_code": null,
+          "finished_at": 1793095200000,
+          "journal_head": "e848aee8253c960e45495c53bc4ebaa8cde7347f5c0b5c05826f9e8ed32d5fa2",
+          "new_append": true,
+          "source_changed": true,
+          "source_database_sha256": "4f99ed169cff7dbf7c1d748bbb894ca35e4a4d27db6e4f7d6c11bc7c2bc7aa07",
+          "started_at": 1793095200000,
+          "state": "succeeded"
+        },
+        "live_allowed": false,
+        "opening_source": "BLOCKED",
+        "schema_version": 1,
+        "snapshot": {
+          "as_of_journal_event_at": 1793091605030,
+          "available_at": 1793091605030,
+          "available_at_semantics": "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time",
+          "blockers": [],
+          "can_execute_forward_paper": false,
+          "can_research": true,
+          "coverage": [
+            {
+              "source_day": "20261026",
+              "state": "valid_eod"
+            },
+            {
+              "source_day": "20261027",
+              "state": "valid_eod"
+            }
+          ],
+          "data_mode": "synthetic_test",
+          "event_count": 7,
+          "gaps": [],
+          "historical_pit": "NOT_VERIFIED",
+          "journal_head": "e848aee8253c960e45495c53bc4ebaa8cde7347f5c0b5c05826f9e8ed32d5fa2",
+          "last_valid_source_day": "20261027",
+          "live_allowed": false,
+          "observed_at": 1793091605000,
+          "on_day_valid_eod_days": 2,
+          "opening_source": "BLOCKED",
+          "provider_published_at": null,
+          "raw_sha256": [
+            {
+              "api": "trade_cal",
+              "received_at": 1793005201010,
+              "sequence": 2,
+              "sha256": "b080e50aab363afff480d6cbeb168c0028773c94fce7b671406e1fc0aecdb0f9"
+            },
+            {
+              "api": "daily",
+              "received_at": 1793005201020,
+              "sequence": 2,
+              "sha256": "2dc1bbcf34ee45b8e08d79d10ea3c6847893834fa13172ce8307fc4463c96ceb"
+            },
+            {
+              "api": "trade_cal",
+              "received_at": 1793091603010,
+              "sequence": 4,
+              "sha256": "60b6ff9bb0357debbebd168989fab6c7a6ac67b9c40e11eab918945ea7b63e77"
+            },
+            {
+              "api": "daily",
+              "received_at": 1793091603020,
+              "sequence": 4,
+              "sha256": "e31dab44d473c8901de3c5052e7cf7881820f36521b74c06cba7d159ba312862"
+            },
+            {
+              "api": "trade_cal",
+              "received_at": 1793091605010,
+              "sequence": 6,
+              "sha256": "60b6ff9bb0357debbebd168989fab6c7a6ac67b9c40e11eab918945ea7b63e77"
+            },
+            {
+              "api": "daily",
+              "received_at": 1793091605020,
+              "sequence": 6,
+              "sha256": "18e6ecbdb63a42f39dbd77961b8c55f05bac623ef2f467ef01caad6dd5bc1e18"
+            }
+          ],
+          "received_at": 1793091605020,
+          "snapshot_id": "eod-v1:a59053e368257213aaec6cb22dead719a20c5e2fb3e9e2681d8b4dc35df15fcd",
+          "snapshot_sha256": "a59053e368257213aaec6cb22dead719a20c5e2fb3e9e2681d8b4dc35df15fcd",
+          "valid_eod_days": 2,
+          "verified_at": 1793095200000,
+          "warnings": [
+            "REVISED_EOD"
+          ]
+        },
+        "source_checked_only_at_latest_sync": true,
+        "source_day_differs_from_wall_clock": false,
+        "wall_clock_day": "20261027"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-75f479060c",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "reason": "ALREADY_ARCHIVED_INPUT_FROZEN",
+        "registration_sha256": "258314746afbfd61331570e2c86bd65f43cc647eea3ece77c6698f6c02ed94f7",
+        "restriction": "RESEARCH_ONLY",
+        "source_day": "2026-10-27",
+        "state": "SKIPPED",
+        "task_id": "1"
+      },
+      "source_clock_ms": 1793095200000
+    },
+    {
+      "command": [
+        "fixture-cli",
+        "task",
+        "1"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "auto-test-full-75f479060c",
+      "result": {
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "evaluation": "NOT_EVALUATED",
+        "live_allowed": false,
+        "mode": "LOCAL_FAKE_ONLY",
+        "restriction": "RESEARCH_ONLY",
+        "task": {
+          "calls": [
+            {
+              "day": "2026-10-27",
+              "id": "1",
+              "input_tokens": "3310",
+              "maximum_micro": "34816",
+              "month": "2026-10",
+              "output_tokens": "128",
+              "price_version": "synthetic-price-v1",
+              "reason": null,
+              "settled_micro": "3566",
+              "state": "settled",
+              "usage_micro": "3566"
+            }
+          ],
+          "cancel_requested_at": null,
+          "created_at": "2026-10-27T10:00:00+00:00",
+          "finished_at": "2026-11-01T04:36:49.635959700+00:00",
+          "id": "1",
+          "input": {
+            "eod_eligible": false,
+            "mode": "synthetic_test",
+            "scopes": [
+              "owner_task",
+              "forward_eod_research_summary_v1"
+            ],
+            "source_day": "2026-10-27",
+            "summary": {
+              "as_of_journal_event_at": 1793091603030,
+              "available_at": 1793091603030,
+              "available_at_semantics": "validated_in_process_precommit_wall_time; not_exact_durable_visibility_or_commit_time",
+              "can_execute_forward_paper": false,
+              "data_mode": "synthetic_test",
+              "eod_eligible": false,
+              "last_valid_source_day": "20261027",
+              "live_allowed": false,
+              "observed_at": 1793091603000,
+              "on_day_valid_eod_days": 2,
+              "provider_published_at": null,
+              "quality": {
+                "blockers": [],
+                "calendar_after_snapshot": "UNKNOWN_NOT_FETCHED",
+                "coverage": [
+                  {
+                    "source_day": "20261026",
+                    "state": "valid_eod"
+                  },
+                  {
+                    "source_day": "20261027",
+                    "state": "valid_eod"
+                  }
+                ],
+                "coverage_count": 2,
+                "gap_count": 0,
+                "gaps": [],
+                "historical_pit": "NOT_VERIFIED",
+                "opening_source": "BLOCKED",
+                "source_checked_only_at_latest_sync": true,
+                "sync_policy": "latest_succeeded_within_24h",
+                "warnings": []
+              },
+              "received_at": 1793091603020,
+              "restriction": "RESEARCH_ONLY",
+              "snapshot_id": "eod-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+              "snapshot_sha256": "130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+              "valid_eod_days": 2
+            },
+            "version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b"
+          },
+          "provider_hash": "4e8f2d9e76856ca0e2ac9031a89337ee7492820901c078f325d19ea467700f62",
+          "provider_id": "fake",
+          "reason": "RESEARCH_SAVED",
+          "request": {
+            "end_day": "2026-10-27",
+            "goal": "根据冻结 EOD 摘要提出可核查假设、依据、反证和下一研究步骤。",
+            "name": "EOD 自动本地研究 · 2026-10-27",
+            "scope": "LOCAL_FAKE_ONLY / RESEARCH_ONLY / 原始 on-day EOD",
+            "start_day": "2026-10-27",
+            "task_budget_micro": null
+          },
+          "result": {
+            "billing": "synthetic_test_settled",
+            "generated_at": "2026-11-01T04:36:49.635959700+00:00",
+            "input_mode": "synthetic_test",
+            "input_summary_version": "eod-agent-input-v1:130d08df702c94c4cfa782e3202c7843ca90e562421a5719f1980edc3b57ff3b",
+            "limitations": "研究意见不能作为独立策略资格/收益或实盘部署结论；历史/合成输入保持原标签。",
+            "model": "deterministic-fixture-v1",
+            "provider_id": "fake",
+            "provider_kind": "fake",
+            "qualification": "EXPLORATORY_NOT_INDEPENDENT",
+            "research": {
+              "evidence": [
+                "依据 input_summary_version 与源日期检查已发布摘要；本结果由确定性 fake 产生。"
+              ],
+              "hypothesis": "假设：在相同数据区间，加入成本与缺估值约束会降低表面收益的稳健性。",
+              "next_steps": [
+                "由独立评价流程核查数据时间、费用假设和后续真实前向证据。"
+              ],
+              "risks": [
+                "synthetic_test；不是云模型研究成果，不能证明策略有独立优势。"
+              ]
+            },
+            "source_day": "2026-10-27",
+            "synthetic_provider": true
+          },
+          "retryable": false,
+          "started_at": "2026-10-27T10:00:00+00:00",
+          "status": "completed"
+        }
+      },
+      "source_clock_ms": 1793095200000
+    }
+  ],
+  "entry_points": {
+    "fixture-cli others": "eod-auto-research.py/eod_auto.main",
+    "fixture-cli sync": "research-data.py/data_snapshot.main"
+  },
+  "test_clock": "2026-10-27 18:00 Asia/Shanghai; test-only injection"
+}

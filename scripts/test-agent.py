@@ -36,8 +36,9 @@ def wait(check, timeout=10):
 
 
 class Service:
-    def __init__(self, binary, directory):
+    def __init__(self, binary, directory, assets=None):
         self.binary, self.directory = binary, directory
+        self.assets = assets or ROOT/'apps/dashboard/dist'
         self.token = (directory / 'owner-token').read_text().strip()
         self.process = None
 
@@ -47,7 +48,7 @@ class Service:
             port = sock.getsockname()[1]
         self.url = f'http://127.0.0.1:{port}'
         self.process = subprocess.Popen([str(self.binary), '--port', str(port), '--agent-dir', str(self.directory),
-                                         '--report-dir', str(REPORT), '--assets-dir', str(ROOT/'apps/dashboard/dist')],
+                                         '--report-dir', str(REPORT), '--assets-dir', str(self.assets)],
                                         cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, creationflags=FLAGS)
         def ready():
             if self.process.poll() is not None:
@@ -94,13 +95,13 @@ class Service:
         return self.request('/api/agent/tasks/'+task_id)['data']
 
 
-def run(binary):
+def run(binary, assets=None):
     before = fingerprints()
     evidence = {'provider': 'local_fake_only', 'real_provider': 'REAL_PROVIDER_NOT_VERIFIED', 'checks': []}
     with tempfile.TemporaryDirectory(prefix='stratide-issue22-') as temp:
         directory = Path(temp)/'agent'
         subprocess.run([str(binary), '--agent-init-fake', str(directory)], check=True, cwd=ROOT, capture_output=True, creationflags=FLAGS)
-        service = Service(binary, directory)
+        service = Service(binary, directory, assets)
         service.start()
         try:
             account = service.request('/api/account')
@@ -196,8 +197,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--binary', type=Path, default=ROOT/'target/debug/stratided.exe')
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--assets-dir', type=Path, help='已有静态资源或隔离测试 stub；不构建 Dashboard')
     args = parser.parse_args()
-    result = run(args.binary.resolve())
+    result = run(args.binary.resolve(), args.assets_dir)
     encoded = json.dumps(result,ensure_ascii=False,indent=2)
     if args.output:
         args.output.parent.mkdir(parents=True,exist_ok=True)

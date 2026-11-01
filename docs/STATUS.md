@@ -1,6 +1,6 @@
 # Stratide 当前状态
 
-> 截至 2026-11-01，基于 `main` `287dfe8583fe63f199215d0fb2f440864572974a`（[PR #40](https://github.com/handFOOLed/Stratide/pull/40) 已合并），附本分支 #41 历史分红情景桥接 V1 开发自测状态。这是**当前实现快照**，不是实盘承诺。Owner 已决定 **Core-first、UI-later**：后续核心功能先用 CLI/持久报告验收，最后由 Sol 按 PR #28 设计体系统一集成 UI。
+> 截至 2026-11-01，基于 `main` `dd39133d656298d1bef6f5b799e28284f627783f`（[PR #42](https://github.com/handFOOLed/Stratide/pull/42) 已合并），附本分支 #43 EOD 自动研究与候选归档 V1 开发自测状态。这是**当前实现快照**，不是实盘承诺。Owner 已决定 **Core-first、UI-later**：后续核心功能先用 CLI/持久报告验收，最后由 Sol 按 PR #28 设计体系统一集成 UI。
 
 ## 已实现
 
@@ -16,10 +16,11 @@
 | UI 视觉基准 | PR #28 已合并，确立设计体系；不代表全部核心功能完成 | [PR #28](https://github.com/handFOOLed/Stratide/pull/28) |
 | 候选冻结与历史评价 | PR #30 已合并；#31 A/B 双线分别独立 PASS；研究不足、长窗口 DATA_BLOCKED 和资格默认拒绝继续有效 | [#31 最终 B 结论](https://github.com/handFOOLed/Stratide/issues/31#issuecomment-6512910618) / [操作](M2_PR04.md) |
 | EOD 研究快照 | PR #33 已合并，#32 完成；既有 observer 离线只读核验、原子持久发布、状态与只读消费 | [操作](M2_PR05.md) / [原自测](evidence/m2-pr05/README.md) |
-| 显式 Fake Agent 闭环 | PR #35 已合并；EOD 快照 → 本地 fake 持久任务 → 候选研究来源；新 scope 禁止云 Provider 与自动 EOD，资格默认拒绝 | [操作](M2_PR06.md) / [原自测](evidence/m2-pr06/README.md) |
+| 显式 Fake Agent 闭环 | PR #35 已合并；EOD 快照 → 本地 fake 持久任务 → 候选研究来源；原手动路径不自动调度，scope 禁止云 Provider，资格默认拒绝 | [操作](M2_PR06.md) / [原自测](evidence/m2-pr06/README.md) |
+| EOD 自动研究与归档（本分支 Draft） | #43：Owner 本机 opt-in，默认 OFF，前台 once/watch、原 Agent 唯一日任务/fake 调用、自动候选归档、恢复与只读查询；LOCAL_FAKE_ONLY / RESEARCH_ONLY，synthetic 不计真实前向覆盖 | [操作](M2_PR07.md) / [自测](evidence/m2-pr07/README.md) |
 
 | 现金分红模型 V1（PR #40 已合并） | 登记权益→应收/扣税负债→到账，ledger v4 / NAV / Risk / 七报告 / Python独立算法 / 双基准；仅隔离 synthetic CLI | [CASH_DIVIDEND_V1](M1_PR08.md) / [原自测](evidence/m1-pr08/README.md) |
-| 历史分红情景桥接 V1（本分支 Draft） | 原冻结历史行情 + PR38 原证据 + 独立假设 → 原 SMA5/20 / v4 / 七报告 / 独立算法 / 双基准；77 会话 EXPLORATORY_EX_POST，真实准入 DENIED、PIT 新增 0 天 | [模块操作](M1_PR09.md) / [自测](evidence/m1-pr09/README.md) |
+| 历史分红情景桥接 V1（PR #42 已合并） | 原冻结历史行情 + PR38 原证据 + 独立假设 → 原 SMA5/20 / v4 / 七报告 / 独立算法 / 双基准；77 会话 EXPLORATORY_EX_POST，真实准入 DENIED、PIT 新增 0 天 | [模块操作](M1_PR09.md) / [原自测](evidence/m1-pr09/README.md) |
 
 ## 仍未实现 / 未验证
 
@@ -31,7 +32,7 @@
 
 ## 当前执行顺序
 
-1. **Sol / #39：** CASH_DIVIDEND_V1 完整模块，单 worktree/分支、`agents=0`、开发自测、Draft 待固定 HEAD 审查；不合并、不扩大真实历史窗口。
+1. **Sol / #43：** EOD 自动研究与候选归档完整模块，单 worktree/分支、`agents=0`、开发自测、Draft 待固定 HEAD 审查；不合并，不解锁真实 Provider 或交易。
 2. **后续核心任务：** Owner 再定范围；真实公司行为/PIT/开盘证据仍受阻，[#36](https://github.com/handFOOLed/Stratide/issues/36) 仍是未来多模型研究提案。
 3. **全部核心功能完成后：** Sol 按 PR #28 的设计体系统一集成全部 UI；旧同步 UI 要求被本 Owner 决定取代。
 
