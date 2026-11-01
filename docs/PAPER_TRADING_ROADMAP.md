@@ -24,11 +24,13 @@ PR #42 的[历史公司行为桥接 V1](M1_PR09.md)、PR #44 的[EOD 自动研�
 
 **M2-PR09 已合并（PR #50）：** [#49](https://github.com/handFOOLed/Stratide/issues/49) 交付 [自动 EOD Operator V1](M2_PR09.md)：一次安全配置/enable → 前台每日检查/原采集器 → Snapshot → Shadow/可选 Fake → 原提交 ref 审计。15:15 检查并报告 `EARLY_SOURCE_UNVERIFIED`，按 Issue 允许的回退保留 16:00 正式单槽；不改变原未知/失败重发语义。默认 OFF、持久 disable、四阶段恢复、只读查询；synthetic 测试不增加真实前向日。**NO_ORDERS / NO_FILLS / NO_NAV**。
 
-**本分支 M2-PR10 Draft：** [#51](https://github.com/handFOOLed/Stratide/issues/51) 的 [Time-Series + Fusion V1](M2_PR10.md)：可信 Snapshot 冻结 → 真实数学基线/独立可替换本地时序测试 Adapter → 原 Rust Agent/预算/Fusion fake → 原候选 Inbox。默认 OFF、新 scope LOCAL_FAKE_ONLY；缺少真实历史和公司行为 PIT 时拒绝预测；不改变 #50 Operator 或财务权限。完整 [开发自测](evidence/m2-pr10/README.md) 不是独立验收。
+**M2-PR10 已合并（PR #52）：** [#51](https://github.com/handFOOLed/Stratide/issues/51) 的 [Time-Series + Fusion V1](M2_PR10.md) 已并入 main `1b2c903`：可信 Snapshot 冻结 → 数学基线/独立可替换本地时序测试 Adapter → 原 Rust Agent/预算/Fusion fake → 原候选 Inbox。精确任务领取和实际任务 reserve/dispatch 双门禁保留，默认 OFF、LOCAL_FAKE_ONLY；不改变 #50 Operator 或财务权限。[原开发自测](evidence/m2-pr10/README.md) 保留其当时记录。
+
+**本分支 M1-PR11 Draft：** [#53](https://github.com/handFOOLed/Stratide/issues/53) 的 [真实前向 EOD 研究资格 V1](M1_PR11.md)：只读原 observer/PR33/PR38，冻结独立事件源契约与实际取得覆盖，逐日核验 21 连续会话并将收据接入原 PR52。完整 synthetic 正反/修订/故障恢复通过只证明工程路径；真实仅两日、事件覆盖缺失且已过期，仍 BLOCKED。历史 PIT、开盘、Paper/Live 均不解锁。
 
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |
-| **当前 #51** | **Sol** | 完整 Time-Series + Fusion Core、独立数值复算、原 Agent/预算与 Registry、来源/并发/故障反证；唯一 Draft，固定 HEAD 审查后由 Owner 决定是否合并。 |
+| **当前 #53** | **Sol** | M1-PR11 前向来源证据、逐日研究资格、原双模型安全接线；真实只读审计与合成正反/修订/恢复，唯一 Draft，固定 HEAD 审查后由 Owner 决定是否合并。 |
 | **后续核心** | Owner 再定范围 | #10 真实开盘、PIT、账户税/到账仍受阻；#36 完整多模态消融及真实供应商未验证。 |
 | **核心全部完成后** | **Sol** | 按 PR #28 的设计体系统一集成 UI；本期不改 UI。 |
 

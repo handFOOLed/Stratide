@@ -104,13 +104,35 @@ impl SnapshotSource {
                 || self.path.with_file_name("snapshots.sqlite-shm").is_file(),
             "SNAPSHOT_WAL_INCOMPLETE",
         )?;
-        // No immutable=1: committed content may still be in the live store WAL.
-        let c = Connection::open_with_flags(&self.path, OpenFlags::SQLITE_OPEN_READ_ONLY)
-            .map_err(|_| "SNAPSHOT_STORE_UNAVAILABLE")?;
+        // Checkpointed research sources must be read without creating/updating
+        // SHM or deleting empty WAL sidecars. A live nonempty WAL still uses
+        // the original SQLite read transaction so committed overlays are seen.
+        let wal = self.path.with_file_name("snapshots.sqlite-wal");
+        let checkpointed = !fs::metadata(&wal).is_ok_and(|m| m.len() > 0);
+        let checkpoint = if checkpointed {
+            Some(fs::read(&self.path).map_err(|_| "SNAPSHOT_STORE_UNAVAILABLE")?)
+        } else {
+            None
+        };
+        let mut uri =
+            reqwest::Url::from_file_path(&self.path).map_err(|_| "SNAPSHOT_STORE_UNAVAILABLE")?;
+        uri.query_pairs_mut().append_pair("mode", "ro");
+        if checkpointed {
+            uri.query_pairs_mut().append_pair("immutable", "1");
+        }
+        let c = Connection::open_with_flags(
+            uri.as_str(),
+            OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_URI,
+        )
+        .map_err(|_| "SNAPSHOT_STORE_UNAVAILABLE")?;
         c.execute_batch("PRAGMA query_only=ON; BEGIN;")?;
         let version: i64 = c.pragma_query_value(None, "user_version", |r| r.get(0))?;
         let journal: String = c.pragma_query_value(None, "journal_mode", |r| r.get(0))?;
-        ensure(version == 1050 && journal == "wal", "SNAPSHOT_STORE_SCHEMA")?;
+        // Immutable handles report delete even for a checkpointed WAL file.
+        let wal_format = checkpoint.as_ref().map_or(journal == "wal", |bytes| {
+            bytes.get(18..20) == Some(&[2, 2][..])
+        });
+        ensure(version == 1050 && wal_format, "SNAPSHOT_STORE_SCHEMA")?;
         let checks: Vec<String> = c
             .prepare("PRAGMA quick_check")?
             .query_map([], |r| r.get(0))?
@@ -149,6 +171,14 @@ impl SnapshotSource {
         let identity = json!({"source":value["source"],"instrument":value["instrument"],
             "endpoint_version":value["endpoint_version"],"journal_genesis":value["journal_genesis"],
             "data_mode":value["data_mode"]});
+        if let Some(before) = checkpoint {
+            ensure(
+                hash(&before)
+                    == hash(&fs::read(&self.path).map_err(|_| "SNAPSHOT_STORE_UNAVAILABLE")?)
+                    && !fs::metadata(&wal).is_ok_and(|m| m.len() > 0),
+                "SNAPSHOT_CHANGED_DURING_READ",
+            )?;
+        }
         Ok((input, identity))
     }
 }

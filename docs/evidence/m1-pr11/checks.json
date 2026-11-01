@@ -1,0 +1,202 @@
+{
+  "errors": 0,
+  "failures": 0,
+  "fills": 0,
+  "independent_acceptance": "NOT_VERIFIED",
+  "orders": 0,
+  "real_forward_days_added": 0,
+  "real_paid_calls": 0,
+  "results": [
+    {
+      "agent_task_id": "1",
+      "check": "positive-a",
+      "daily_rows": 21,
+      "evidence_head_sha256": "6ccaa8ba902a52ad8b93dda78124c7b945694aa12bd01459ce72858c4a6d4bc2",
+      "fake_calls": 1,
+      "protected_original_bytes_and_mtime_unchanged": true,
+      "real_forward_days_added": 0,
+      "receipt_sha256": "fcd01399802466156b057d87cf91d2deee11dd0cd0f0ee61a0f24497026897d6",
+      "registrations": 1,
+      "snapshot_sha256": "d8738c50885a8babfa7ea23cce9e4a10b0fba913b5ee84a8a42fa77bb6a01448",
+      "task_id": "e741b396c118a0c20c7662ad7b3e9952f8e87ec094d6401cffe32f3be69fba9d",
+      "tasks": 1
+    },
+    {
+      "agent_task_id": "2",
+      "check": "positive-b",
+      "daily_rows": 21,
+      "evidence_head_sha256": "709374a8bdc0d421173a63da1affd4da80637dd21f1979e065895e59c4cb3314",
+      "fake_calls": 1,
+      "protected_original_bytes_and_mtime_unchanged": true,
+      "real_forward_days_added": 0,
+      "receipt_sha256": "91d3e74c334fb63358e49156624a1a67981cc7d99bc3dfd5897b28034b015690",
+      "registrations": 1,
+      "snapshot_sha256": "efb5ba6f014fc18f54251c5406bbb807d25abb28bbf071df1dac69519ce0eac0",
+      "task_id": "13fa7251a7110eb964b904028ad86efdce8783d812a637ea24d94f17d25fd7d0",
+      "tasks": 1
+    },
+    {
+      "blockers": [
+        "INSUFFICIENT_FORWARD_HISTORY",
+        "INSUFFICIENT_FORWARD_WARMUP"
+      ],
+      "check": "short",
+      "fake_calls": 0,
+      "registrations": 0
+    },
+    {
+      "blockers": [
+        "FORWARD_COVERAGE_GAP",
+        "INSUFFICIENT_FORWARD_HISTORY",
+        "INSUFFICIENT_FORWARD_WARMUP"
+      ],
+      "check": "gap",
+      "fake_calls": 0,
+      "registrations": 0
+    },
+    {
+      "blockers": [
+        "ACTION_FEED_UNAVAILABLE",
+        "COVERAGE_NOT_ATTESTED"
+      ],
+      "check": "no-feed",
+      "fake_calls": 0,
+      "registrations": 0
+    },
+    {
+      "blockers": [
+        "COVERAGE_NOT_ATTESTED"
+      ],
+      "check": "missing",
+      "fake_calls": 0,
+      "registrations": 0
+    },
+    {
+      "blockers": [
+        "COVERAGE_NOT_ATTESTED"
+      ],
+      "check": "empty-not-proof",
+      "fake_calls": 0,
+      "registrations": 0
+    },
+    {
+      "blockers": [
+        "ACTION_FUTURE_PUBLICATION"
+      ],
+      "check": "future-publisher",
+      "fake_calls": 0,
+      "registrations": 0
+    },
+    {
+      "blockers": [
+        "COVERAGE_NOT_ATTESTED"
+      ],
+      "check": "ex_post_cannot_backfill",
+      "new_receipt": "d3702327b1b48d7f499f62658c283883f3a4cbc39f302be85de6743ffa83d7e5",
+      "prior_receipt_retained": true
+    },
+    {
+      "actual_account_cash_assertions": 0,
+      "check": "event_never_adjusts_or_books_money",
+      "event_blockers": [
+        "EVENT_FACT_PARTIAL",
+        "PRICE_SEMANTICS_UNSAFE"
+      ],
+      "unit_date_symbol_rejections": 5
+    },
+    {
+      "check": "forged_flag_hash_mode_owner",
+      "fake_calls": 0,
+      "registrations": 0,
+      "rejections": 5
+    },
+    {
+      "calls": 0,
+      "check": "actual_rust_pre_reserve_receipt",
+      "reason": "MULTIMODAL_READINESS_REJECTED",
+      "registrations": 0,
+      "task_status": "cancelled"
+    },
+    {
+      "calls": 0,
+      "check": "actual_rust_pre_reserve_raw-journal",
+      "reason": "MULTIMODAL_READINESS_REJECTED",
+      "registrations": 0,
+      "task_status": "cancelled"
+    },
+    {
+      "calls": 0,
+      "check": "actual_rust_pre_reserve_owner",
+      "reason": "OWNER_DISABLED",
+      "registrations": 0,
+      "task_status": "cancelled"
+    },
+    {
+      "blockers": [
+        "ACTION_SOURCE_CONFLICT",
+        "ACTION_SOURCE_REVISED",
+        "EVENT_FACT_PARTIAL",
+        "PRICE_SEMANTICS_UNSAFE",
+        "REVISED_OR_LATE_SOURCE_REJECTED"
+      ],
+      "check": "source_revision_and_action_correction",
+      "old_receipt_unchanged": true
+    },
+    {
+      "check": "freshness_asof_label_clock_paths",
+      "rejections": 9
+    },
+    {
+      "check": "process_exit86_three_publication_points_and_concurrent",
+      "concurrent_exit_codes": [
+        2,
+        0
+      ],
+      "duplicate_receipt_stable": true,
+      "exits": [
+        86,
+        86,
+        86
+      ],
+      "recovery": "PASS"
+    },
+    {
+      "check": "exact_task_and_settled_restart",
+      "duplicate_charges": 0,
+      "invalid_a_calls": 0,
+      "valid_b_calls": 1,
+      "valid_b_registrations": 1
+    },
+    {
+      "check": "old-gap_new_clean_window",
+      "original_bytes_and_mtime_unchanged": true,
+      "prior_versions_preserved": true,
+      "receipt_sha256": "b9638db22e0dbf964196f90f48423834eb9915d3fe4f513d2b4cde5f9c07176f"
+    },
+    {
+      "check": "old-revision_new_clean_window",
+      "original_bytes_and_mtime_unchanged": true,
+      "prior_versions_preserved": true,
+      "receipt_sha256": "1971134173d7fe539a090c59a2949fb4b92e2bfe4bdc61dd8f37e76e79c578f8"
+    },
+    {
+      "call_state": "no_charge",
+      "check": "actual_dispatch_gate_after_reserve_commit",
+      "dispatched_calls": 0,
+      "reason": "OWNER_DISABLED",
+      "reenable_does_not_resend": true,
+      "registrations": 0,
+      "reserved_call_records": 1,
+      "status": "cancelled"
+    },
+    {
+      "check": "on_day_complete_then_unchanged_fact_refresh",
+      "new_qualified_receipts": 2,
+      "old_failure_retained": true,
+      "old_queued_calls": 0,
+      "old_queued_status": "cancelled"
+    }
+  ],
+  "schema_version": 1,
+  "tests": 13
+}

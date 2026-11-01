@@ -1,0 +1,17 @@
+{
+  "errors": 0,
+  "failures": 0,
+  "fills": 0,
+  "independent_acceptance": "NOT_VERIFIED",
+  "orders": 0,
+  "real_forward_days_added": 0,
+  "real_paid_calls": 0,
+  "results": [
+    {
+      "check": "freshness_asof_label_clock_paths",
+      "rejections": 9
+    }
+  ],
+  "schema_version": 1,
+  "tests": 1
+}

@@ -1,0 +1,190 @@
+{
+  "assurance": "LOCAL_OPERATOR_REVIEW_AND_ACQUISITION; HASHES_DO_NOT_AUTHENTICATE_PUBLISHER_OR_CLOCK",
+  "blockers": [
+    "ACTION_FEED_UNAVAILABLE",
+    "COVERAGE_NOT_ATTESTED",
+    "INSUFFICIENT_FORWARD_HISTORY",
+    "INSUFFICIENT_FORWARD_WARMUP",
+    "MISSED_OR_STALE",
+    "NO_VALID_CURRENT_ON_DAY_EOD",
+    "SNAPSHOT_SYNC_STALE_OR_CLOCK"
+  ],
+  "calendar_coverage": [
+    {
+      "source_day": "20261028",
+      "state": "valid_eod"
+    },
+    {
+      "source_day": "20261029",
+      "state": "valid_eod"
+    }
+  ],
+  "can_execute_forward_paper": false,
+  "continuous_sessions": 2,
+  "contract": "forward-research-readiness-v1",
+  "corporate_action_references": [
+    {
+      "bundle_sha256": "c9b15d74dd687691e9418742fefa22bf70e4843dc6a066cb5f554df43329b49b",
+      "documents": [
+        {
+          "disclosed_on": "2026-07-09",
+          "disclosure_basis": "document_signed_date",
+          "document_id": "1225416710",
+          "id": "cninfo-1225416710",
+          "public_url": "https://static.cninfo.com.cn/finalpage/2026-07-10/1225416710.PDF",
+          "published_at": null,
+          "review_method": "operator_manual_document_text_crosscheck",
+          "role": "implementation",
+          "sha256": "afe3ee2cf61dcd1e9e76d2b8d4a93a2cc16fd7ea27eb89da815b8a808f8de386",
+          "size_bytes": 108034,
+          "supersedes": null,
+          "text_sha256": "af6d8832c28939476735818780d82d3976ff20af4d023c1cacf370216890ae86",
+          "text_size_bytes": 5516,
+          "transcript_assurance": "operator_attested_not_automatic_pdf_semantic_verification",
+          "version": "observed-cninfo-1225416710-v1"
+        }
+      ],
+      "event_fact_status": "FACTS_PARTIAL",
+      "events": [
+        {
+          "facts": {
+            "actual_account_cash_received_at": null,
+            "announcement_date": "2026-07-09",
+            "capitalization_ratio": null,
+            "cash_amount": "0.42",
+            "cash_unit": "CNY_PER_SHARE",
+            "currency": "CNY",
+            "event_id": "临2026-021",
+            "event_type": "CASH_DIVIDEND",
+            "ex_date": "2026-07-16",
+            "net_cash_amount": null,
+            "record_date": "2026-07-15",
+            "rights_ratio": null,
+            "scheduled_pay_date": "2026-07-16",
+            "sellable_date": null,
+            "stock_dividend_ratio": null,
+            "stock_listing_date": null,
+            "symbol": "600000.SH",
+            "tax_basis": "GROSS",
+            "tax_terms": "暂不扣缴个人所得税"
+          },
+          "source_id": "cninfo-1225416710"
+        }
+      ],
+      "historical_pit_status": "NOT_VERIFIED",
+      "obtained_at": {
+        "cninfo-1225416710": "2026-10-31T13:50:22.362722Z"
+      }
+    }
+  ],
+  "daily_evidence": [
+    {
+      "available_at": 1793192840090,
+      "bar_sha256": "81e9bfa61533ebf4ba08120e2d4fed10c5dbac0e4beff83cc37864bafa4a1944",
+      "blockers": [
+        "ACTION_FEED_UNAVAILABLE",
+        "COVERAGE_NOT_ATTESTED"
+      ],
+      "evidence_sha256": [],
+      "late_backfill": false,
+      "observed_at": 1793192836361,
+      "raw_sha256": [
+        {
+          "api": "trade_cal",
+          "received_at": 1793192837756,
+          "sequence": 2,
+          "sha256": "c58a3f22477fcba061ab45ddb3bded36af9d318bc7b959e2e75505512348a6e1"
+        },
+        {
+          "api": "daily",
+          "received_at": 1793192840090,
+          "sequence": 2,
+          "sha256": "04994bab8f4b4e2140c75cb3d66e66de45dbc233c01268eb54214e09ef42306e"
+        }
+      ],
+      "received_at": 1793192840090,
+      "return_from": "20261028",
+      "revision_of": null,
+      "sequence": 2,
+      "source_day": "20261028",
+      "status": "UNKNOWN"
+    },
+    {
+      "available_at": 1793281197419,
+      "bar_sha256": "0727b58e4450a60b1663010b2578eec8e0688753bcba189b7b08198134f36b4e",
+      "blockers": [
+        "ACTION_FEED_UNAVAILABLE",
+        "COVERAGE_NOT_ATTESTED"
+      ],
+      "evidence_sha256": [],
+      "late_backfill": false,
+      "observed_at": 1793281196805,
+      "raw_sha256": [
+        {
+          "api": "trade_cal",
+          "received_at": 1793281197167,
+          "sequence": 4,
+          "sha256": "3fc20abcd3bd9159512b9da8b7d9ea5db53f82f7d188e7d82184937fc2d83526"
+        },
+        {
+          "api": "daily",
+          "received_at": 1793281197419,
+          "sequence": 4,
+          "sha256": "238afb58e7737b6c7c2c4cbd4665ad83031a1ec0f8bb65b4f8a9751eba117eab"
+        }
+      ],
+      "received_at": 1793281197419,
+      "return_from": "20261028",
+      "revision_of": null,
+      "sequence": 4,
+      "source_day": "20261029",
+      "status": "UNKNOWN"
+    }
+  ],
+  "decision_at": 1793542869020,
+  "eligibility": "ELIGIBILITY_DENIED",
+  "evidence_head_sha256": null,
+  "forward_research_readiness": "BLOCKED",
+  "gaps": [],
+  "historical_pit_status": "NOT_VERIFIED",
+  "input_mode": "forward_observed_eod",
+  "input_snapshot_sha256": "3def7bf43e54d889a68db292b09cfe0885782f650438792b01baff70f44cde03",
+  "instrument": "600000.SH",
+  "journal_head": "28a8f562c7df902ced5fe03a38ceb22f8f44190da3df67944771e075effa8b66",
+  "live_allowed": false,
+  "name": "real-forward-audit-d37de19b4324",
+  "next_required_evidence": [
+    "21 consecutive on-day original EOD sessions and a fresh PR33 snapshot",
+    "operator-reviewed authorized complete action-feed contract and actual on-day capture for each return interval"
+  ],
+  "observer_binding_sha256": "20374537a1978db010410000efe9f51ea8040516bc54cbb20c07f6280616bf42",
+  "opening_source": "BLOCKED",
+  "real_on_day_sessions": 2,
+  "receipt_sha256": "dd0e0762b516b8d9f3dabc90e8901d23910110dc22024f49437cbdaa2708d22e",
+  "receipt_verification": "REPLAYABLE_LOCAL_EVIDENCE_NOT_EXTERNAL_CERTIFICATION",
+  "required_sessions": 21,
+  "restriction": "RESEARCH_ONLY",
+  "source_day": "20261029",
+  "source_evidence_status": "FACTS_PARTIAL",
+  "source_identity_sha256": "8e345d43dd2b2569498d56757347cfd89965562c18d8c7aa8748963a253f776a",
+  "source_permission": {
+    "action_feed_authority": "ACTION_FEED_UNAVAILABLE_NO_NEW_PROVIDER_REQUEST",
+    "authority": "EXISTING_OBSERVER_PERSISTED_LOCAL_STORAGE_GRANT",
+    "provider": "tushare_pro",
+    "raw_kinds": [
+      "daily",
+      "trade_cal"
+    ]
+  },
+  "verification": {
+    "candidates": 0,
+    "fills": 0,
+    "orders": 0,
+    "paid_calls": 0,
+    "public_market_requests": 0,
+    "raw_payload_sha256_checked_independently": 4,
+    "real_forward_days_added": 0,
+    "receipt_sha256_checked_independently": true
+  },
+  "warnings": []
+}

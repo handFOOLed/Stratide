@@ -16,7 +16,10 @@ import sys
 from urllib.parse import urlsplit
 import uuid
 
-from .eod_journal import Rejected, ZONE, canonical, loads, no_links, require, sha
+if __package__:
+    from .eod_journal import Rejected, ZONE, canonical, loads, no_links, require, sha
+else:
+    from eod_journal import Rejected, ZONE, canonical, loads, no_links, require, sha
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = "corporate-action-evidence-v1"

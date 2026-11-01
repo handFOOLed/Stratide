@@ -207,18 +207,24 @@ def validate_expert(value, frozen, kind):
     validate_metrics(value["result"], frozen["window"], descriptor)
 
 
-def source_window(src, at):
+def source_window(src, at, readiness_ref=None, *, replay=False):
     """Reuse #48 source/time/calendar rules; refuse revisions instead of warming
     up with retrospectively patched prices. Unadjusted is explicit, never PIT.
     """
-    ready, window = s.readiness(src, at)
+    if readiness_ref is not None:
+        import forward_readiness as r
+        ready, window = r.window_readiness(src, at)
+    else:
+        ready, window = s.readiness(src, at)
     content = src["saved"]["content"]
     mode = content["data_mode"]
     j.require(mode in ("synthetic_test", "forward_observed_eod"), "HISTORICAL_REPLAY_EX_POST_ONLY")
     if len(window) < WINDOW:
         raise j.Rejected("INSUFFICIENT_FORWARD_HISTORY" if mode == "forward_observed_eod" else "INSUFFICIENT_HISTORY")
     j.require(not ready["blockers"], ready["blockers"][0] if ready["blockers"] else "WINDOW_BLOCKED")
-    j.require(not any(v["revision_of"] is not None or v["late_backfill"] for v in content["versions"]),
+    versions = content["versions"] if readiness_ref is None else [
+        v for v in content["versions"] if v["bar"]["trade_day"] >= window[0]["bar"]["trade_day"]]
+    j.require(not any(v["revision_of"] is not None or v["late_backfill"] for v in versions),
               "REVISED_OR_LATE_SOURCE_REJECTED")
     for row in window:
         key = row["bar"]["trade_day"]
@@ -226,9 +232,13 @@ def source_window(src, at):
         j.require(0 < observed <= received <= available <= content["as_of_journal_event_at"] <= at
                   and all(j.day(t) == key for t in (observed, received, available)), "WINDOW_TIME_INVALID")
     closes(window)
-    # No corporate-action PIT certification exists in PR33. A real prediction
-    # cannot acquire that missing qualification merely by accumulating 21 bars.
-    j.require(mode != "forward_observed_eod", "CORPORATE_ACTION_PIT_NOT_VERIFIED")
+    # PR33 alone is insufficient. Recompute the bound, on-day receipt rather
+    # than replacing the old hard rejection with a caller's ready boolean.
+    if mode == "forward_observed_eod" or readiness_ref is not None:
+        j.require(readiness_ref is not None, "CORPORATE_ACTION_PIT_NOT_VERIFIED")
+        import forward_readiness as r
+        r.authorize(readiness_ref, src, at, current=not replay)
+        ready["research_readiness_receipt"] = readiness_ref
     return ready, window
 
 
@@ -249,11 +259,16 @@ def validate_frozen(value):
               and value["instrument"] == content["instrument"] and value["source_day"] == content["last_valid_source_day"]
               and value["as_of"] == content["as_of_journal_event_at"], "FROZEN_SOURCE_SHA")
     identity = {key: content[key] for key in ("source", "instrument", "endpoint_version", "journal_genesis", "data_mode")}
-    j.require(value["source_identity_sha256"] == digest(identity) and value["spec"] == dict(
+    expected_spec = dict(
               source_identity_sha256=digest(identity), input_snapshot_sha256=digest(content),
-              source_day=value["source_day"], target=TARGET, horizon_sessions=1, plan=value["plan"], policy=POLICY),
+              source_day=value["source_day"], target=TARGET, horizon_sessions=1, plan=value["plan"], policy=POLICY)
+    receipt = value["readiness"].get("research_readiness_receipt")
+    if receipt is not None:
+        expected_spec["research_readiness_receipt"] = receipt
+    j.require(value["source_identity_sha256"] == digest(identity) and value["spec"] == expected_spec,
               "FROZEN_SPEC_MISMATCH")
-    ready, window = source_window(dict(saved=dict(content=content), attempt=value["latest_sync"]), value["decision_at"])
+    ready, window = source_window(dict(saved=dict(content=content), attempt=value["latest_sync"]), value["decision_at"],
+                                  receipt, replay=True)
     j.require(ready == value["readiness"] and window == value["window"]
               and digest(window) == value["window_sha256"], "FROZEN_WINDOW_MISMATCH")
 
@@ -271,6 +286,8 @@ def fusion_input(frozen, base, temporal):
                    quality_blockers=["EXTERNAL_TIMESERIES_NOT_CONFIGURED", "CORPORATE_ACTION_PIT_NOT_VERIFIED",
                                      "OPENING_SOURCE_BLOCKED"], uncertainty="UNKNOWN_UNCALIBRATED",
                    tradable_at="UNKNOWN_OPENING_SOURCE_BLOCKED", authority=SAFE)
+    if "research_readiness_receipt" in frozen["readiness"]:
+        summary["research_readiness_receipt"] = frozen["readiness"]["research_readiness_receipt"]
     j.require(len(j.canonical(summary)) <= 20000, "FUSION_INPUT_SIZE")
     day = frozen["source_day"]
     return dict(version=SCOPE + ":" + digest(summary), source_day=f"{day[:4]}-{day[4:6]}-{day[6:]}",
