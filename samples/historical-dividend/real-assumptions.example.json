@@ -1,0 +1,100 @@
+{
+  "protocol": "historical_dividend_scenario_v1",
+  "version": "cash42-tax20-delay0720-expost-v1",
+  "evidence_class": "EXPLORATORY_EX_POST",
+  "input_kind": "frozen_authorized_history",
+  "license_scope": "Owner-authorized personal noncommercial local research; no redistribution",
+  "selected_start": "20260706",
+  "selected_end": "20261028",
+  "window_policy": "fixed_before_execution_not_selected_by_NAV",
+  "source_sha256": {
+    "calendar": "284cbb28d12f576ae93e54b0bd8abf516a595cc668f56363cd2cfbb68a4d5bf9",
+    "daily": "5689c59e8fa92b5ca2499141c3b4e199b168ea02f70b385c8a24eb81340d2075",
+    "extraction": "5eb1abff2764e414f484d9610807af7544fa672ccf6228056796f4a5337e4075",
+    "limits": "dabd396dc7594bf90c74118d92be256c87667bc0cfd46af08b7c9f1861ceec2f",
+    "suspensions": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "evidence_bundle_sha256": "c9b15d74dd687691e9418742fefa22bf70e4843dc6a066cb5f554df43329b49b",
+  "models": {
+    "announcement_at": {
+      "value": "2026-07-09T10:00:00Z",
+      "modeled_only": true,
+      "version": "expost-model-v1",
+      "reason": "公告仅支持日期；18:00仅用于隔离模型事件校验，不表示当年实收。",
+      "as_of_class": "EX_POST_MODEL_ONLY",
+      "sensitivity": "精确披露/PIT未知；策略只看前缀收盘，不消费事件前瞻。"
+    },
+    "record_at": {
+      "value": "2026-07-15T11:00:00Z",
+      "modeled_only": true,
+      "version": "expost-model-v1",
+      "reason": "模型在登记日18:00输入之后19:00冻结权益。",
+      "as_of_class": "EX_POST_MODEL_ONLY",
+      "sensitivity": "调整模型锁定时点须新版本，不得回填成交。"
+    },
+    "ex_at": {
+      "value": "2026-07-16T01:30:00Z",
+      "modeled_only": true,
+      "version": "expost-model-v1",
+      "reason": "已支持除息日期，09:30是事后事件时钟。",
+      "as_of_class": "EX_POST_MODEL_ONLY",
+      "sensitivity": "不证明当时开盘源或实际入账时刻。"
+    },
+    "payment_at": {
+      "value": "2026-07-20T01:30:00Z",
+      "modeled_only": true,
+      "version": "expost-model-v1",
+      "reason": "计划发放日7/16不证明到账；人为延迟至7/20模型开盘支付。",
+      "as_of_class": "EX_POST_MODEL_ONLY",
+      "sensitivity": "比较7/16及7/20支付；支付时点只改变现金可用性，不二次创收益。"
+    },
+    "withholding_ppm": {
+      "value": 200000,
+      "modeled_only": true,
+      "version": "expost-model-v1",
+      "reason": "同一股息覆盖的20%模拟扣税；不是实际持有期税/递延税。",
+      "as_of_class": "EX_POST_MODEL_ONLY",
+      "sensitivity": "另起0%和100%税版本比较；不认证实际净额。"
+    },
+    "share_change_ratio": {
+      "value": "0",
+      "modeled_only": true,
+      "version": "expost-model-v1",
+      "reason": "显式只研究现金分红、股份变化设0；原缺证字段仍为null。",
+      "as_of_class": "EX_POST_MODEL_ONLY",
+      "sensitivity": "混合送转不支持，任何已知非零动作拒绝。"
+    },
+    "other_actions": {
+      "value": "none_in_selected_window",
+      "modeled_only": true,
+      "version": "expost-model-v1",
+      "reason": "窗口内仅模型化已识别现金事件；其他未知行动不是已核实不存在。",
+      "as_of_class": "EX_POST_MODEL_ONLY",
+      "sensitivity": "其他断点/已知后续权益拒绝，真实资格始终拒绝。"
+    },
+    "opening": {
+      "value": "daily_open_ex_post_next_open_adverse_1fen",
+      "modeled_only": true,
+      "version": "expost-model-v1",
+      "reason": "从事后daily.open构造next-open不利1分执行；不是实时收到。",
+      "as_of_class": "EX_POST_MODEL_ONLY",
+      "sensitivity": "当日高低收/成交量不决定开盘成交，#10 gate仍BLOCKED。"
+    },
+    "eod_availability": {
+      "value": "18:00_Asia_Shanghai_assumed_not_received",
+      "modeled_only": true,
+      "version": "expost-model-v1",
+      "reason": "18:00仅假设可见；保留真实2026-10提取及公告取得时间。",
+      "as_of_class": "EX_POST_MODEL_ONLY",
+      "sensitivity": "无逐bar历史实收或修订全史，不支持PIT认证。"
+    },
+    "rules": {
+      "value": "ordinary_SSE_A_TPlusOne_100shares_1fen_ex_post",
+      "modeled_only": true,
+      "version": "expost-model-v1",
+      "reason": "现有普通沪市A股T+1/100股/1分及冻结费用模型。",
+      "as_of_class": "EX_POST_MODEL_ONLY",
+      "sensitivity": "非实际券商费率证明；不扩展7/6前历史。"
+    }
+  }
+}

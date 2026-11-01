@@ -77,7 +77,7 @@ def source_check(dataset, source):
                 e["tax"]["identity"] == raw["tax_identity"], "tax identity differs")
 
 
-def verify(dataset, rows, report):
+def verify(dataset, rows, report, historical_scenario=False):
     """Pure cross-check: frozen events + trusted input prices + fill list only."""
     g = json.loads(rows[0][2])
     config = g["genesis"]["config"]
@@ -97,7 +97,7 @@ def verify(dataset, rows, report):
     mark, previous_nav, day_start, peak = 0, initial, initial, initial
     day = g["genesis"]["day"]
     freezes = {"account_freezes": set(), "strategy_freezes": set()}
-    by_day, actions, all_fills = {}, [], []
+    by_day, actions, all_fills, pending = {}, [], [], {}
 
     def totals():
         return dict(receivable_fen=sum(gross[k] for k in gross if phases[k] == 2),
@@ -126,11 +126,12 @@ def verify(dataset, rows, report):
         require(seq == expected_seq and audit["seq"] == seq and audit["event_id"] == event_id and
                 audit["ledger_digest"] == digest and audit["command"] == json.loads(payload), "audit/journal mismatch")
         kind, cmd = next(iter(json.loads(payload).items()))
-        next_day = cmd.get("day", day)
+        next_day = cmd["bar"]["day"] if kind == "HistoricalNextOpenV1" else cmd.get("day", day)
         if next_day > day:
             day_start, day = previous_nav, next_day
         require(next_day == day, "backdated command")
-        require(kind in ("Match", "Submit", "CashDividendV1"), "unsupported financial command")
+        allowed = ("HistoricalNextOpenV1", "Submit", "CashDividendV1") if historical_scenario else ("Match", "Submit", "CashDividendV1")
+        require(kind in allowed, "unsupported financial command")
         s = sessions[day]
         if kind == "CashDividendV1":
             key, phase = cmd["event_id"], cmd["phase"]
@@ -138,10 +139,19 @@ def verify(dataset, rows, report):
             step = ("record", "ex", "payment").index(phase)
             require(phases[key] == step, "duplicate/out-of-order corporate action")
             require(cmd["now"] == e[phase+"_at"] and day == e[phase+"_day"], "phase timestamp differs")
-            mark = s["close_fen"] if phase == "record" else s["opening"]["price_fen"]
+            mark = s["close_fen"] if phase == "record" else s["open_fen"] if historical_scenario else s["opening"]["price_fen"]
+            require(not audit["new_fills"], "corporate action cannot fabricate fill")
+            if historical_scenario:
+                require(cmd["marks"] == [dict(instrument=dataset["instrument"], price=mark,
+                    as_of=s["closes_at"] if phase == "record" else s["opens_at"],
+                    available_at=s["available_at"] if phase == "record" else s["opens_at"],
+                    source="historical_ex_post_assumption/EX_POST_MODEL_ONLY; not historical receipt or forward opening")],
+                    "phase borrowed future/pre-ex price")
             if phase == "record":
                 entitlement[key] = held
             elif phase == "ex":
+                if historical_scenario:
+                    pending.clear()  # The sole instrument's pre-ex orders expire.
                 divisor = 10 if e["cash_unit"] == "per_ten_shares" else 1
                 per_share = Decimal(e["cash_amount_fen"]) / Decimal(divisor)
                 require(per_share == per_share.to_integral_value(), "fractional fen rejected")
@@ -151,17 +161,24 @@ def verify(dataset, rows, report):
                 cash += gross[key] - tax[key]
             phases[key] += 1
             actions.append((seq, key, phase, entitlement[key]))
-        elif kind == "Match":
-            mark = s["opening"]["price_fen"]
+        elif kind in ("Match", "HistoricalNextOpenV1"):
+            mark = s["open_fen"] if historical_scenario else s["opening"]["price_fen"]
             observe()  # opening risk must see receivable AND withholding
             for f in audit["new_fills"]:
                 require(f["event_id"] not in fill_ids, "duplicate fill")
                 fill_ids.add(f["event_id"])
                 o = next(o for o in report["orders"] if o["proposal"]["proposal_id"] == f["order_id"])
                 p = o["proposal"]
-                require(f["day"] == day and f["quantity"] > 0 and f["price"] == p["limit_price"] and
+                price = s["open_fen"] + (1 if f["side"] == "Buy" else -1) if historical_scenario else p["limit_price"]
+                require(f["day"] == day and f["quantity"] > 0 and f["price"] == price and
                         p["decision_at"] < s["opens_at"] and p["data_available_at"] < s["opens_at"] and
-                        s["closes_at"] < p["expires_at"] and p["side"] == f["side"], "invalid modeled fill/time")
+                        (s["opens_at"] if historical_scenario else s["closes_at"]) < p["expires_at"] and p["side"] == f["side"], "invalid modeled fill/time")
+                if historical_scenario:
+                    require(f["quantity"] == 100 and f["risk_checked_at"] == s["opens_at"] and
+                            f.get("opening_evidence") is None and f["historical_execution"].startswith("historical_ex_post_execution_assumption") and
+                            s["rules"]["tradable"] and s["rules"]["min_price_fen"] < price < s["rules"]["max_price_fen"] and
+                            (price <= p["limit_price"] if f["side"] == "Buy" else price >= p["limit_price"]), "historical execution/risk/limit differs")
+                    require(not any(e["ex_at"] > p["decision_at"] for e in events.values() if e["ex_day"] <= day), "stale pre-ex order filled")
                 require(f["evidence"]["provenance"]["dataset_hash"] == report["input_sha256"], "fill input differs")
                 q, price = f["quantity"], f["price"]
                 amount = q*price
@@ -175,9 +192,11 @@ def verify(dataset, rows, report):
                 if f["side"] == "Buy":
                     cash -= amount + cost
                     held += q
-                    lots.append([q, amount+cost])
+                    lots.append([q, amount+cost, day])
                 else:
                     require(f["side"] == "Sell" and q <= held, "unowned sale")
+                    if historical_scenario:
+                        require(q <= sum(l[0] for l in lots if l[2] < day), "T+1 violated")
                     cash += amount - cost
                     held -= q
                     remaining, basis = q, 0
@@ -196,8 +215,24 @@ def verify(dataset, rows, report):
                 all_fills.append(f)
                 observe()  # fee loss at execution is not deferred to next day
             mark = s["close_fen"]
+            if historical_scenario:
+                pending.clear()  # next-session IOC, including rejected remainder
         else:
             require(not audit["new_fills"], "submit cannot be a dividend/fill")
+            if historical_scenario:
+                for order in audit["new_orders"]:
+                    p = order["proposal"]
+                    require(order["status"] in ("Open", "Rejected"), "invalid submission state")
+                    if order["status"] == "Open":
+                        rate = dataset["fee"]
+                        unit = p["limit_price"] if p["side"] == "Buy" else s["rules"]["max_price_fen"]
+                        per_share_cost = max(charge(unit, rate["commission_ppm"]), rate["minimum_commission_fen"])
+                        per_share_cost += charge(unit, rate["transfer_ppm"])
+                        per_share_cost += charge(unit, rate["sell_tax_ppm"]) if p["side"] == "Sell" else 0
+                        bound = p["quantity"]*per_share_cost
+                        require(order["reserved_fee"] == bound, "fee reservation differs")
+                        pending[p["proposal_id"]] = (p["side"], p["quantity"],
+                            p["quantity"]*p["limit_price"]+bound if p["side"] == "Buy" else 0)
         observe()
         require(audit["cash_fen"] == cash and audit["held_shares"] == held and
                 audit["cash_dividend"] == totals() and audit["nav_fen"] == nav() and
@@ -209,6 +244,13 @@ def verify(dataset, rows, report):
                            cumulative_fee_fen=fees, external_flow_total_fen=0,
                            realized_pnl_fen=realized, remaining_cost_basis_fen=sum(l[1] for l in lots),
                            unrealized_pnl_fen=held*mark-sum(l[1] for l in lots), cash_dividend=totals())
+        if historical_scenario:
+            reserved = sum(p[2] for p in pending.values())
+            reserved_sell = sum(p[1] for p in pending.values() if p[0] == "Sell")
+            unsettled = sum(l[0] for l in lots if l[2] == day)
+            by_day[day].update(reserved_cash_fen=reserved, available_cash_fen=cash-reserved,
+                reserved_sell_shares=reserved_sell, pending_orders=len(pending), unsettled_shares=unsettled,
+                sellable_shares=held-unsettled-reserved_sell)
 
     require(all(v == 3 for v in phases.values()), "lifecycle incomplete")
     require(all_fills == report["fills"], "fill list differs")
@@ -233,9 +275,9 @@ def verify(dataset, rows, report):
                 net_pnl_fen=nav()-initial, trading_fee_fen=fees, **totals())
 
 
-def verify_files(dataset, ledger, directory):
+def verify_files(dataset, ledger, directory, historical_scenario=False):
     report = read(directory / "report.json")
-    result = verify(dataset, journal(ledger / "ledger.sqlite"), report)
+    result = verify(dataset, journal(ledger / "ledger.sqlite"), report, historical_scenario)
     require(read(directory / "events.json") == report["events"] and
             read(directory / "cash-dividends.json") == report["cash_dividend_actions"], "detail JSON differs")
     with (directory / "daily.csv").open(encoding="utf-8", newline="") as f:

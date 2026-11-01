@@ -1,0 +1,985 @@
+{
+  "label": "synthetic_test; all artificial; weekdays are not real trade_cal",
+  "daily": [
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260706",
+      "open": "10.00",
+      "high": "10.10",
+      "low": "9.90",
+      "close": "10.00",
+      "pre_close": "10.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260707",
+      "open": "10.00",
+      "high": "10.10",
+      "low": "9.90",
+      "close": "10.00",
+      "pre_close": "10.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260708",
+      "open": "10.00",
+      "high": "10.10",
+      "low": "9.90",
+      "close": "10.00",
+      "pre_close": "10.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260709",
+      "open": "10.00",
+      "high": "10.10",
+      "low": "9.90",
+      "close": "10.00",
+      "pre_close": "10.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260710",
+      "open": "10.00",
+      "high": "10.10",
+      "low": "9.90",
+      "close": "10.00",
+      "pre_close": "10.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260713",
+      "open": "10.00",
+      "high": "10.10",
+      "low": "9.90",
+      "close": "10.00",
+      "pre_close": "10.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260714",
+      "open": "10.00",
+      "high": "10.10",
+      "low": "9.90",
+      "close": "10.00",
+      "pre_close": "10.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260715",
+      "open": "10.00",
+      "high": "10.10",
+      "low": "9.90",
+      "close": "10.00",
+      "pre_close": "10.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260716",
+      "open": "9.50",
+      "high": "9.60",
+      "low": "9.40",
+      "close": "9.50",
+      "pre_close": "9.58",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260717",
+      "open": "9.50",
+      "high": "9.60",
+      "low": "9.40",
+      "close": "9.50",
+      "pre_close": "9.50",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260720",
+      "open": "9.50",
+      "high": "9.60",
+      "low": "9.40",
+      "close": "9.50",
+      "pre_close": "9.50",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260721",
+      "open": "9.50",
+      "high": "9.60",
+      "low": "9.40",
+      "close": "9.50",
+      "pre_close": "9.50",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260722",
+      "open": "9.50",
+      "high": "9.60",
+      "low": "9.40",
+      "close": "9.50",
+      "pre_close": "9.50",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260723",
+      "open": "9.50",
+      "high": "9.60",
+      "low": "9.40",
+      "close": "9.50",
+      "pre_close": "9.50",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260724",
+      "open": "9.50",
+      "high": "9.60",
+      "low": "9.40",
+      "close": "9.50",
+      "pre_close": "9.50",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260727",
+      "open": "9.50",
+      "high": "9.60",
+      "low": "9.40",
+      "close": "9.50",
+      "pre_close": "9.50",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260728",
+      "open": "9.50",
+      "high": "9.60",
+      "low": "9.40",
+      "close": "9.50",
+      "pre_close": "9.50",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260729",
+      "open": "9.50",
+      "high": "9.60",
+      "low": "9.40",
+      "close": "9.50",
+      "pre_close": "9.50",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260730",
+      "open": "9.50",
+      "high": "9.60",
+      "low": "9.40",
+      "close": "9.50",
+      "pre_close": "9.50",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260731",
+      "open": "9.50",
+      "high": "9.60",
+      "low": "9.40",
+      "close": "9.50",
+      "pre_close": "9.50",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260803",
+      "open": "9.50",
+      "high": "9.60",
+      "low": "9.40",
+      "close": "9.50",
+      "pre_close": "9.50",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260804",
+      "open": "9.50",
+      "high": "9.60",
+      "low": "9.40",
+      "close": "9.50",
+      "pre_close": "9.50",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260805",
+      "open": "11.00",
+      "high": "11.10",
+      "low": "10.90",
+      "close": "11.00",
+      "pre_close": "9.50",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260806",
+      "open": "11.00",
+      "high": "11.10",
+      "low": "10.90",
+      "close": "11.00",
+      "pre_close": "11.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260807",
+      "open": "11.00",
+      "high": "11.10",
+      "low": "10.90",
+      "close": "11.00",
+      "pre_close": "11.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260810",
+      "open": "11.00",
+      "high": "11.10",
+      "low": "10.90",
+      "close": "11.00",
+      "pre_close": "11.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260811",
+      "open": "11.00",
+      "high": "11.10",
+      "low": "10.90",
+      "close": "11.00",
+      "pre_close": "11.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260812",
+      "open": "11.00",
+      "high": "11.10",
+      "low": "10.90",
+      "close": "11.00",
+      "pre_close": "11.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260813",
+      "open": "9.00",
+      "high": "9.10",
+      "low": "8.90",
+      "close": "9.00",
+      "pre_close": "11.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260814",
+      "open": "9.00",
+      "high": "9.10",
+      "low": "8.90",
+      "close": "9.00",
+      "pre_close": "9.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260817",
+      "open": "9.00",
+      "high": "9.10",
+      "low": "8.90",
+      "close": "9.00",
+      "pre_close": "9.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260818",
+      "open": "9.00",
+      "high": "9.10",
+      "low": "8.90",
+      "close": "9.00",
+      "pre_close": "9.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260819",
+      "open": "9.00",
+      "high": "9.10",
+      "low": "8.90",
+      "close": "9.00",
+      "pre_close": "9.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260820",
+      "open": "9.00",
+      "high": "9.10",
+      "low": "8.90",
+      "close": "9.00",
+      "pre_close": "9.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260821",
+      "open": "10.20",
+      "high": "10.30",
+      "low": "10.10",
+      "close": "10.20",
+      "pre_close": "9.00",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260824",
+      "open": "10.20",
+      "high": "10.30",
+      "low": "10.10",
+      "close": "10.20",
+      "pre_close": "10.20",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260825",
+      "open": "10.20",
+      "high": "10.30",
+      "low": "10.10",
+      "close": "10.20",
+      "pre_close": "10.20",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260826",
+      "open": "10.20",
+      "high": "10.30",
+      "low": "10.10",
+      "close": "10.20",
+      "pre_close": "10.20",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260827",
+      "open": "10.20",
+      "high": "10.30",
+      "low": "10.10",
+      "close": "10.20",
+      "pre_close": "10.20",
+      "vol": "10000"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260828",
+      "open": "10.20",
+      "high": "10.30",
+      "low": "10.10",
+      "close": "10.20",
+      "pre_close": "10.20",
+      "vol": "10000"
+    }
+  ],
+  "calendar": [
+    {
+      "exchange": "SSE",
+      "cal_date": "20260706",
+      "is_open": 1,
+      "pretrade_date": "20260703"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260707",
+      "is_open": 1,
+      "pretrade_date": "20260706"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260708",
+      "is_open": 1,
+      "pretrade_date": "20260707"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260709",
+      "is_open": 1,
+      "pretrade_date": "20260708"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260710",
+      "is_open": 1,
+      "pretrade_date": "20260709"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260711",
+      "is_open": 0,
+      "pretrade_date": "20260710"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260712",
+      "is_open": 0,
+      "pretrade_date": "20260710"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260713",
+      "is_open": 1,
+      "pretrade_date": "20260710"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260714",
+      "is_open": 1,
+      "pretrade_date": "20260713"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260715",
+      "is_open": 1,
+      "pretrade_date": "20260714"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260716",
+      "is_open": 1,
+      "pretrade_date": "20260715"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260717",
+      "is_open": 1,
+      "pretrade_date": "20260716"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260718",
+      "is_open": 0,
+      "pretrade_date": "20260717"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260719",
+      "is_open": 0,
+      "pretrade_date": "20260717"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260720",
+      "is_open": 1,
+      "pretrade_date": "20260717"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260721",
+      "is_open": 1,
+      "pretrade_date": "20260720"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260722",
+      "is_open": 1,
+      "pretrade_date": "20260721"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260723",
+      "is_open": 1,
+      "pretrade_date": "20260722"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260724",
+      "is_open": 1,
+      "pretrade_date": "20260723"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260725",
+      "is_open": 0,
+      "pretrade_date": "20260724"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260726",
+      "is_open": 0,
+      "pretrade_date": "20260724"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260727",
+      "is_open": 1,
+      "pretrade_date": "20260724"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260728",
+      "is_open": 1,
+      "pretrade_date": "20260727"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260729",
+      "is_open": 1,
+      "pretrade_date": "20260728"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260730",
+      "is_open": 1,
+      "pretrade_date": "20260729"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260731",
+      "is_open": 1,
+      "pretrade_date": "20260730"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260801",
+      "is_open": 0,
+      "pretrade_date": "20260731"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260802",
+      "is_open": 0,
+      "pretrade_date": "20260731"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260803",
+      "is_open": 1,
+      "pretrade_date": "20260731"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260804",
+      "is_open": 1,
+      "pretrade_date": "20260803"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260805",
+      "is_open": 1,
+      "pretrade_date": "20260804"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260806",
+      "is_open": 1,
+      "pretrade_date": "20260805"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260807",
+      "is_open": 1,
+      "pretrade_date": "20260806"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260808",
+      "is_open": 0,
+      "pretrade_date": "20260807"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260809",
+      "is_open": 0,
+      "pretrade_date": "20260807"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260810",
+      "is_open": 1,
+      "pretrade_date": "20260807"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260811",
+      "is_open": 1,
+      "pretrade_date": "20260810"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260812",
+      "is_open": 1,
+      "pretrade_date": "20260811"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260813",
+      "is_open": 1,
+      "pretrade_date": "20260812"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260814",
+      "is_open": 1,
+      "pretrade_date": "20260813"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260815",
+      "is_open": 0,
+      "pretrade_date": "20260814"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260816",
+      "is_open": 0,
+      "pretrade_date": "20260814"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260817",
+      "is_open": 1,
+      "pretrade_date": "20260814"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260818",
+      "is_open": 1,
+      "pretrade_date": "20260817"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260819",
+      "is_open": 1,
+      "pretrade_date": "20260818"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260820",
+      "is_open": 1,
+      "pretrade_date": "20260819"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260821",
+      "is_open": 1,
+      "pretrade_date": "20260820"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260822",
+      "is_open": 0,
+      "pretrade_date": "20260821"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260823",
+      "is_open": 0,
+      "pretrade_date": "20260821"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260824",
+      "is_open": 1,
+      "pretrade_date": "20260821"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260825",
+      "is_open": 1,
+      "pretrade_date": "20260824"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260826",
+      "is_open": 1,
+      "pretrade_date": "20260825"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260827",
+      "is_open": 1,
+      "pretrade_date": "20260826"
+    },
+    {
+      "exchange": "SSE",
+      "cal_date": "20260828",
+      "is_open": 1,
+      "pretrade_date": "20260827"
+    }
+  ],
+  "limits": [
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260706",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260707",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260708",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260709",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260710",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260713",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260714",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260715",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260716",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260717",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260720",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260721",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260722",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260723",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260724",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260727",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260728",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260729",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260730",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260731",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260803",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260804",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260805",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260806",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260807",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260810",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260811",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260812",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260813",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260814",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260817",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260818",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260819",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260820",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260821",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260824",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260825",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260826",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260827",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    },
+    {
+      "ts_code": "600000.SH",
+      "trade_date": "20260828",
+      "up_limit": "13.00",
+      "down_limit": "7.00"
+    }
+  ],
+  "suspensions": [],
+  "extraction": {
+    "source": "artificial_fixture_no_provider",
+    "response_kind": "synthetic_test",
+    "extracted_at_utc": "2026-10-29T05:16:51.993Z",
+    "params": {
+      "ts_code": "600000.SH",
+      "exchange": "SSE",
+      "start_date": "20260706",
+      "end_date": "20260828"
+    }
+  }
+}

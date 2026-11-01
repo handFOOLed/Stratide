@@ -1,6 +1,6 @@
 # Stratide Paper 阶段路线图（当前执行版）
 
-> 2026-10-31；最新实现与数据边界见 [STATUS](STATUS.md)。Owner 已决定 **Core-first、UI-later**：后续核心功能不要求同期 Dashboard/UI，最终由 Sol 按已合并 PR #28 的视觉基准统一集成。旧各 PR 实施/验收细节仍保存在 `docs/M0_*.md`、`docs/M1_*.md`、`docs/M2_PR01.md` 与 `docs/evidence/`。
+> 2026-11-01；最新实现与数据边界见 [STATUS](STATUS.md)。Owner 已决定 **Core-first、UI-later**：后续核心功能不要求同期 Dashboard/UI，最终由 Sol 按已合并 PR #28 的视觉基准统一集成。旧各 PR 实施/验收细节仍保存在 `docs/M0_*.md`、`docs/M1_*.md`、`docs/M2_PR01.md` 与 `docs/evidence/`。
 
 ## 已完成（已并入 main）
 
@@ -14,13 +14,15 @@
 
 8. **M1-PR07B 公司行为证据**：[PR #38](https://github.com/handFOOLed/Stratide/pull/38) 已合并于 `a02a9b0`；真实事实 `FACTS_PARTIAL`、PIT 未核实，原证据包只读保留。
 
+9. **M1-PR08 现金分红模型**：[PR #40](https://github.com/handFOOLed/Stratide/pull/40) 已合并于 `287dfe8`；隔离 synthetic v4 / 七报告 / 独立算术与双基准，现实资格仍拒绝。
+
 ## 当前和下一个完整功能包
 
-**本分支 M1-PR08 Draft：** [#39](https://github.com/handFOOLed/Stratide/issues/39) 一次交付 [CASH_DIVIDEND_V1](M1_PR08.md) 的输入、权益、应收、到账、统一账本/Risk、报告、独立算法及实际 CLI。Sol `agents=0` 开发自测，ChatGPT 固定 HEAD 审查，Owner 明确授权后才合并。原 v3/六报告/68 日及 forward/Agent/候选资格不变；现实源仍不可启用。
+**本分支 M1-PR09 Draft：** [#41](https://github.com/handFOOLed/Stratide/issues/41) 一次交付[历史公司行为桥接 V1](M1_PR09.md)：原冻结行情、PR38 证据、显式模型假设、原 SMA5/20 / v4、七报告、独立算术/时点检查及双基准。77 个会话只为 EXPLORATORY_EX_POST，真实 PIT 新增 0 天。Sol `agents=0` 开发自测，ChatGPT 固定 HEAD 审查，Owner 明确授权后才合并。原 v3/六报告/68 日及 forward/Agent/候选资格不变；现实源仍不可启用。
 
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |
-| **当前 #39** | **Sol** | 完整现金分红模型、原账本字节兼容、财务反证、真实 CLI E2E 与 Draft PR；证据见 [自测](evidence/m1-pr08/README.md)。 |
+| **当前 #41** | **Sol** | 完整历史情景桥接、双冻结/回放/评价、原 v3/68 日和 PR38 保全；证据见 [自测](evidence/m1-pr09/README.md)。 |
 | **后续核心** | Owner 再定范围 | #10 真实开盘、PIT、账户税/到账仍受阻；#36 为未来提案。 |
 | **核心全部完成后** | **Sol** | 按 PR #28 的设计体系统一集成 UI；本期不改 UI。 |
 
