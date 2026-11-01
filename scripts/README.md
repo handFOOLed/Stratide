@@ -23,3 +23,7 @@ M2-PR06 的 `eod-research summary/run/task` 显式运行本地 fake 研究并保
 ## EOD 连续观察
 
 `observe-eod.ps1 -Journal <已有观察目录> -Reports <新报告根目录>` 默认执行一次 `forward-eod-step`；加 `-Watch -MaxDays 5` 在当前前台进程等到每日 Asia/Shanghai 16:00，最多处理 5 个自然日期。不会安装任务、保存 Token、自动补旧日或反复重试失败。失败停止，重启仍从原 journal 判断；完整操作和限制见 [PR04B](../docs/M1_PR04B.md)。
+
+## 自动 EOD Operator
+
+`python -B scripts/eod-operator.py --snapshot-store <已有store> init --observer <已有observer>` 默认 OFF，绑定同源 Shadow 和可选 `--auto-name <已有FakeAuto>`。Windows 用 `credential` 一次配置当前用户原生凭据，`enable` 一次授权后运行前台 `watch --interval-seconds 300`，跨进程无需逐次确认；`disable` 持久阻止后续批次/阶段。15:15 起检查，V1 保留原 collector 16:00–17:15 正式采集窗口，未知或失败槽不自动重发。`status/history/verify/report` 严格只读；完整配置、恢复与状态见 [M2-PR09](../docs/M2_PR09.md)。`python -X utf8 -B scripts/test-eod-operator.py` 运行隔离 synthetic/loopback HTTP/原 Rust Fake 的 E2E，不调用公共行情。

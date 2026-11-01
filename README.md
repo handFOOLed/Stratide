@@ -11,12 +11,13 @@
 - **候选链路已合并：** [M2-PR04 / PR #30](docs/M2_PR04.md) 提供登记 → 冻结 → 独立评价 → 隔离历史回放 CLI；#31 双线独立 PASS，研究证据不足、资格默认拒绝继续有效。
 - **EOD 快照已合并：** [M2-PR05 / PR #33](docs/M2_PR05.md) 提供离线只读同步、持久研究快照、状态和消费 CLI。
 - **Fake Agent 闭环已合并：** [M2-PR06 / PR #35](docs/M2_PR06.md) 接通显式快照 → 本地 Fake Agent 持久任务 → 候选研究来源；原快照手动路径不自动调度，scope 禁止云外发，资格默认拒绝。
-- **本分支 Draft（#43）：** [EOD 自动研究与归档 V1](docs/M2_PR07.md) 提供 Owner 本机显式启停、前台 once/watch、每日持久去重、原 Agent fake 任务、候选自动归档及恢复/只读查询；仅 LOCAL_FAKE_ONLY，默认 OFF，synthetic 自测不计真实前向覆盖。
+- **EOD Auto / 审阅 / Shadow 已合并：** [PR #44](docs/M2_PR07.md)、[PR #46](docs/M2_PR08.md)、[PR #48](docs/M1_PR10.md) 提供本地 Fake 自动研究、人工模板审阅、固定 SMA5/20 只观察日志。
+- **本分支 Draft（#49）：** [自动 EOD Operator V1](docs/M2_PR09.md) 一次配置/启用后，前台 watch 自动串起原采集器 → Snapshot → Shadow/可选 Fake。15:15 起检查，保留原 16:00 正式采集门槛；Windows 原生安全凭据、持久停用、原证据恢复和只读报告，默认 OFF。
 - **公司行为证据已合并（PR #38）：** [证据包 V1](docs/M1_PR07B.md) 保留真实公告的 `FACTS_PARTIAL / historical_pit=NOT_VERIFIED`，没有真实历史准入。
 - **现金分红模型已合并（PR #40）：** [CASH_DIVIDEND_V1](docs/M1_PR08.md) 完成隔离现金分红的登记→应收/税负→到账、统一 NAV/Risk、七报告和独立算法复算；旧 synthetic CLI、v3/68 日保持兼容。
 - **历史分红桥接已合并（PR #42）：** [历史分红桥接 V1](docs/M1_PR09.md) 将原冻结行情、PR38 证据和显式模型假设接入 v4、原 SMA5/20、七报告及独立算法/双基准；实际运行 77 会话 **EXPLORATORY_EX_POST**，真实 PIT 新增 **0 天**，真实准入继续拒绝。
 - **仍受阻：** 仅 68 个历史交易日、3 笔模拟成交，长窗口公司行为/费用证据 `DATA_BLOCKED`；真实 EOD 两日 `EOD_CONTINUITY_VERIFIED`，开盘源仍 BLOCKED，**尚无真正前向模拟成交或 NAV**。
-- **当前顺序：** [#43 EOD 自动研究与归档](https://github.com/handFOOLed/Stratide/issues/43) 按 **Core-first、UI-later** 执行；[#36 多模型研究](https://github.com/handFOOLed/Stratide/issues/36) 是未来提案。全部核心完成后，Sol 按 PR #28 视觉基准统一集成 UI。细节与证据见 [当前状态](docs/STATUS.md)。
+- **当前顺序：** [#49 自动 EOD Operator](https://github.com/handFOOLed/Stratide/issues/49) 按 **Core-first、UI-later** 执行；[#36 多模型研究](https://github.com/handFOOLed/Stratide/issues/36) 是未来提案。全部核心完成后，Sol 按 PR #28 视觉基准统一集成 UI。细节与证据见 [当前状态](docs/STATUS.md)。
 
 ## Windows 本地体验
 

@@ -1,0 +1,95 @@
+test_canonical_alias_copy_cwd_and_links (__main__.OperatorTests.test_canonical_alias_copy_cwd_and_links) ... ok
+test_child_disabled_and_cross_source_refs (__main__.OperatorTests.test_child_disabled_and_cross_source_refs) ... ok
+test_double_writer_and_disable_during_stage (__main__.OperatorTests.test_double_writer_and_disable_during_stage) ... ok
+test_early_future_late_backfill_and_bad_raw (__main__.OperatorTests.test_early_future_late_backfill_and_bad_raw) ... ok
+test_early_observation_never_becomes_post_16_data (__main__.OperatorTests.test_early_observation_never_becomes_post_16_data) ... ok
+test_failure_responses_are_not_success_or_automatic_retries (__main__.OperatorTests.test_failure_responses_are_not_success_or_automatic_retries) ... ok
+test_four_process_kills_recover_authoritative_commits (__main__.OperatorTests.test_four_process_kills_recover_authoritative_commits) ... ok
+test_kill_after_original_started_is_unknown_no_request (__main__.OperatorTests.test_kill_after_original_started_is_unknown_no_request) ... ok
+test_missing_credential_does_not_spend_slot (__main__.OperatorTests.test_missing_credential_does_not_spend_slot) ... ok
+test_native_windows_credential_roundtrip_synthetic_only (__main__.OperatorTests.test_native_windows_credential_roundtrip_synthetic_only) ... ok
+test_own_hot_receipt_recovers_only_in_writer_without_rerunning_children (__main__.OperatorTests.test_own_hot_receipt_recovers_only_in_writer_without_rerunning_children) ... ok
+test_persisted_enable_foreground_watch_window_disable_and_cutoff (__main__.OperatorTests.test_persisted_enable_foreground_watch_window_disable_and_cutoff) ... ok
+test_readonly_absent_and_no_invocation_or_token_lookup (__main__.OperatorTests.test_readonly_absent_and_no_invocation_or_token_lookup) ... ok
+test_source_revision_does_not_research_again_or_mix_success_refs (__main__.OperatorTests.test_source_revision_does_not_research_again_or_mix_success_refs) ... ok
+test_two_22_day_chains_original_shadow_and_rust_fake (__main__.OperatorTests.test_two_22_day_chains_original_shadow_and_rust_fake) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 126.753s
+
+OK
+{
+  "result": "PASS",
+  "tests_run": 15,
+  "failures": 0,
+  "errors": 0,
+  "checks": [
+    {
+      "check": "four_actual_process_kills",
+      "points": [
+        "after_collect",
+        "after_sync",
+        "after_shadow",
+        "after_fake"
+      ],
+      "exits": 86,
+      "collector_attempts_each": 1,
+      "fake_settlements_each": 1
+    },
+    {
+      "check": "two_22_day_original_subsystems",
+      "outcomes": [
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "INSUFFICIENT_FORWARD_WARMUP",
+        "UP_CROSS",
+        "DOWN_CROSS"
+      ],
+      "tasks": 44,
+      "settled_fake_calls": 44,
+      "registrations": 44,
+      "loopback_requests": 84,
+      "independent_decimal": true,
+      "readonly_bytes_and_mtimes_unchanged": true
+    }
+  ],
+  "verification": "developer_selftest_not_independent_acceptance",
+  "data_mode": "synthetic_test",
+  "clock": "test_only_dependency_injection_and_original_Rust_cfg_test",
+  "collector": "loopback_HTTP_schema1041_protocol_fixture_original_collector_unchanged",
+  "collection_policy": "16h_fallback_EARLY_SOURCE_UNVERIFIED_no_early_retry",
+  "implementation_sha256": {
+    "research/eod_operator.py": "1a1a633e1ae9045470a3df933ff5a33c529198ee786788f55c14ccf86dfa917b",
+    "scripts/eod-operator.py": "51184fa6deaee05c262384b77e3bf10d73164b67a80a3f79f44dd8faa8ead489",
+    "scripts/test-eod-operator.py": "5064c4eaaaf0575af098f77be442531337d99df89870b2635d4bc63027627821"
+  },
+  "public_market_requests": 0,
+  "real_llm_calls": 0,
+  "genuine_new_forward_days": 0,
+  "opening_source": "BLOCKED",
+  "historical_pit": "NOT_VERIFIED",
+  "forward_paper_allowed": false,
+  "live_allowed": false,
+  "orders": 0,
+  "fills": 0,
+  "nav": null,
+  "authority": "NO_ORDERS/NO_FILLS/NO_NAV"
+}
+Local evidence: <IGNORED_SYNTHETIC_TEST_STATE>

@@ -1,0 +1,19 @@
+{
+  "base": "6e3448d15b6e5fe47678d7aec37f4cf06980fd26",
+  "protected_tracked_files": 325,
+  "protected_git_blob_manifest_sha256": "5c0aa2d4de1e3ad973132861f98de9ea4da1f8927ecf0faff58a11ca49575bda",
+  "protected_scopes": [
+    "crates",
+    "apps",
+    "research/agent",
+    "samples",
+    "docs/evidence"
+  ],
+  "unchanged_from_base": true,
+  "changed_protected_paths": [],
+  "real_runtime_data_selected_or_opened": false,
+  "real_runtime_sha_recomparison": "NOT_PERFORMED",
+  "existing_frozen_evidence_preserved": true,
+  "real_provider_requests": 0,
+  "note": "Git content comparison, not a new real-account or historical-PIT acceptance"
+}
