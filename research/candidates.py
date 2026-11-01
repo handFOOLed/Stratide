@@ -172,6 +172,20 @@ def snapshot_provenance(task, store_name):
                 eod_eligible=False, can_execute_forward_paper=False, live_allowed=False)
 
 
+def owner_template(owner):
+    """The same finite, exact Owner contract for registration and derivation."""
+    allowed = {"schema_version", "template_id", "parameters", "hypothesis", "limitations"}
+    template = TEMPLATES.get(owner.get("template_id")) if isinstance(owner, dict) and isinstance(owner.get("template_id"), str) else None
+    supported = (isinstance(owner, dict) and set(owner) == allowed
+                 and type(owner.get("schema_version")) is int and owner["schema_version"] == 1
+                 and template is not None
+                 and canonical(owner.get("parameters")) == canonical(template["parameters"])
+                 and isinstance(owner.get("hypothesis"), str) and bool(owner["hypothesis"].strip())
+                 and isinstance(owner.get("limitations"), list)
+                 and bool(owner["limitations"]) and all(isinstance(v, str) for v in owner["limitations"]))
+    return template if supported else None
+
+
 class Registry:
     def __init__(self, name, create=False):
         require(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}", name), "REGISTRY_NAME_INVALID")
@@ -238,26 +252,14 @@ class Registry:
                 require(key in result, "AGENT_PROVENANCE_MISSING")
         provenance = snapshot_provenance(task, snapshot_store)
         # No parsing of natural language, no guessed parameters, no provider tools.
-        allowed = {"schema_version", "template_id", "parameters", "hypothesis", "limitations"}
-        template = TEMPLATES.get(owner.get("template_id")) if isinstance(owner, dict) and isinstance(owner.get("template_id"), str) else None
-        supported = (isinstance(owner, dict) and set(owner) == allowed
-                     and type(owner.get("schema_version")) is int and owner["schema_version"] == 1
-                     and template is not None
-                     and canonical(owner.get("parameters")) == canonical(template["parameters"])
-                     and isinstance(owner.get("hypothesis"), str) and bool(owner["hypothesis"].strip())
-                     and isinstance(owner.get("limitations"), list)
-                     and bool(owner["limitations"]) and all(isinstance(v, str) for v in owner["limitations"]))
+        template = owner_template(owner)
+        supported = template is not None
         material = dict(schema_version=1, owner_input=owner, saved_agent_task=task,
                         authority="owner_explicit_template" if supported else "research_only",
                         template=template if supported else None)
         if provenance is not None:
             material["snapshot_provenance"] = provenance
-        identity = digest(material)
-        path = self.path("registrations", identity).with_suffix(".json")
-        if not path.exists():
-            path.parent.mkdir(exist_ok=True)
-            write(path, dict(registration_sha256=identity, registered_at=now(), material=material))
-        self.registration(identity)
+        identity = self.save_registration(material)
         result = dict(registration_sha256=identity,
                     state="REGISTERED" if supported else "RESEARCH_ONLY",
                     reason=None if supported else "UNSUPPORTED_CANDIDATE", handoff=handoff(),
@@ -265,6 +267,32 @@ class Registry:
         if provenance is not None:
             result["snapshot_provenance"] = provenance
         return result
+
+    def save_registration(self, material):
+        identity = digest(material)
+        path = self.path("registrations", identity).with_suffix(".json")
+        if not path.exists():
+            path.parent.mkdir(exist_ok=True)
+            write(path, dict(registration_sha256=identity, registered_at=now(), material=material))
+        self.registration(identity)
+        return identity
+
+    def derive(self, parent_identity, owner):
+        """Explicit Owner association; keep the parent's historical provenance.
+
+        Caller holds the original registry writer lock. No current snapshot read,
+        task import, Agent invocation or hypothesis-to-strategy inference.
+        """
+        parent = self.registration(parent_identity)["material"]
+        require(parent["authority"] == "research_only" and parent["template"] is None
+                and parent["owner_input"] is None and parent.get("snapshot_provenance") is not None,
+                "RESEARCH_PARENT_REQUIRED")
+        template = owner_template(owner)
+        require(template is not None, "OWNER_FIXED_TEMPLATE_REQUIRED")
+        material = dict(parent, owner_input=owner, authority="owner_explicit_template", template=template,
+                        parent_registration_sha256=parent_identity,
+                        association="OWNER_EXPLICIT_ASSOCIATION_NOT_HYPOTHESIS_VALIDATION")
+        return self.save_registration(material)
 
     def source(self, identity):
         material = self.registration(identity)["material"]
