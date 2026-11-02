@@ -1,0 +1,53 @@
+{
+  "count": 1,
+  "eligibility": "ELIGIBILITY_DENIED",
+  "forward_paper_allowed": false,
+  "independent_acceptance": "NOT_VERIFIED",
+  "items": [
+    {
+      "eligibility": "ELIGIBILITY_DENIED",
+      "evaluation": "NOT_EVALUATED",
+      "forward_paper_allowed": false,
+      "independent_acceptance": "NOT_VERIFIED",
+      "live_allowed": false,
+      "next_step": "review --owner-input with an explicit fixed template",
+      "parent": {
+        "binding_sha256": "c09cd96198f20df6df51f6d61d703e849c1ed053d81c149ae3deeef2f439b7e6",
+        "current_source_verification": "NOT_RECHECKED_OFFLINE_REVIEW",
+        "frozen_input_sha256": "0ae038de0d11dd0743f9dae2d3c82b062e471470e3eab47cd915df542791b816",
+        "input_summary_version": "risk_portfolio_v1:c09cd96198f20df6df51f6d61d703e849c1ed053d81c149ae3deeef2f439b7e6:fusion",
+        "model_sha256": "f3304fdceeefd5b415523c918227b495c74dab7b4473d9cfded17ad43a5c4142",
+        "parent_registration_sha256": "91a3a2eaebb0b7103cf13c9bcec6a141d3638adbcdf766177607731f2147d49c",
+        "provider_sha256": "37c7dce103312c82081fbe3a2521efaff5e14b3d946a43309ebef25c84e23819",
+        "snapshot_provenance": {
+          "can_execute_forward_paper": false,
+          "data_mode": "synthetic_test",
+          "eod_eligible": false,
+          "expert_input_sha256": "c09cd96198f20df6df51f6d61d703e849c1ed053d81c149ae3deeef2f439b7e6",
+          "frozen_input_sha256": "0ae038de0d11dd0743f9dae2d3c82b062e471470e3eab47cd915df542791b816",
+          "input_summary_version": "risk_portfolio_v1:c09cd96198f20df6df51f6d61d703e849c1ed053d81c149ae3deeef2f439b7e6:fusion",
+          "live_allowed": false,
+          "research_task_id": "29",
+          "restriction": "RESEARCH_ONLY",
+          "risk_result_sha256": "ae172a9f9823a3e0cbef333b570ded3fd5efe64456819d24d8702a94f13fd440",
+          "risk_task_id": "28",
+          "snapshot_sha256": "7a8e4734c6138884b914de3ff7b4ea7ec849bd1dee90d5e4f462504419ee6d9a",
+          "snapshot_verification": "ORIGINAL_AGENT_AND_FROZEN_SYNTHETIC_SOURCE_VERIFIED",
+          "source_day": "2026-11-02",
+          "task_origin": "ORIGINAL_AGENT_SQLITE_VERIFIED_BY_RUNNER"
+        },
+        "source_day": "2026-11-02",
+        "task_detail_sha256": "0b72d4afbbecd4af7a22b9665334fcb9bfb04aec2a40273d5f0efc7dce15482b",
+        "task_id": "29"
+      },
+      "restriction": "RESEARCH_ONLY",
+      "state": "AWAITING_OWNER_TEMPLATE",
+      "task_origin": "TASK_ORIGIN_NOT_ATTESTED",
+      "versions": []
+    }
+  ],
+  "live_allowed": false,
+  "restriction": "RESEARCH_ONLY",
+  "schema_version": 1,
+  "task_origin": "TASK_ORIGIN_NOT_ATTESTED"
+}

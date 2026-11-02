@@ -1,0 +1,16 @@
+   Compiling ring v0.17.14
+    Checking serde_core v1.0.229
+   Compiling libsqlite3-sys v0.36.0
+    Checking chrono v0.4.45
+    Checking chrono-tz v0.10.4
+    Checking serde v1.0.229
+    Checking serde_json v1.0.154
+   Compiling rustls v0.23.46
+    Checking serde_urlencoded v0.7.1
+    Checking rusqlite v0.38.0
+    Checking rustls-webpki v0.103.16
+    Checking tokio-rustls v0.26.6
+    Checking hyper-rustls v0.27.10
+    Checking reqwest v0.12.28
+    Checking stratide-research v0.0.1 (<checkout>\research\agent)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.01s

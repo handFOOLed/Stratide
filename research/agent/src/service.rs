@@ -50,6 +50,7 @@ impl Agent {
             Settings::default()
         };
         let store = Store::open(dir, &settings)?;
+        crate::risk_binding::check_settings_path(&store, &config_path)?;
         store.recover(Utc::now())?;
         let token_path = dir.join("owner-token");
         if !token_path.exists() {

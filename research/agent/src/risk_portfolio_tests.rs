@@ -40,7 +40,7 @@ fn process_driver() {
     assert!(name.starts_with("rp-test-") && crate::eod_snapshot::valid_name(name));
     let agent = Agent::open(
         &rp::agent_dir().unwrap(),
-        None,
+        Some(&rp::settings_path().unwrap()),
         InputSummary {
             version: "fixture".into(),
             source_day: String::new(),
@@ -53,6 +53,46 @@ fn process_driver() {
     .unwrap();
     if v["hold_lock"] == true {
         fault("holding_lock");
+        return;
+    }
+    if v["legacy"] == true {
+        let selected = agent.store().setting("default_model").unwrap().unwrap();
+        let now = v["at"]
+            .as_str()
+            .map(|s| s.parse().unwrap())
+            .unwrap_or_else(chrono::Utc::now);
+        if let Some(model) = v["model"].as_str() {
+            agent
+                .control("model", &json!({"model_id":model}), now)
+                .unwrap();
+        }
+        let input = InputSummary {
+            version: "original-owner-fixture-v1".into(),
+            source_day: now.format("%Y-%m-%d").to_string(),
+            mode: "synthetic_test".into(),
+            scopes: vec!["owner_task".into()],
+            summary: json!({"fixture":"original owner research"}),
+            eod_eligible: false,
+        };
+        let request = crate::TaskRequest {
+            name: "Original Owner Agent".into(),
+            goal: "Verify shared research spending".into(),
+            scope: "owner_task".into(),
+            start_day: input.source_day.clone(),
+            end_day: input.source_day.clone(),
+            task_budget_micro: None,
+        };
+        let trigger = format!("legacy-owner-fixture:{name}");
+        let settings = crate::config::Settings::load(&rp::settings_path().unwrap()).unwrap();
+        let id = agent
+            .store()
+            .create(&settings, &request, &input, now, Some(&trigger))
+            .unwrap();
+        agent.tick_task(now, id, &trigger).unwrap();
+        agent
+            .control("model", &json!({"model_id":selected}), chrono::Utc::now())
+            .unwrap();
+        println!("RP_RESULT={}", agent.store().task(id).unwrap());
         return;
     }
     let id = v["task_id"].as_i64().unwrap();

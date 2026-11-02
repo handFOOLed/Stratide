@@ -306,7 +306,7 @@ pub fn prepare(m: &Model, input: &Value) -> Result<Prepared> {
         )
     } else {
         // Authorization must also precede any DNS/credentials/transport preparation.
-        let settings = crate::config::Settings::load(&rp::agent_dir()?.join("settings.json"))?;
+        let settings = crate::config::Settings::load(&rp::settings_path()?)?;
         m.authorize(&i.scopes, settings.budget.as_ref())?;
         let url = Url::parse(m.endpoint.as_ref().ok_or("ENDPOINT_REQUIRED")?)
             .map_err(|_| "ENDPOINT_INVALID")?;

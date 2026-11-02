@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "<checkout>\state\rerun-issue55-review-junction.py", line 19, in <module>
+    spec.loader.exec_module(module)
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "<checkout>\scripts\test-research-review.py", line 17, in <module>
+    import eod_auto as a
+ModuleNotFoundError: No module named 'eod_auto'

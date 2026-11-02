@@ -49,11 +49,11 @@ def cli(*args, code=0):
 
 
 def settings():
-    return p.read(p.root() / ".agent/settings.json")
+    return p.read(p.settings_path())
 
 
 def save_settings(value):
-    p.c.write(p.root() / ".agent/settings.json", value)
+    p.c.write(p.settings_path(), value)
 
 
 def setup(label, scenario="calm", version="novel-v1"):
@@ -66,7 +66,7 @@ def queue(run, phase="risk"):
     return p.bridge("queue", run.name, phase)
 
 
-def driver(run, task, *, point=None, behavior="wait", port=None, hold=False):
+def driver(run, task, *, point=None, behavior="wait", port=None, hold=False, legacy=False, at=None, model=None):
     env = dict(os.environ, STRATIDE_RP_TEST_DRIVER="1",
                STRATIDE_RESEARCH_KEY_GOOGLE="never-send-real-env-secret-55",
                STRATIDE_RESEARCH_KEY_DEEPSEEK="never-send-real-env-secret-55",
@@ -80,7 +80,7 @@ def driver(run, task, *, point=None, behavior="wait", port=None, hold=False):
         env["STRATIDE_RP_TEST_LOOPBACK_PORT"] = str(port)
     process = subprocess.Popen([str(DRIVER), "--exact", "risk_portfolio_tests::process_driver", "--nocapture"],
                                cwd=ROOT, env=env, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    process.stdin.write(json.dumps(dict(batch=run.name, task_id=int(task["id"]) if task else None, hold_lock=hold)).encode())
+    process.stdin.write(json.dumps(dict(batch=run.name, task_id=int(task["id"]) if task else None, hold_lock=hold, legacy=legacy, at=at, model=model)).encode())
     process.stdin.close()
     process.stdin = None
     return process
@@ -137,10 +137,28 @@ def server(response, mode="ok"):
 class PortfolioTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cli("init")
+        common = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"], cwd=ROOT, capture_output=True, check=True)
+        assert Path(os.fsdecode(common.stdout).strip()).resolve().parent == ROOT, "Use an isolated Git checkout; never bind the Owner's checkout for tests"
+        cls.owner = ROOT / "state/original-owner-agent"
+        fresh = not cls.owner.exists()
+        if fresh:
+            original = subprocess.run([str(ROOT / "target/debug/stratided.exe"), "--agent-init-fake", str(cls.owner)], cwd=ROOT, capture_output=True)
+            assert original.returncode == 0
+        else:
+            assert Path(p.binding()["agent_dir"]).resolve() == cls.owner.resolve()
+        prior = p.read(cls.owner / "settings.json")
+        if fresh:
+            assert cli("init", code=2)["reason"] == "CLOUD_AGENT_BINDING_REQUIRED"
+        assert not (p.root() / ".agent").exists()
+        cli("init", "--agent-dir", cls.owner)
+        assert p.read(cls.owner / "settings.json") == prior
+        cli("configure-recorded")
         cls.original = settings()
         assert cls.original["budget"]["currency"] == "TST"
-        assert all(m["cloud"]["transport"] == "recorded" for m in cls.original["models"])
+        assert cls.original["budget"] == prior["budget"] and cls.original["models"][:len(prior["models"])] == prior["models"]
+        assert all(m["cloud"]["transport"] == "recorded" for m in cls.original["models"] if m["kind"] != "fake")
+        with p.agent_db() as db:
+            assert dict(db.execute("SELECT key,value FROM meta"))["default_model"] == "fake"
         cli("enable")
 
     def tearDown(self):
@@ -262,7 +280,7 @@ class PortfolioTests(unittest.TestCase):
             else:
                 config = settings()
                 if change == "revoke":
-                    config["models"][0]["grant"]["revoked"] = True
+                    next(m for m in config["models"] if m["id"] == "risk-timesfm")["grant"]["revoked"] = True
                 else:
                     config["budget"]["daily_limit_micro"] = 1
                 save_settings(config)
@@ -292,13 +310,13 @@ class PortfolioTests(unittest.TestCase):
         (run.root / "test-release").write_text("continue"); finish(process)
         q = queue(run)
         # A durable prior-period unknown bill is kept in the same original calls table.
-        with sqlite3.connect(p.root() / ".agent/agent.sqlite") as db:
+        with contextlib.closing(sqlite3.connect(p.agent_dir() / "agent.sqlite")) as db, db:
             db.execute("INSERT INTO calls(task_id,day,month,maximum_micro,price_version,state,created_at) VALUES(?,?,?,?,?,'outcome_uncertain',?)",
                        (int(q["id"]), "2026-10-31", "2026-10", 1000000, "synthetic-cross-period", "2026-10-31T23:59:00Z"))
         fresh = setup("held")
         assert cli("--name", fresh.name, "once", code=2)["reason"] == "DAILY_BUDGET_EXHAUSTED"
         # Explicit synthetic test cleanup is a bill settlement, never deleting reservations/history.
-        with sqlite3.connect(p.root() / ".agent/agent.sqlite") as db:
+        with contextlib.closing(sqlite3.connect(p.agent_dir() / "agent.sqlite")) as db, db:
             db.execute("UPDATE calls SET state='settled',settled_micro=0,reason='SYNTHETIC_TEST_INVOICE_ZERO' WHERE price_version='synthetic-cross-period'")
         FACTS.append(dict(case="caps-and-two-process-exclusion", batch_daily_monthly_rejected=True, cross_period_maximum_held=True))
 
@@ -364,24 +382,92 @@ class PortfolioTests(unittest.TestCase):
         authority = p.root()
         with patch.dict(os.environ, dict(GIT_DIR=str(ROOT / "state/nonexistent-git-dir"), GIT_WORK_TREE="invalid", GIT_COMMON_DIR="invalid")):
             assert p.root() == authority
-            assert p.bridge("descriptor")[0]["id"] == "risk-timesfm"
+            assert "risk-timesfm" in {m["id"] for m in p.bridge("descriptor")}
         assert p.task(q["id"])["calls"] == []
         FACTS.append(dict(case="immutable-authority-and-batch-owner", copied_batch_dispatched=0, git_environment_reset=False))
 
     def test_10_actual_task_provider_must_match_the_frozen_stage_pin(self):
         config = settings()
-        extra = copy.deepcopy(config["models"][0]); extra["id"] = "other-risk-provider"
+        extra = copy.deepcopy(next(m for m in config["models"] if m["id"] == "risk-timesfm")); extra["id"] = "other-risk-provider"
         config["models"].append(extra); save_settings(config)
         run = setup("wrong-model")
         q = queue(run)
         # Simulate a wrong caller choosing another otherwise configured/authorized model.
         descriptor = {m["id"]: m for m in p.bridge("descriptor")}
-        with sqlite3.connect(p.root() / ".agent/agent.sqlite") as db:
+        with contextlib.closing(sqlite3.connect(p.agent_dir() / "agent.sqlite")) as db, db:
             db.execute("UPDATE tasks SET provider_id=?,provider_hash=? WHERE id=?",
                        (extra["id"], descriptor[extra["id"]]["fingerprint"], int(q["id"])))
         result = p.bridge("tick", run.name, "risk")
         assert result["reason"] == "PINNED_CLOUD_TASK_MODEL_MISMATCH" and result["calls"] == []
         FACTS.append(dict(case="actual-provider-pin-mismatch", calls=0, rejected=True))
+
+    def test_11_original_agent_spend_and_both_cloud_stages_share_daily_monthly_caps(self):
+        for period in ("daily", "monthly"):
+            legacy_run = setup("legacy-spend-" + period)
+            encoded = finish(driver(legacy_run, None, legacy=True))
+            legacy = json.loads(next(line.removeprefix(b"RP_RESULT=") for line in encoded.splitlines() if line.startswith(b"RP_RESULT=")))
+            assert legacy["status"] == "completed" and legacy["result"]["provider_kind"] == "fake"
+            assert int(legacy["calls"][0]["settled_micro"]) > 0
+            view = p.status()
+            descriptor = {m["id"]: m for m in p.bridge("descriptor")}
+            maximum = descriptor["risk-timesfm"]["maximum_micro"] + descriptor["fusion-deepseek"]["maximum_micro"]
+            config = settings()
+            config["budget"]["daily_limit_micro"] = view["daily_settled_micro"] + view["held_maximum_micro"] + maximum + 100000
+            config["budget"]["monthly_limit_micro"] = view["monthly_settled_micro"] + view["held_maximum_micro"] + maximum + 100000
+            config["budget"][period + "_limit_micro"] -= 100001
+            save_settings(config)
+            run = setup("shared-" + period)
+            result = cli("--name", run.name, "once", code=2)
+            assert result["phase"] == "fusion" and result["reason"] == period.upper() + "_BUDGET_EXHAUSTED"
+            assert len(run.task_for(run.intent("risk"))["calls"]) == 1
+            assert run.task_for(run.intent("fusion"))["calls"] == []
+            with p.agent_db() as db:
+                assert db.execute("SELECT settled_micro FROM calls WHERE id=?", (int(legacy["calls"][0]["id"]),)).fetchone()[0] > 0
+                assert dict(db.execute("SELECT key,value FROM meta"))["default_model"] == "fake"
+                assert db.execute("SELECT COUNT(*) FROM tasks WHERE trigger_key=?", ("legacy-owner-fixture:" + legacy_run.name,)).fetchone()[0] == 1
+            FACTS.append(dict(case="original-agent-spend-shared-" + period, legacy_task=legacy["id"], legacy_call=legacy["calls"][0]["id"],
+                              cloud_risk_task=result["task_id"], rejected=result["reason"], same_existing_database=True, default_model_unchanged=True))
+            save_settings(self.original)
+
+    def test_12_original_agent_unknown_cost_survives_month_boundary_into_cloud_gate(self):
+        run = setup("legacy-month")
+        prior = dt.datetime.now(p.j.ZONE).replace(day=1,hour=0,minute=0,second=0,microsecond=0) - dt.timedelta(minutes=1)
+        encoded = finish(driver(run, None, legacy=True, model="fake-unknown", at=prior.isoformat()))
+        legacy = json.loads(next(line.removeprefix(b"RP_RESULT=") for line in encoded.splitlines() if line.startswith(b"RP_RESULT=")))
+        call = legacy["calls"][0]
+        assert legacy["status"] == "outcome_uncertain" and call["state"] == "outcome_uncertain"
+        assert call["month"] != dt.datetime.now(p.j.ZONE).strftime("%Y-%m")
+        view = p.status(); descriptor = {m["id"]: m for m in p.bridge("descriptor")}
+        config = settings()
+        config["budget"]["daily_limit_micro"] = view["daily_settled_micro"] + view["held_maximum_micro"] + descriptor["risk-timesfm"]["maximum_micro"] + descriptor["fusion-deepseek"]["maximum_micro"] - 1
+        save_settings(config)
+        cloud_run = setup("new-month-cloud")
+        blocked = cli("--name", cloud_run.name, "once", code=2)
+        assert blocked["phase"] == "fusion" and blocked["reason"] == "DAILY_BUDGET_EXHAUSTED"
+        with p.agent_db() as db:
+            state, maximum, settled = db.execute("SELECT state,maximum_micro,settled_micro FROM calls WHERE id=?", (int(call["id"]),)).fetchone()
+            assert state == "outcome_uncertain" and maximum == int(call["maximum_micro"]) and settled == 0
+        FACTS.append(dict(case="legacy-month-boundary-unknown", legacy_task=legacy["id"], legacy_call=call["id"],
+                          maximum_held=maximum, old_month=call["month"], new_cloud_rejected=blocked["reason"], retries=0, database_rebuilt=False))
+
+    def test_13_binding_does_not_create_or_switch_cost_authority(self):
+        other = ROOT / ("state/other-original-agent-" + os.urandom(3).hex())
+        init = subprocess.run([str(ROOT / "target/debug/stratided.exe"), "--agent-init-fake", str(other)], cwd=ROOT, capture_output=True)
+        assert init.returncode == 0
+        before = p.status()
+        denied = cli("init", "--agent-dir", other, code=2)
+        assert denied["reason"] == "CLOUD_AGENT_BINDING_IMMUTABLE"
+        assert p.status() == before and not (p.root() / ".agent").exists()
+        original = (p.root() / "agent-binding.json").read_bytes()
+        mutated = p.binding(); mutated["authority_id"] = "f" * 64
+        p.c.write(p.root() / "agent-binding.json", mutated)
+        try:
+            assert cli("status", code=2)["reason"] == "CLOUD_AGENT_AUTHORITY_CHANGED"
+        finally:
+            (p.root() / "agent-binding.json").write_bytes(original)
+        assert p.status() == before
+        FACTS.append(dict(case="explicit-existing-authority-binding", silent_new_database=False, rebinding_rejected=True,
+                          changed_authority_rejected=True, budget_and_calls_unchanged=True))
 
 
 def main():

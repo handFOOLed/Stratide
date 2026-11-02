@@ -15,7 +15,8 @@ pub fn adapter_sha() -> String {
     hash(
         concat!(
             include_str!("risk_cloud.rs"),
-            include_str!("risk_portfolio.rs")
+            include_str!("risk_portfolio.rs"),
+            include_str!("risk_binding.rs")
         )
         .as_bytes(),
     )
@@ -45,7 +46,10 @@ pub fn root() -> Result<PathBuf> {
         .join("state/risk-portfolio"))
 }
 pub fn agent_dir() -> Result<PathBuf> {
-    Ok(root()?.join(".agent"))
+    Ok(crate::risk_binding::read()?.agent_dir)
+}
+pub fn settings_path() -> Result<PathBuf> {
+    Ok(crate::risk_binding::read()?.settings_path)
 }
 pub fn is_input(i: &InputSummary) -> bool {
     i.scopes.iter().any(|s| SCOPES.contains(&s.as_str()))
@@ -351,6 +355,7 @@ pub fn gate(
     now: DateTime<Utc>,
     settings: &Settings,
 ) -> Result<()> {
+    crate::risk_binding::read()?.verify(c)?;
     let (t, f) = context(i, now)?;
     ensure(
         trigger == Some(format!("{POLICY}:{}:{}:{}", t.batch, t.frozen_sha256, t.phase).as_str()),

@@ -1,0 +1,26 @@
+{
+  "adapter_sha256": "a200f6a523f3ea227809bace829e626475c78eed0f63a4780c53dcae1ac0fc01",
+  "binding_created_only_in_synthetic_checkout": true,
+  "existing_owner_calls_or_budget_deleted": false,
+  "isolated_checkout_source_matches": true,
+  "source_manifest_verified_at_utc": "2026-11-02T02:57:50.490323+00:00",
+  "source_sha256": {
+    "research/agent/src/bin/risk-portfolio-agent.rs": "eb72b5d1bc11cff4fd3dabcde5ae314ef7c40aa6477fb97bc36a0edf267aa7cf",
+    "research/agent/src/budget.rs": "f5bf1997b26cdb992cdb64aa27fa32854513d961796e9bb2682d872a23c22da8",
+    "research/agent/src/config.rs": "1921f855ffd626a9920d0fbbb3ee8e4814f3bbc13eb8e33cd3c4dfc927bbb2f6",
+    "research/agent/src/lib.rs": "9775fd9a146be0ce3390dcad4145f4f2063b30a8b896a97ef449817135a228d5",
+    "research/agent/src/provider.rs": "7c1c7027477c104ba69f2b64c9de45350ac9d6da9feefddeed69e8e514ce91f9",
+    "research/agent/src/risk_binding.rs": "a5fca62e40a53747729c0f82baf3df37b5bc3bf512f15c280936f00cd4a55148",
+    "research/agent/src/risk_cloud.rs": "207f14e6ffe11b514507c71ef001a6cc78eb25f32f141cfe803409a3776b6157",
+    "research/agent/src/risk_portfolio.rs": "40654b2ffb349cb5c0055054b329c8ed364faff5d9b6d60060ab4a49be462547",
+    "research/agent/src/risk_portfolio_tests.rs": "f7a721cfcee1b84734837e6d3bd53c3082c7400afe6353b1966de5fd7bf13f7d",
+    "research/agent/src/service.rs": "20ccf6f79f6f725ec616e9a3eaf6d1a8a2443817e62a4991d118fa762d5cd19f",
+    "research/agent/src/store.rs": "0ab6d375c2841d0cf1f9505bf847385a58f029997b8f5aba026028a6ac357021",
+    "research/agent/tests/shared_budget.rs": "40b0c8f25840b1c58d587476789965e98ee689c2b279dd4f498041fd63ee27df",
+    "research/candidates.py": "a2424fd8542d16da4974b51daa2d4dd247de5a068d712371e7cf94a3a4415684",
+    "research/portfolio_research.py": "65df98bde2dde3378ce5be0950b4065cddc743796b0e5cc57c9c0b4ed0663ad7",
+    "research/review.py": "38f88f060b858c74ebd484c34ecc12e70eebb0ad1a033db3fd3983be85f65ad9",
+    "scripts/risk-portfolio.py": "2e098c3f5155623ffc65ee60bc78fb52eac3f1a9d4206579e31eea11445078fd",
+    "scripts/test-risk-portfolio.py": "0aad2d8f81a0a1b9859f859349dec1269f84e6410622a63625d4d2d1866a6916"
+  }
+}

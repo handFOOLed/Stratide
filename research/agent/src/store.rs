@@ -163,11 +163,23 @@ impl Store {
         now: DateTime<Utc>,
         trigger: Option<&str>,
     ) -> Result<i64> {
-        request.validate()?;
-        self.capacity(settings)?;
         let id = self
             .setting("default_model")?
             .ok_or("DEFAULT_MODEL_UNCONFIGURED")?;
+        self.create_for_model(settings, request, input, now, trigger, &id)
+    }
+    /// Targeted research must not change the Owner's default model selection.
+    pub fn create_for_model(
+        &self,
+        settings: &Settings,
+        request: &TaskRequest,
+        input: &InputSummary,
+        now: DateTime<Utc>,
+        trigger: Option<&str>,
+        id: &str,
+    ) -> Result<i64> {
+        request.validate()?;
+        self.capacity(settings)?;
         let model = settings
             .models
             .iter()

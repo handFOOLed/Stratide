@@ -1,0 +1,1572 @@
+{
+  "billable_calls": 0,
+  "commands": [
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "init",
+        "--agent-dir",
+        "<synthetic-checkout>\\state\\original-owner-agent"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "configure-recorded"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-calm-b994",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-calm-b994",
+        "once"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-calm-b994",
+        "once"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-calm-b994",
+        "verify"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-calm-b994",
+        "report"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "status"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "models"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "history"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-calm-b994",
+        "inbox"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-stress-a2b6",
+        "synthetic-freeze",
+        "--scenario",
+        "stress",
+        "--strategy-version",
+        "novel-v2"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-stress-a2b6",
+        "once"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-stress-a2b6",
+        "once"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-stress-a2b6",
+        "verify"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-stress-a2b6",
+        "report"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "status"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "models"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "history"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-stress-a2b6",
+        "inbox"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-loopback-f2d1",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-timeout-dc0f",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-timeout-dc0f",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-redirect-faea",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-redirect-faea",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-after_dispatch-1fe0",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-after_provider_result-9e09",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-after_settled-f2a9",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-revokebef-b1f1",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-revokeaft-ab42",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-capaft-5bfd",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-receiptaft-6210",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-disableaft-de7a",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "disable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-caps-741f",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-caps-741f",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-dai-b5d5",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-dai-b5d5",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-mon-0701",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-mon-0701",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-lock-3d89",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-lock-3d89",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-held-7758",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-held-7758",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-context-90a0",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-context-90a0",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-future-2b26",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-future-2b26",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-real-487e",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-real-487e",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-weights-935a",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-weights-935a",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-unknown_position-ab22",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-unknown_position-ab22",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-infinite-8927",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-infinite-8927",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-receipt-d1ee",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-receipt-d1ee",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-secret-response-9aaf",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-owner-1a30",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-copied",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-wrong-model-0792",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-legacy-spend-daily-0194",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-shared-daily-7365",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-shared-daily-7365",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-legacy-spend-monthly-cd4e",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-shared-monthly-b395",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-shared-monthly-b395",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-legacy-month-3122",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-new-month-cloud-36d4",
+        "synthetic-freeze",
+        "--scenario",
+        "calm",
+        "--strategy-version",
+        "novel-v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "--name",
+        "rp-test-588a39e3-new-month-cloud-36d4",
+        "once"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "init",
+        "--agent-dir",
+        "<synthetic-checkout>\\state\\other-original-agent-e5b984"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "status"
+      ],
+      "exit_code": 2
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/risk-portfolio.py",
+        "enable"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "errors": 0,
+  "facts": [
+    {
+      "case": "calm",
+      "comparisons": [
+        {
+          "cloud_recording_absolute_error": 0.002048939502233685,
+          "ewma_absolute_error": 6.361406741944723e-05,
+          "horizon": 5,
+          "instrument": "600000.SH",
+          "naive_absolute_error": 3.181667938474469e-05,
+          "synthetic_realized_proxy": 0.0019510604977663153
+        },
+        {
+          "cloud_recording_absolute_error": 0.0020471262165451263,
+          "ewma_absolute_error": 6.180078173088671e-05,
+          "horizon": 20,
+          "instrument": "600000.SH",
+          "naive_absolute_error": 3.0003393696184178e-05,
+          "synthetic_realized_proxy": 0.0019528737834548758
+        },
+        {
+          "cloud_recording_absolute_error": 0.002028569059513642,
+          "ewma_absolute_error": 2.537222465862467e-05,
+          "horizon": 5,
+          "instrument": "000001.SZ",
+          "naive_absolute_error": 6.222800632756402e-05,
+          "synthetic_realized_proxy": 0.001971430940486358
+        },
+        {
+          "cloud_recording_absolute_error": 0.0020435514284889694,
+          "ewma_absolute_error": 1.0389855683298928e-05,
+          "horizon": 20,
+          "instrument": "000001.SZ",
+          "naive_absolute_error": 4.724563735223827e-05,
+          "synthetic_realized_proxy": 0.0019564485715110325
+        },
+        {
+          "cloud_recording_absolute_error": 0.0020413700576029084,
+          "ewma_absolute_error": 1.2425567071795273e-05,
+          "horizon": 5,
+          "instrument": "600519.SH",
+          "naive_absolute_error": 1.5735664331786858e-05,
+          "synthetic_realized_proxy": 0.0019586299423970917
+        },
+        {
+          "cloud_recording_absolute_error": 0.0020446707916046527,
+          "ewma_absolute_error": 1.5726301073537823e-05,
+          "horizon": 20,
+          "instrument": "600519.SH",
+          "naive_absolute_error": 1.903639833352941e-05,
+          "synthetic_realized_proxy": 0.001955329208395349
+        }
+      ],
+      "predictive_claim": "NONE_SYNTHETIC_RECORDED_ONLY",
+      "refusal_rate": 0
+    },
+    {
+      "case": "stress",
+      "comparisons": [
+        {
+          "cloud_recording_absolute_error": 0.008887929424961569,
+          "ewma_absolute_error": 0.00036622055035519935,
+          "horizon": 5,
+          "instrument": "600000.SH",
+          "naive_absolute_error": 0.0008434457365167972,
+          "synthetic_realized_proxy": 0.04888792942496157
+        },
+        {
+          "cloud_recording_absolute_error": 0.008689616135106604,
+          "ewma_absolute_error": 0.0001679072605002413,
+          "horizon": 20,
+          "instrument": "600000.SH",
+          "naive_absolute_error": 0.0006451324466618391,
+          "synthetic_realized_proxy": 0.04868961613510661
+        },
+        {
+          "cloud_recording_absolute_error": 0.008696608373716441,
+          "ewma_absolute_error": 0.0005424985340975394,
+          "horizon": 5,
+          "instrument": "000001.SZ",
+          "naive_absolute_error": 0.0007435199807182824,
+          "synthetic_realized_proxy": 0.04869660837371644
+        },
+        {
+          "cloud_recording_absolute_error": 0.008680931713323979,
+          "ewma_absolute_error": 0.0005268218737050842,
+          "horizon": 20,
+          "instrument": "000001.SZ",
+          "naive_absolute_error": 0.0007278433203258272,
+          "synthetic_realized_proxy": 0.04868093171332399
+        },
+        {
+          "cloud_recording_absolute_error": 0.008749592514094712,
+          "ewma_absolute_error": 0.0011053168688367962,
+          "horizon": 5,
+          "instrument": "600519.SH",
+          "naive_absolute_error": 0.001231641743465954,
+          "synthetic_realized_proxy": 0.04874959251409471
+        },
+        {
+          "cloud_recording_absolute_error": 0.008583385532544771,
+          "ewma_absolute_error": 0.0012715238503867299,
+          "horizon": 20,
+          "instrument": "600519.SH",
+          "naive_absolute_error": 0.0013978487250158877,
+          "synthetic_realized_proxy": 0.04858338553254478
+        }
+      ],
+      "predictive_claim": "NONE_SYNTHETIC_RECORDED_ONLY",
+      "refusal_rate": 0
+    },
+    {
+      "case": "production-loopback",
+      "real_cloud_calls": 0,
+      "real_key_sent": false,
+      "requests": 2,
+      "system_proxy_bypassed": true
+    },
+    {
+      "case": "timeout",
+      "post_dispatch": "OUTCOME_UNCERTAIN",
+      "requests": 1,
+      "reservation_held": 1000,
+      "retries": 0
+    },
+    {
+      "case": "redirect",
+      "post_dispatch": "OUTCOME_UNCERTAIN",
+      "requests": 1,
+      "reservation_held": 1000,
+      "retries": 0
+    },
+    {
+      "actual_process_kill": true,
+      "call_state": "outcome_uncertain",
+      "calls": 1,
+      "case": "after_dispatch",
+      "recovered": "outcome_uncertain",
+      "retries": 0
+    },
+    {
+      "actual_process_kill": true,
+      "call_state": "outcome_uncertain",
+      "calls": 1,
+      "case": "after_provider_result",
+      "recovered": "outcome_uncertain",
+      "retries": 0
+    },
+    {
+      "actual_process_kill": true,
+      "call_state": "settled",
+      "calls": 1,
+      "case": "after_settled",
+      "recovered": "outcome_uncertain",
+      "retries": 0
+    },
+    {
+      "boundary": "before_reserve",
+      "case": "revoke",
+      "dispatched": 0,
+      "durable_reason": "PINNED_MODEL_CONFIGURATION_CHANGED"
+    },
+    {
+      "boundary": "after_reserve",
+      "case": "revoke",
+      "dispatched": 0,
+      "durable_reason": "PINNED_MODEL_CONFIGURATION_CHANGED"
+    },
+    {
+      "boundary": "after_reserve",
+      "case": "cap",
+      "dispatched": 0,
+      "durable_reason": "DAILY_BUDGET_EXHAUSTED"
+    },
+    {
+      "boundary": "after_reserve",
+      "case": "receipt",
+      "dispatched": 0,
+      "durable_reason": "FROZEN_SOURCE_OR_RECEIPT_CHANGED"
+    },
+    {
+      "boundary": "after_reserve",
+      "case": "disable",
+      "dispatched": 0,
+      "durable_reason": "CLOUD_RESEARCH_DISABLED"
+    },
+    {
+      "batch_daily_monthly_rejected": true,
+      "case": "caps-and-two-process-exclusion",
+      "cross_period_maximum_held": true
+    },
+    {
+      "automatic_repairs": 0,
+      "case": "context",
+      "reason": "INSUFFICIENT_MODEL_CONTEXT",
+      "result": "REJECTED_ENTIRE_PROPOSAL_OR_INPUT"
+    },
+    {
+      "automatic_repairs": 0,
+      "case": "future",
+      "reason": "BAD_OR_FUTURE_OBSERVATION",
+      "result": "REJECTED_ENTIRE_PROPOSAL_OR_INPUT"
+    },
+    {
+      "automatic_repairs": 0,
+      "case": "real",
+      "reason": "REAL_READINESS_BLOCKED",
+      "result": "REJECTED_ENTIRE_PROPOSAL_OR_INPUT"
+    },
+    {
+      "automatic_repairs": 0,
+      "case": "weights",
+      "reason": "TARGET_PORTFOLIO_INVALID",
+      "result": "REJECTED_ENTIRE_PROPOSAL_OR_INPUT"
+    },
+    {
+      "automatic_repairs": 0,
+      "case": "unknown_position",
+      "reason": "PORTFOLIO_SOURCE_OR_INSTRUMENT_UNVERIFIED",
+      "result": "REJECTED_ENTIRE_PROPOSAL_OR_INPUT"
+    },
+    {
+      "automatic_repairs": 0,
+      "case": "infinite",
+      "reason": "PORTFOLIO_SCHEMA",
+      "result": "REJECTED_ENTIRE_PROPOSAL_OR_INPUT"
+    },
+    {
+      "automatic_repairs": 0,
+      "case": "receipt",
+      "reason": "OUTBOUND_RECEIPT_CHANGED_NEW_TASK_REQUIRED",
+      "result": "REJECTED_ENTIRE_PROPOSAL_OR_INPUT"
+    },
+    {
+      "case": "sensitive-error-redaction",
+      "raw_error_saved": false,
+      "raw_result_hash_saved": true,
+      "reservation_held": true
+    },
+    {
+      "case": "immutable-authority-and-batch-owner",
+      "copied_batch_dispatched": 0,
+      "git_environment_reset": false
+    },
+    {
+      "calls": 0,
+      "case": "actual-provider-pin-mismatch",
+      "rejected": true
+    },
+    {
+      "case": "original-agent-spend-shared-daily",
+      "cloud_risk_task": "59",
+      "default_model_unchanged": true,
+      "legacy_call": "46",
+      "legacy_task": "57",
+      "rejected": "DAILY_BUDGET_EXHAUSTED",
+      "same_existing_database": true
+    },
+    {
+      "case": "original-agent-spend-shared-monthly",
+      "cloud_risk_task": "62",
+      "default_model_unchanged": true,
+      "legacy_call": "48",
+      "legacy_task": "60",
+      "rejected": "MONTHLY_BUDGET_EXHAUSTED",
+      "same_existing_database": true
+    },
+    {
+      "case": "legacy-month-boundary-unknown",
+      "database_rebuilt": false,
+      "legacy_call": "50",
+      "legacy_task": "63",
+      "maximum_held": 34816,
+      "new_cloud_rejected": "DAILY_BUDGET_EXHAUSTED",
+      "old_month": "2026-10",
+      "retries": 0
+    },
+    {
+      "budget_and_calls_unchanged": true,
+      "case": "explicit-existing-authority-binding",
+      "changed_authority_rejected": true,
+      "rebinding_rejected": true,
+      "silent_new_database": false
+    }
+  ],
+  "failures": 0,
+  "independent_acceptance": "NOT_VERIFIED",
+  "paper_live_orders": 0,
+  "real_cloud_calls": 0,
+  "tests": 13
+}

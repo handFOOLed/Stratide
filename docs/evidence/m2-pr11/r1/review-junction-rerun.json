@@ -1,0 +1,18 @@
+{
+  "started_at_utc": "2026-11-02T02:56:22.104799+00:00",
+  "duration_seconds": 1.78,
+  "test": "ReviewTests.test_owner_parameter_injection_and_junction_never_run",
+  "tests_run": 1,
+  "failures": 0,
+  "errors": 0,
+  "unchanged_original_test": true,
+  "original_checks": [
+    {
+      "check": "owner_parameter_and_link_injection",
+      "rejected": 7,
+      "counts_unchanged": true
+    }
+  ],
+  "normal_windows_permissions": true,
+  "real_cloud_calls": 0
+}

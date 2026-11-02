@@ -46,6 +46,35 @@ def read(path, limit=262144):
     return c.read(path, limit)
 
 
+def binding():
+    path = root() / "agent-binding.json"
+    j.require(path.is_file(), "CLOUD_AGENT_BINDING_REQUIRED")
+    value = read(path, 8192)
+    j.require(set(value) == {"schema_version", "agent_dir", "settings_path", "authority_id"}
+              and value["schema_version"] == 1 and re.fullmatch(r"[a-f0-9]{64}", value["authority_id"]), "CLOUD_AGENT_BINDING_INVALID")
+    for path in (Path(value["agent_dir"]), Path(value["settings_path"]), Path(value["agent_dir"]) / "agent.sqlite"):
+        c.no_links(path)
+        j.require(path.exists(), "EXISTING_OWNER_AGENT_REQUIRED")
+    return value
+
+
+def agent_dir():
+    return Path(binding()["agent_dir"])
+
+
+def settings_path():
+    return Path(binding()["settings_path"])
+
+
+def verify_authority(db, bound):
+    j.require(db.execute("PRAGMA application_id").fetchone()[0] == 1397899569
+              and db.execute("PRAGMA user_version").fetchone()[0] == 1, "ORIGINAL_AGENT_SCHEMA_REQUIRED")
+    meta = dict(db.execute("SELECT key,value FROM meta WHERE key IN ('risk_portfolio_authority_id','risk_portfolio_settings_path')"))
+    j.require(meta.get("risk_portfolio_authority_id") == bound["authority_id"]
+              and Path(meta.get("risk_portfolio_settings_path", "")).resolve() == Path(bound["settings_path"]).resolve(),
+              "CLOUD_AGENT_AUTHORITY_CHANGED")
+
+
 def bridge(*args):
     j.require(EXE.is_file(), "RISK_PORTFOLIO_AGENT_NOT_BUILT")
     p = subprocess.Popen([str(EXE), *args], cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -63,8 +92,9 @@ def bridge(*args):
 
 @contextlib.contextmanager
 def agent_db():
-    with s.readonly(root() / ".agent/agent.sqlite") as db:
-        j.require(db.execute("PRAGMA application_id").fetchone()[0] == 1397899569, "ORIGINAL_AGENT_SCHEMA_REQUIRED")
+    bound = binding()
+    with s.readonly(Path(bound["agent_dir"]) / "agent.sqlite") as db:
+        verify_authority(db, bound)
         yield db
 
 
@@ -96,19 +126,21 @@ def result_sha(task_id):
 
 def control(enabled):
     """Owner-local opt-in/stop can commit while the original Agent owns its lock."""
-    path = root() / ".agent/agent.sqlite"
+    bound = binding()
+    path = Path(bound["agent_dir"]) / "agent.sqlite"
     for file in (path, *s.sidecars(path)):
         c.no_links(file)
     j.require(path.is_file(), "ORIGINAL_AGENT_STORE_REQUIRED")
     if enabled:
-        config = read(root() / ".agent/settings.json")
-        j.require(config["budget"]["currency"] == "TST" and all(m.get("cloud", {}).get("transport") == "recorded" for m in config["models"]),
+        config = read(Path(bound["settings_path"]))
+        models = [m for m in config["models"] if m["kind"] in ("bigquery_forecast_v1", "deepseek_portfolio_v1")]
+        j.require(config["budget"]["currency"] == "TST" and {m["kind"] for m in models} == {"bigquery_forecast_v1", "deepseek_portfolio_v1"}
+                  and all(m["cloud"]["transport"] == "recorded" for m in models),
                   "CLOUD_NOT_AUTHORIZED")
     with contextlib.closing(sqlite3.connect(path.as_uri() + "?mode=rw", uri=True, timeout=5)) as db:
         db.execute("PRAGMA synchronous=FULL")
         db.execute("BEGIN IMMEDIATE")
-        j.require(db.execute("PRAGMA application_id").fetchone()[0] == 1397899569
-                  and db.execute("PRAGMA user_version").fetchone()[0] == 1, "ORIGINAL_AGENT_SCHEMA_REQUIRED")
+        verify_authority(db, bound)
         db.execute("INSERT INTO meta VALUES('risk_portfolio_enabled',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
                    ("true" if enabled else "false",))
         db.commit()
@@ -253,7 +285,7 @@ class ReviewSource(Run):
         return self.name
 
     def settings(self):
-        return read(root() / ".agent/settings.json")
+        return read(settings_path())
 
     def validate_intent(self, key, intent):
         j.require(key == digest(self.frozen()) and intent == self.intent("fusion"), "PORTFOLIO_INTENT_CHANGED")
@@ -325,7 +357,8 @@ def synthetic_freeze(name, scenario, version):
 
 
 def status():
-    config = read(root() / ".agent/settings.json")
+    bound = binding()
+    config = read(Path(bound["settings_path"]))
     with agent_db() as db:
         enabled = db.execute("SELECT value FROM meta WHERE key='risk_portfolio_enabled'").fetchone()
         counts = dict(tasks=db.execute("SELECT COUNT(*) FROM tasks").fetchone()[0], calls=db.execute("SELECT COUNT(*) FROM calls").fetchone()[0])
@@ -337,7 +370,8 @@ def status():
                 daily_settled_micro=daily, monthly_settled_micro=monthly,
                 daily_remaining_micro=max(0, config["budget"]["daily_limit_micro"]-daily-held),
                 monthly_remaining_micro=max(0, config["budget"]["monthly_limit_micro"]-monthly-held),
-                models=[{k: m[k] for k in ("id", "model", "kind", "endpoint", "cloud", "grant")} for m in config["models"]],
+                authority_id=bound["authority_id"], agent_dir=bound["agent_dir"],
+                models=[{k: m.get(k) for k in ("id", "model", "kind", "endpoint", "cloud", "grant")} for m in config["models"]],
                 cloud="CLOUD_NOT_AUTHORIZED", billing="NOT_BILLED", **counts, **SAFE)
 
 
@@ -345,7 +379,10 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--name")
     commands = parser.add_subparsers(dest="command", required=True)
-    for command in ("init", "enable", "disable", "models", "status", "history", "once", "verify", "report", "inbox"):
+    init = commands.add_parser("init")
+    init.add_argument("--agent-dir", type=Path)
+    init.add_argument("--agent-config", type=Path)
+    for command in ("configure-recorded", "enable", "disable", "models", "status", "history", "once", "verify", "report", "inbox"):
         commands.add_parser(command)
     freeze = commands.add_parser("synthetic-freeze")
     freeze.add_argument("--scenario", choices=("calm", "stress"), required=True)
@@ -353,7 +390,11 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         if args.command == "init":
-            value = bridge(args.command)
+            j.require(args.agent_dir is not None or args.agent_config is None, "AGENT_DIR_REQUIRED")
+            value = bridge("init", *(["--agent-dir", str(args.agent_dir)] if args.agent_dir else []),
+                           *(["--agent-config", str(args.agent_config)] if args.agent_config else []))
+        elif args.command == "configure-recorded":
+            value = bridge("configure-recorded")
         elif args.command in ("enable", "disable"):
             value = control(args.command == "enable")
         elif args.command in ("models", "status"):

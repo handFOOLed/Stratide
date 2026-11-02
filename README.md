@@ -18,6 +18,7 @@
 - **历史分红桥接已合并（PR #42）：** [历史分红桥接 V1](docs/M1_PR09.md) 将原冻结行情、PR38 证据和显式模型假设接入 v4、原 SMA5/20、七报告及独立算法/双基准；实际运行 77 会话 **EXPLORATORY_EX_POST**，真实 PIT 新增 **0 天**，真实准入继续拒绝。
 - **仍受阻：** 仅 68 个历史交易日、3 笔模拟成交，长窗口公司行为/费用证据 `DATA_BLOCKED`；真实 EOD 两日 `EOD_CONTINUITY_VERIFIED`，开盘源仍 BLOCKED，**尚无真正前向模拟成交或 NAV**。
 - **当前顺序：** PR #50/#52/#54 已合并。本分支 [#55 云风险专家与自主组合](docs/M2_PR11.md) 将 BigQuery TimesFM 2.5、DeepSeek flash 两套生产 Adapter 经原 Rust Agent/统一预算接到原 Registry/Inbox；完整 recorded/loopback 合成 E2E，支持三只股票+现金及 100% 现金。默认 OFF，真实云 `CLOUD_NOT_AUTHORIZED / NOT_BILLED`，BigQuery 费用上界未核实则禁止付费。真实前向仍两日，PR54 资格及模型 context 仍 BLOCKED；没有 Paper/Live 订单或权限。[#36](https://github.com/handFOOLed/Stratide/issues/36) 的真实研究能力仍待数据和模型证据；核心完成后统一集成 UI。见 [当前状态](docs/STATUS.md)。
+- **PR #56 审查修复：** 新链路须显式绑定已有 Owner AgentDir/配置，与旧 Agent 共用同一费用库，不再初始化第二个预算。跨旧消费、未知预留、月界和并发的开发自测已通过；旧 PR52/54 三套有效时间回归仍待盘后复测，见 [R1 证据](docs/evidence/m2-pr11/r1/README.md)。
 
 ## Windows 本地体验
 

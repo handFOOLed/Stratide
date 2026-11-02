@@ -1,0 +1,3 @@
+    Checking stratide-research v0.0.1 (<checkout>\research\agent)
+    Checking stratided v0.0.1 (<checkout>\apps\stratided)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.25s

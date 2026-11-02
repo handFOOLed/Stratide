@@ -2,10 +2,10 @@
 use chrono::Utc;
 use rusqlite::OptionalExtension;
 use serde_json::{json, Value};
-use std::fs;
+use std::path::Path;
 use stratide_research::{
-    config::Settings, ensure, risk_cloud as cloud, risk_portfolio as rp, Agent, InputSummary,
-    Result, TaskRequest,
+    config::Settings, ensure, risk_binding as binding, risk_cloud as cloud, risk_portfolio as rp,
+    Agent, InputSummary, Result, TaskRequest,
 };
 
 fn blank() -> InputSummary {
@@ -18,76 +18,27 @@ fn blank() -> InputSummary {
         eod_eligible: false,
     }
 }
-fn offline_settings() -> Settings {
-    let mut s = Settings::fake();
-    s.models.truncate(1);
-    s.backup_model = None;
-    let mut risk = s.models[0].clone();
-    risk.id = "risk-timesfm".into();
-    risk.label = "BigQuery TimesFM 2.5 / recorded transport".into();
-    risk.kind = "bigquery_forecast_v1".into();
-    risk.model = "TimesFM 2.5".into();
-    risk.endpoint = Some(
-        "https://bigquery.googleapis.com/bigquery/v2/projects/stratide-offline/queries".into(),
-    );
-    risk.api_key_env = Some("STRATIDE_RESEARCH_KEY_GOOGLE".into());
-    risk.fake_scenario = None;
-    risk.price = None;
-    risk.max_input_tokens = 131072;
-    risk.max_output_tokens = 8192;
-    risk.cloud = Some(cloud::Cloud {
-        transport: "recorded".into(),
-        model_version: "TimesFM 2.5".into(),
-        scope: "risk_timeseries_v1".into(),
-        fields: cloud::RISK_FIELDS.map(String::from).to_vec(),
-        policy_version: rp::POLICY.into(),
-        max_call_micro: 1000,
-        project: Some("stratide-offline".into()),
-        dataset: Some("risk_research".into()),
-        location: Some("US".into()),
-        maximum_bytes_billed: Some(10485760),
-        billing_unit: "query_bytes+prediction_bytes+storage_byte_seconds".into(),
-        billing_bound_source: "synthetic_test".into(),
-        billing_bound_version: "offline-v1".into(),
-    });
-    let mut fusion = s.models[0].clone();
-    fusion.id = "fusion-deepseek".into();
-    fusion.label = "DeepSeek flash / recorded transport".into();
-    fusion.kind = "deepseek_portfolio_v1".into();
-    fusion.model = "deepseek-flash".into();
-    fusion.fake_scenario = None;
-    fusion.endpoint = Some("https://api.deepseek.com/chat/completions".into());
-    fusion.api_key_env = Some("STRATIDE_RESEARCH_KEY_DEEPSEEK".into());
-    fusion.max_input_tokens = 65536;
-    fusion.max_output_tokens = 8192;
-    fusion.cloud = Some(cloud::Cloud {
-        transport: "recorded".into(),
-        model_version: "deepseek-flash/pinned-policy-v1-provider-alias".into(),
-        scope: "portfolio_fusion_v1".into(),
-        fields: cloud::FUSION_FIELDS.map(String::from).to_vec(),
-        policy_version: rp::POLICY.into(),
-        max_call_micro: 100000,
-        project: None,
-        dataset: None,
-        location: None,
-        maximum_bytes_billed: None,
-        billing_unit: "input_output_tokens".into(),
-        billing_bound_source: "synthetic_test".into(),
-        billing_bound_version: "offline-v1".into(),
-    });
-    for m in [&mut risk, &mut fusion] {
-        let g = m.grant.as_mut().unwrap();
-        g.receiver = m.endpoint.clone().unwrap();
-        g.purpose = rp::SCOPE.into();
-        g.scopes = vec![rp::SCOPE.into(), m.cloud.as_ref().unwrap().scope.clone()];
-    }
-    s.models = vec![risk, fusion];
-    s.default_model = Some("fusion-deepseek".into());
-    s
-}
 fn run(args: &[String]) -> Result<Value> {
     ensure(!args.is_empty(), "RISK_ARGUMENTS")?;
-    let dir = rp::agent_dir()?;
+    if args[0] == "init" {
+        let bound = match args.len() {
+            1 => binding::read()?,
+            3 if args[1] == "--agent-dir" => binding::bind(Path::new(&args[2]), None)?,
+            5 if args[1] == "--agent-dir" && args[3] == "--agent-config" => {
+                binding::bind(Path::new(&args[2]), Some(Path::new(&args[4])))?
+            }
+            _ => return Err("RISK_ARGUMENTS".into()),
+        };
+        let agent = Agent::open(&bound.agent_dir, Some(&bound.settings_path), blank())?;
+        if agent.store().setting("risk_portfolio_enabled")?.is_none() {
+            agent.store().set("risk_portfolio_enabled", "false")?;
+        }
+        return Ok(
+            json!({"state":"INITIALIZED","authority_id":bound.authority_id,"enabled":agent.store().setting("risk_portfolio_enabled")?.as_deref()==Some("true"),"scope":rp::SCOPE,"cloud":"CLOUD_NOT_AUTHORIZED","billing":"NOT_BILLED"}),
+        );
+    }
+    let bound = binding::read()?;
+    let dir = bound.agent_dir.clone();
     for file in [
         "settings.json",
         "agent.sqlite",
@@ -99,28 +50,14 @@ fn run(args: &[String]) -> Result<Value> {
     ] {
         stratide_research::eod_snapshot::no_links(&dir.join(file))?;
     }
-    if args[0] == "init" {
+    let s = Settings::load(&bound.settings_path)?;
+    let agent = Agent::open(&dir, Some(&bound.settings_path), blank())?;
+    bound.verify(&agent.store().connect()?)?;
+    if args[0] == "configure-recorded" {
         ensure(args.len() == 1, "RISK_ARGUMENTS")?;
-        if !dir.join("settings.json").exists() {
-            ensure(!dir.exists(), "CLOUD_AGENT_INIT_INCOMPLETE")?;
-            fs::create_dir_all(&dir).map_err(|_| "CLOUD_AGENT_DIRECTORY")?;
-            let s = offline_settings();
-            s.validate()?;
-            fs::write(
-                dir.join("settings.json"),
-                serde_json::to_vec_pretty(&s).unwrap(),
-            )
-            .map_err(|_| "CLOUD_AGENT_CONFIG_WRITE")?;
-        }
-    }
-    let s = Settings::load(&dir.join("settings.json"))?;
-    let agent = Agent::open(&dir, None, blank())?;
-    if args[0] == "init" {
-        if agent.store().setting("risk_portfolio_enabled")?.is_none() {
-            agent.store().set("risk_portfolio_enabled", "false")?;
-        }
+        binding::add_recorded_models(&bound, binding::recorded_models())?;
         return Ok(
-            json!({"state":"INITIALIZED","enabled":agent.store().setting("risk_portfolio_enabled")?.as_deref()==Some("true"),"scope":rp::SCOPE,"cloud":"CLOUD_NOT_AUTHORIZED","billing":"NOT_BILLED"}),
+            json!({"state":"RECORDED_MODELS_ADDED","budget":"EXISTING_OWNER_BUDGET_UNCHANGED","authority_id":bound.authority_id}),
         );
     }
     if matches!(args[0].as_str(), "enable" | "disable") {
@@ -219,7 +156,6 @@ fn run(args: &[String]) -> Result<Value> {
         } else {
             &f.fusion_model
         };
-        agent.store().set("default_model", &pin.id)?;
         let request = TaskRequest {
             name: format!("Risk/Portfolio {} {}", args[2], f.strategy_version),
             goal: "Produce bounded research evidence or an autonomous stock/cash target portfolio"
@@ -231,7 +167,7 @@ fn run(args: &[String]) -> Result<Value> {
         };
         agent
             .store()
-            .create(&s, &request, &input, Utc::now(), Some(&trigger))?
+            .create_for_model(&s, &request, &input, Utc::now(), Some(&trigger), &pin.id)?
     };
     if args[0] == "tick" && agent.store().task(id)?["status"] == "queued" {
         agent.tick_task(Utc::now(), id, &trigger)?;

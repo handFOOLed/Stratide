@@ -1,0 +1,28 @@
+test_evaluated_report_receipt_qualification_and_frozen_input_tampering (__main__.ReviewTests.test_evaluated_report_receipt_qualification_and_frozen_input_tampering) ... ok
+test_forged_completed_export_and_fake_directory_do_not_create_inbox_entries (__main__.ReviewTests.test_forged_completed_export_and_fake_directory_do_not_create_inbox_entries) ... ok
+test_four_process_exit_points_resume_and_reuse_original_receipt (__main__.ReviewTests.test_four_process_exit_points_resume_and_reuse_original_receipt) ... ok
+test_full_cli_two_directories_and_readonly_inbox_report (__main__.ReviewTests.test_full_cli_two_directories_and_readonly_inbox_report) ... ok
+test_local_historical_source_content_reuse_missing_and_new_version (__main__.ReviewTests.test_local_historical_source_content_reuse_missing_and_new_version) ... ok
+test_missing_or_inadequate_history_is_stable_data_blocked_and_new_template_version (__main__.ReviewTests.test_missing_or_inadequate_history_is_stable_data_blocked_and_new_template_version) ... ok
+test_moved_review_directory_still_reuses_original_candidate_and_evaluation (__main__.ReviewTests.test_moved_review_directory_still_reuses_original_candidate_and_evaluation) ... ok
+test_no_agent_provider_or_replay_on_readonly_queries (__main__.ReviewTests.test_no_agent_provider_or_replay_on_readonly_queries) ... ok
+test_original_registration_task_call_intent_and_source_sha_tampering_fail_closed (__main__.ReviewTests.test_original_registration_task_call_intent_and_source_sha_tampering_fail_closed) ... ok
+test_owner_parameter_injection_and_junction_never_run (__main__.ReviewTests.test_owner_parameter_injection_and_junction_never_run) ... FAIL
+test_stale_changed_missing_eod_snapshot_offline_review_never_relabels_current (__main__.ReviewTests.test_stale_changed_missing_eod_snapshot_offline_review_never_relabels_current) ... ok
+test_two_concurrent_clis_and_renamed_auto_cannot_repeat_research (__main__.ReviewTests.test_two_concurrent_clis_and_renamed_auto_cannot_repeat_research) ... ok
+
+======================================================================
+FAIL: test_owner_parameter_injection_and_junction_never_run (__main__.ReviewTests.test_owner_parameter_injection_and_junction_never_run)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>\scripts\test-research-review.py", line 326, in test_owner_parameter_injection_and_junction_never_run
+    self.assertEqual(p.returncode, 0, p.stderr.decode(errors="replace"))
+AssertionError: 1 != 0 : Access is denied.
+
+
+
+----------------------------------------------------------------------
+Ran 12 tests in 73.802s
+
+FAILED (failures=1)
+{"result": "FAIL", "tests_run": 12, "evidence_ref": "state/review-tests/run-a851286fc9"}

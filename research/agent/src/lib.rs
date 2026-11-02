@@ -3,6 +3,7 @@ pub mod config;
 pub mod eod_snapshot;
 pub mod multimodal;
 pub mod provider;
+pub mod risk_binding;
 pub mod risk_cloud;
 pub mod risk_portfolio;
 #[cfg(test)]
