@@ -1,0 +1,205 @@
+{
+  "apis": {
+    "adj_factor": {
+      "a_share_rows": 6416218,
+      "attempt_states": {
+        "NETWORK_OUTCOME_UNKNOWN": 1
+      },
+      "blocked_or_unpublished_dates": 0,
+      "complete_dates": 0,
+      "documented_row_cap": null,
+      "partial_dates": 1212,
+      "partial_reason_counts": {
+        "TRUNCATION_OR_UNIVERSE_UNVERIFIED_UNDOCUMENTED_CAP": 1212
+      },
+      "permission": "ALLOWED_OBSERVED",
+      "requests": 1214,
+      "rows": 6416218,
+      "securities": 5783,
+      "source_receipts_sha": "4a7a6b3c9a2e82f9ab83f35588aaa20a77888fa6c3308e006627625e24d93d61",
+      "unpublished_dates": []
+    },
+    "daily_basic": {
+      "a_share_rows": 6336488,
+      "attempt_states": {
+        "NETWORK_OUTCOME_UNKNOWN": 1
+      },
+      "blocked_or_unpublished_dates": 0,
+      "complete_dates": 1212,
+      "documented_row_cap": 6000,
+      "partial_dates": 0,
+      "partial_reason_counts": {},
+      "permission": "ALLOWED_OBSERVED",
+      "requests": 1214,
+      "rows": 6336488,
+      "securities": 5772,
+      "source_receipts_sha": "898a0efa8260ca33658122450f4d3eaedbfd32c297c3caf16a718d6aab4a148c",
+      "unpublished_dates": []
+    },
+    "stk_limit": {
+      "a_share_rows": 6351150,
+      "attempt_states": {
+        "EXCHANGE_SCOPE_MISMATCH": 1
+      },
+      "blocked_or_unpublished_dates": 0,
+      "complete_dates": 1179,
+      "documented_row_cap": 5800,
+      "partial_dates": 33,
+      "partial_reason_counts": {
+        "SOURCE_EXCHANGE_CODE_CONFLICT": 33
+      },
+      "permission": "ALLOWED_OBSERVED",
+      "requests": 1214,
+      "rows": 6424625,
+      "securities": 5862,
+      "source_receipts_sha": "eabaf64b3e98c3d77e9e5fe54800ab206542107e324a0741d9474ef73d8a6a6c",
+      "unpublished_dates": []
+    },
+    "suspend_d": {
+      "a_share_rows": 44070,
+      "attempt_states": {
+        "NETWORK_OUTCOME_UNKNOWN": 1
+      },
+      "blocked_or_unpublished_dates": 0,
+      "complete_dates": 1212,
+      "documented_row_cap": 5000,
+      "partial_dates": 0,
+      "partial_reason_counts": {},
+      "permission": "ALLOWED_OBSERVED",
+      "requests": 2426,
+      "rows": 44070,
+      "securities": 1758,
+      "source_receipts_sha": "1396d6addf0ad47f26de3f718fffe2924528f580c73725b85b876996632f6e83",
+      "unpublished_dates": []
+    }
+  },
+  "bse_calendar": "NOT_VERIFIED",
+  "budget": {
+    "account_points": 2000,
+    "base_calls": 6068,
+    "official_daily_calls_per_api": 100000,
+    "official_rpm": 200,
+    "open_days": 1212,
+    "origin": "Owner Issue #59; official table doc_id=290; actual errors authoritative",
+    "remaining_provider_quota": "UNKNOWN",
+    "reserve_calls": 911,
+    "total_cap": 6979,
+    "worker_count": 1
+  },
+  "coverage": "PARTIAL",
+  "data_mode": "historical_backfill_ex_post",
+  "disk_bytes": 8926085760,
+  "environment": {
+    "os": "Windows",
+    "python": "3.12.10",
+    "release": "11",
+    "timezone": "Asia/Singapore",
+    "worker_count": 1
+  },
+  "first_obtained_at": "2026-11-02T10:23:45.353764+00:00",
+  "forward_research_readiness": "BLOCKED",
+  "free_disk_bytes": 266552680448,
+  "historical_pit_status": "NOT_VERIFIED",
+  "historical_received_at": null,
+  "idempotent_resume_requests": 0,
+  "last_obtained_at": "2026-11-02T14:23:42.415409+00:00",
+  "live_allowed": false,
+  "metadata_source_sha": "012c11d9b4009d5a7e400173dc74b4de5c48b32c0f1a4e8dca5379ee4e9b3344",
+  "network_operation": false,
+  "official_remaining_quota": "UNKNOWN_NO_AUTHORIZED_BALANCE_ENDPOINT",
+  "open_days": 1212,
+  "paper_allowed": false,
+  "protected": {
+    "bytes": 4605406031,
+    "files": 4298,
+    "manifest_sha256": "ba9650b2afa4a925ccf46067bdd756c1dbbb2953374009850a99879367fe7aa7",
+    "unchanged": true
+  },
+  "provider_published_at": null,
+  "range": [
+    "20211101",
+    "20261030"
+  ],
+  "readonly": {
+    "bytes": 8926085760,
+    "files": 6067,
+    "manifest_sha256": "5939c9ee9a50348b6535805f9d1729d521eeab507177d5588c6b310d30a03cef",
+    "unchanged": true
+  },
+  "rejected_refreshes": 0,
+  "requests": 6068,
+  "runs": [
+    {
+      "ended": "2026-11-02T10:23:53.038743+00:00",
+      "id": 1,
+      "kind": "preflight",
+      "started": "2026-11-02T10:23:45.050989+00:00",
+      "status": "EXCHANGE_SCOPE_MISMATCH"
+    },
+    {
+      "ended": "2026-11-02T10:24:42.091434+00:00",
+      "id": 2,
+      "kind": "preflight",
+      "started": "2026-11-02T10:24:38.817357+00:00",
+      "status": "PREFLIGHT_PASSED"
+    },
+    {
+      "ended": "2026-11-02T12:21:53.212288+00:00",
+      "id": 3,
+      "kind": "backfill",
+      "started": "2026-11-02T10:24:42.270424+00:00",
+      "status": "NETWORK_OUTCOME_UNKNOWN"
+    },
+    {
+      "ended": "2026-11-02T12:31:29.155337+00:00",
+      "id": 4,
+      "kind": "resume",
+      "started": "2026-11-02T12:30:28.427282+00:00",
+      "status": "NETWORK_OUTCOME_UNKNOWN"
+    },
+    {
+      "ended": "2026-11-02T13:36:45.813711+00:00",
+      "id": 5,
+      "kind": "resume",
+      "started": "2026-11-02T12:46:31.414933+00:00",
+      "status": "NETWORK_OUTCOME_UNKNOWN"
+    },
+    {
+      "ended": "2026-11-02T14:17:26.251656+00:00",
+      "id": 6,
+      "kind": "resume",
+      "started": "2026-11-02T13:53:20.386252+00:00",
+      "status": "PARTIAL_BLOCKED_CONTINUE_FROM_CHECKPOINT"
+    },
+    {
+      "ended": "2026-11-02T14:23:43.514556+00:00",
+      "id": 7,
+      "kind": "resume",
+      "started": "2026-11-02T14:23:39.501071+00:00",
+      "status": "RANGE_COLLECTED_COVERAGE_PARTIAL"
+    },
+    {
+      "ended": "2026-11-02T14:39:37.795581+00:00",
+      "id": 8,
+      "kind": "resume",
+      "started": "2026-11-02T14:39:37.753054+00:00",
+      "status": "RANGE_COLLECTED_COVERAGE_PARTIAL"
+    }
+  ],
+  "source_verify": {
+    "attempts": 6068,
+    "data_mode": "historical_backfill_ex_post",
+    "forward_research_readiness": "BLOCKED",
+    "historical_pit_status": "NOT_VERIFIED",
+    "historical_received_at": null,
+    "live_allowed": false,
+    "paper_allowed": false,
+    "provider_published_at": null,
+    "rows": 19221401,
+    "state": "VERIFIED_STORAGE_SOURCE_BINDING",
+    "versions": 4848
+  },
+  "state": "RANGE_COLLECTED_COVERAGE_PARTIAL",
+  "total_call_cap": 6979,
+  "version": "tushare-historical-sidecar-v2"
+}

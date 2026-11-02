@@ -1,0 +1,15 @@
+{
+  "id": 4291,
+  "api": "adj_factor",
+  "params": "{\"trade_date\":\"20250515\"}",
+  "started": "2026-11-02T12:21:49.085644+00:00",
+  "ended": "2026-11-02T12:21:53.207384+00:00",
+  "status": "NETWORK_OUTCOME_UNKNOWN",
+  "http_status": null,
+  "provider_code": null,
+  "response_sha": null,
+  "raw_bytes": null,
+  "elapsed_seconds": 4.12174,
+  "raw_file_exists": false,
+  "free_disk_bytes": 269295607808
+}

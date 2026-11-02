@@ -1,0 +1,13 @@
+{
+  "command": [
+    "python",
+    "-I",
+    "-B",
+    "scripts/test-historical-sidecar.py"
+  ],
+  "exit": 0,
+  "elapsed_seconds": 21.156000000002678,
+  "at_utc": "2026-11-02T12:45:28.991024+00:00",
+  "source_sha256": "e1b4b16f7eb4496c1f5df650f7051157789171826a8cddd8d8c0ba89ae16abed",
+  "test_sha256": "b14969c99b81e6a17edf1e56d581f4091b9f5c8a8f75e33fa2f34cc6331a5f98"
+}

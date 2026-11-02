@@ -1,0 +1,21 @@
+test_40_days_four_apis_decimal_null_units_and_queries (__main__.Suite.test_40_days_four_apis_decimal_null_units_and_queries) ... ok
+test_bad_types_scope_conflicts_non_a_and_suspend_intervals (__main__.Suite.test_bad_types_scope_conflicts_non_a_and_suspend_intervals) ... ok
+test_budget_persists_and_cannot_auto_expand (__main__.Suite.test_budget_persists_and_cannot_auto_expand) ... ok
+test_capped_response_codes_outside_catalog_survive_multiple_partitions (__main__.Suite.test_capped_response_codes_outside_catalog_survive_multiple_partitions) ... ok
+test_caps_all_four_and_bounded_partitions (__main__.Suite.test_caps_all_four_and_bounded_partitions) ... ok
+test_foreign_sqlite_and_internal_links (__main__.Suite.test_foreign_sqlite_and_internal_links) ... ok
+test_frozen_anchor_join_uses_v1_readonly_and_ignores_later_revision (__main__.Suite.test_frozen_anchor_join_uses_v1_readonly_and_ignores_later_revision) ... ok
+test_missing_optional_fields_cannot_reduce_admitted_view (__main__.Suite.test_missing_optional_fields_cannot_reduce_admitted_view) ... ok
+test_quota_cooldown_refuses_waiting_day_or_new_call (__main__.Suite.test_quota_cooldown_refuses_waiting_day_or_new_call) ... ok
+test_readonly_cli_routes_and_checkpoint_source_scope (__main__.Suite.test_readonly_cli_routes_and_checkpoint_source_scope) ... ok
+test_readonly_no_network_credentials_or_mtime (__main__.Suite.test_readonly_no_network_credentials_or_mtime) ... ok
+test_refresh_revision_rollback_and_reduced_universe (__main__.Suite.test_refresh_revision_rollback_and_reduced_universe) ... ok
+test_resume_complete_and_partial_dates_zero_requests (__main__.Suite.test_resume_complete_and_partial_dates_zero_requests) ... ok
+test_slow_http_extends_timeout_preserving_fixed_transport_and_unknown_halt (__main__.Suite.test_slow_http_extends_timeout_preserving_fixed_transport_and_unknown_halt) ... ok
+test_two_process_writer_and_crash_transaction (__main__.Suite.test_two_process_writer_and_crash_transaction) ... ok
+test_unknown_429_quota_permission_and_no_blind_retry (__main__.Suite.test_unknown_429_quota_permission_and_no_blind_retry) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 21.022s
+
+OK

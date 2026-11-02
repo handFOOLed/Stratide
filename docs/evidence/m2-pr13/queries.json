@@ -1,0 +1,121 @@
+[
+  {
+    "api": "adj_factor",
+    "covered_api_dates": 20,
+    "has_more": false,
+    "missing_dates": [],
+    "quality_counts": {
+      "COMPLETE": 0,
+      "PARTIAL": 20
+    },
+    "query_sha": "d2e99ae0ca5b0138997eda461e37a69d4d310466c7c68b3cf572587fa7b333fa",
+    "rows": 60,
+    "scope": "three_symbols_20_sessions"
+  },
+  {
+    "api": "adj_factor",
+    "has_more": false,
+    "query_sha": "85d4072e9b948d07b7e83bf660fb72078ec877fda195d7938aab84a68c312d7b",
+    "rows": 5581,
+    "scope": "full_market_20261030",
+    "source_sha": [
+      "bc720d456db0705432b5db40ad4a556cf290352cf067a2a8714fbc49a48e860b"
+    ]
+  },
+  {
+    "api": "suspend_d",
+    "covered_api_dates": 20,
+    "has_more": false,
+    "missing_dates": [],
+    "quality_counts": {
+      "COMPLETE": 20,
+      "PARTIAL": 0
+    },
+    "query_sha": "5153c07ec3dbc28177476435cbb141c2b706ef1fd573f7a7010a4adfbdbf9d4c",
+    "rows": 0,
+    "scope": "three_symbols_20_sessions"
+  },
+  {
+    "api": "suspend_d",
+    "has_more": false,
+    "query_sha": "51bbf731859778abeb3a4dd699bb1df81e785f50f55ccbc46c076e9b3a7f67af",
+    "rows": 7,
+    "scope": "full_market_20261030",
+    "source_sha": [
+      "706fd603ae1f0ca6e688cf7b67dcf6b89e4c1949a4fbe8961ac179bfc7b09069"
+    ]
+  },
+  {
+    "api": "stk_limit",
+    "covered_api_dates": 20,
+    "has_more": false,
+    "missing_dates": [],
+    "quality_counts": {
+      "COMPLETE": 20,
+      "PARTIAL": 0
+    },
+    "query_sha": "042a41d467bf869999ea122de20301cbc122f7283508cb65153e3f7cfb9e2e75",
+    "rows": 60,
+    "scope": "three_symbols_20_sessions"
+  },
+  {
+    "api": "stk_limit",
+    "has_more": false,
+    "query_sha": "4c2a2dbbc87b80a68918d7a1bc31bdc861840784f565f564fc6064135d8b3d1f",
+    "rows": 5654,
+    "scope": "full_market_20261030",
+    "source_sha": [
+      "18b1b5886d940615e2ac042f65b57c4b9c37f8b01cf5d7b1f806744360e5504e"
+    ]
+  },
+  {
+    "api": "daily_basic",
+    "covered_api_dates": 20,
+    "has_more": false,
+    "missing_dates": [],
+    "quality_counts": {
+      "COMPLETE": 20,
+      "PARTIAL": 0
+    },
+    "query_sha": "64cde7f5b4c9f2b9471fac867675bcd393993845fcb8d11da9c732960524f4d3",
+    "rows": 60,
+    "scope": "three_symbols_20_sessions"
+  },
+  {
+    "api": "daily_basic",
+    "has_more": false,
+    "query_sha": "36f3c0abb3ab9da948c6a86e7ff1d205c07aa258884966427ff0ab730c9591df",
+    "rows": 5571,
+    "scope": "full_market_20261030",
+    "source_sha": [
+      "4a129b220cdd5ac086d2e09992cc3fc52689ff514e64e7f35e09d7fe8c57fcaa"
+    ]
+  },
+  {
+    "anchor_date": "20261030",
+    "daily_version_ceiling": 1212,
+    "factor_version_ceiling": 4848,
+    "query_sha": "daed4a7daa9963016f76cb03bdad85d61dad88bfb710b36262081a1a9e3e613d",
+    "rows": 20,
+    "scope": "frozen_anchor_qfq",
+    "symbol": "600000.SH"
+  },
+  {
+    "anchor_date": "20261030",
+    "daily_version_ceiling": 1212,
+    "factor_version_ceiling": 4848,
+    "query_sha": "5adb4ab930237ba5bd3e025c885f4c515eac46037ccc0437e4a0b07ec4940e11",
+    "rows": 20,
+    "scope": "frozen_anchor_qfq",
+    "symbol": "000001.SZ"
+  },
+  {
+    "anchor_date": "20261030",
+    "daily_version_ceiling": 1212,
+    "factor_version_ceiling": 4848,
+    "query_sha": "4a9821922d7d78bee7d7d919d1bdc7e11b62085134b3a7758169bd59069c0f35",
+    "rows": 20,
+    "scope": "frozen_anchor_qfq",
+    "symbol": "600519.SH"
+  }
+]

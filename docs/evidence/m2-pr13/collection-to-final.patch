@@ -1,0 +1,65 @@
+--- collection-loaded-module.py
++++ research/historical_sidecar.py
+@@ -54,0 +55,15 @@
++
++
++class _LongerRead:
++    """Keep PR58's fixed HTTPS request/redirect/secret checks, allow slow reads."""
++    def __init__(self, delegate):
++        self.delegate = delegate
++
++    def open(self, request, timeout=None):
++        return self.delegate.open(request, timeout=120)
++
++
++class TushareHTTP(v1.TushareHTTP):
++    def __init__(self, token):
++        super().__init__(token)
++        self.opener = _LongerRead(self.opener)
+@@ -257 +272,4 @@
+-            old_keys = {r[0] for r in db.execute("SELECT row_key FROM rows WHERE version_id=?",(current["id"],))}
++            old_rows = {r[0]:json.loads(r[1]) for r in db.execute("SELECT row_key,row_json FROM rows WHERE version_id=?",(current["id"],))}
++            old_keys = set(old_rows)
++            new_rows = {key(r,api):r for r in rows}
++            missing_fields = any(set(old_rows[k])-{"quality_flags"}-set(new_rows[k]) for k in old_keys & new_rows.keys())
+@@ -260,2 +278,2 @@
+-            if (current["status"] == "COMPLETE" and status != "COMPLETE") or not old_keys <= {k for k,_ in hashed}:
+-                reason = "QUALITY_DOWNGRADE" if old_keys <= {k for k,_ in hashed} else "MISSING_PRIOR_ROWS"
++            if (current["status"] == "COMPLETE" and status != "COMPLETE") or not old_keys <= set(new_rows) or missing_fields:
++                reason = "MISSING_PRIOR_SOURCE_FIELDS" if missing_fields else ("QUALITY_DOWNGRADE" if old_keys <= set(new_rows) else "MISSING_PRIOR_ROWS")
+@@ -343 +361 @@
+-                join = "JOIN checkpoints c ON c.version_id=v.id"
++                join = "JOIN checkpoints c ON c.version_id=v.id AND c.api=v.api AND c.trade_date=v.trade_date"
+@@ -347,0 +366,4 @@
++            partitions = [dict(trade_date=r["trade_date"],version_id=r["id"],quality=r["status"],reason=r["reason"],
++                               row_count=r["row_count"],source_sha=r["source_sha"],sources=json.loads(r["manifest"])["attempts"])
++                          for r in db.execute("SELECT v.* FROM versions v "+join+" WHERE "+" AND ".join(conditions)+" ORDER BY v.trade_date",args)]
++            missing_dates = sorted(set(self.open_days(db,start,end))-{r["trade_date"] for r in partitions})
+@@ -356 +378,3 @@
+-                        query_sha=sha(canonical(data)),coverage="PARTIAL",**SAFE)
++                        partitions=partitions,missing_dates=missing_dates,
++                        empty_event_interpretation="NO_REPORTED_EVENTS_NOT_TRADABILITY" if api=="suspend_d" else None,
++                        query_sha=sha(canonical(dict(rows=data,partitions=partitions,missing_dates=missing_dates))),coverage="PARTIAL",**SAFE)
+@@ -362,0 +387 @@
++            require(not db.execute("SELECT 1 FROM checkpoints c JOIN versions v ON v.id=c.version_id WHERE c.api!=v.api OR c.trade_date!=v.trade_date LIMIT 1").fetchone(),"CHECKPOINT_SCOPE")
+@@ -374,0 +400 @@
++                require(a["api"] in FIELDS and a["fields"]==FIELDS[a["api"]] and a["permission_source"]==PERMISSION,"ATTEMPT_AUTHORIZED_SCOPE")
+@@ -386,0 +413 @@
++                require(manifest["contract_sha"]==sha(canonical(CONTRACT)) and manifest["metadata_source_sha"]==metadata["sha"] and manifest["api"]==version["api"] and manifest["fields"]==FIELDS[version["api"]],"MANIFEST_CONTRACT")
+@@ -440,0 +468 @@
++        self.retry_failed = False
+@@ -458,0 +487 @@
++                require(wait<=60,"QUOTA_COOLDOWN_ACTIVE" if prior["status"]=="PARTIAL_QUOTA_LIMIT" else "RATE_COOLDOWN_ACTIVE")
+@@ -507,0 +537,2 @@
++        require(not a or a["status"]!="NETWORK_OUTCOME_UNKNOWN" or self.retry_failed,
++                "NETWORK_OUTCOME_UNKNOWN_REQUIRES_EXPLICIT_RETRY")
+@@ -582,0 +614 @@
++        self.retry_failed = retry_failed
+@@ -617 +649 @@
+-    old = v1.Warehouse(old_root).query(start,end,(code,),as_of=daily_version,limit=10000)
++    old = v1.Warehouse(old_root).query(start,end,(code,),as_of_version=daily_version,limit=10000)
+@@ -671 +703 @@
+-            download = Download(w,db,args.action,v1.TushareHTTP(token),source,args.start,args.end,args.rpm,args.max_calls,args.total_call_cap,
++            download = Download(w,db,args.action,TushareHTTP(token),source,args.start,args.end,args.rpm,args.max_calls,args.total_call_cap,
+@@ -672,0 +705 @@
++            download.retry_failed = args.retry_failed

@@ -1,0 +1,54 @@
+[
+  {
+    "id": 4293,
+    "api": "suspend_d",
+    "params": "{\"suspend_type\":\"S\",\"trade_date\":\"20250515\"}",
+    "started": "2026-11-02T12:30:49.132796+00:00",
+    "ended": "2026-11-02T12:31:29.152280+00:00",
+    "status": "NETWORK_OUTCOME_UNKNOWN",
+    "http_status": null,
+    "provider_code": null,
+    "response_sha": null,
+    "raw_bytes": null,
+    "elapsed_seconds": 40.019484
+  },
+  {
+    "id": 4292,
+    "api": "adj_factor",
+    "params": "{\"trade_date\":\"20250515\"}",
+    "started": "2026-11-02T12:30:29.347615+00:00",
+    "ended": "2026-11-02T12:30:48.044202+00:00",
+    "status": "OK",
+    "http_status": 200,
+    "provider_code": 0,
+    "response_sha": "9d257eb50527e018e701d0fbb13b3f6dcdfff834aa58b2a0b0767b6a6fbbaf1e",
+    "raw_bytes": 170705,
+    "elapsed_seconds": 18.696587
+  },
+  {
+    "id": 4291,
+    "api": "adj_factor",
+    "params": "{\"trade_date\":\"20250515\"}",
+    "started": "2026-11-02T12:21:49.085644+00:00",
+    "ended": "2026-11-02T12:21:53.207384+00:00",
+    "status": "NETWORK_OUTCOME_UNKNOWN",
+    "http_status": null,
+    "provider_code": null,
+    "response_sha": null,
+    "raw_bytes": null,
+    "elapsed_seconds": 4.12174
+  },
+  {
+    "id": 5497,
+    "api": "daily_basic",
+    "params": "{\"trade_date\":\"20260513\"}",
+    "started": "2026-11-02T13:34:42.120425+00:00",
+    "ended": "2026-11-02T13:36:45.809841+00:00",
+    "status": "NETWORK_OUTCOME_UNKNOWN",
+    "http_status": null,
+    "provider_code": null,
+    "response_sha": null,
+    "raw_bytes": null,
+    "elapsed_seconds": 123.689416
+  }
+]

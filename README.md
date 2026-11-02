@@ -6,7 +6,8 @@
 
 ## 当前状态
 
-- **历史仓库 V1（本分支 Draft / #57）：** [M2-PR12](docs/M2_PR12.md) 提供独立 SQLite 证券目录、交易日历、未复权日线的预检/试采/有界回填、断点续传与只读查询。真实取得范围与缺口见[证据](docs/evidence/m2-pr12/README.md)；`historical_backfill_ex_post / PIT NOT_VERIFIED`，不增加前向或交易资格。
+- **历史 sidecar V2（本分支 Draft / #59）：** [M2-PR13](docs/M2_PR13.md) 使用现有 2000 积分 Tushare 账号执行四 API 五年历史回填；每 API 1212 日期已落地、共 6068 次请求，支持持久有界续传、版本查询与冻结锚点复权。[真实证据](docs/evidence/m2-pr13/README.md)；数据仅在本机、ex-post / coverage PARTIAL，不增加 PIT 或交易资格。
+- **历史仓库 V1（PR #58 已合并）：** [M2-PR12](docs/M2_PR12.md) 提供独立 SQLite 证券目录、交易日历、未复权日线的预检/试采/有界回填、断点续传与只读查询。真实取得范围与缺口见[证据](docs/evidence/m2-pr12/README.md)；`historical_backfill_ex_post / PIT NOT_VERIFIED`，不增加前向或交易资格。
 - **已实现：** Paper Risk Kernel、持久账本、六报告、真实历史 EOD 探索性回测、只观察的前向 EOD journal、[Web Dashboard V1](apps/dashboard/README.md)。
 - **Agent V1 已在 main：** 持久任务、日/月预算、受控 Provider、本地 fake、EOD 去重及 [API](docs/AGENT_API.md)；真实 Provider **REAL_PROVIDER_NOT_VERIFIED**，未配置 Owner 预算/授权不付费。
 - **候选链路已合并：** [M2-PR04 / PR #30](docs/M2_PR04.md) 提供登记 → 冻结 → 独立评价 → 隔离历史回放 CLI；#31 双线独立 PASS，研究证据不足、资格默认拒绝继续有效。
@@ -19,7 +20,7 @@
 - **历史分红桥接已合并（PR #42）：** [历史分红桥接 V1](docs/M1_PR09.md) 将原冻结行情、PR38 证据和显式模型假设接入 v4、原 SMA5/20、七报告及独立算法/双基准；实际运行 77 会话 **EXPLORATORY_EX_POST**，真实 PIT 新增 **0 天**，真实准入继续拒绝。
 - **仍受阻：** 仅 68 个历史交易日、3 笔模拟成交，长窗口公司行为/费用证据 `DATA_BLOCKED`；真实 EOD 两日 `EOD_CONTINUITY_VERIFIED`，开盘源仍 BLOCKED，**尚无真正前向模拟成交或 NAV**。
 - **当前顺序：** PR #50/#52/#54 已合并。本分支 [#55 云风险专家与自主组合](docs/M2_PR11.md) 将 BigQuery TimesFM 2.5、DeepSeek flash 两套生产 Adapter 经原 Rust Agent/统一预算接到原 Registry/Inbox；完整 recorded/loopback 合成 E2E，支持三只股票+现金及 100% 现金。默认 OFF，真实云 `CLOUD_NOT_AUTHORIZED / NOT_BILLED`，BigQuery 费用上界未核实则禁止付费。真实前向仍两日，PR54 资格及模型 context 仍 BLOCKED；没有 Paper/Live 订单或权限。[#36](https://github.com/handFOOLed/Stratide/issues/36) 的真实研究能力仍待数据和模型证据；核心完成后统一集成 UI。见 [当前状态](docs/STATUS.md)。
-- **PR #56 审查修复：** 新链路须显式绑定已有 Owner AgentDir/配置，与旧 Agent 共用同一费用库，不再初始化第二个预算。预算修复已获源码复审确认；原 PR52/54 三套盘后完整回归 **10+4+13 项均 exit 0**，开发证据已补齐，最终独立复审仍待完成；见 [R1 证据](docs/evidence/m2-pr11/r1/README.md)。
+- **PR #56 审查修复：** 新链路须显式绑定已有 Owner AgentDir/配置，与旧 Agent 共用同一费用库，不再初始化第二个预算。预算修复已获源码复审确认；原 PR52/54 三套盘后完整回归 **10+4+13 项均 exit 0**，PR #56 后续已合并，原开发证据保留；见 [R1 证据](docs/evidence/m2-pr11/r1/README.md)。
 
 ## Windows 本地体验
 

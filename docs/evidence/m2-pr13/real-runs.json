@@ -1,0 +1,160 @@
+[
+  {
+    "action": "preflight",
+    "command": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/historical-sidecar.py",
+      "preflight",
+      "--credential-source",
+      "existing-tushare-mcp-config",
+      "--rpm",
+      "60",
+      "--v1-root",
+      "<existing-local-v1-store>"
+    ],
+    "elapsed_seconds": 8.577999999994063,
+    "ended_utc": "2026-11-02T10:23:53.088489+00:00",
+    "exit": 2,
+    "loaded_collection_module_sha256": "15e69509fdea1931729b001ffdc32047852e32dbde393dda00f1526c919585b3",
+    "output_sha256": "0f9157f8604ad954201be6667e553abc49853e6684376db072ade9b10cb7dc1c",
+    "source_file_sha_on_completion": "15e69509fdea1931729b001ffdc32047852e32dbde393dda00f1526c919585b3",
+    "started_utc": "2026-11-02T10:23:44.522282+00:00"
+  },
+  {
+    "action": "preflight",
+    "command": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/historical-sidecar.py",
+      "preflight",
+      "--credential-source",
+      "existing-tushare-mcp-config",
+      "--rpm",
+      "60",
+      "--v1-root",
+      "<existing-local-v1-store>"
+    ],
+    "elapsed_seconds": 3.4530000000086147,
+    "ended_utc": "2026-11-02T10:24:42.144260+00:00",
+    "exit": 0,
+    "loaded_collection_module_sha256": "c4b4ae48bdbe8430ba93388a3edfea8d7c54b147b8a78886dfd81763b6f42ad4",
+    "output_sha256": "5623ac7c08014b624cc5877944c2b634c10772162eebf4aa9a2d2b320400c85c",
+    "source_file_sha_on_completion": "c4b4ae48bdbe8430ba93388a3edfea8d7c54b147b8a78886dfd81763b6f42ad4",
+    "started_utc": "2026-11-02T10:24:38.696629+00:00"
+  },
+  {
+    "action": "backfill",
+    "command": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/historical-sidecar.py",
+      "backfill",
+      "--credential-source",
+      "existing-tushare-mcp-config",
+      "--rpm",
+      "60"
+    ],
+    "elapsed_seconds": 7037.827999999994,
+    "ended_utc": "2026-11-02T12:21:59.973483+00:00",
+    "exit": 2,
+    "loaded_collection_module_sha256": "c4b4ae48bdbe8430ba93388a3edfea8d7c54b147b8a78886dfd81763b6f42ad4",
+    "output_sha256": "e23415a07823a42bb786a5a81069752b943396c325031e020c34bc28dd77d2ec",
+    "source_file_sha_on_completion": "901ff88e0385331ef087c8ba30a52a1fd9d4cbe4a1e3e9173902556f4f3f5b85",
+    "started_utc": "2026-11-02T10:24:42.144260+00:00"
+  },
+  {
+    "action": "resume",
+    "command": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/historical-sidecar.py",
+      "resume",
+      "--retry-failed",
+      "--credential-source",
+      "existing-tushare-mcp-config",
+      "--rpm",
+      "60"
+    ],
+    "elapsed_seconds": 68.31299999999464,
+    "ended_utc": "2026-11-02T12:31:34.957675+00:00",
+    "exit": 2,
+    "loaded_collection_module_sha256": "901ff88e0385331ef087c8ba30a52a1fd9d4cbe4a1e3e9173902556f4f3f5b85",
+    "output_sha256": "18599434a61e54c06e1078b9fcb6e59b7928ae479a6a657fa26d8dfa91cef4f6",
+    "reason": "explicit resume after read-only inspection; unknown attempt counted; fixed cumulative cap retained",
+    "source_file_sha_on_completion": "901ff88e0385331ef087c8ba30a52a1fd9d4cbe4a1e3e9173902556f4f3f5b85",
+    "started_utc": "2026-11-02T12:30:26.646058+00:00"
+  },
+  {
+    "action": "resume",
+    "command": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/historical-sidecar.py",
+      "resume",
+      "--retry-failed",
+      "--credential-source",
+      "existing-tushare-mcp-config",
+      "--rpm",
+      "30"
+    ],
+    "elapsed_seconds": 3088.9689999999973,
+    "ended_utc": "2026-11-02T13:37:58.613435+00:00",
+    "exit": 2,
+    "loaded_collection_module_sha256": "e1b4b16f7eb4496c1f5df650f7051157789171826a8cddd8d8c0ba89ae16abed",
+    "output_sha256": "3efa073ca6b1587e541cf9426e825ca6e326fdf3385e143e62a3ee66897802d0",
+    "reason": "explicit resume after read-only inspection; unknown attempt counted; fixed cumulative cap retained",
+    "source_file_sha_on_completion": "e1b4b16f7eb4496c1f5df650f7051157789171826a8cddd8d8c0ba89ae16abed",
+    "started_utc": "2026-11-02T12:46:29.648173+00:00"
+  },
+  {
+    "action": "resume",
+    "command": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/historical-sidecar.py",
+      "resume",
+      "--credential-source",
+      "existing-tushare-mcp-config",
+      "--rpm",
+      "30"
+    ],
+    "elapsed_seconds": 1479.1880000000092,
+    "ended_utc": "2026-11-02T14:17:56.866223+00:00",
+    "exit": 2,
+    "loaded_collection_module_sha256": "e1b4b16f7eb4496c1f5df650f7051157789171826a8cddd8d8c0ba89ae16abed",
+    "output_sha256": "99cec070d7e861fe7216079dbaa6f0a6a22de0a366fb0c1dc1f766d2ce5b2fe3",
+    "reason": "explicit resume after read-only inspection; unknown attempt counted; fixed cumulative cap retained",
+    "source_file_sha_on_completion": "e1b4b16f7eb4496c1f5df650f7051157789171826a8cddd8d8c0ba89ae16abed",
+    "started_utc": "2026-11-02T13:53:17.680965+00:00"
+  },
+  {
+    "action": "resume",
+    "command": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/historical-sidecar.py",
+      "resume",
+      "--retry-failed",
+      "--credential-source",
+      "existing-tushare-mcp-config",
+      "--rpm",
+      "30"
+    ],
+    "elapsed_seconds": 14.64100000000326,
+    "ended_utc": "2026-11-02T14:23:51.701456+00:00",
+    "exit": 0,
+    "loaded_collection_module_sha256": "e1b4b16f7eb4496c1f5df650f7051157789171826a8cddd8d8c0ba89ae16abed",
+    "output_sha256": "09aabdf0bc4b9b558277af83e6052598ecbab89896f9da61e8a5180000a39488",
+    "reason": "explicit resume after read-only inspection; unknown attempt counted; fixed cumulative cap retained",
+    "source_file_sha_on_completion": "e1b4b16f7eb4496c1f5df650f7051157789171826a8cddd8d8c0ba89ae16abed",
+    "started_utc": "2026-11-02T14:23:37.057257+00:00"
+  }
+]
