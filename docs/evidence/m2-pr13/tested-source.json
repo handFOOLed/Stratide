@@ -1,0 +1,22 @@
+{
+  "base": "9a030459127da60028098a43adc8316c3988da35",
+  "collection_loaded_module_sha256": "c4b4ae48bdbe8430ba93388a3edfea8d7c54b147b8a78886dfd81763b6f42ad4",
+  "files": {
+    "research/historical_sidecar.py": {
+      "git_blob_sha1": "109e10c658783f4a9a7a5f730f81c26257cb410e",
+      "sha256": "e1b4b16f7eb4496c1f5df650f7051157789171826a8cddd8d8c0ba89ae16abed"
+    },
+    "research/historical_warehouse.py": {
+      "git_blob_sha1": "363d46fc59494ad50a3aa5f5ced8075cab000b17",
+      "sha256": "eefbdf231b381fcfc53813237c6785a70b4291d6462db89d8542dca7cb36fdcf"
+    },
+    "scripts/historical-sidecar.py": {
+      "git_blob_sha1": "656c5948093134d0cb8c62420031395cc3ec0dec",
+      "sha256": "6e2521be1143100b32d6f858f95ae23eba4d16de404ab5239e7ab2c88e89c64f"
+    },
+    "scripts/test-historical-sidecar.py": {
+      "git_blob_sha1": "1a40d5031d72565c6cda7d714dc980d13b7e9ed1",
+      "sha256": "b14969c99b81e6a17edf1e56d581f4091b9f5c8a8f75e33fa2f34cc6331a5f98"
+    }
+  }
+}

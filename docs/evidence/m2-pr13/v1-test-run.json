@@ -1,0 +1,18 @@
+{
+  "command": [
+    "python",
+    "-I",
+    "-B",
+    "scripts/test-historical-warehouse.py"
+  ],
+  "exit": 0,
+  "tests": 30,
+  "passed": 28,
+  "skipped": 2,
+  "elapsed_seconds": 22.269,
+  "limitations": [
+    "Windows SeCreateSymbolicLinkPrivilege unavailable for two file-symlink tests; real raw-directory junction test passed"
+  ],
+  "unchanged_source_sha256": "eefbdf231b381fcfc53813237c6785a70b4291d6462db89d8542dca7cb36fdcf",
+  "unchanged_tests_sha256": "532651284ead6a15d19ae2d531f658613566bae9cd1f292e126eb4e1264ddf54"
+}

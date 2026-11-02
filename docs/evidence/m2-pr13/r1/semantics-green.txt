@@ -1,0 +1,7 @@
+test_adj_factor_documented_scope_has_no_invented_numeric_cap (__main__.Suite.test_adj_factor_documented_scope_has_no_invented_numeric_cap) ... ok
+test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 5.106s
+
+OK

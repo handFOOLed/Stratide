@@ -1,0 +1,30 @@
+test_adj_factor_documented_scope_has_no_invented_numeric_cap (__main__.Suite.test_adj_factor_documented_scope_has_no_invented_numeric_cap) ...
+  test_adj_factor_documented_scope_has_no_invented_numeric_cap (__main__.Suite.test_adj_factor_documented_scope_has_no_invented_numeric_cap) (rows=1000) ... FAIL
+  test_adj_factor_documented_scope_has_no_invented_numeric_cap (__main__.Suite.test_adj_factor_documented_scope_has_no_invented_numeric_cap) (rows=6000) ... FAIL
+
+======================================================================
+FAIL: test_adj_factor_documented_scope_has_no_invented_numeric_cap (__main__.Suite.test_adj_factor_documented_scope_has_no_invented_numeric_cap) (rows=1000)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>\scripts\test-historical-sidecar.py", line 457, in test_adj_factor_documented_scope_has_no_invented_numeric_cap
+    self.assertEqual(response["status"],"OK")
+AssertionError: 'TRUNCATION_SUSPECTED' != 'OK'
+- TRUNCATION_SUSPECTED
++ OK
+
+
+======================================================================
+FAIL: test_adj_factor_documented_scope_has_no_invented_numeric_cap (__main__.Suite.test_adj_factor_documented_scope_has_no_invented_numeric_cap) (rows=6000)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>\scripts\test-historical-sidecar.py", line 457, in test_adj_factor_documented_scope_has_no_invented_numeric_cap
+    self.assertEqual(response["status"],"OK")
+AssertionError: 'TRUNCATION_SUSPECTED' != 'OK'
+- TRUNCATION_SUSPECTED
++ OK
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.291s
+
+FAILED (failures=2)

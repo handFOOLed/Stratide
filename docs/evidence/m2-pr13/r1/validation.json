@@ -1,0 +1,130 @@
+{
+  "baseline": {
+    "head": "4135268e2d3fe6c46a2d5ee85e3c8b81b345e395",
+    "source_evidence": "docs/evidence/m2-pr13/real-summary.json",
+    "source_binding": {
+      "attempts": 6068,
+      "versions": 4848,
+      "rows": 19221401,
+      "result": "VERIFIED_STORAGE_SOURCE_BINDING"
+    },
+    "v2_tests": {
+      "passed": 16
+    },
+    "v1_tests": {
+      "passed": 28,
+      "skipped": 2
+    },
+    "reuse": "Prior storage/raw/row/manifest binding and untouched behavior only; not a new quality-metadata verification of real data"
+  },
+  "runs": [
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-historical-sidecar.py",
+        "Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly"
+      ],
+      "exit": 1,
+      "at_utc": "2026-11-02T15:09:31.495690+00:00",
+      "module_sha256": "e1b4b16f7eb4496c1f5df650f7051157789171826a8cddd8d8c0ba89ae16abed",
+      "stage": "quality-red",
+      "raw_local_log_sha256": "df030f2bb0ad5a7f6d1692d848f070d64f10f4605f18f43b171ab82b478d4db0",
+      "published_log_sha256": "cfb050c7717e1af0dbd783ea843aa930048ff957a84cccb750eb6c82ee90ff4a"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-historical-sidecar.py",
+        "Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly"
+      ],
+      "exit": 0,
+      "at_utc": "2026-11-02T15:10:39.937204+00:00",
+      "module_sha256": "70002b2d35aea864b96b8ff88e691cbbba6dc6dea8dacae0d64ad361037a225f",
+      "stage": "quality-green",
+      "raw_local_log_sha256": "6308ac9012d7011cd8ee97ba252f8a3cd035007f9586f115537e8f66ce84b818",
+      "published_log_sha256": "df02cea15f7840e57ca7f30508d99d7c9a19cfd7d93a63530a067905f246a0ce"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-historical-sidecar.py",
+        "Suite.test_adj_factor_documented_scope_has_no_invented_numeric_cap"
+      ],
+      "exit": 1,
+      "at_utc": "2026-11-02T15:12:02.418095+00:00",
+      "module_sha256": "70002b2d35aea864b96b8ff88e691cbbba6dc6dea8dacae0d64ad361037a225f",
+      "stage": "semantics-red",
+      "raw_local_log_sha256": "259d01b0f872f2ae2fef635c440359f960765f33b70407e6870c07f3c47b3bcc",
+      "published_log_sha256": "cd42061979f827d35ddab684d11e132cc36d4d38b6126967ee4c984eb6decc3f"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-historical-sidecar.py",
+        "Suite.test_adj_factor_documented_scope_has_no_invented_numeric_cap",
+        "Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly"
+      ],
+      "exit": 0,
+      "at_utc": "2026-11-02T15:12:48.479962+00:00",
+      "module_sha256": "ced928920e89888dd73f0fd12786ed2760e285d969e42ea104620589c6cb44d0",
+      "stage": "semantics-green",
+      "raw_local_log_sha256": "7a5e4ed19e1bbfd3ff24e349317d1d34b72893632e5393c8cae013a902c24f67",
+      "published_log_sha256": "5c8a52a7b9c0690258b2f128401c7008b53aaac34b14696478e50fddd845ed44"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-historical-sidecar.py",
+        "Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly",
+        "Suite.test_adj_factor_documented_scope_has_no_invented_numeric_cap",
+        "Suite.test_40_days_four_apis_decimal_null_units_and_queries",
+        "Suite.test_documented_caps_and_bounded_partitions",
+        "Suite.test_capped_response_codes_outside_catalog_survive_multiple_partitions",
+        "Suite.test_refresh_revision_rollback_and_reduced_universe",
+        "Suite.test_readonly_no_network_credentials_or_mtime",
+        "Suite.test_missing_optional_fields_cannot_reduce_admitted_view"
+      ],
+      "exit": 0,
+      "elapsed_seconds": 15.469000000011874,
+      "at_utc": "2026-11-02T15:15:11.976758+00:00",
+      "module_sha256": "ced928920e89888dd73f0fd12786ed2760e285d969e42ea104620589c6cb44d0",
+      "test_sha256": "da656f26829d082c0d3f7a828f5eae6a2001cab75c74ad95e27f974201fd19ac",
+      "data_scope": "new disposable synthetic SQLite/raw only; no existing historical DB opened",
+      "network_calls": 0,
+      "stage": "targeted-green",
+      "raw_local_log_sha256": "17b245f1fb53630f5ef9bf769367ad84c9fbf9a05ab98daadec6738347f5113f",
+      "published_log_sha256": "1f19f9d569c84f0a69a1aa6f3fd651e5e72125803d13dd0a296a6652dda2f7a3"
+    }
+  ],
+  "current_tested_sources": {
+    "research/historical_sidecar.py": {
+      "sha256": "ced928920e89888dd73f0fd12786ed2760e285d969e42ea104620589c6cb44d0",
+      "git_blob_sha1": "411815ba42a588a11654f2c998b5040c8aa49c0b"
+    },
+    "scripts/test-historical-sidecar.py": {
+      "sha256": "da656f26829d082c0d3f7a828f5eae6a2001cab75c74ad95e27f974201fd19ac",
+      "git_blob_sha1": "3ec05f96b893fc56ee299193f29d2daf0011e2ee"
+    }
+  },
+  "current_result": "8 targeted synthetic tests passed; 16 CLI metadata corruption subcases rejected readonly",
+  "data_changes": "No existing historical database opened or written; only new disposable synthetic SQLite/raw fixtures",
+  "real_tushare_api_calls": 0,
+  "not_run": [
+    "real historical verify under new code",
+    "historical raw reparse",
+    "V1/V2 full fingerprint scans",
+    "fresh market collection",
+    "unaffected V1/Rust/cloud suites",
+    "independent fixed-HEAD review"
+  ]
+}

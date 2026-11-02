@@ -28,13 +28,17 @@ PR #42 的[历史公司行为桥接 V1](M1_PR09.md)、PR #44 的[EOD 自动研�
 
 **M1-PR11 已合并（PR #54）：** [#53](https://github.com/handFOOLed/Stratide/issues/53) 的 [真实前向 EOD 研究资格 V1](M1_PR11.md) 已并入 `main a27f466`：只读原 observer/PR33/PR38，冻结独立事件源契约与实际取得覆盖，逐日核验 21 连续会话并接入原 PR52。完整 synthetic 正反/修订/恢复只证明工程路径；真实两日、事件覆盖缺失且已过期，仍 BLOCKED。历史 PIT、开盘、Paper/Live 均不解锁。
 
-**本分支 M2-PR11 Draft：** [#55](https://github.com/handFOOLed/Stratide/issues/55) 的 [Cloud Risk Expert + Autonomous Portfolio V1](M2_PR11.md)：独立 scope、BigQuery/DeepSeek 两套生产 Adapter、原 Rust 任务/统一预算、Naive/EWMA 风险代理、严格股票/现金组合及原 Inbox。3 股票+现金/全现金、策略版本变化和费用/基线对照走 recorded/loopback 完整路径。无真实云/资金/订单；真实数据、完整 query 费用和模型能力仍 BLOCKED/NOT_VERIFIED。
+**M2-PR11 已合并（PR #56）：** [#55](https://github.com/handFOOLed/Stratide/issues/55) 的 [Cloud Risk Expert + Autonomous Portfolio V1](M2_PR11.md)：独立 scope、BigQuery/DeepSeek 两套生产 Adapter、原 Rust 任务/统一预算、Naive/EWMA 风险代理、严格股票/现金组合及原 Inbox。3 股票+现金/全现金、策略版本变化和费用/基线对照走 recorded/loopback 完整路径。无真实云/资金/订单；真实数据、完整 query 费用和模型能力仍 BLOCKED/NOT_VERIFIED。
 
-**审查修复 R1：** 新链路显式绑定已有 Owner AgentDir 与配置，共享原费用库；177 Rust、13 新 E2E 开发自测通过。PR52/54 三套原完整回归于 2026-11-02 盘后有效时间实际运行，**10+4+13 项均 exit 0**，开发证据已补齐，最终独立复审仍待完成；[修复证据](evidence/m2-pr11/r1/README.md) / [盘后运行](evidence/m2-pr11/r1/afternoon/README.md)。
+**审查修复 R1：** 新链路显式绑定已有 Owner AgentDir 与配置，共享原费用库；177 Rust、13 新 E2E 开发自测通过。PR52/54 三套原完整回归于 2026-11-02 盘后有效时间实际运行，**10+4+13 项均 exit 0**，该段记录当时开发证据；PR #56 后续已并入 main，原记录保留；[修复证据](evidence/m2-pr11/r1/README.md) / [盘后运行](evidence/m2-pr11/r1/afternoon/README.md)。
+
+**M2-PR12 已合并（PR #58）：** [历史仓库 V1](M2_PR12.md) 已真实下载 1212 日期、6347781 行；历史身份/BSE 日历/PIT 仍未核实，本地旧库保留。
+
+**当前 M2-PR13 Draft（#59）：** [四接口历史 sidecar V2](M2_PR13.md)，仅用现有 2000 积分 Tushare 账号，极窄预检后立即执行五年全量回填，已实际提交 4848 个 API×日期分区、6068 次请求；支持持久硬预算、断点续传、只读版本查询和冻结锚点复权。真实覆盖与限制见 [本期证据](evidence/m2-pr13/README.md)；不接云外发、策略评价或交易。
 
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |
-| **当前 #55** | **Sol** | M2-PR11 云风险/自主组合，真实 Adapter + 合成 E2E + 费用/凭据/并发/恢复反证；唯一 Draft，固定 HEAD 审查及针对性独立 P0 复核后由 Owner 决定是否合并。 |
+| **当前 #59** | **Sol** | M2-PR13 四 API 真实历史回填与可复现查询；完整/部分/受阻以实际证据为准。唯一 Draft，固定 HEAD 审查及 Owner 明确批准后才可合并。 |
 | **后续核心** | Owner 再定范围 | #10 真实开盘、PIT、账户税/到账仍受阻；#36 完整多模态消融及真实供应商未验证。 |
 | **核心全部完成后** | **Sol** | 按 PR #28 的设计体系统一集成 UI；本期不改 UI。 |
 

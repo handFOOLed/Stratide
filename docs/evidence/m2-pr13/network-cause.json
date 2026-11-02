@@ -1,0 +1,11 @@
+{
+  "reported_by": "Owner",
+  "reported_cause": "local network changes during collection",
+  "scope_attempt_ids": [
+    4291,
+    4293
+  ],
+  "evidence_level": "OWNER_REPORTED",
+  "later_network_failure_cause": "NOT_VERIFIED",
+  "provider_permission_or_quota_rejection_observed": false
+}
