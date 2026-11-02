@@ -30,7 +30,7 @@ PR #42 的[历史公司行为桥接 V1](M1_PR09.md)、PR #44 的[EOD 自动研�
 
 **本分支 M2-PR11 Draft：** [#55](https://github.com/handFOOLed/Stratide/issues/55) 的 [Cloud Risk Expert + Autonomous Portfolio V1](M2_PR11.md)：独立 scope、BigQuery/DeepSeek 两套生产 Adapter、原 Rust 任务/统一预算、Naive/EWMA 风险代理、严格股票/现金组合及原 Inbox。3 股票+现金/全现金、策略版本变化和费用/基线对照走 recorded/loopback 完整路径。无真实云/资金/订单；真实数据、完整 query 费用和模型能力仍 BLOCKED/NOT_VERIFIED。
 
-**审查修复 R1：** 新链路显式绑定已有 Owner AgentDir 与配置，共享原费用库；177 Rust、13 新 E2E 开发自测通过。PR52/54 三套原始回归仍待盘后有效时间复测，当前不计 PASS；[修复证据及续跑交接](evidence/m2-pr11/r1/README.md)。
+**审查修复 R1：** 新链路显式绑定已有 Owner AgentDir 与配置，共享原费用库；177 Rust、13 新 E2E 开发自测通过。PR52/54 三套原完整回归于 2026-11-02 盘后有效时间实际运行，**10+4+13 项均 exit 0**，开发证据已补齐，最终独立复审仍待完成；[修复证据](evidence/m2-pr11/r1/README.md) / [盘后运行](evidence/m2-pr11/r1/afternoon/README.md)。
 
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |

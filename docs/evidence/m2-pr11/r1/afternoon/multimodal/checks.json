@@ -1,0 +1,2889 @@
+{
+  "commands": [
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-e2e-a-e703",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-e2e-a-e703"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-a-e703",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-e2e-a-e703"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-a-e703"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-a-e703",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-a-e703"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-a-e703",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-a-e703"
+    },
+    {
+      "args": [
+        "report",
+        "cb7be153673edcddac4b6d4b4236391f9df7a2fb553d3117f89833bba9622d8b"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-a-e703",
+        "report",
+        "cb7be153673edcddac4b6d4b4236391f9df7a2fb553d3117f89833bba9622d8b"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-a-e703"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-a-e703",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-a-e703"
+    },
+    {
+      "args": [
+        "status"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-a-e703",
+        "status"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-a-e703"
+    },
+    {
+      "args": [
+        "history"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-a-e703",
+        "history"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-a-e703"
+    },
+    {
+      "args": [
+        "verify",
+        "cb7be153673edcddac4b6d4b4236391f9df7a2fb553d3117f89833bba9622d8b"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-a-e703",
+        "verify",
+        "cb7be153673edcddac4b6d4b4236391f9df7a2fb553d3117f89833bba9622d8b"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-a-e703"
+    },
+    {
+      "args": [
+        "report",
+        "cb7be153673edcddac4b6d4b4236391f9df7a2fb553d3117f89833bba9622d8b"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-a-e703",
+        "report",
+        "cb7be153673edcddac4b6d4b4236391f9df7a2fb553d3117f89833bba9622d8b"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-a-e703"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-e2e-b-36dc",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-e2e-b-36dc"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-b-36dc",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-e2e-b-36dc"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-b-36dc"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-b-36dc",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-b-36dc"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-b-36dc",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-b-36dc"
+    },
+    {
+      "args": [
+        "report",
+        "d83a0bf56326e52e1a9a5c6b0cd5d122ef97b8389eab7c10ecaa9a2259e0d2e7"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-b-36dc",
+        "report",
+        "d83a0bf56326e52e1a9a5c6b0cd5d122ef97b8389eab7c10ecaa9a2259e0d2e7"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-b-36dc"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-b-36dc",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-b-36dc"
+    },
+    {
+      "args": [
+        "status"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-b-36dc",
+        "status"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-b-36dc"
+    },
+    {
+      "args": [
+        "history"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-b-36dc",
+        "history"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-b-36dc"
+    },
+    {
+      "args": [
+        "verify",
+        "d83a0bf56326e52e1a9a5c6b0cd5d122ef97b8389eab7c10ecaa9a2259e0d2e7"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-b-36dc",
+        "verify",
+        "d83a0bf56326e52e1a9a5c6b0cd5d122ef97b8389eab7c10ecaa9a2259e0d2e7"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-b-36dc"
+    },
+    {
+      "args": [
+        "report",
+        "d83a0bf56326e52e1a9a5c6b0cd5d122ef97b8389eab7c10ecaa9a2259e0d2e7"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-e2e-b-36dc",
+        "report",
+        "d83a0bf56326e52e1a9a5c6b0cd5d122ef97b8389eab7c10ecaa9a2259e0d2e7"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-e2e-b-36dc"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-adapter-5ad5",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-adapter-5ad5"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-adapter-5ad5",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-adapter-5ad5"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-adapter-5ad5"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-adapter-5ad5",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-adapter-5ad5"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-adapter-5ad5",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-adapter-5ad5"
+    },
+    {
+      "args": [
+        "experiment",
+        "--time-series-model",
+        "local-test-momentum",
+        "--label",
+        "momentum-v1"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-adapter-5ad5",
+        "experiment",
+        "--time-series-model",
+        "local-test-momentum",
+        "--label",
+        "momentum-v1"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-adapter-5ad5"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-adapter-5ad5",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-adapter-5ad5"
+    },
+    {
+      "args": [
+        "report",
+        "6f278cd3a7294b6911ee6b10816c835e4f874b2a3a7eca21da269438d4aada99"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-adapter-5ad5",
+        "report",
+        "6f278cd3a7294b6911ee6b10816c835e4f874b2a3a7eca21da269438d4aada99"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-adapter-5ad5"
+    },
+    {
+      "args": [
+        "experiment",
+        "--without-fusion",
+        "--label",
+        "no-fusion-control"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-adapter-5ad5",
+        "experiment",
+        "--without-fusion",
+        "--label",
+        "no-fusion-control"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-adapter-5ad5"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-adapter-5ad5",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-adapter-5ad5"
+    },
+    {
+      "args": [
+        "history"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-adapter-5ad5",
+        "history"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-adapter-5ad5"
+    },
+    {
+      "args": [
+        "verify",
+        "f1567f0a594375e40430038ac30e9e1c3668e350d0a7d939bf3389cef88f289a"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-adapter-5ad5",
+        "verify",
+        "f1567f0a594375e40430038ac30e9e1c3668e350d0a7d939bf3389cef88f289a"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-adapter-5ad5"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-after_freeze-6f81",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-after_freeze-6f81"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_freeze-6f81",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-after_freeze-6f81"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_freeze-6f81"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_freeze-6f81",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_freeze-6f81"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-b7e9a1bd\\request-650e925b0c.json"
+      ],
+      "exit_code": 86,
+      "fault": "after_freeze",
+      "name": "mm-test-b7e9a1bd-after_freeze-6f81"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_freeze-6f81",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_freeze-6f81"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_freeze-6f81",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_freeze-6f81"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-after_experts-cc43",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-after_experts-cc43"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_experts-cc43",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-after_experts-cc43"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_experts-cc43"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_experts-cc43",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_experts-cc43"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-b7e9a1bd\\request-ca9f22ff8e.json"
+      ],
+      "exit_code": 86,
+      "fault": "after_experts",
+      "name": "mm-test-b7e9a1bd-after_experts-cc43"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_experts-cc43",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_experts-cc43"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_experts-cc43",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_experts-cc43"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-after_queue-ac04",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-after_queue-ac04"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_queue-ac04",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-after_queue-ac04"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_queue-ac04"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_queue-ac04",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_queue-ac04"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-b7e9a1bd\\request-04e7819df3.json"
+      ],
+      "exit_code": 86,
+      "fault": "after_queue",
+      "name": "mm-test-b7e9a1bd-after_queue-ac04"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_queue-ac04",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_queue-ac04"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_queue-ac04",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_queue-ac04"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-after_fusion-412c",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-after_fusion-412c"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_fusion-412c",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-after_fusion-412c"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_fusion-412c"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_fusion-412c",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_fusion-412c"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-b7e9a1bd\\request-acf189307c.json"
+      ],
+      "exit_code": 86,
+      "fault": "after_fusion",
+      "name": "mm-test-b7e9a1bd-after_fusion-412c"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_fusion-412c",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_fusion-412c"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_fusion-412c",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_fusion-412c"
+    },
+    {
+      "args": [
+        "verify",
+        "6941dda2982d5726ded61e850cc1340218c7bb6463a150600da2edf11a38ba90"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-after_fusion-412c",
+        "verify",
+        "6941dda2982d5726ded61e850cc1340218c7bb6463a150600da2edf11a38ba90"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-after_fusion-412c"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-concurrent-08e0",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-concurrent-08e0"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-concurrent-08e0",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-concurrent-08e0"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-concurrent-08e0"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-concurrent-08e0",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-concurrent-08e0"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-concurrent-08e0",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-concurrent-08e0"
+    },
+    {
+      "args": [
+        "disable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-concurrent-08e0",
+        "disable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-concurrent-08e0"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-b7e9a1bd\\request-01ad74605a.json"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-concurrent-08e0"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-concurrent-08e0",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-concurrent-08e0"
+    },
+    {
+      "args": [
+        "experiment",
+        "--label",
+        "owner-reenabled"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-concurrent-08e0",
+        "experiment",
+        "--label",
+        "owner-reenabled"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-concurrent-08e0"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-owner-9a22",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-owner-9a22"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-owner-9a22",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-owner-9a22"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-owner-9a22"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-owner-9a22",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-owner-9a22"
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-owner-9a22"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-alias-86afa6",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-owner-9a22"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-alias-86afa6"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-alias-86afa6",
+        "enable"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-alias-86afa6"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-short-cc95",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-short-cc95"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-short-cc95",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-short-cc95"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-short-cc95"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-short-cc95",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-short-cc95"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-short-cc95",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-short-cc95"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-forward-short-38f4",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-forward-short-38f4"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-forward-short-38f4",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-forward-short-38f4"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-forward-short-38f4"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-forward-short-38f4",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-forward-short-38f4"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-forward-short-38f4",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-forward-short-38f4"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-forward-ca-blocked-f064",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-forward-ca-blocked-f064"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-forward-ca-blocked-f064",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-forward-ca-blocked-f064"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-forward-ca-blocked-f064"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-forward-ca-blocked-f064",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-forward-ca-blocked-f064"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-forward-ca-blocked-f064",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-forward-ca-blocked-f064"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-daily-a6bd",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-daily-a6bd"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-daily-a6bd",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-daily-a6bd"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-daily-a6bd"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-daily-a6bd",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-daily-a6bd"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-daily-a6bd",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-daily-a6bd"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-daily-a6bd",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-daily-a6bd"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-month-0326",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-month-0326"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-month-0326",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-month-0326"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-month-0326"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-month-0326",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-month-0326"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-month-0326",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-month-0326"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-month-0326",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-month-0326"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-revoked-ac66",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-revoked-ac66"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-revoked-ac66",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-revoked-ac66"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-revoked-ac66"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-revoked-ac66",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-revoked-ac66"
+    },
+    {
+      "args": [
+        "experiment",
+        "--label",
+        "revoked"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-revoked-ac66",
+        "experiment",
+        "--label",
+        "revoked"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-revoked-ac66"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-revoked-ac66",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-revoked-ac66"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-cloud-204a",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-cloud-204a"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-cloud-204a",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-cloud-204a"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-cloud-204a"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-cloud-204a",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-cloud-204a"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-cloud-204a",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-cloud-204a"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-unknown-38e2",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-unknown-38e2"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-unknown-38e2",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-unknown-38e2"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-unknown-38e2"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-unknown-38e2",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-unknown-38e2"
+    },
+    {
+      "args": [
+        "experiment",
+        "--fusion-model",
+        "fake-unknown",
+        "--label",
+        "unknown"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-unknown-38e2",
+        "experiment",
+        "--fusion-model",
+        "fake-unknown",
+        "--label",
+        "unknown"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-unknown-38e2"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-unknown-38e2",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-unknown-38e2"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-unknown-38e2",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-unknown-38e2"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-unknown-held-58ce",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-unknown-held-58ce"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-unknown-held-58ce",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-unknown-held-58ce"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-unknown-held-58ce"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-unknown-held-58ce",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-unknown-held-58ce"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-unknown-held-58ce",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-unknown-held-58ce"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-no-external-b010",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-no-external-b010"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-no-external-b010",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-no-external-b010"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-no-external-b010"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-no-external-b010",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-no-external-b010"
+    },
+    {
+      "args": [
+        "experiment",
+        "--time-series-model",
+        "external",
+        "--label",
+        "external"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-no-external-b010",
+        "experiment",
+        "--time-series-model",
+        "external",
+        "--label",
+        "external"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-no-external-b010"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-no-external-b010",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-no-external-b010"
+    },
+    {
+      "args": [
+        "history"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-no-external-b010",
+        "history"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-no-external-b010"
+    },
+    {
+      "args": [
+        "report"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-no-external-b010",
+        "report"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-no-external-b010"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-expert-inconsistent-59f9",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-expert-inconsistent-59f9"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-expert-inconsistent-59f9",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-expert-inconsistent-59f9"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-expert-inconsistent-59f9"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-expert-inconsistent-59f9",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-expert-inconsistent-59f9"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-b7e9a1bd\\request-69ff426bcf.json"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-expert-inconsistent-59f9"
+    },
+    {
+      "args": [
+        "report"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-expert-inconsistent-59f9",
+        "report"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-expert-inconsistent-59f9"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-expert-error-2866",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-expert-error-2866"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-expert-error-2866",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-expert-error-2866"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-expert-error-2866"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-expert-error-2866",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-expert-error-2866"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-b7e9a1bd\\request-537aed72e5.json"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-expert-error-2866"
+    },
+    {
+      "args": [
+        "report"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-expert-error-2866",
+        "report"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-expert-error-2866"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-malicious-0994",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-malicious-0994"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-malicious-0994",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-malicious-0994"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-malicious-0994"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-malicious-0994",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-malicious-0994"
+    },
+    {
+      "args": [
+        "experiment",
+        "--fusion-model",
+        "fake-text",
+        "--label",
+        "malicious"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-malicious-0994",
+        "experiment",
+        "--fusion-model",
+        "fake-text",
+        "--label",
+        "malicious"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-malicious-0994"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-malicious-0994",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-malicious-0994"
+    },
+    {
+      "args": [
+        "report"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-malicious-0994",
+        "report"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-malicious-0994"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-malicious-0994",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-malicious-0994"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-expert-negative-fa01",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-expert-negative-fa01"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-expert-negative-fa01",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-expert-negative-fa01"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-expert-negative-fa01"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-expert-negative-fa01",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-expert-negative-fa01"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-expert-negative-fa01",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-expert-negative-fa01"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-b7e9a1bd-source-negative-e097",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-source-negative-e097"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-source-negative-e097",
+        "init",
+        "--snapshot-store",
+        "mm-test-b7e9a1bd-source-negative-e097"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-source-negative-e097"
+    },
+    {
+      "args": [
+        "enable"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-source-negative-e097",
+        "enable"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-source-negative-e097"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-source-negative-e097",
+        "once"
+      ],
+      "exit_code": 0,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-source-negative-e097"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-b7e9a1bd\\request-2015751472.json"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-source-negative-e097"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-source-negative-e097",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-source-negative-e097"
+    },
+    {
+      "args": [
+        "once"
+      ],
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-b7e9a1bd-source-negative-e097",
+        "once"
+      ],
+      "exit_code": 2,
+      "fault": null,
+      "name": "mm-test-b7e9a1bd-source-negative-e097"
+    }
+  ],
+  "errors": 0,
+  "failures": 0,
+  "independent_acceptance": "NOT_VERIFIED",
+  "public_requests": 0,
+  "results": [
+    {
+      "additional_agent_calls": 0,
+      "automated_template_selections": 0,
+      "candidate_sha256": "2df9f4b3a84b33a660b8146996e3a63dec853657ef24fc1169221fa0377d7285",
+      "check": "explicit_owner_review_reuses_original_evaluator",
+      "evaluation_sha256": "08e39f41b3881f3ae8f5048488e1079f244a52439a2449ebeedfd7d2a23832f9",
+      "qualification": "SYNTHETIC_TEST_ONLY"
+    },
+    {
+      "baseline_sha256": "a9015bfc08f07cefb466d4c91456613aff09adb4b05be8c9bf237e8cc60c1355",
+      "calls": [
+        {
+          "day": "2026-11-02",
+          "id": "1",
+          "input_tokens": "6632",
+          "maximum_micro": "34816",
+          "month": "2026-11",
+          "output_tokens": "128",
+          "price_version": "synthetic-price-v1",
+          "reason": null,
+          "settled_micro": "6888",
+          "state": "settled",
+          "usage_micro": "6888"
+        }
+      ],
+      "check": "production_cli_e2e",
+      "fusion_sha256": "39daba110ca0772d1bad9c8813df7f5dda0b37f2d20bf1850bd2230b134f38ab",
+      "input_snapshot_sha256": "a312b93a205f8fbfb6fb289114011350df7c3aeb3150eeb41a51c6ed29b743c5",
+      "name": "mm-test-b7e9a1bd-e2e-a-e703",
+      "provider": "ORIGINAL_RUST_FAKE",
+      "public_requests": 0,
+      "readonly_byte_and_mtime_preserved": true,
+      "registration_sha256": "03a2795a352d04c9998d326b845ba7e6ba27563374ef6a8227390c04389270ac",
+      "report_sha256": "c41e1780dd4bf746ba7fe17a1f233b6eb73ab4c9e58f04164ddbfea549f0c7d4",
+      "source_days": 25,
+      "task_detail_sha256": "284f9873b8a4410e479f861f158a57cf29b8e6e9c7bab18648da61286d6c7871",
+      "task_id": "cb7be153673edcddac4b6d4b4236391f9df7a2fb553d3117f89833bba9622d8b",
+      "time_series_sha256": "51e0cb8764c998ec1fbf3c14441f9745d76e25f0ab1fcc6e6abbdaa05f824e27",
+      "walk_forward": {
+        "attempted": 4,
+        "authority": {
+          "can_execute_forward_paper": false,
+          "eligibility": "ELIGIBILITY_DENIED",
+          "live_allowed": false,
+          "restriction": "RESEARCH_ONLY"
+        },
+        "evaluated": 4,
+        "fusion_comparison": "STRUCTURED_HYPOTHESES_ONLY_NO_PRICE_ACCURACY_SCORE",
+        "holdout": "SYNTHETIC_EXPOSED_NOT_BLIND",
+        "mean_absolute_error_ratio": {
+          "naive": "0.002397174285",
+          "time_series": "0.001943327206"
+        },
+        "refusal_rate": "0.000000000000",
+        "refused": 0,
+        "rows": [
+          {
+            "naive": "0.000000000000",
+            "prefix_sha256": "ce52ced183a14eff35d28730dbd4fa2e42a9758af3b360c61e096741249d3b99",
+            "revealed_day": "20261030",
+            "revealed_return_ratio": "0.001923076923",
+            "time_series": "0.000982994969",
+            "train_through": "20261029"
+          },
+          {
+            "naive": "0.000000000000",
+            "prefix_sha256": "24deed96176c0e1efd8b8b3b20386f179e3638201bcdd9b25b2c2a583d94f773",
+            "revealed_day": "20261031",
+            "revealed_return_ratio": "0.004798464491",
+            "time_series": "0.000906071892",
+            "train_through": "20261030"
+          },
+          {
+            "naive": "0.000000000000",
+            "prefix_sha256": "d8606ad016146ca87e045e6495c5dd7d2bae7d03fdbf239ba37d97bdc32a3a00",
+            "revealed_day": "20261101",
+            "revealed_return_ratio": "-0.000955109838",
+            "time_series": "0.001050909126",
+            "train_through": "20261031"
+          },
+          {
+            "naive": "0.000000000000",
+            "prefix_sha256": "c24f9ec6d9efe433c7bac19e53beab6137c8a69b1b3c10f02966c2b01bf4a2df",
+            "revealed_day": "20261102",
+            "revealed_return_ratio": "0.001912045889",
+            "time_series": "0.000977230584",
+            "train_through": "20261101"
+          }
+        ],
+        "status": "SYNTHETIC_PREFIX_CHECK_NOT_INDEPENDENT"
+      }
+    },
+    {
+      "baseline_sha256": "2500426138e7e4f180eb710a71e114e92c8c6916c4049a436c35f11e6bb56f0c",
+      "calls": [
+        {
+          "day": "2026-11-02",
+          "id": "2",
+          "input_tokens": "6634",
+          "maximum_micro": "34816",
+          "month": "2026-11",
+          "output_tokens": "128",
+          "price_version": "synthetic-price-v1",
+          "reason": null,
+          "settled_micro": "6890",
+          "state": "settled",
+          "usage_micro": "6890"
+        }
+      ],
+      "check": "production_cli_e2e",
+      "fusion_sha256": "1f50ec844c517c7fbd0e5b0700e42102b4b8c8f5d476d859cbb62e6223d420ad",
+      "input_snapshot_sha256": "d2814074ffb280bbf0af2444a0f812be00b87c434d6a403594d5d7e28b1c569c",
+      "name": "mm-test-b7e9a1bd-e2e-b-36dc",
+      "provider": "ORIGINAL_RUST_FAKE",
+      "public_requests": 0,
+      "readonly_byte_and_mtime_preserved": true,
+      "registration_sha256": "329afe4ff6a8de476c5ea223731b5b1c88d66a8a496ed3dcdca771bae47a1069",
+      "report_sha256": "a6ce119cf6d083147d8e038009e4b0eada68c4d937da26edcca1b2b3746fcf25",
+      "source_days": 25,
+      "task_detail_sha256": "1983eb962652f427751d5ba59b0421f487afaeb4ff8835ec0f087e7ecc817208",
+      "task_id": "d83a0bf56326e52e1a9a5c6b0cd5d122ef97b8389eab7c10ecaa9a2259e0d2e7",
+      "time_series_sha256": "8aa1c373fd1a62e9b1f62f98b98e5d7ff78c16d67fbfddbbd0c8d49f97adfd2e",
+      "walk_forward": {
+        "attempted": 4,
+        "authority": {
+          "can_execute_forward_paper": false,
+          "eligibility": "ELIGIBILITY_DENIED",
+          "live_allowed": false,
+          "restriction": "RESEARCH_ONLY"
+        },
+        "evaluated": 4,
+        "fusion_comparison": "STRUCTURED_HYPOTHESES_ONLY_NO_PRICE_ACCURACY_SCORE",
+        "holdout": "SYNTHETIC_EXPOSED_NOT_BLIND",
+        "mean_absolute_error_ratio": {
+          "naive": "0.002408255894",
+          "time_series": "0.001971238455"
+        },
+        "refusal_rate": "0.000000000000",
+        "refused": 0,
+        "rows": [
+          {
+            "naive": "0.000000000000",
+            "prefix_sha256": "087ac81322b34f39c445c596a5a64eaf5d3f5d428d68a3e33e1709df1310ff57",
+            "revealed_day": "20261030",
+            "revealed_return_ratio": "-0.001923076923",
+            "time_series": "-0.000941221000",
+            "train_through": "20261029"
+          },
+          {
+            "naive": "0.000000000000",
+            "prefix_sha256": "0f34520bb532721f6e5435f7670863be97bc2b920bf8e7c4cd0d0de386ea7dca",
+            "revealed_day": "20261031",
+            "revealed_return_ratio": "0.000963391137",
+            "time_series": "-0.001012446071",
+            "train_through": "20261030"
+          },
+          {
+            "naive": "0.000000000000",
+            "prefix_sha256": "30c2884d2869a63d285fea642f0af9ca67b3985a716782d492bc1f36f82e76a3",
+            "revealed_day": "20261101",
+            "revealed_return_ratio": "-0.004812319538",
+            "time_series": "-0.000872727620",
+            "train_through": "20261031"
+          },
+          {
+            "naive": "0.000000000000",
+            "prefix_sha256": "9c97dc1d088357fd829840528ce486ffa480fc962de824a5cd9c2584ba9a7e9a",
+            "revealed_day": "20261102",
+            "revealed_return_ratio": "-0.001934235977",
+            "time_series": "-0.000946567207",
+            "train_through": "20261101"
+          }
+        ],
+        "status": "SYNTHETIC_PREFIX_CHECK_NOT_INDEPENDENT"
+      }
+    },
+    {
+      "check": "adapter_replaced_and_no_fusion_control",
+      "control": "7d2e4b6e536d51d74699f5d073f328e3a6dc64848d8cdbc0830d7386239272be",
+      "first": "f1567f0a594375e40430038ac30e9e1c3668e350d0a7d939bf3389cef88f289a",
+      "original_agent_counts": [
+        2,
+        2
+      ],
+      "second": "6f278cd3a7294b6911ee6b10816c835e4f874b2a3a7eca21da269438d4aada99"
+    },
+    {
+      "after": [
+        1,
+        1
+      ],
+      "before": [
+        0,
+        0
+      ],
+      "check": "abrupt_restart",
+      "point": "after_freeze",
+      "settled_without_candidate_reused": false,
+      "task_id": "d18c66d085742bb50b81ccbb9ef0c6c0f1954fb99b177cf460f7852c38d36ed5"
+    },
+    {
+      "after": [
+        1,
+        1
+      ],
+      "before": [
+        0,
+        0
+      ],
+      "check": "abrupt_restart",
+      "point": "after_experts",
+      "settled_without_candidate_reused": false,
+      "task_id": "b2c4a420d24bc8d6798a748d34ad7fd262bfea3a0a63486909d77d1756197605"
+    },
+    {
+      "after": [
+        1,
+        1
+      ],
+      "before": [
+        1,
+        0
+      ],
+      "check": "abrupt_restart",
+      "point": "after_queue",
+      "settled_without_candidate_reused": false,
+      "task_id": "71efc31e0eeb98f137012ab7ccdbb7aa98c247591c4cb608d26293ad60405b35"
+    },
+    {
+      "after": [
+        1,
+        1
+      ],
+      "before": [
+        1,
+        1
+      ],
+      "check": "abrupt_restart",
+      "point": "after_fusion",
+      "settled_without_candidate_reused": true,
+      "task_id": "6941dda2982d5726ded61e850cc1340218c7bb6463a150600da2edf11a38ba90"
+    },
+    {
+      "check": "two_processes_disable_fence",
+      "disabled_new_calls": 0,
+      "duplicate_calls": 0,
+      "duplicate_tasks": 0,
+      "final_counts": [
+        1,
+        1
+      ]
+    },
+    {
+      "check": "forward_mode_negative_fixtures_not_real_observations",
+      "generated_predictions": 0,
+      "short_reason": "INSUFFICIENT_FORWARD_HISTORY",
+      "sufficient_bars_but_ca_unknown": "CORPORATE_ACTION_PIT_NOT_VERIFIED"
+    },
+    {
+      "check": "budgets_revoked_cloud_unknown",
+      "daily_and_monthly_calls": 0,
+      "public_requests": 0,
+      "unknown_calls": 1,
+      "unknown_reservation_retained": true
+    },
+    {
+      "check": "malicious_expert_and_fusion",
+      "expert_rejections": 10,
+      "forged_original_task_rejected": true,
+      "fusion_rejections": 11
+    },
+    {
+      "check": "protected_old_evidence",
+      "files": 60,
+      "unchanged": true
+    }
+  ],
+  "run": "mm-test-b7e9a1bd",
+  "schema_version": 1,
+  "tests": 10,
+  "token_and_cost_source": "ORIGINAL_AGENT_SQLITE_TST_NOT_CLOUD_BILLING",
+  "true_paid_calls": 0
+}

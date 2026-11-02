@@ -1,0 +1,1575 @@
+{
+  "tests": 4,
+  "failures": 0,
+  "errors": 0,
+  "results": [
+    {
+      "check": "actual_global_task_gate",
+      "scenario": "revision",
+      "before": {
+        "a": [
+          {
+            "id": 1,
+            "trigger_key": "multimodal-v1:mm-test-19946564-gate-revision-6d54:b82a0df87989b862b6d303235780f27940a683ff5801be8d9ab14ebd7607c299",
+            "status": "queued",
+            "reason": null,
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "f555b9e88807d8d189ff941e51fc0fb8abf742ce00f974cad5908df5f79a48bc",
+            "current_snapshot_sha256": "222f00c0048e93882b26aa4b19990180a5229f3738e75bd8bbf5892b18952d19",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "78b700d6c95d16097932dac77bf3e7ffca6522ba6456eb44d1b538917fd8342d",
+            "frozen_input_sha256": "460200e6c21509509cbf45ce4a6c955d27d8019c177ca788a4b57d0109adda96",
+            "calls": [],
+            "registrations": 0
+          }
+        ],
+        "b": [
+          {
+            "id": 2,
+            "trigger_key": "multimodal-v1:mm-test-19946564-other-revision-052b:016f7ba29ec167e1b12a10700e02f05fee176f400737880b5f8f32988315e781",
+            "status": "queued",
+            "reason": null,
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "b5191a2814103255d36a9861a394b049f277852ea12548229f84917dddeedbac",
+            "current_snapshot_sha256": "b5191a2814103255d36a9861a394b049f277852ea12548229f84917dddeedbac",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "c30228c2eb0397738c6fd7772a2be02512cfd7b9a6870104953a79614d543533",
+            "frozen_input_sha256": "28a474c21846b407732326756731268e39a5119cef175bb1a32297e5b0829be6",
+            "calls": [],
+            "registrations": 0
+          }
+        ]
+      },
+      "after": {
+        "a": [
+          {
+            "id": 1,
+            "trigger_key": "multimodal-v1:mm-test-19946564-gate-revision-6d54:b82a0df87989b862b6d303235780f27940a683ff5801be8d9ab14ebd7607c299",
+            "status": "cancelled",
+            "reason": "MULTIMODAL_SNAPSHOT_CHANGED",
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "f555b9e88807d8d189ff941e51fc0fb8abf742ce00f974cad5908df5f79a48bc",
+            "current_snapshot_sha256": "222f00c0048e93882b26aa4b19990180a5229f3738e75bd8bbf5892b18952d19",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "78b700d6c95d16097932dac77bf3e7ffca6522ba6456eb44d1b538917fd8342d",
+            "frozen_input_sha256": "460200e6c21509509cbf45ce4a6c955d27d8019c177ca788a4b57d0109adda96",
+            "calls": [],
+            "registrations": 0
+          }
+        ],
+        "b": [
+          {
+            "id": 2,
+            "trigger_key": "multimodal-v1:mm-test-19946564-other-revision-052b:016f7ba29ec167e1b12a10700e02f05fee176f400737880b5f8f32988315e781",
+            "status": "completed",
+            "reason": "RESEARCH_SAVED",
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "b5191a2814103255d36a9861a394b049f277852ea12548229f84917dddeedbac",
+            "current_snapshot_sha256": "b5191a2814103255d36a9861a394b049f277852ea12548229f84917dddeedbac",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "c30228c2eb0397738c6fd7772a2be02512cfd7b9a6870104953a79614d543533",
+            "frozen_input_sha256": "28a474c21846b407732326756731268e39a5119cef175bb1a32297e5b0829be6",
+            "calls": [
+              {
+                "state": "settled",
+                "price_version": "synthetic-price-v1",
+                "reason": null,
+                "day": "2026-11-02",
+                "month": "2026-11",
+                "id": "1",
+                "maximum_micro": "34816",
+                "settled_micro": "6888",
+                "usage_micro": "6888",
+                "input_tokens": "6632",
+                "output_tokens": "128"
+              }
+            ],
+            "registrations": 1
+          }
+        ]
+      }
+    },
+    {
+      "check": "actual_global_task_gate",
+      "scenario": "expiry",
+      "before": {
+        "a": [
+          {
+            "id": 3,
+            "trigger_key": "multimodal-v1:mm-test-19946564-gate-expiry-f590:d5d637c36cf72a0a9198c82905ad4adb99343ef5cac6bd460a579795fc1634ea",
+            "status": "queued",
+            "reason": null,
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "fe242cea6a52c13f12e677ffa1fb5696f9058a318fc0ed89034fe4293af4a9c3",
+            "current_snapshot_sha256": "fe242cea6a52c13f12e677ffa1fb5696f9058a318fc0ed89034fe4293af4a9c3",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "1bcc843efad4431e572c9ed8959d2156e1f643dd21afe39fb04f73cbe333a042",
+            "frozen_input_sha256": "285619ac21df4bb53bfbc78641d383661b734c90443adbabfee61318d2f55a7a",
+            "calls": [],
+            "registrations": 0
+          }
+        ],
+        "b": [
+          {
+            "id": 4,
+            "trigger_key": "multimodal-v1:mm-test-19946564-other-expiry-8462:d5b0e26939e2805c7f2e63807d92a4b39956bc1266870e17d91de120e5e716b7",
+            "status": "queued",
+            "reason": null,
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "aae76565d939ed8dcccb8a1870cbfbf30b6c54b4d81c8001e578df6b2172d409",
+            "current_snapshot_sha256": "aae76565d939ed8dcccb8a1870cbfbf30b6c54b4d81c8001e578df6b2172d409",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "e3f1c1dcf8a97da57814de7ea7608999c1df79924c34f44e7742b9ed2ad75d8c",
+            "frozen_input_sha256": "da03b540d13059955300e6dd7baea527fb1da8ae46485c90ba23bf4440dc7342",
+            "calls": [],
+            "registrations": 0
+          }
+        ]
+      },
+      "after": {
+        "a": [
+          {
+            "id": 3,
+            "trigger_key": "multimodal-v1:mm-test-19946564-gate-expiry-f590:d5d637c36cf72a0a9198c82905ad4adb99343ef5cac6bd460a579795fc1634ea",
+            "status": "cancelled",
+            "reason": "MISSED_OR_STALE",
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "fe242cea6a52c13f12e677ffa1fb5696f9058a318fc0ed89034fe4293af4a9c3",
+            "current_snapshot_sha256": "fe242cea6a52c13f12e677ffa1fb5696f9058a318fc0ed89034fe4293af4a9c3",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "1bcc843efad4431e572c9ed8959d2156e1f643dd21afe39fb04f73cbe333a042",
+            "frozen_input_sha256": "285619ac21df4bb53bfbc78641d383661b734c90443adbabfee61318d2f55a7a",
+            "calls": [],
+            "registrations": 0
+          }
+        ],
+        "b": [
+          {
+            "id": 4,
+            "trigger_key": "multimodal-v1:mm-test-19946564-other-expiry-8462:d5b0e26939e2805c7f2e63807d92a4b39956bc1266870e17d91de120e5e716b7",
+            "status": "completed",
+            "reason": "RESEARCH_SAVED",
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "aae76565d939ed8dcccb8a1870cbfbf30b6c54b4d81c8001e578df6b2172d409",
+            "current_snapshot_sha256": "aae76565d939ed8dcccb8a1870cbfbf30b6c54b4d81c8001e578df6b2172d409",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "e3f1c1dcf8a97da57814de7ea7608999c1df79924c34f44e7742b9ed2ad75d8c",
+            "frozen_input_sha256": "da03b540d13059955300e6dd7baea527fb1da8ae46485c90ba23bf4440dc7342",
+            "calls": [
+              {
+                "state": "settled",
+                "price_version": "synthetic-price-v1",
+                "reason": null,
+                "day": "2026-11-02",
+                "month": "2026-11",
+                "id": "2",
+                "maximum_micro": "34816",
+                "settled_micro": "6888",
+                "usage_micro": "6888",
+                "input_tokens": "6632",
+                "output_tokens": "128"
+              }
+            ],
+            "registrations": 1
+          }
+        ]
+      }
+    },
+    {
+      "check": "actual_global_task_gate",
+      "scenario": "disabled",
+      "before": {
+        "a": [
+          {
+            "id": 5,
+            "trigger_key": "multimodal-v1:mm-test-19946564-gate-disabled-2b5a:fe8037464ca1da076a89aa4f4f7be49170321d440f19eacded9c2d4cfd56f4ad",
+            "status": "queued",
+            "reason": null,
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "40c123187a3945348dfbc03db5ccbeddeb6c4130ac3968d864694691168dcd18",
+            "current_snapshot_sha256": "40c123187a3945348dfbc03db5ccbeddeb6c4130ac3968d864694691168dcd18",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "6b3254585a19244a048706816d41735edd2e5d236ed594c4be61a5b6a8afd473",
+            "frozen_input_sha256": "b3ceb063b900a90d742a783daf3d917c78ed39d919b753a6fb120506deb1615c",
+            "calls": [],
+            "registrations": 0
+          }
+        ],
+        "b": [
+          {
+            "id": 6,
+            "trigger_key": "multimodal-v1:mm-test-19946564-other-disabled-61b2:210bc041288b904e0f39b1a36772dce1582923b9538e1b9d876e181e8d1b9347",
+            "status": "queued",
+            "reason": null,
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "1c5ffad4eaa6d579177b24e39b9e4b295137fcde2d8fe36221f3d75da45a38f8",
+            "current_snapshot_sha256": "1c5ffad4eaa6d579177b24e39b9e4b295137fcde2d8fe36221f3d75da45a38f8",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "2e88f40d01a2e423729d402db63cc3730d62e957a6f9a00a455415c6a16bc336",
+            "frozen_input_sha256": "488d5da96b31ffc2bc9692ed14515e8b3f77ae52b5c5a7427426461644ce5721",
+            "calls": [],
+            "registrations": 0
+          }
+        ]
+      },
+      "after": {
+        "a": [
+          {
+            "id": 5,
+            "trigger_key": "multimodal-v1:mm-test-19946564-gate-disabled-2b5a:fe8037464ca1da076a89aa4f4f7be49170321d440f19eacded9c2d4cfd56f4ad",
+            "status": "cancelled",
+            "reason": "OWNER_DISABLED",
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "40c123187a3945348dfbc03db5ccbeddeb6c4130ac3968d864694691168dcd18",
+            "current_snapshot_sha256": "40c123187a3945348dfbc03db5ccbeddeb6c4130ac3968d864694691168dcd18",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "6b3254585a19244a048706816d41735edd2e5d236ed594c4be61a5b6a8afd473",
+            "frozen_input_sha256": "b3ceb063b900a90d742a783daf3d917c78ed39d919b753a6fb120506deb1615c",
+            "calls": [],
+            "registrations": 0
+          }
+        ],
+        "b": [
+          {
+            "id": 6,
+            "trigger_key": "multimodal-v1:mm-test-19946564-other-disabled-61b2:210bc041288b904e0f39b1a36772dce1582923b9538e1b9d876e181e8d1b9347",
+            "status": "completed",
+            "reason": "RESEARCH_SAVED",
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "1c5ffad4eaa6d579177b24e39b9e4b295137fcde2d8fe36221f3d75da45a38f8",
+            "current_snapshot_sha256": "1c5ffad4eaa6d579177b24e39b9e4b295137fcde2d8fe36221f3d75da45a38f8",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "2e88f40d01a2e423729d402db63cc3730d62e957a6f9a00a455415c6a16bc336",
+            "frozen_input_sha256": "488d5da96b31ffc2bc9692ed14515e8b3f77ae52b5c5a7427426461644ce5721",
+            "calls": [
+              {
+                "state": "settled",
+                "price_version": "synthetic-price-v1",
+                "reason": null,
+                "day": "2026-11-02",
+                "month": "2026-11",
+                "id": "3",
+                "maximum_micro": "34816",
+                "settled_micro": "6888",
+                "usage_micro": "6888",
+                "input_tokens": "6632",
+                "output_tokens": "128"
+              }
+            ],
+            "registrations": 1
+          }
+        ]
+      }
+    },
+    {
+      "check": "changed_source_new_experiment",
+      "before": {
+        "id": 7,
+        "trigger_key": "multimodal-v1:mm-test-19946564-changed-source-347a:a7b0aaec451473aa69df5ca0cd9a971a8be9630ce0eed2c3305cdf6af2400011",
+        "status": "queued",
+        "reason": null,
+        "source_day": "2026-11-02",
+        "input_snapshot_sha256": "1770c75e4ee5c0eac6020b94a787003a5935d854ffde664bb021a01a53ca1fe1",
+        "current_snapshot_sha256": "1770c75e4ee5c0eac6020b94a787003a5935d854ffde664bb021a01a53ca1fe1",
+        "current_source_day": "20261102",
+        "current_source_identity_sha256": "d013982d4b54748c4166a67c1301960a15a9f9eefe6add92f0f439c5d07e4439",
+        "frozen_input_sha256": "93391f6135c62e243b16281e49136419387da342eed0e2e8645a2a7a57ed8ff6",
+        "calls": [],
+        "registrations": 0
+      },
+      "after": [
+        {
+          "id": 7,
+          "trigger_key": "multimodal-v1:mm-test-19946564-changed-source-347a:a7b0aaec451473aa69df5ca0cd9a971a8be9630ce0eed2c3305cdf6af2400011",
+          "status": "cancelled",
+          "reason": "MULTIMODAL_SOURCE_RECHECK_FAILED",
+          "source_day": "2026-11-02",
+          "input_snapshot_sha256": "1770c75e4ee5c0eac6020b94a787003a5935d854ffde664bb021a01a53ca1fe1",
+          "current_snapshot_sha256": "ebc7d7ed89b6c5f361d199180ee95f2df04723262104104f3a80e3a2d4b3dff6",
+          "current_source_day": "20261102",
+          "current_source_identity_sha256": "d013982d4b54748c4166a67c1301960a15a9f9eefe6add92f0f439c5d07e4439",
+          "frozen_input_sha256": "93391f6135c62e243b16281e49136419387da342eed0e2e8645a2a7a57ed8ff6",
+          "calls": [],
+          "registrations": 0
+        },
+        {
+          "id": 8,
+          "trigger_key": "multimodal-v1:mm-test-19946564-changed-source-347a:f0d587e9f4cd50371ddebbc3bee1df0b9d1cca0f71ca32dbaccc5f05936f41be",
+          "status": "completed",
+          "reason": "RESEARCH_SAVED",
+          "source_day": "2026-11-02",
+          "input_snapshot_sha256": "ebc7d7ed89b6c5f361d199180ee95f2df04723262104104f3a80e3a2d4b3dff6",
+          "current_snapshot_sha256": "ebc7d7ed89b6c5f361d199180ee95f2df04723262104104f3a80e3a2d4b3dff6",
+          "current_source_day": "20261102",
+          "current_source_identity_sha256": "d013982d4b54748c4166a67c1301960a15a9f9eefe6add92f0f439c5d07e4439",
+          "frozen_input_sha256": "2c8a1b1b7c47d4d9df50a59cee21b30616998e2820323ca732259a24add441f4",
+          "calls": [
+            {
+              "state": "settled",
+              "price_version": "synthetic-price-v1",
+              "reason": null,
+              "day": "2026-11-02",
+              "month": "2026-11",
+              "id": "4",
+              "maximum_micro": "34816",
+              "settled_micro": "6888",
+              "usage_micro": "6888",
+              "input_tokens": "6632",
+              "output_tokens": "128"
+            }
+          ],
+          "registrations": 1
+        }
+      ]
+    },
+    {
+      "check": "cross_task_kill_settled_restart",
+      "after": {
+        "a": [
+          {
+            "id": 9,
+            "trigger_key": "multimodal-v1:mm-test-19946564-kill-a-79a4:36b7084bb92414e5aa3d5d8d43a470fc31441a7d87e19cd2efdee238ab165f4c",
+            "status": "completed",
+            "reason": "RESEARCH_SAVED",
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "acaa0faf7db51a4568d829272300f472533d253542d12cae8ae0e07f3133dac4",
+            "current_snapshot_sha256": "acaa0faf7db51a4568d829272300f472533d253542d12cae8ae0e07f3133dac4",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "a3fa3d40e954b905c187fc339a0ac0057fdfdfa83836791d492914922212f79a",
+            "frozen_input_sha256": "ab36d808f386a36c1393a10a9cf9d4cdb86ee93a988afb33a0cd834fcbca1686",
+            "calls": [
+              {
+                "state": "settled",
+                "price_version": "synthetic-price-v1",
+                "reason": null,
+                "day": "2026-11-02",
+                "month": "2026-11",
+                "id": "6",
+                "maximum_micro": "34816",
+                "settled_micro": "6888",
+                "usage_micro": "6888",
+                "input_tokens": "6632",
+                "output_tokens": "128"
+              }
+            ],
+            "registrations": 1
+          }
+        ],
+        "b": [
+          {
+            "id": 10,
+            "trigger_key": "multimodal-v1:mm-test-19946564-kill-b-928e:cc5e875f149fb9f7d0df682a2a93d8f3f5ae2da29a70cbabae4247cbd483f712",
+            "status": "completed",
+            "reason": "RESEARCH_SAVED",
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "cbf16308bb9c9a4e5b070406444c6cd3a6e89185cdcf13019012088b3246e4c9",
+            "current_snapshot_sha256": "cbf16308bb9c9a4e5b070406444c6cd3a6e89185cdcf13019012088b3246e4c9",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "cc9038c7f7457c15281b3489deb1a639aeb17d33c301ddb21f9ca96a4049c91b",
+            "frozen_input_sha256": "4037b3dfcf8cd200e83f746c97053e6ed10dd732b70a9683b7bffea4b6fa08c4",
+            "calls": [
+              {
+                "state": "settled",
+                "price_version": "synthetic-price-v1",
+                "reason": null,
+                "day": "2026-11-02",
+                "month": "2026-11",
+                "id": "5",
+                "maximum_micro": "34816",
+                "settled_micro": "6888",
+                "usage_micro": "6888",
+                "input_tokens": "6632",
+                "output_tokens": "128"
+              }
+            ],
+            "registrations": 1
+          }
+        ]
+      },
+      "abrupt_exit_code": 86,
+      "duplicate_calls": 0
+    },
+    {
+      "check": "two_sources_exact_task",
+      "before": {
+        "a": [
+          {
+            "id": 11,
+            "trigger_key": "multimodal-v1:mm-test-19946564-route-a-56c9:5f4e519b53774ccf099cdcec05c5faae7f19a61339ba16f3b1ca604d93ace67d",
+            "status": "queued",
+            "reason": null,
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "71125d86a00fac7da9607427fb3ed159042629ab48e793d976c1f7e83463f315",
+            "current_snapshot_sha256": "71125d86a00fac7da9607427fb3ed159042629ab48e793d976c1f7e83463f315",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "948404a752b27a041feafd261fa0842a5823aaf0f8f4800edd57edb1c0294c46",
+            "frozen_input_sha256": "4b36b01d99b47872fbd6dbd3be42133ee3121ed5a3605d71e7ed726e1d63c750",
+            "calls": [],
+            "registrations": 0
+          }
+        ],
+        "b": [
+          {
+            "id": 12,
+            "trigger_key": "multimodal-v1:mm-test-19946564-route-b-e89c:805d7d8a3934f732ff1dc39c22b4820f22532e31482bb8e91f05a3900f98fb89",
+            "status": "queued",
+            "reason": null,
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "a8106a73f4bbb81784d7bc12a79c2a4f95645b822ea7433a7ff7ab0eb9a2da0b",
+            "current_snapshot_sha256": "a8106a73f4bbb81784d7bc12a79c2a4f95645b822ea7433a7ff7ab0eb9a2da0b",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "9f4ecf1bd8921ac26eb341844e8bb5e6f70b5246b1a9a6bb9e9ede3dfcb34fbb",
+            "frozen_input_sha256": "aa8e6042a372200ca5871f03062c637f962cc0df66a8e7a8a88a14d154ff4f19",
+            "calls": [],
+            "registrations": 0
+          }
+        ]
+      },
+      "after": {
+        "a": [
+          {
+            "id": 11,
+            "trigger_key": "multimodal-v1:mm-test-19946564-route-a-56c9:5f4e519b53774ccf099cdcec05c5faae7f19a61339ba16f3b1ca604d93ace67d",
+            "status": "completed",
+            "reason": "RESEARCH_SAVED",
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "71125d86a00fac7da9607427fb3ed159042629ab48e793d976c1f7e83463f315",
+            "current_snapshot_sha256": "71125d86a00fac7da9607427fb3ed159042629ab48e793d976c1f7e83463f315",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "948404a752b27a041feafd261fa0842a5823aaf0f8f4800edd57edb1c0294c46",
+            "frozen_input_sha256": "4b36b01d99b47872fbd6dbd3be42133ee3121ed5a3605d71e7ed726e1d63c750",
+            "calls": [
+              {
+                "state": "settled",
+                "price_version": "synthetic-price-v1",
+                "reason": null,
+                "day": "2026-11-02",
+                "month": "2026-11",
+                "id": "8",
+                "maximum_micro": "34816",
+                "settled_micro": "6888",
+                "usage_micro": "6888",
+                "input_tokens": "6632",
+                "output_tokens": "128"
+              }
+            ],
+            "registrations": 1
+          }
+        ],
+        "b": [
+          {
+            "id": 12,
+            "trigger_key": "multimodal-v1:mm-test-19946564-route-b-e89c:805d7d8a3934f732ff1dc39c22b4820f22532e31482bb8e91f05a3900f98fb89",
+            "status": "completed",
+            "reason": "RESEARCH_SAVED",
+            "source_day": "2026-11-02",
+            "input_snapshot_sha256": "a8106a73f4bbb81784d7bc12a79c2a4f95645b822ea7433a7ff7ab0eb9a2da0b",
+            "current_snapshot_sha256": "a8106a73f4bbb81784d7bc12a79c2a4f95645b822ea7433a7ff7ab0eb9a2da0b",
+            "current_source_day": "20261102",
+            "current_source_identity_sha256": "9f4ecf1bd8921ac26eb341844e8bb5e6f70b5246b1a9a6bb9e9ede3dfcb34fbb",
+            "frozen_input_sha256": "aa8e6042a372200ca5871f03062c637f962cc0df66a8e7a8a88a14d154ff4f19",
+            "calls": [
+              {
+                "state": "settled",
+                "price_version": "synthetic-price-v1",
+                "reason": null,
+                "day": "2026-11-02",
+                "month": "2026-11",
+                "id": "7",
+                "maximum_micro": "34816",
+                "settled_micro": "6888",
+                "usage_micro": "6888",
+                "input_tokens": "6632",
+                "output_tokens": "128"
+              }
+            ],
+            "registrations": 1
+          }
+        ]
+      }
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-19946564-gate-revision-6d54",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-gate-revision-6d54",
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-gate-revision-6d54"
+      ],
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-gate-revision-6d54"
+      ],
+      "name": "mm-test-19946564-gate-revision-6d54",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-gate-revision-6d54",
+        "enable"
+      ],
+      "args": [
+        "enable"
+      ],
+      "name": "mm-test-19946564-gate-revision-6d54",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-19946564\\request-0cdd2f0fe1.json"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-gate-revision-6d54",
+      "exit_code": 86,
+      "fault": "after_queue"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-19946564-other-revision-052b",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-other-revision-052b",
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-other-revision-052b"
+      ],
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-other-revision-052b"
+      ],
+      "name": "mm-test-19946564-other-revision-052b",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-other-revision-052b",
+        "enable"
+      ],
+      "args": [
+        "enable"
+      ],
+      "name": "mm-test-19946564-other-revision-052b",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-19946564\\request-2b399351df.json"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-other-revision-052b",
+      "exit_code": 86,
+      "fault": "after_queue"
+    },
+    {
+      "command": [
+        "<checkout>\\target\\debug\\multimodal-agent.exe",
+        "tick",
+        "mm-test-19946564-other-revision-052b",
+        "016f7ba29ec167e1b12a10700e02f05fee176f400737880b5f8f32988315e781"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "multimodal-agent libtest clock",
+        "mm-test-19946564-gate-revision-6d54",
+        "b82a0df87989b862b6d303235780f27940a683ff5801be8d9ab14ebd7607c299"
+      ],
+      "at": 1793610660695,
+      "global_tick": true,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "<checkout>\\target\\debug\\multimodal-agent.exe",
+        "tick",
+        "mm-test-19946564-gate-revision-6d54",
+        "b82a0df87989b862b6d303235780f27940a683ff5801be8d9ab14ebd7607c299"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-other-revision-052b",
+        "once"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-other-revision-052b",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-19946564-gate-expiry-f590",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-gate-expiry-f590",
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-gate-expiry-f590"
+      ],
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-gate-expiry-f590"
+      ],
+      "name": "mm-test-19946564-gate-expiry-f590",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-gate-expiry-f590",
+        "enable"
+      ],
+      "args": [
+        "enable"
+      ],
+      "name": "mm-test-19946564-gate-expiry-f590",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-19946564\\request-46dd93ff90.json"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-gate-expiry-f590",
+      "exit_code": 86,
+      "fault": "after_queue"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-19946564-other-expiry-8462",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-other-expiry-8462",
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-other-expiry-8462"
+      ],
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-other-expiry-8462"
+      ],
+      "name": "mm-test-19946564-other-expiry-8462",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-other-expiry-8462",
+        "enable"
+      ],
+      "args": [
+        "enable"
+      ],
+      "name": "mm-test-19946564-other-expiry-8462",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-19946564\\request-ed1482894c.json"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-other-expiry-8462",
+      "exit_code": 86,
+      "fault": "after_queue"
+    },
+    {
+      "command": [
+        "<checkout>\\target\\debug\\multimodal-agent.exe",
+        "tick",
+        "mm-test-19946564-other-expiry-8462",
+        "d5b0e26939e2805c7f2e63807d92a4b39956bc1266870e17d91de120e5e716b7"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "multimodal-agent libtest clock",
+        "mm-test-19946564-gate-expiry-f590",
+        "d5d637c36cf72a0a9198c82905ad4adb99343ef5cac6bd460a579795fc1634ea"
+      ],
+      "at": 1793692800000,
+      "global_tick": true,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "<checkout>\\target\\debug\\multimodal-agent.exe",
+        "tick",
+        "mm-test-19946564-gate-expiry-f590",
+        "d5d637c36cf72a0a9198c82905ad4adb99343ef5cac6bd460a579795fc1634ea"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-other-expiry-8462",
+        "once"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-other-expiry-8462",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-19946564-gate-disabled-2b5a",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-gate-disabled-2b5a",
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-gate-disabled-2b5a"
+      ],
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-gate-disabled-2b5a"
+      ],
+      "name": "mm-test-19946564-gate-disabled-2b5a",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-gate-disabled-2b5a",
+        "enable"
+      ],
+      "args": [
+        "enable"
+      ],
+      "name": "mm-test-19946564-gate-disabled-2b5a",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-19946564\\request-e35f735782.json"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-gate-disabled-2b5a",
+      "exit_code": 86,
+      "fault": "after_queue"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-19946564-other-disabled-61b2",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-other-disabled-61b2",
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-other-disabled-61b2"
+      ],
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-other-disabled-61b2"
+      ],
+      "name": "mm-test-19946564-other-disabled-61b2",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-other-disabled-61b2",
+        "enable"
+      ],
+      "args": [
+        "enable"
+      ],
+      "name": "mm-test-19946564-other-disabled-61b2",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-19946564\\request-e760b7b451.json"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-other-disabled-61b2",
+      "exit_code": 86,
+      "fault": "after_queue"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-gate-disabled-2b5a",
+        "disable"
+      ],
+      "args": [
+        "disable"
+      ],
+      "name": "mm-test-19946564-gate-disabled-2b5a",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "<checkout>\\target\\debug\\multimodal-agent.exe",
+        "tick",
+        "mm-test-19946564-other-disabled-61b2",
+        "210bc041288b904e0f39b1a36772dce1582923b9538e1b9d876e181e8d1b9347"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "multimodal-agent libtest clock",
+        "mm-test-19946564-gate-disabled-2b5a",
+        "fe8037464ca1da076a89aa4f4f7be49170321d440f19eacded9c2d4cfd56f4ad"
+      ],
+      "at": 1793610672592,
+      "global_tick": true,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "<checkout>\\target\\debug\\multimodal-agent.exe",
+        "tick",
+        "mm-test-19946564-gate-disabled-2b5a",
+        "fe8037464ca1da076a89aa4f4f7be49170321d440f19eacded9c2d4cfd56f4ad"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-other-disabled-61b2",
+        "once"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-other-disabled-61b2",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-19946564-changed-source-347a",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-changed-source-347a",
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-changed-source-347a"
+      ],
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-changed-source-347a"
+      ],
+      "name": "mm-test-19946564-changed-source-347a",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-changed-source-347a",
+        "enable"
+      ],
+      "args": [
+        "enable"
+      ],
+      "name": "mm-test-19946564-changed-source-347a",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-19946564\\request-e10e71b9f2.json"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-changed-source-347a",
+      "exit_code": 86,
+      "fault": "after_queue"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-changed-source-347a",
+        "once"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-changed-source-347a",
+      "exit_code": 2,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-changed-source-347a",
+        "experiment",
+        "--label",
+        "new-verified-snapshot"
+      ],
+      "args": [
+        "experiment",
+        "--label",
+        "new-verified-snapshot"
+      ],
+      "name": "mm-test-19946564-changed-source-347a",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-changed-source-347a",
+        "once"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-changed-source-347a",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-19946564-kill-a-79a4",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-kill-a-79a4",
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-kill-a-79a4"
+      ],
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-kill-a-79a4"
+      ],
+      "name": "mm-test-19946564-kill-a-79a4",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-kill-a-79a4",
+        "enable"
+      ],
+      "args": [
+        "enable"
+      ],
+      "name": "mm-test-19946564-kill-a-79a4",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-19946564\\request-89be22a92d.json"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-kill-a-79a4",
+      "exit_code": 86,
+      "fault": "after_queue"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-19946564-kill-b-928e",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-kill-b-928e",
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-kill-b-928e"
+      ],
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-kill-b-928e"
+      ],
+      "name": "mm-test-19946564-kill-b-928e",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-kill-b-928e",
+        "enable"
+      ],
+      "args": [
+        "enable"
+      ],
+      "name": "mm-test-19946564-kill-b-928e",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-19946564\\request-d001a801b1.json"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-kill-b-928e",
+      "exit_code": 86,
+      "fault": "after_queue"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-19946564\\request-8cd5e825a1.json"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-kill-b-928e",
+      "exit_code": 86,
+      "fault": "after_fusion"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-kill-b-928e",
+        "once"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-kill-b-928e",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-kill-b-928e",
+        "once"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-kill-b-928e",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-kill-a-79a4",
+        "once"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-kill-a-79a4",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-19946564-route-a-56c9",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-route-a-56c9",
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-route-a-56c9"
+      ],
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-route-a-56c9"
+      ],
+      "name": "mm-test-19946564-route-a-56c9",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-route-a-56c9",
+        "enable"
+      ],
+      "args": [
+        "enable"
+      ],
+      "name": "mm-test-19946564-route-a-56c9",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-19946564\\request-984e8924a7.json"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-route-a-56c9",
+      "exit_code": 86,
+      "fault": "after_queue"
+    },
+    {
+      "command": [
+        "research-data.py",
+        "--store",
+        "mm-test-19946564-route-b-e89c",
+        "sync",
+        "--observer",
+        "synthetic_test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-route-b-e89c",
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-route-b-e89c"
+      ],
+      "args": [
+        "init",
+        "--snapshot-store",
+        "mm-test-19946564-route-b-e89c"
+      ],
+      "name": "mm-test-19946564-route-b-e89c",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-route-b-e89c",
+        "enable"
+      ],
+      "args": [
+        "enable"
+      ],
+      "name": "mm-test-19946564-route-b-e89c",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\test-multimodal-research.py",
+        "--fixture-cli",
+        "<checkout>\\state\\multimodal-tests\\mm-test-19946564\\request-ffe1604ee4.json"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-route-b-e89c",
+      "exit_code": 86,
+      "fault": "after_queue"
+    },
+    {
+      "command": [
+        "<checkout>\\target\\debug\\multimodal-agent.exe",
+        "tick",
+        "mm-test-19946564-route-b-e89c",
+        "805d7d8a3934f732ff1dc39c22b4820f22532e31482bb8e91f05a3900f98fb89"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-route-b-e89c",
+        "once"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-route-b-e89c",
+      "exit_code": 0,
+      "fault": null
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "<checkout>\\scripts\\multimodal-research.py",
+        "--name",
+        "mm-test-19946564-route-a-56c9",
+        "once"
+      ],
+      "args": [
+        "once"
+      ],
+      "name": "mm-test-19946564-route-a-56c9",
+      "exit_code": 0,
+      "fault": null
+    }
+  ],
+  "public_requests": 0,
+  "true_paid_calls": 0,
+  "independent_acceptance": "NOT_VERIFIED"
+}

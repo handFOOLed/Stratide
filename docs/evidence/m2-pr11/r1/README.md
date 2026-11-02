@@ -1,6 +1,6 @@
 # PR56 审查修复 R1 开发证据
 
-对应 [审查意见](https://github.com/handFOOLed/Stratide/pull/56#issuecomment-6567321469)，原固定 HEAD `a24c8feba1811d474db19db28628b95898963191`，base `a27f466e643cb7dd05e3be72b83402a4599a301f`。当前修复提交的固定 HEAD 以唯一 Draft PR #56 描述为准；[tested-source.json](tested-source.json) 绑定 17 个实际测试源码的 SHA-256，并在提交后与 Git blob 核对。以下均为开发者测试，独立定向复审仍为 **NOT_VERIFIED**。
+对应 [首轮审查](https://github.com/handFOOLed/Stratide/pull/56#issuecomment-6567321469)及 [R1 定向复审](https://github.com/handFOOLed/Stratide/pull/56#issuecomment-6568334369)，原固定 HEAD `a24c8feba1811d474db19db28628b95898963191`，base `a27f466e643cb7dd05e3be72b83402a4599a301f`。R1 预算修复已获源码复审确认；2026-11-02 盘后补齐原 PR52/54 全部 **27 项**开发者回归证据。本次追加仅为文档和证据，生产代码与原测试未改。交付固定 HEAD 以唯一 Draft PR #56 描述为准；[tested-source.json](tested-source.json) 绑定原 17 个测试源码，另有 [盘后 24 个源码 SHA 与实际运行 HEAD](afternoon/source.json)。本次证据的独立最终复审仍为 **NOT_VERIFIED**。
 
 ## P1：现有 Owner Agent 与新云研究共用费用权威
 
@@ -15,7 +15,7 @@
 | 当前 workspace Rust | **177/177 PASS**（原 171 + 6），隔离 ignored TEMP/TMP；[fixture-rust-test.txt](fixture-rust-test.txt) |
 | 当前新链路 Python E2E | **13/13 PASS**，保留原 10 项并增加旧 Agent 实际消费叠加两阶段、原未知跨月和绑定不可替换；[portfolio-test.txt](portfolio-test.txt) / [checks.json](checks.json) |
 | 编译/静态检查 | build、fmt、check、clippy `-D warnings` 结果见本目录日志 |
-| 原 Agent / Candidates / Review | 原 Agent API 6 组检查、Candidates 13/13；Review 首轮 11 项通过，junction 单项正常 Windows 权限复跑通过，共 12 个唯一用例通过；[原命令/退出码](original-regressions.json)、[首轮 Review](original-review.txt)、[单项复跑](review-junction-rerun.txt) |
+| 原 Agent / Candidates / Review | 原 Agent API 6 组检查、Candidates 13/13 均 exit 0；Review 首轮完整 12 项 **exit 1**（11 项通过、junction 创建被沙箱拒绝），原 junction 单项正常 Windows 权限复跑 **exit 0**，共 12 个唯一用例完成验证；[原命令/退出码](original-regressions.json)、[首轮 Review](original-review.txt)、[单项复跑](review-junction-rerun.txt)。不将首轮整套计为 exit 0 |
 | 原状态与测试定义 | 20 个受保护文件 SHA/长度/mtime 不变；[preservation.json](preservation.json)。PR52/54 三套原测试及 snapshot 夹具未改，SHA 见 [original-test-source.json](original-test-source.json) |
 
 新用例 11 在同一原库先运行原 fake Agent 实际结算，再运行两个 cloud 阶段；合计超过原日/月测试 cap 时，Fusion 分别精确返回 `DAILY_BUDGET_EXHAUSTED`/`MONTHLY_BUDGET_EXHAUSTED`，默认模型仍为原 fake。用例 12 将原 fake-unknown 保留在前月，重启后最大预留继续占用新期预算；新请求被拒绝，无旧请求重试。该独立预算用例的显式历史时间只用于预算算法，不涉及 PR52/54 的真实安全时钟测试。
@@ -24,7 +24,9 @@
 
 ## P1：PR52/54 三套原始回归
 
-**PENDING / NOT PASSED。** 原首轮无效时间失败仍保留在上级证据目录，不以历史 PASS 替代。本次不修改原测试定义、系统时钟或安全时钟门禁。原 `scripts/test-data-snapshot.py:stamp()` 使用当日 **17:00 UTC+8**，比 suite 的 16:00 提示更晚；已在本聊天安排 2026-11-02 **17:10 UTC+8** 单次续跑原 multimodal 10 项、routing 4 项、forward-readiness 13 项。准确条件、命令和状态保全方式见 [HANDOFF.md](HANDOFF.md)。三套实际通过前，本审查项不关闭。
+**开发者完整回归 PASS：10/10 + 4/4 + 13/13，三套各 exit 0。** 本次在实际 HEAD `4ad0a3d716ee8acc3f43e58db463714cf51a2bbc` 于 2026-11-02 **17:10:56 UTC+8** 启动，原 `stamp()` 的当日 17:00 来源时间已经生效。三套使用独立 Git authority、ignored TEMP/TMP，原测试定义、系统时钟及安全时钟门禁均未修改；没有使用上午编译、新链路 13 项或历史 PASS 顶替。
+
+[盘后证据索引](afternoon/README.md) / [真实命令、时区、耗时、退出码](afternoon/execution.json) / [原状态保全](afternoon/preservation.json)。原 20 文件 byte SHA、长度及 mtime 在测试前后均与最初基线一致。原上午失败完整保留；本次无需生产代码修复或权限复跑。本次提交只追加文档和证据，最终 HEAD 与运行 HEAD 的代码/测试字节相同，待针对该最终 HEAD 的独立复审。
 
 ## 失败保留与验证边界
 

@@ -1,0 +1,18 @@
+test_01_two_independent_journals_daily_coverage_original_fusion_and_inbox (__main__.ReadinessTests.test_01_two_independent_journals_daily_coverage_original_fusion_and_inbox) ... ok
+test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event (__main__.ReadinessTests.test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event) ... ok
+test_03_ex_post_acquisition_never_rewrites_original_failure (__main__.ReadinessTests.test_03_ex_post_acquisition_never_rewrites_original_failure) ... ok
+test_04_real_event_units_dates_partial_facts_and_price_semantics (__main__.ReadinessTests.test_04_real_event_units_dates_partial_facts_and_price_semantics) ... ok
+test_05_sha_editing_json_mode_and_owner_disable_are_not_authority (__main__.ReadinessTests.test_05_sha_editing_json_mode_and_owner_disable_are_not_authority) ... ok
+test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal (__main__.ReadinessTests.test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal) ... ok
+test_07_source_revision_late_backfill_and_receipt_replay (__main__.ReadinessTests.test_07_source_revision_late_backfill_and_receipt_replay) ... ok
+test_08_freshness_asof_label_clock_and_malicious_paths (__main__.ReadinessTests.test_08_freshness_asof_label_clock_and_malicious_paths) ... ok
+test_09_publication_interruptions_recovery_duplicate_and_concurrent_runs (__main__.ReadinessTests.test_09_publication_interruptions_recovery_duplicate_and_concurrent_runs) ... ok
+test_10_settled_kill_restart_never_recharges_and_other_task_cannot_attest (__main__.ReadinessTests.test_10_settled_kill_restart_never_recharges_and_other_task_cannot_attest) ... ok
+test_11_a_later_clean_21_session_window_recovers_without_rewriting_old_observations (__main__.ReadinessTests.test_11_a_later_clean_21_session_window_recovers_without_rewriting_old_observations) ... ok
+test_12_original_dispatch_gate_releases_reservation_after_owner_disable (__main__.ReadinessTests.test_12_original_dispatch_gate_releases_reservation_after_owner_disable) ... ok
+test_13_on_day_complete_evidence_and_identical_fact_refresh_create_new_receipts (__main__.ReadinessTests.test_13_on_day_complete_evidence_and_identical_fact_refresh_create_new_receipts) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 192.321s
+
+OK

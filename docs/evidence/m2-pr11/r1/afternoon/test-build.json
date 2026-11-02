@@ -1,0 +1,16 @@
+{
+  "binary_sha256": {
+    "target/debug/deps/eod_auto_agent-8cfad1900624fb89.exe": "cb8590067ebf801f55f330624fe0881312d0c1c65860e4ea45abd7540a8ec722",
+    "target/debug/deps/multimodal_agent-3f9115f554af49f1.exe": "f441b468bd1b0e44919ac8530dcdca532dc50a3167c0c03189a875acaadc9ca2",
+    "target/debug/eod-auto-agent.exe": "b7028eb8601a69f419cbebe09f5a99a79e2ab0bf451245f4c0f518d2c98f2920",
+    "target/debug/multimodal-agent.exe": "72020b019bf8c31ae8a5a06c40e05e69ecd6b6ee9eb5f130cecd4fc7d03fd157",
+    "target/debug/stratide-cli.exe": "9ee907c71e5ca85193c8173df216f9b0b2ec02a84f02d2d4616b5205b10ed6bf"
+  },
+  "command": "scripts/with-msvc.ps1 test --workspace --locked --offline --no-run",
+  "exit_code": 0,
+  "latest_review": "https://github.com/handFOOLed/Stratide/pull/56#issuecomment-6568334369",
+  "original_suites_status": "PENDING_NOT_PASSED",
+  "recorded_at_utc": "2026-11-02T03:35:47.738619+00:00",
+  "source_head": "4ad0a3d716ee8acc3f43e58db463714cf51a2bbc",
+  "tests_executed": 0
+}

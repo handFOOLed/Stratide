@@ -1,0 +1,80 @@
+{
+  "billable_calls": 0,
+  "fills": 0,
+  "independent_acceptance": "NOT_VERIFIED",
+  "market_requests": 0,
+  "orders": 0,
+  "real_cloud_calls": 0,
+  "results": [
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-multimodal-research.py",
+        "--evidence",
+        "<checkout>\\docs\\evidence\\m2-pr11\\r1\\afternoon\\multimodal"
+      ],
+      "duration_seconds": 72.97,
+      "errors": 0,
+      "exit_code": 0,
+      "expected_tests": 10,
+      "failures": 0,
+      "pass": true,
+      "source_head": "4ad0a3d716ee8acc3f43e58db463714cf51a2bbc",
+      "started_at_local": "2026-11-02T17:10:56.360316+08:00",
+      "started_at_utc": "2026-11-02T09:10:56.360316+00:00",
+      "suite": "multimodal",
+      "tests": 10,
+      "timezone": "Asia/Shanghai (UTC+08:00)"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-multimodal-routing.py",
+        "--evidence",
+        "<checkout>\\docs\\evidence\\m2-pr11\\r1\\afternoon\\routing"
+      ],
+      "duration_seconds": 38.5,
+      "errors": 0,
+      "exit_code": 0,
+      "expected_tests": 4,
+      "failures": 0,
+      "pass": true,
+      "source_head": "4ad0a3d716ee8acc3f43e58db463714cf51a2bbc",
+      "started_at_local": "2026-11-02T17:10:56.360316+08:00",
+      "started_at_utc": "2026-11-02T09:10:56.360316+00:00",
+      "suite": "routing",
+      "tests": 4,
+      "timezone": "Asia/Shanghai (UTC+08:00)"
+    },
+    {
+      "command": [
+        "python",
+        "-X",
+        "utf8",
+        "-B",
+        "scripts/test-forward-readiness.py",
+        "--evidence",
+        "<checkout>\\docs\\evidence\\m2-pr11\\r1\\afternoon\\readiness"
+      ],
+      "duration_seconds": 192.55,
+      "errors": 0,
+      "exit_code": 0,
+      "expected_tests": 13,
+      "failures": 0,
+      "pass": true,
+      "source_head": "4ad0a3d716ee8acc3f43e58db463714cf51a2bbc",
+      "started_at_local": "2026-11-02T17:10:56.358311+08:00",
+      "started_at_utc": "2026-11-02T09:10:56.358311+00:00",
+      "suite": "readiness",
+      "tests": 13,
+      "timezone": "Asia/Shanghai (UTC+08:00)"
+    }
+  ],
+  "source_head": "4ad0a3d716ee8acc3f43e58db463714cf51a2bbc"
+}
