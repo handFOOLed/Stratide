@@ -1,0 +1,46 @@
+{
+  "automation_id": "pr56",
+  "billable_calls": 0,
+  "commands": {
+    "build": "scripts/with-msvc.ps1 build --workspace --locked --offline",
+    "check": "scripts/with-msvc.ps1 check --workspace --all-targets --locked --offline",
+    "clippy": "scripts/with-msvc.ps1 clippy --workspace --all-targets --locked --offline -- -D warnings",
+    "fmt": "cargo fmt --all -- --check",
+    "new_e2e": "python -X utf8 -B <synthetic-checkout>/scripts/test-risk-portfolio.py --driver <current-libtest> --evidence <out>",
+    "rust_test": "scripts/with-msvc.ps1 test --manifest-path <synthetic-checkout>/Cargo.toml --workspace --locked --offline"
+  },
+  "continuation_at": "2026-11-02T17:10:00+08:00",
+  "continuation_completed_at_utc": "2026-11-02T09:17:01.938061+00:00",
+  "followup_changes": "DOCUMENTATION_AND_EVIDENCE_ONLY",
+  "independent_acceptance": "NOT_VERIFIED",
+  "legacy_execution": "afternoon/execution.json",
+  "legacy_full_tests": 27,
+  "legacy_multimodal_full": "PASS",
+  "legacy_readiness_full": "PASS",
+  "legacy_routing_full": "PASS",
+  "legacy_tested_source_head": "4ad0a3d716ee8acc3f43e58db463714cf51a2bbc",
+  "market_requests": 0,
+  "new_python_exit_code": 0,
+  "new_python_tests": 13,
+  "original_owner_authority_unmodified_and_unbound": true,
+  "original_owner_calls_or_caps_reset": false,
+  "original_review": {
+    "full_suite_exit_code": 1,
+    "full_suite_junction_failures": 1,
+    "full_suite_passed": 11,
+    "full_suite_tests": 12,
+    "original_junction_rerun_exit_code": 0,
+    "original_junction_rerun_tests": 1,
+    "unique_cases_verified": 12
+  },
+  "paper_live_orders": 0,
+  "real_cloud_calls": 0,
+  "rust_tests": 177,
+  "static_and_build_exit_codes": {
+    "build": 0,
+    "check": 0,
+    "clippy": 0,
+    "fmt": 0
+  },
+  "tested_source_manifest": "tested-source.json"
+}

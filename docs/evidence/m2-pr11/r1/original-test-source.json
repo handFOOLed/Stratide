@@ -1,0 +1,13 @@
+{
+  "original_tests_unchanged": true,
+  "reference_head": "a24c8feba1811d474db19db28628b95898963191",
+  "source_sha256": {
+    "scripts/test-agent.py": "47c0ff27d9f441878d17503fd35974549d7e5e3d49a638da86f68913e98d2c71",
+    "scripts/test-candidates.py": "e54f92b8bcdd63cd583c756b14953cd003c488565db950cdf652b5f5b5bdf9a3",
+    "scripts/test-data-snapshot.py": "194975c36452135c1c422bb7787ecc99e477affbf8b21d4f2dcd98695f14722d",
+    "scripts/test-forward-readiness.py": "ec2b733dad11613bc509e3841a01c93ff23a3b0bf6074f6ba61cb5cfe70a2e59",
+    "scripts/test-multimodal-research.py": "12dd3186188fa30142ffa6c3be3a19d3988edd5bd636bd461d34506b0234da0d",
+    "scripts/test-multimodal-routing.py": "e43f0a84df568fd9906516fa14f93ca56a3ec32458de137828391aff0c96a549",
+    "scripts/test-research-review.py": "7061db608c729c8e96ea371899ddf4db586928a30b3e72934164cf5f4c4e7cb9"
+  }
+}

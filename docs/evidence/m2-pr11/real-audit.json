@@ -1,0 +1,31 @@
+{
+  "blockers": [
+    "ACTION_FEED_UNAVAILABLE",
+    "BEFORE_EOD_WINDOW",
+    "COVERAGE_NOT_ATTESTED",
+    "INSUFFICIENT_FORWARD_HISTORY",
+    "INSUFFICIENT_FORWARD_WARMUP",
+    "MISSED_OR_STALE",
+    "NO_VALID_CURRENT_ON_DAY_EOD",
+    "SNAPSHOT_SYNC_STALE_OR_CLOCK"
+  ],
+  "can_execute_forward_paper": false,
+  "continuous_sessions": 2,
+  "forward_research_readiness": "BLOCKED",
+  "historical_pit_status": "NOT_VERIFIED",
+  "input_mode": "forward_observed_eod",
+  "input_snapshot_sha256": "3def7bf43e54d889a68db292b09cfe0885782f650438792b01baff70f44cde03",
+  "live_allowed": false,
+  "old_receipt_replayed": true,
+  "opening_source": "BLOCKED",
+  "original_files_unchanged": true,
+  "paper_live_orders": 0,
+  "protected_files": 20,
+  "real_cloud_calls": 0,
+  "real_on_day_sessions": 2,
+  "required_closes_for_64_rolling20_points": 84,
+  "required_sessions": 21,
+  "risk_model_context": "INSUFFICIENT_MODEL_CONTEXT",
+  "source_day": "20261029",
+  "source_receipt_sha256": "4b6405cf365a44a382103b310e6a6b41000705261ccca335e00006193606d92e"
+}

@@ -1,0 +1,45 @@
+   Compiling ring v0.17.14
+   Compiling libsqlite3-sys v0.36.0
+   Compiling rustls v0.23.46
+   Compiling rusqlite v0.38.0
+   Compiling stratide-ledger v0.0.1 (<synthetic-checkout>\crates\ledger)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<synthetic-checkout>\target\debug\incremental\stratide_ledger-20774eq9c2lcr\s-hnrum03d74-1ikgh9g-working`
+
+   Compiling rustls-webpki v0.103.16
+warning: `stratide-ledger` (lib) generated 1 warning
+   Compiling tokio-rustls v0.26.6
+   Compiling ureq v3.5.0
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.12.28
+   Compiling stratide-forward v0.0.1 (<synthetic-checkout>\crates\forward)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<synthetic-checkout>\target\debug\incremental\stratide_forward-1lig89ii9lezi\s-hnrum1msu0-1eoa6gf-working`
+
+   Compiling stratide-research v0.0.1 (<synthetic-checkout>\research\agent)
+warning: `stratide-forward` (lib) generated 1 warning
+   Compiling stratide-cli v0.0.1 (<synthetic-checkout>\apps\stratide-cli)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<synthetic-checkout>\target\debug\incremental\stratide_research-11ee840rdjkti\s-hnrum1yog3-054dl6a-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<synthetic-checkout>\target\debug\incremental\stratide_cli-05oxi8jtsac4d\s-hnrum23seb-0o8901m-working`
+
+   Compiling stratided v0.0.1 (<synthetic-checkout>\apps\stratided)
+warning: `stratide-research` (lib) generated 1 warning
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<synthetic-checkout>\target\debug\incremental\eod_research-0wayxnef5d84l\s-hnrum450e4-1ioq979-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<synthetic-checkout>\target\debug\incremental\eod_auto_agent-3ngs2mf1p913m\s-hnrum452xk-1ejkuh3-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<synthetic-checkout>\target\debug\incremental\multimodal_agent-1i2gyxq2en6oz\s-hnrum450qz-0gyxg3y-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<synthetic-checkout>\target\debug\incremental\risk_portfolio_agent-3f06qkz9f1gjk\s-hnrum45673-1p68ebr-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<synthetic-checkout>\target\debug\incremental\stratided-3jbtvib7u7cl9\s-hnrum35dnl-04p8my6-working`
+
+warning: `stratide-cli` (bin "stratide-cli") generated 1 warning
+warning: `stratided` (lib) generated 1 warning
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<synthetic-checkout>\target\debug\incremental\stratided-319ewz0qrcxxy\s-hnrum50vre-1ao7kp2-working`
+
+warning: `stratide-research` (bin "risk-portfolio-agent") generated 1 warning
+warning: `stratide-research` (bin "eod-research") generated 1 warning
+warning: `stratide-research` (bin "eod-auto-agent") generated 1 warning
+warning: `stratide-research` (bin "multimodal-agent") generated 1 warning
+warning: `stratided` (bin "stratided") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 13.76s

@@ -1,0 +1,84 @@
+[
+  {
+    "command": [
+      "python",
+      "-X",
+      "utf8",
+      "-B",
+      "scripts/test-agent.py",
+      "--output",
+      "<checkout>\\docs\\evidence\\m2-pr11\\agent-regression.json",
+      "--assets-dir",
+      "<checkout>\\state\\issue55-validation\\assets"
+    ],
+    "exit_code": 1,
+    "elapsed_seconds": 2.328,
+    "tests": null,
+    "log": "test-agent-regression.txt"
+  },
+  {
+    "command": [
+      "python",
+      "-X",
+      "utf8",
+      "-B",
+      "scripts/test-candidates.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 6.0,
+    "tests": 13,
+    "log": "test-candidates-regression.txt"
+  },
+  {
+    "command": [
+      "python",
+      "-X",
+      "utf8",
+      "-B",
+      "scripts/test-research-review.py"
+    ],
+    "exit_code": 1,
+    "elapsed_seconds": 76.125,
+    "tests": 12,
+    "log": "test-research-review-regression.txt"
+  },
+  {
+    "command": [
+      "python",
+      "-X",
+      "utf8",
+      "-B",
+      "scripts/test-multimodal-research.py"
+    ],
+    "exit_code": 1,
+    "elapsed_seconds": 0.172,
+    "tests": 0,
+    "log": "test-multimodal-research-regression.txt"
+  },
+  {
+    "command": [
+      "python",
+      "-X",
+      "utf8",
+      "-B",
+      "scripts/test-multimodal-routing.py"
+    ],
+    "exit_code": 1,
+    "elapsed_seconds": 1.0,
+    "tests": 4,
+    "log": "test-multimodal-routing-regression.txt"
+  },
+  {
+    "command": [
+      "python",
+      "-X",
+      "utf8",
+      "-B",
+      "scripts/test-forward-readiness.py"
+    ],
+    "exit_code": 1,
+    "elapsed_seconds": 96.719,
+    "tests": 13,
+    "log": "test-forward-readiness-regression.txt"
+  }
+]

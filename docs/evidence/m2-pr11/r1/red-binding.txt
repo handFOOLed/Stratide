@@ -1,0 +1,6 @@
+Original trusted stratided --agent-init-fake: exit 0; existing Owner fixture created.
+New bridge init --agent-dir <existing-owner-fixture>: exit 2
+{"billing":"NOT_BILLED","cloud":"CLOUD_NOT_AUTHORIZED","error_code":"RISK_ARGUMENTS","live_allowed":false}
+
+Expected: bind this existing Agent database, preserving its cap/default/tasks.
+Observed prior implementation: cannot bind; it hard-codes its separate .agent directory.

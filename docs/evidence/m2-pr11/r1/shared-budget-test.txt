@@ -1,0 +1,36 @@
+   Compiling ring v0.17.14
+   Compiling libsqlite3-sys v0.36.0
+   Compiling rusqlite v0.38.0
+   Compiling rustls-webpki v0.103.16
+   Compiling rustls v0.23.46
+   Compiling tokio-rustls v0.26.6
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.12.28
+   Compiling stratide-research v0.0.1 (<checkout>\research\agent)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratide_research-34r7b9k123m3b\s-hnrubehati-067qqdk-working`
+
+warning: `stratide-research` (lib) generated 1 warning
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\eod_research-1qnjso9h5s2ue\s-hnrubfrtba-02quba0-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\multimodal_agent-28hlb7zehqfjo\s-hnrubfrqve-0idl9sl-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\risk_portfolio_agent-20gqxrroe3gzr\s-hnrubfrqwb-1lp6mf6-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\eod_auto_agent-09yckw4m4i0il\s-hnrubfrwhl-1qg1ozt-working`
+
+warning: `stratide-research` (bin "eod-research") generated 1 warning
+warning: `stratide-research` (bin "multimodal-agent") generated 1 warning
+warning: `stratide-research` (bin "eod-auto-agent") generated 1 warning
+warning: `stratide-research` (bin "risk-portfolio-agent") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.78s
+     Running tests\shared_budget.rs (target\debug\deps\shared_budget-415906f10675851d.exe)
+
+running 6 tests
+test cross_entry_process ... ok
+test two_processes_from_legacy_and_cloud_share_one_atomic_reservation ... ok
+test selecting_cloud_task_preserves_existing_default_and_shared_call_table ... ok
+test existing_authority_rejects_a_second_settings_file_or_database ... ok
+test legacy_unknown_survives_restart_and_month_change_in_cloud_budget ... ok
+test original_spend_and_cloud_quotes_share_both_period_caps ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.66s

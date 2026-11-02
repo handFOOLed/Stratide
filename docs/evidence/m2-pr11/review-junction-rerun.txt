@@ -1,0 +1,6 @@
+test_owner_parameter_injection_and_junction_never_run (original_review_regression.ReviewTests.test_owner_parameter_injection_and_junction_never_run) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 3.871s
+
+OK

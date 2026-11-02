@@ -1,0 +1,111 @@
+test_01_two_scenarios_original_inbox_versions_readonly_and_fee_baselines (__main__.PortfolioTests.test_01_two_scenarios_original_inbox_versions_readonly_and_fee_baselines) ... ok
+test_02_loopback_production_requests_auth_projection_and_no_proxy (__main__.PortfolioTests.test_02_loopback_production_requests_auth_projection_and_no_proxy) ... ok
+test_03_timeout_and_redirect_never_resend_or_release_budget (__main__.PortfolioTests.test_03_timeout_and_redirect_never_resend_or_release_budget) ... ok
+test_04_real_kill_at_dispatch_result_and_settlement_commit (__main__.PortfolioTests.test_04_real_kill_at_dispatch_result_and_settlement_commit) ... ok
+test_05_reserve_dispatch_rechecks_revocation_receipt_and_lowered_caps (__main__.PortfolioTests.test_05_reserve_dispatch_rechecks_revocation_receipt_and_lowered_caps) ... FAIL
+test_06_single_daily_monthly_batch_caps_two_processes_and_cross_period_holds (__main__.PortfolioTests.test_06_single_daily_monthly_batch_caps_two_processes_and_cross_period_holds) ... ok
+test_07_bad_input_weights_receipts_never_self_approve (__main__.PortfolioTests.test_07_bad_input_weights_receipts_never_self_approve) ... ok
+test_08_sensitive_error_is_hashed_and_redacted_with_held_reservation (__main__.PortfolioTests.test_08_sensitive_error_is_hashed_and_redacted_with_held_reservation) ... ok
+test_09_renaming_batches_or_git_environment_cannot_reset_shared_authority (__main__.PortfolioTests.test_09_renaming_batches_or_git_environment_cannot_reset_shared_authority) ... ok
+test_10_actual_task_provider_must_match_the_frozen_stage_pin (__main__.PortfolioTests.test_10_actual_task_provider_must_match_the_frozen_stage_pin) ... FAIL
+test_11_original_agent_spend_and_both_cloud_stages_share_daily_monthly_caps (__main__.PortfolioTests.test_11_original_agent_spend_and_both_cloud_stages_share_daily_monthly_caps) ... ERROR
+test_12_original_agent_unknown_cost_survives_month_boundary_into_cloud_gate (__main__.PortfolioTests.test_12_original_agent_unknown_cost_survives_month_boundary_into_cloud_gate) ... ERROR
+test_13_binding_does_not_create_or_switch_cost_authority (__main__.PortfolioTests.test_13_binding_does_not_create_or_switch_cost_authority) ... ERROR
+
+======================================================================
+ERROR: test_11_original_agent_spend_and_both_cloud_stages_share_daily_monthly_caps (__main__.PortfolioTests.test_11_original_agent_spend_and_both_cloud_stages_share_daily_monthly_caps)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<synthetic-checkout>\scripts\test-risk-portfolio.py", line 407, in test_11_original_agent_spend_and_both_cloud_stages_share_daily_monthly_caps
+    view = p.status()
+           ^^^^^^^^^^
+  File "<synthetic-checkout>\research\portfolio_research.py", line 362, in status
+    with agent_db() as db:
+         ^^^^^^^^^^
+  File "<python-install>\Lib\contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "<synthetic-checkout>\research\portfolio_research.py", line 96, in agent_db
+    with s.readonly(Path(bound["agent_dir"]) / "agent.sqlite") as db:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<python-install>\Lib\contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "<synthetic-checkout>\research\shadow.py", line 61, in readonly
+    j.require(not rollback.exists() and (not wal.exists() or
+  File "<synthetic-checkout>\research\eod_journal.py", line 26, in require
+    raise Rejected(code)
+eod_journal.Rejected: STORE_BUSY_OR_RECOVERY_REQUIRED
+
+======================================================================
+ERROR: test_12_original_agent_unknown_cost_survives_month_boundary_into_cloud_gate (__main__.PortfolioTests.test_12_original_agent_unknown_cost_survives_month_boundary_into_cloud_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<synthetic-checkout>\scripts\test-risk-portfolio.py", line 436, in test_12_original_agent_unknown_cost_survives_month_boundary_into_cloud_gate
+    view = p.status(); descriptor = {m["id"]: m for m in p.bridge("descriptor")}
+           ^^^^^^^^^^
+  File "<synthetic-checkout>\research\portfolio_research.py", line 362, in status
+    with agent_db() as db:
+         ^^^^^^^^^^
+  File "<python-install>\Lib\contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "<synthetic-checkout>\research\portfolio_research.py", line 96, in agent_db
+    with s.readonly(Path(bound["agent_dir"]) / "agent.sqlite") as db:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<python-install>\Lib\contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "<synthetic-checkout>\research\shadow.py", line 61, in readonly
+    j.require(not rollback.exists() and (not wal.exists() or
+  File "<synthetic-checkout>\research\eod_journal.py", line 26, in require
+    raise Rejected(code)
+eod_journal.Rejected: STORE_BUSY_OR_RECOVERY_REQUIRED
+
+======================================================================
+ERROR: test_13_binding_does_not_create_or_switch_cost_authority (__main__.PortfolioTests.test_13_binding_does_not_create_or_switch_cost_authority)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<synthetic-checkout>\scripts\test-risk-portfolio.py", line 453, in test_13_binding_does_not_create_or_switch_cost_authority
+    before = p.status()
+             ^^^^^^^^^^
+  File "<synthetic-checkout>\research\portfolio_research.py", line 362, in status
+    with agent_db() as db:
+         ^^^^^^^^^^
+  File "<python-install>\Lib\contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "<synthetic-checkout>\research\portfolio_research.py", line 96, in agent_db
+    with s.readonly(Path(bound["agent_dir"]) / "agent.sqlite") as db:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<python-install>\Lib\contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "<synthetic-checkout>\research\shadow.py", line 61, in readonly
+    j.require(not rollback.exists() and (not wal.exists() or
+  File "<synthetic-checkout>\research\eod_journal.py", line 26, in require
+    raise Rejected(code)
+eod_journal.Rejected: STORE_BUSY_OR_RECOVERY_REQUIRED
+
+======================================================================
+FAIL: test_05_reserve_dispatch_rechecks_revocation_receipt_and_lowered_caps (__main__.PortfolioTests.test_05_reserve_dispatch_rechecks_revocation_receipt_and_lowered_caps)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<synthetic-checkout>\scripts\test-risk-portfolio.py", line 286, in test_05_reserve_dispatch_rechecks_revocation_receipt_and_lowered_caps
+    assert t["status"] in ("cancelled", "failed")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+
+======================================================================
+FAIL: test_10_actual_task_provider_must_match_the_frozen_stage_pin (__main__.PortfolioTests.test_10_actual_task_provider_must_match_the_frozen_stage_pin)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<synthetic-checkout>\scripts\test-risk-portfolio.py", line 397, in test_10_actual_task_provider_must_match_the_frozen_stage_pin
+    assert result["reason"] == "PINNED_CLOUD_TASK_MODEL_MISMATCH" and result["calls"] == []
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+
+----------------------------------------------------------------------
+Ran 13 tests in 61.035s
+
+FAILED (failures=2, errors=3)

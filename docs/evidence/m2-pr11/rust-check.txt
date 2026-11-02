@@ -1,0 +1,17 @@
+   Compiling ring v0.17.14
+   Compiling libsqlite3-sys v0.36.0
+    Checking stratide-contracts v0.0.1 (<checkout>\crates\contracts)
+    Checking stratide-risk v0.0.1 (<checkout>\crates\risk)
+   Compiling rustls v0.23.46
+    Checking rusqlite v0.38.0
+    Checking rustls-webpki v0.103.16
+    Checking stratide-ledger v0.0.1 (<checkout>\crates\ledger)
+    Checking tokio-rustls v0.26.6
+    Checking ureq v3.5.0
+    Checking hyper-rustls v0.27.10
+    Checking reqwest v0.12.28
+    Checking stratide-forward v0.0.1 (<checkout>\crates\forward)
+    Checking stratide-research v0.0.1 (<checkout>\research\agent)
+    Checking stratide-cli v0.0.1 (<checkout>\apps\stratide-cli)
+    Checking stratided v0.0.1 (<checkout>\apps\stratided)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.10s

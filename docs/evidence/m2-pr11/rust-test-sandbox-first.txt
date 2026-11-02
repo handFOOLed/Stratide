@@ -1,0 +1,53 @@
+   Compiling stratide-risk v0.0.1 (<checkout>\crates\risk)
+   Compiling stratide-contracts v0.0.1 (<checkout>\crates\contracts)
+   Compiling stratide-ledger v0.0.1 (<checkout>\crates\ledger)
+   Compiling stratide-forward v0.0.1 (<checkout>\crates\forward)
+   Compiling stratide-cli v0.0.1 (<checkout>\apps\stratide-cli)
+   Compiling stratide-research v0.0.1 (<checkout>\research\agent)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratide_research-11ee840rdjkti\s-hnrsjinb60-0gwk1hw-working`
+
+   Compiling stratided v0.0.1 (<checkout>\apps\stratided)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratided-3jbtvib7u7cl9\s-hnrsjl50zl-1egflzw-working`
+
+warning: `stratide-research` (lib) generated 1 warning
+warning: `stratided` (lib) generated 1 warning
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\multimodal_agent-1i2gyxq2en6oz\s-hnrsjog6th-05qsxb8-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\eod_research-0wayxnef5d84l\s-hnrsjoljvd-1h8vho9-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\eod_auto_agent-3ngs2mf1p913m\s-hnrsjogxm2-05lhw8c-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\risk_portfolio_agent-3f06qkz9f1gjk\s-hnrsjogxip-0d0lgz4-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<checkout>\target\debug\incremental\stratided-319ewz0qrcxxy\s-hnrsjqjjrc-107vup2-working`
+
+warning: `stratide-research` (bin "eod-research") generated 1 warning
+warning: `stratide-research` (bin "multimodal-agent") generated 1 warning
+warning: `stratide-research` (bin "eod-auto-agent") generated 1 warning
+warning: `stratide-research` (bin "risk-portfolio-agent") generated 1 warning
+warning: `stratided` (bin "stratided") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 29.38s
+     Running unittests src\main.rs (target\debug\deps\stratide_cli-eece85223b46f6dc.exe)
+
+running 5 tests
+test replay::report::publish::tests::crash_child ... ok
+test replay::historical::tests::historical_adapter_cannot_supply_forward_opening_or_change_assumption_labels ... ok
+test replay::historical::tests::future_prices_and_appended_sessions_cannot_change_frozen_today_signal ... ok
+test replay::report::publish::tests::conflicting_or_nonsequential_content_is_never_archived_or_overwritten ... ok
+test replay::report::publish::tests::process_death_during_write_archive_and_publish_can_resume_same_path ... FAILED
+
+failures:
+
+---- replay::report::publish::tests::process_death_during_write_archive_and_publish_can_resume_same_path stdout ----
+
+thread 'replay::report::publish::tests::process_death_during_write_archive_and_publish_can_resume_same_path' (28204) panicked at apps\stratide-cli\src\replay\report\publish.rs:184:37:
+called `Result::unwrap()` on an `Err` value: "报表发布未完成，可用原命令重试：Access is denied. (os error 5)"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    replay::report::publish::tests::process_death_during_write_archive_and_publish_can_resume_same_path
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p stratide-cli --bin stratide-cli`

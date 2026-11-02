@@ -1,6 +1,6 @@
 # Stratide Paper 阶段路线图（当前执行版）
 
-> 2026-11-01；最新实现与数据边界见 [STATUS](STATUS.md)。Owner 已决定 **Core-first、UI-later**：后续核心功能不要求同期 Dashboard/UI，最终由 Sol 按已合并 PR #28 的视觉基准统一集成。旧各 PR 实施/验收细节仍保存在 `docs/M0_*.md`、`docs/M1_*.md`、`docs/M2_PR01.md` 与 `docs/evidence/`。
+> 2026-11-02；最新实现与数据边界见 [STATUS](STATUS.md)。Owner 已决定 **Core-first、UI-later**：后续核心功能不要求同期 Dashboard/UI，最终按已合并 PR #28 的视觉基准统一集成。旧各 PR 实施/验收细节仍保存在 `docs/M0_*.md`、`docs/M1_*.md`、`docs/M2_PR01.md` 与 `docs/evidence/`。
 
 ## 已完成（已并入 main）
 
@@ -26,11 +26,15 @@ PR #42 的[历史公司行为桥接 V1](M1_PR09.md)、PR #44 的[EOD 自动研�
 
 **M2-PR10 已合并（PR #52）：** [#51](https://github.com/handFOOLed/Stratide/issues/51) 的 [Time-Series + Fusion V1](M2_PR10.md) 已并入 main `1b2c903`：可信 Snapshot 冻结 → 数学基线/独立可替换本地时序测试 Adapter → 原 Rust Agent/预算/Fusion fake → 原候选 Inbox。精确任务领取和实际任务 reserve/dispatch 双门禁保留，默认 OFF、LOCAL_FAKE_ONLY；不改变 #50 Operator 或财务权限。[原开发自测](evidence/m2-pr10/README.md) 保留其当时记录。
 
-**本分支 M1-PR11 Draft：** [#53](https://github.com/handFOOLed/Stratide/issues/53) 的 [真实前向 EOD 研究资格 V1](M1_PR11.md)：只读原 observer/PR33/PR38，冻结独立事件源契约与实际取得覆盖，逐日核验 21 连续会话并将收据接入原 PR52。完整 synthetic 正反/修订/故障恢复通过只证明工程路径；真实仅两日、事件覆盖缺失且已过期，仍 BLOCKED。历史 PIT、开盘、Paper/Live 均不解锁。
+**M1-PR11 已合并（PR #54）：** [#53](https://github.com/handFOOLed/Stratide/issues/53) 的 [真实前向 EOD 研究资格 V1](M1_PR11.md) 已并入 `main a27f466`：只读原 observer/PR33/PR38，冻结独立事件源契约与实际取得覆盖，逐日核验 21 连续会话并接入原 PR52。完整 synthetic 正反/修订/恢复只证明工程路径；真实两日、事件覆盖缺失且已过期，仍 BLOCKED。历史 PIT、开盘、Paper/Live 均不解锁。
+
+**本分支 M2-PR11 Draft：** [#55](https://github.com/handFOOLed/Stratide/issues/55) 的 [Cloud Risk Expert + Autonomous Portfolio V1](M2_PR11.md)：独立 scope、BigQuery/DeepSeek 两套生产 Adapter、原 Rust 任务/统一预算、Naive/EWMA 风险代理、严格股票/现金组合及原 Inbox。3 股票+现金/全现金、策略版本变化和费用/基线对照走 recorded/loopback 完整路径。无真实云/资金/订单；真实数据、完整 query 费用和模型能力仍 BLOCKED/NOT_VERIFIED。
+
+**审查修复 R1：** 新链路显式绑定已有 Owner AgentDir 与配置，共享原费用库；177 Rust、13 新 E2E 开发自测通过。PR52/54 三套原完整回归于 2026-11-02 盘后有效时间实际运行，**10+4+13 项均 exit 0**，开发证据已补齐，最终独立复审仍待完成；[修复证据](evidence/m2-pr11/r1/README.md) / [盘后运行](evidence/m2-pr11/r1/afternoon/README.md)。
 
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |
-| **当前 #53** | **Sol** | M1-PR11 前向来源证据、逐日研究资格、原双模型安全接线；真实只读审计与合成正反/修订/恢复，唯一 Draft，固定 HEAD 审查后由 Owner 决定是否合并。 |
+| **当前 #55** | **Sol** | M2-PR11 云风险/自主组合，真实 Adapter + 合成 E2E + 费用/凭据/并发/恢复反证；唯一 Draft，固定 HEAD 审查及针对性独立 P0 复核后由 Owner 决定是否合并。 |
 | **后续核心** | Owner 再定范围 | #10 真实开盘、PIT、账户税/到账仍受阻；#36 完整多模态消融及真实供应商未验证。 |
 | **核心全部完成后** | **Sol** | 按 PR #28 的设计体系统一集成 UI；本期不改 UI。 |
 

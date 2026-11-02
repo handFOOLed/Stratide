@@ -59,6 +59,8 @@ pub struct Model {
     pub price: Option<Price>,
     pub grant: Option<Grant>,
     pub fake_scenario: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cloud: Option<crate::risk_cloud::Cloud>,
 }
 impl Default for Settings {
     fn default() -> Self {
@@ -175,8 +177,12 @@ impl Settings {
                 "MODEL_CONFIG_INVALID",
             )?;
             match m.kind.as_str() {
+                "bigquery_forecast_v1" | "deepseek_portfolio_v1" => {
+                    crate::risk_cloud::validate_model(m)?;
+                }
                 "fake" => ensure(
-                    m.endpoint.is_none()
+                    m.cloud.is_none()
+                        && m.endpoint.is_none()
                         && m.api_key_env.is_none()
                         && matches!(
                             m.fake_scenario.as_deref(),
@@ -192,6 +198,7 @@ impl Settings {
                     "FAKE_CONFIG_INVALID",
                 )?,
                 "chat_completions_v1" => {
+                    ensure(m.cloud.is_none(), "CLOUD_PROTOCOL_MISMATCH")?;
                     crate::provider::endpoint(m.endpoint.as_deref().ok_or("ENDPOINT_REQUIRED")?)?;
                     let key = m.api_key_env.as_deref().ok_or("KEY_ENV_REQUIRED")?;
                     ensure(
@@ -264,6 +271,7 @@ impl Settings {
                     revoked: false,
                 }),
                 fake_scenario: Some(scenario.into()),
+                cloud: None,
             });
         }
         result
@@ -274,6 +282,15 @@ impl Model {
         hash(&serde_json::to_vec(self).expect("model JSON"))
     }
     pub fn authorize(&self, scopes: &[String], budget: Option<&Budget>) -> Result<()> {
+        if crate::risk_cloud::is_model(self) {
+            return crate::risk_cloud::authorize(self, scopes, budget);
+        }
+        ensure(
+            !scopes
+                .iter()
+                .any(|s| crate::risk_portfolio::SCOPES.contains(&s.as_str())),
+            "RISK_PORTFOLIO_EXPLICIT_PROTOCOL_REQUIRED",
+        )?;
         ensure(
             self.kind == "fake" || !scopes.iter().any(|s| s == crate::multimodal::SCOPE),
             "MULTIMODAL_LOCAL_FAKE_ONLY",
@@ -315,6 +332,13 @@ impl Model {
         Ok(())
     }
     pub fn cost(&self, input: u32, output: u32) -> Result<i64> {
+        if self.kind == "bigquery_forecast_v1" {
+            return Ok(self
+                .cloud
+                .as_ref()
+                .ok_or("CLOUD_CONFIG_REQUIRED")?
+                .max_call_micro);
+        }
         let price = self.price.as_ref().ok_or("PRICE_UNCONFIGURED")?;
         let numerator = i128::from(input) * i128::from(price.input_micro_per_million)
             + i128::from(output) * i128::from(price.output_micro_per_million);

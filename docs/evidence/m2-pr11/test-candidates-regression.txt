@@ -1,0 +1,35 @@
+test_ambiguous_json_and_mismatched_agent_source_are_rejected (__main__.CandidateTests.test_ambiguous_json_and_mismatched_agent_source_are_rejected) ... ok
+
+test_changed_parameters_extra_commands_and_unknown_templates_are_research_only (__main__.CandidateTests.test_changed_parameters_extra_commands_and_unknown_templates_are_research_only) ... ok
+
+test_corrupted_reports_and_forged_qualification_are_not_cached_success (__main__.CandidateTests.test_corrupted_reports_and_forged_qualification_are_not_cached_success) ... ok
+
+test_frozen_data_and_protocol_tampering_reject_before_execution (__main__.CandidateTests.test_frozen_data_and_protocol_tampering_reject_before_execution) ... ok
+
+test_missing_source_bad_sha_and_synthetic_upgrade_remain_data_blocked (__main__.CandidateTests.test_missing_source_bad_sha_and_synthetic_upgrade_remain_data_blocked) ... ok
+
+test_offline_cli_end_to_end_restart_cache_accounting_and_preservation (__main__.CandidateTests.test_offline_cli_end_to_end_restart_cache_accounting_and_preservation) ... ok
+
+test_process_interruption_never_publishes_success_and_restart_uses_new_ledger (__main__.CandidateTests.test_process_interruption_never_publishes_success_and_restart_uses_new_ledger) ... ok
+
+test_registration_and_freeze_repeat_without_new_candidate (__main__.CandidateTests.test_registration_and_freeze_repeat_without_new_candidate) ... ok
+
+test_registry_writer_exclusion_and_path_boundary (__main__.CandidateTests.test_registry_writer_exclusion_and_path_boundary) ... ok
+
+test_synthetic_future_probe_preserves_prior_decisions_and_cannot_replace_fixed_fixture (__main__.CandidateTests.test_synthetic_future_probe_preserves_prior_decisions_and_cannot_replace_fixed_fixture) ... ok
+
+test_two_independent_registries_produce_identical_six_reports_and_evaluation (__main__.CandidateTests.test_two_independent_registries_produce_identical_six_reports_and_evaluation) ... ok
+
+test_unknown_availability_corporate_action_and_dates_fail_existing_preparation (__main__.CandidateTests.test_unknown_availability_corporate_action_and_dates_fail_existing_preparation) ... ok
+
+test_whitelist_and_untrusted_text_have_no_execution_authority (__main__.CandidateTests.test_whitelist_and_untrusted_text_have_no_execution_authority) ... ok
+
+
+
+----------------------------------------------------------------------
+
+Ran 13 tests in 5.824s
+
+
+
+OK

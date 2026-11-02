@@ -1,0 +1,127 @@
+{
+  "files": {
+    "original_multimodal_agent/agent.lock": {
+      "bytes": 0,
+      "mtime_ns": 1793536060271143400,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_multimodal_agent/agent.sqlite": {
+      "bytes": 2502656,
+      "mtime_ns": 1793542365795960200,
+      "sha256": "0ba3ea1202b43d6b3718831f6f0afbb41f840dc58f5127143611edcf56a2c2ba",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_multimodal_agent/settings.json": {
+      "bytes": 4097,
+      "mtime_ns": 1793542344456527100,
+      "sha256": "8dd2ef98f962dd22f7d1d1e67824ff0fa28e863ac426e3557ec58cd1a2dfb0b6",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_observer/forward.lock": {
+      "bytes": 0,
+      "mtime_ns": 1793188200071308600,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_observer/forward.sqlite": {
+      "bytes": 12288,
+      "mtime_ns": 1793188469111016900,
+      "sha256": "9345ed7e8dfc50c990499f6d62bd0de616d4408666579d7386a2626e427e6f4b",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_pr33/snapshots.sqlite": {
+      "bytes": 16384,
+      "mtime_ns": 1793327717501455100,
+      "sha256": "ac4c814efa38c44fe7e6384f38f73c839e3a6111d085d97ef90ee9759c0d88c8",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_pr33/snapshots.sqlite-shm": {
+      "bytes": 32768,
+      "mtime_ns": 1793332061643535000,
+      "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_pr33/snapshots.sqlite-wal": {
+      "bytes": 0,
+      "mtime_ns": 1793327717509207900,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_pr33/writer.lock": {
+      "bytes": 1,
+      "mtime_ns": 1793327717263202800,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_pr38/bundle.json": {
+      "bytes": 12088,
+      "mtime_ns": 1793455246899956600,
+      "sha256": "68e9392cfaa76ab8c8548fa98e7c3e269da33fb8ec35e6db1dd46153e6a2e3b7",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_pr38/documents/af6d8832c28939476735818780d82d3976ff20af4d023c1cacf370216890ae86.txt": {
+      "bytes": 5516,
+      "mtime_ns": 1793455246858000800,
+      "sha256": "af6d8832c28939476735818780d82d3976ff20af4d023c1cacf370216890ae86",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_pr38/documents/afe3ee2cf61dcd1e9e76d2b8d4a93a2cc16fd7ea27eb89da815b8a808f8de386.pdf": {
+      "bytes": 108034,
+      "mtime_ns": 1793455246863001600,
+      "sha256": "afe3ee2cf61dcd1e9e76d2b8d4a93a2cc16fd7ea27eb89da815b8a808f8de386",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_pr38/history/calendar.json": {
+      "bytes": 90816,
+      "mtime_ns": 1793455246869002900,
+      "sha256": "284cbb28d12f576ae93e54b0bd8abf516a595cc668f56363cd2cfbb68a4d5bf9",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_pr38/history/daily.json": {
+      "bytes": 99953,
+      "mtime_ns": 1793455246872792600,
+      "sha256": "5689c59e8fa92b5ca2499141c3b4e199b168ea02f70b385c8a24eb81340d2075",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_pr38/history/extraction.json": {
+      "bytes": 622,
+      "mtime_ns": 1793455246877790200,
+      "sha256": "5eb1abff2764e414f484d9610807af7544fa672ccf6228056796f4a5337e4075",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_pr38/history/limits.json": {
+      "bytes": 61790,
+      "mtime_ns": 1793455246884614200,
+      "sha256": "dabd396dc7594bf90c74118d92be256c87667bc0cfd46af08b7c9f1861ceec2f",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_pr38/history/suspensions.json": {
+      "bytes": 2,
+      "mtime_ns": 1793455246887412400,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_pr38/manifest.json": {
+      "bytes": 7112,
+      "mtime_ns": 1793455246895813100,
+      "sha256": "3bbde84676a2df89fadc0e6b12f8f60196a926750d4f09c76981e0404c48d73e",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_readiness/readiness.sqlite": {
+      "bytes": 40960,
+      "mtime_ns": 1793541638121651900,
+      "sha256": "d04444f83f47cf3b71bad14627edae27f4d500871dc39abdbeaf5421dc02a83c",
+      "unchanged_sha_and_mtime": true
+    },
+    "original_readiness/writer.lock": {
+      "bytes": 1,
+      "mtime_ns": 1793541638052578500,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "unchanged_sha_and_mtime": true
+    }
+  },
+  "protected_file_count": 20,
+  "source_hashes_only_no_prices_or_private_paths": true,
+  "unchanged": true
+}

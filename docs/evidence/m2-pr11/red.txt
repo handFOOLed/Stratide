@@ -1,0 +1,161 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling stable_deref_trait v1.2.1
+   Compiling windows-link v0.2.1
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.15
+   Compiling cfg-if v1.0.5
+   Compiling bytes v1.12.1
+   Compiling pin-project-lite v0.2.17
+   Compiling itoa v1.0.18
+   Compiling smallvec v1.16.4
+   Compiling futures-core v0.3.34
+   Compiling writeable v0.6.4
+   Compiling litemap v0.8.3
+   Compiling utf8_iter v1.0.4
+   Compiling windows-sys v0.61.2
+   Compiling icu_properties_data v2.4.0
+   Compiling once_cell v1.21.4
+   Compiling icu_normalizer_data v2.4.0
+   Compiling percent-encoding v2.3.2
+   Compiling zeroize v1.9.1
+   Compiling futures-sink v0.3.34
+   Compiling memchr v2.8.3
+   Compiling version_check v0.9.5
+   Compiling getrandom v0.2.17
+   Compiling untrusted v0.9.0
+   Compiling futures-io v0.3.34
+   Compiling slab v0.4.12
+   Compiling cc v1.10.0
+   Compiling http v1.5.0
+   Compiling rustls-pki-types v1.15.1
+   Compiling serde_core v1.0.229
+   Compiling futures-task v0.3.34
+   Compiling httparse v1.10.1
+   Compiling libc v0.2.191
+   Compiling generic-array v0.14.7
+   Compiling autocfg v1.5.1
+   Compiling try-lock v0.2.5
+   Compiling futures-util v0.3.34
+   Compiling tower-service v0.3.3
+   Compiling rustls v0.23.46
+   Compiling typenum v1.20.1
+   Compiling want v0.3.2
+   Compiling form_urlencoded v1.2.2
+   Compiling tracing-core v0.1.36
+   Compiling serde v1.0.229
+   Compiling http-body v1.1.0
+   Compiling num-traits v0.2.19
+   Compiling zmij v1.0.23
+   Compiling subtle v2.6.1
+   Compiling vcpkg v0.2.15
+   Compiling pkg-config v0.3.34
+   Compiling atomic-waker v1.1.2
+   Compiling futures-channel v0.3.34
+   Compiling sync_wrapper v1.0.2
+   Compiling tracing v0.1.44
+   Compiling siphasher v1.0.4
+   Compiling base64 v0.23.1
+   Compiling bitflags v2.13.2
+   Compiling ipnet v2.12.2
+   Compiling foldhash v0.2.0
+   Compiling syn v3.0.9
+   Compiling winapi v0.3.9
+   Compiling serde_json v1.0.154
+   Compiling tower-layer v0.3.3
+   Compiling hashbrown v0.16.1
+   Compiling phf_shared v0.12.1
+   Compiling webpki-roots v1.0.11
+   Compiling getrandom v0.3.4
+   Compiling chrono-tz v0.10.4
+   Compiling ryu v1.0.23
+   Compiling phf v0.12.1
+   Compiling http-body-util v0.1.5
+   Compiling base64 v0.22.1
+   Compiling socket2 v0.6.5
+   Compiling mio v1.2.4
+   Compiling block-buffer v0.10.4
+   Compiling ring v0.17.14
+   Compiling libsqlite3-sys v0.36.0
+   Compiling crypto-common v0.1.7
+   Compiling digest v0.10.7
+   Compiling chrono v0.4.45
+   Compiling hashlink v0.11.1
+   Compiling fallible-iterator v0.3.0
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling cpufeatures v0.2.17
+   Compiling log v0.4.34
+   Compiling tokio v1.54.1
+   Compiling sha2 v0.10.9
+   Compiling getrandom v0.4.3
+   Compiling fastrand v2.5.0
+   Compiling tempfile v3.27.0
+   Compiling fs2 v0.4.3
+   Compiling synstructure v0.14.0
+   Compiling zerovec-derive v0.11.7
+   Compiling displaydoc v0.2.7
+   Compiling serde_derive v1.0.229
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.4
+   Compiling zerofrom v0.1.8
+   Compiling yoke v0.8.4
+   Compiling rustls-webpki v0.103.16
+   Compiling hyper v1.12.0
+   Compiling tower v0.5.3
+   Compiling rusqlite v0.38.0
+   Compiling zerovec v0.11.9
+   Compiling zerotrie v0.2.5
+   Compiling tinystr v0.8.5
+   Compiling potential_utf v0.1.6
+   Compiling icu_collections v2.4.0
+   Compiling icu_locale_core v2.4.0
+   Compiling serde_urlencoded v0.7.1
+   Compiling hyper-util v0.1.21
+   Compiling icu_provider v2.4.0
+   Compiling icu_properties v2.4.0
+   Compiling icu_normalizer v2.4.0
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling tokio-rustls v0.26.6
+   Compiling hyper-rustls v0.27.10
+   Compiling tower-http v0.6.11
+   Compiling reqwest v0.12.28
+   Compiling stratide-research v0.0.1 (<checkout>\research\agent)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.83s
+     Running tests\risk_portfolio.rs (target\debug\deps\risk_portfolio-2d5db47a4b37ce35.exe)
+
+running 3 tests
+test bigquery_https_fails_closed_without_a_verified_all_dimension_bound ... FAILED
+test production_adapter_config_is_supported_offline ... FAILED
+test copied_old_grant_cannot_authorize_new_cloud_scope ... FAILED
+
+failures:
+
+---- bigquery_https_fails_closed_without_a_verified_all_dimension_bound stdout ----
+
+thread 'bigquery_https_fails_closed_without_a_verified_all_dimension_bound' (9832) panicked at research\agent\tests\risk_portfolio.rs:44:53:
+production config parses: Error("unknown field `cloud`, expected one of `id`, `label`, `kind`, `model`, `endpoint`, `api_key_env`, `max_input_tokens`, `max_output_tokens`, `timeout_seconds`, `price`, `grant`, `fake_scenario`", line: 0, column: 0)
+
+---- production_adapter_config_is_supported_offline stdout ----
+
+thread 'production_adapter_config_is_supported_offline' (21144) panicked at research\agent\tests\risk_portfolio.rs:28:56:
+new explicit cloud protocol config: Error("unknown field `cloud`, expected one of `id`, `label`, `kind`, `model`, `endpoint`, `api_key_env`, `max_input_tokens`, `max_output_tokens`, `timeout_seconds`, `price`, `grant`, `fake_scenario`", line: 0, column: 0)
+
+---- copied_old_grant_cannot_authorize_new_cloud_scope stdout ----
+
+thread 'copied_old_grant_cannot_authorize_new_cloud_scope' (27380) panicked at research\agent\tests\risk_portfolio.rs:37:5:
+assertion failed: m.authorize(&["risk_portfolio_v1".into()],
+        Settings::fake().budget.as_ref()).is_err()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    bigquery_https_fails_closed_without_a_verified_all_dimension_bound
+    copied_old_grant_cannot_authorize_new_cloud_scope
+    production_adapter_config_is_supported_offline
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p stratide-research --test risk_portfolio`

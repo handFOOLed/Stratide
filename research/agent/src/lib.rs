@@ -3,6 +3,11 @@ pub mod config;
 pub mod eod_snapshot;
 pub mod multimodal;
 pub mod provider;
+pub mod risk_binding;
+pub mod risk_cloud;
+pub mod risk_portfolio;
+#[cfg(test)]
+mod risk_portfolio_tests;
 mod service;
 mod store;
 use serde::{Deserialize, Serialize};
@@ -60,9 +65,14 @@ pub struct Research {
     pub next_steps: Vec<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fusion: Option<Box<multimodal::Fusion>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub risk_portfolio: Option<Value>,
 }
 impl Research {
     pub fn validate(&self) -> Result<()> {
+        if let Some(v) = &self.risk_portfolio {
+            risk_portfolio::validate_output(v)?;
+        }
         if let Some(fusion) = &self.fusion {
             fusion.validate()?;
         }
@@ -76,7 +86,14 @@ impl Research {
                             && a.len() <= 8
                             && a.iter().all(|s| !s.trim().is_empty() && s.len() <= 2048)
                     })
-                && serde_json::to_vec(self).is_ok_and(|s| s.len() <= 16384),
+                && serde_json::to_vec(self).is_ok_and(|s| {
+                    s.len()
+                        <= if self.risk_portfolio.is_some() {
+                            65536
+                        } else {
+                            16384
+                        }
+                }),
             "RESEARCH_OUTPUT_INVALID",
         )
     }

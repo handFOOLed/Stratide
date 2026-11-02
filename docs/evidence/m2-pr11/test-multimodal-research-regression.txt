@@ -1,0 +1,29 @@
+setUpClass (__main__.MultimodalTests) ... ERROR
+
+
+
+======================================================================
+
+ERROR: setUpClass (__main__.MultimodalTests)
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-multimodal-research.py", line 143, in setUpClass
+
+    assert dt.datetime.now(m.j.ZONE).hour >= 16, "synthetic production CLI E2E uses today's real after-close clock"
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+AssertionError: synthetic production CLI E2E uses today's real after-close clock
+
+
+
+----------------------------------------------------------------------
+
+Ran 0 tests in 0.001s
+
+
+
+FAILED (errors=1)

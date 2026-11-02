@@ -1,0 +1,1429 @@
+{
+  "account_facts": "UNKNOWN_NO_ACCOUNT_ORDERS",
+  "adapter_sha256": "65fe6a53ed4d66e21132af05b76cfff9f453c59f7d6372353edda4b32809629c",
+  "as_of": "2026-11-02T01:46:14.885467Z",
+  "batch_budget_micro": 100000,
+  "calendar": [
+    "2026-07-08",
+    "2026-07-09",
+    "2026-07-10",
+    "2026-07-13",
+    "2026-07-14",
+    "2026-07-15",
+    "2026-07-16",
+    "2026-07-17",
+    "2026-07-20",
+    "2026-07-21",
+    "2026-07-22",
+    "2026-07-23",
+    "2026-07-24",
+    "2026-07-27",
+    "2026-07-28",
+    "2026-07-29",
+    "2026-07-30",
+    "2026-07-31",
+    "2026-08-03",
+    "2026-08-04",
+    "2026-08-05",
+    "2026-08-06",
+    "2026-08-07",
+    "2026-08-10",
+    "2026-08-11",
+    "2026-08-12",
+    "2026-08-13",
+    "2026-08-14",
+    "2026-08-17",
+    "2026-08-18",
+    "2026-08-19",
+    "2026-08-20",
+    "2026-08-21",
+    "2026-08-24",
+    "2026-08-25",
+    "2026-08-26",
+    "2026-08-27",
+    "2026-08-28",
+    "2026-08-31",
+    "2026-09-01",
+    "2026-09-02",
+    "2026-09-03",
+    "2026-09-04",
+    "2026-09-07",
+    "2026-09-08",
+    "2026-09-09",
+    "2026-09-10",
+    "2026-09-11",
+    "2026-09-14",
+    "2026-09-15",
+    "2026-09-16",
+    "2026-09-17",
+    "2026-09-18",
+    "2026-09-21",
+    "2026-09-22",
+    "2026-09-23",
+    "2026-09-24",
+    "2026-09-25",
+    "2026-09-28",
+    "2026-09-29",
+    "2026-09-30",
+    "2026-10-01",
+    "2026-10-02",
+    "2026-10-05",
+    "2026-10-06",
+    "2026-10-07",
+    "2026-10-08",
+    "2026-10-09",
+    "2026-10-12",
+    "2026-10-13",
+    "2026-10-14",
+    "2026-10-15",
+    "2026-10-16",
+    "2026-10-19",
+    "2026-10-20",
+    "2026-10-21",
+    "2026-10-22",
+    "2026-10-23",
+    "2026-10-26",
+    "2026-10-27",
+    "2026-10-28",
+    "2026-10-29",
+    "2026-10-30",
+    "2026-11-02",
+    "2026-11-03",
+    "2026-11-04",
+    "2026-11-05",
+    "2026-11-06",
+    "2026-11-09",
+    "2026-11-10",
+    "2026-11-11",
+    "2026-11-12",
+    "2026-11-13",
+    "2026-11-16",
+    "2026-11-17",
+    "2026-11-18",
+    "2026-11-19",
+    "2026-11-20",
+    "2026-11-23",
+    "2026-11-24",
+    "2026-11-25",
+    "2026-11-26",
+    "2026-11-27",
+    "2026-11-30"
+  ],
+  "calendar_provenance": "SYNTHETIC_EXCHANGE_SESSION_FIXTURE",
+  "fusion_model": {
+    "fingerprint": "37c7dce103312c82081fbe3a2521efaff5e14b3d946a43309ebef25c84e23819",
+    "id": "fusion-deepseek"
+  },
+  "fusion_recording_sha256": "d1f043257747ed284b726fc2e4b70756577fca5f32b057c9d709c8dc022ddc90",
+  "input_mode": "synthetic_test",
+  "opportunities": [
+    {
+      "evidence": [],
+      "instrument": "600000.SH",
+      "status": "UNKNOWN"
+    },
+    {
+      "evidence": [],
+      "instrument": "000001.SZ",
+      "status": "UNKNOWN"
+    },
+    {
+      "evidence": [],
+      "instrument": "600519.SH",
+      "status": "UNKNOWN"
+    }
+  ],
+  "policy": "risk-portfolio-v1",
+  "prompt_sha256": "0918e1bf84c888447eeb98ff166890f4974fcc06dbba44893460ddf91965c64e",
+  "prompt_version": "portfolio-json-v1",
+  "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+  "risk_model": {
+    "fingerprint": "f4b2e9426d774afc01fbc8d9de1f520a351c9c794fc626eb703427a9cab63494",
+    "id": "risk-timesfm"
+  },
+  "risk_recording_sha256": "5c0da9420aecb8f0389fb1761edaadc27c58426cb1b95685f5b02c2ee9dba206",
+  "schema_version": 1,
+  "scope": "risk_portfolio_v1",
+  "series": [
+    {
+      "corporate_actions": "SYNTHETIC_NONE_VERIFIED",
+      "instrument": "600000.SH",
+      "observations": [
+        {
+          "available_at": "2026-07-08T00:00:00Z",
+          "close_fen": 10000,
+          "trade_day": "2026-07-08"
+        },
+        {
+          "available_at": "2026-07-09T00:00:00Z",
+          "close_fen": 10028,
+          "trade_day": "2026-07-09"
+        },
+        {
+          "available_at": "2026-07-10T00:00:00Z",
+          "close_fen": 10033,
+          "trade_day": "2026-07-10"
+        },
+        {
+          "available_at": "2026-07-13T00:00:00Z",
+          "close_fen": 10013,
+          "trade_day": "2026-07-13"
+        },
+        {
+          "available_at": "2026-07-14T00:00:00Z",
+          "close_fen": 9990,
+          "trade_day": "2026-07-14"
+        },
+        {
+          "available_at": "2026-07-15T00:00:00Z",
+          "close_fen": 9987,
+          "trade_day": "2026-07-15"
+        },
+        {
+          "available_at": "2026-07-16T00:00:00Z",
+          "close_fen": 10010,
+          "trade_day": "2026-07-16"
+        },
+        {
+          "available_at": "2026-07-17T00:00:00Z",
+          "close_fen": 10040,
+          "trade_day": "2026-07-17"
+        },
+        {
+          "available_at": "2026-07-20T00:00:00Z",
+          "close_fen": 10053,
+          "trade_day": "2026-07-20"
+        },
+        {
+          "available_at": "2026-07-21T00:00:00Z",
+          "close_fen": 10039,
+          "trade_day": "2026-07-21"
+        },
+        {
+          "available_at": "2026-07-22T00:00:00Z",
+          "close_fen": 10014,
+          "trade_day": "2026-07-22"
+        },
+        {
+          "available_at": "2026-07-23T00:00:00Z",
+          "close_fen": 10004,
+          "trade_day": "2026-07-23"
+        },
+        {
+          "available_at": "2026-07-24T00:00:00Z",
+          "close_fen": 10020,
+          "trade_day": "2026-07-24"
+        },
+        {
+          "available_at": "2026-07-27T00:00:00Z",
+          "close_fen": 10051,
+          "trade_day": "2026-07-27"
+        },
+        {
+          "available_at": "2026-07-28T00:00:00Z",
+          "close_fen": 10071,
+          "trade_day": "2026-07-28"
+        },
+        {
+          "available_at": "2026-07-29T00:00:00Z",
+          "close_fen": 10064,
+          "trade_day": "2026-07-29"
+        },
+        {
+          "available_at": "2026-07-30T00:00:00Z",
+          "close_fen": 10040,
+          "trade_day": "2026-07-30"
+        },
+        {
+          "available_at": "2026-07-31T00:00:00Z",
+          "close_fen": 10023,
+          "trade_day": "2026-07-31"
+        },
+        {
+          "available_at": "2026-08-03T00:00:00Z",
+          "close_fen": 10032,
+          "trade_day": "2026-08-03"
+        },
+        {
+          "available_at": "2026-08-04T00:00:00Z",
+          "close_fen": 10061,
+          "trade_day": "2026-08-04"
+        },
+        {
+          "available_at": "2026-08-05T00:00:00Z",
+          "close_fen": 10087,
+          "trade_day": "2026-08-05"
+        },
+        {
+          "available_at": "2026-08-06T00:00:00Z",
+          "close_fen": 10088,
+          "trade_day": "2026-08-06"
+        },
+        {
+          "available_at": "2026-08-07T00:00:00Z",
+          "close_fen": 10066,
+          "trade_day": "2026-08-07"
+        },
+        {
+          "available_at": "2026-08-10T00:00:00Z",
+          "close_fen": 10044,
+          "trade_day": "2026-08-10"
+        },
+        {
+          "available_at": "2026-08-11T00:00:00Z",
+          "close_fen": 10045,
+          "trade_day": "2026-08-11"
+        },
+        {
+          "available_at": "2026-08-12T00:00:00Z",
+          "close_fen": 10072,
+          "trade_day": "2026-08-12"
+        },
+        {
+          "available_at": "2026-08-13T00:00:00Z",
+          "close_fen": 10100,
+          "trade_day": "2026-08-13"
+        },
+        {
+          "available_at": "2026-08-14T00:00:00Z",
+          "close_fen": 10109,
+          "trade_day": "2026-08-14"
+        },
+        {
+          "available_at": "2026-08-17T00:00:00Z",
+          "close_fen": 10092,
+          "trade_day": "2026-08-17"
+        },
+        {
+          "available_at": "2026-08-18T00:00:00Z",
+          "close_fen": 10068,
+          "trade_day": "2026-08-18"
+        },
+        {
+          "available_at": "2026-08-19T00:00:00Z",
+          "close_fen": 10061,
+          "trade_day": "2026-08-19"
+        },
+        {
+          "available_at": "2026-08-20T00:00:00Z",
+          "close_fen": 10081,
+          "trade_day": "2026-08-20"
+        },
+        {
+          "available_at": "2026-08-21T00:00:00Z",
+          "close_fen": 10112,
+          "trade_day": "2026-08-21"
+        },
+        {
+          "available_at": "2026-08-24T00:00:00Z",
+          "close_fen": 10128,
+          "trade_day": "2026-08-24"
+        },
+        {
+          "available_at": "2026-08-25T00:00:00Z",
+          "close_fen": 10117,
+          "trade_day": "2026-08-25"
+        },
+        {
+          "available_at": "2026-08-26T00:00:00Z",
+          "close_fen": 10093,
+          "trade_day": "2026-08-26"
+        },
+        {
+          "available_at": "2026-08-27T00:00:00Z",
+          "close_fen": 10079,
+          "trade_day": "2026-08-27"
+        },
+        {
+          "available_at": "2026-08-28T00:00:00Z",
+          "close_fen": 10092,
+          "trade_day": "2026-08-28"
+        },
+        {
+          "available_at": "2026-08-31T00:00:00Z",
+          "close_fen": 10122,
+          "trade_day": "2026-08-31"
+        },
+        {
+          "available_at": "2026-09-01T00:00:00Z",
+          "close_fen": 10145,
+          "trade_day": "2026-09-01"
+        },
+        {
+          "available_at": "2026-09-02T00:00:00Z",
+          "close_fen": 10142,
+          "trade_day": "2026-09-02"
+        },
+        {
+          "available_at": "2026-09-03T00:00:00Z",
+          "close_fen": 10119,
+          "trade_day": "2026-09-03"
+        },
+        {
+          "available_at": "2026-09-04T00:00:00Z",
+          "close_fen": 10099,
+          "trade_day": "2026-09-04"
+        },
+        {
+          "available_at": "2026-09-07T00:00:00Z",
+          "close_fen": 10105,
+          "trade_day": "2026-09-07"
+        },
+        {
+          "available_at": "2026-09-08T00:00:00Z",
+          "close_fen": 10132,
+          "trade_day": "2026-09-08"
+        },
+        {
+          "available_at": "2026-09-09T00:00:00Z",
+          "close_fen": 10160,
+          "trade_day": "2026-09-09"
+        },
+        {
+          "available_at": "2026-09-10T00:00:00Z",
+          "close_fen": 10165,
+          "trade_day": "2026-09-10"
+        },
+        {
+          "available_at": "2026-09-11T00:00:00Z",
+          "close_fen": 10144,
+          "trade_day": "2026-09-11"
+        },
+        {
+          "available_at": "2026-09-14T00:00:00Z",
+          "close_fen": 10121,
+          "trade_day": "2026-09-14"
+        },
+        {
+          "available_at": "2026-09-15T00:00:00Z",
+          "close_fen": 10119,
+          "trade_day": "2026-09-15"
+        },
+        {
+          "available_at": "2026-09-16T00:00:00Z",
+          "close_fen": 10143,
+          "trade_day": "2026-09-16"
+        },
+        {
+          "available_at": "2026-09-17T00:00:00Z",
+          "close_fen": 10173,
+          "trade_day": "2026-09-17"
+        },
+        {
+          "available_at": "2026-09-18T00:00:00Z",
+          "close_fen": 10185,
+          "trade_day": "2026-09-18"
+        },
+        {
+          "available_at": "2026-09-21T00:00:00Z",
+          "close_fen": 10170,
+          "trade_day": "2026-09-21"
+        },
+        {
+          "available_at": "2026-09-22T00:00:00Z",
+          "close_fen": 10146,
+          "trade_day": "2026-09-22"
+        },
+        {
+          "available_at": "2026-09-23T00:00:00Z",
+          "close_fen": 10136,
+          "trade_day": "2026-09-23"
+        },
+        {
+          "available_at": "2026-09-24T00:00:00Z",
+          "close_fen": 10153,
+          "trade_day": "2026-09-24"
+        },
+        {
+          "available_at": "2026-09-25T00:00:00Z",
+          "close_fen": 10184,
+          "trade_day": "2026-09-25"
+        },
+        {
+          "available_at": "2026-09-28T00:00:00Z",
+          "close_fen": 10203,
+          "trade_day": "2026-09-28"
+        },
+        {
+          "available_at": "2026-09-29T00:00:00Z",
+          "close_fen": 10196,
+          "trade_day": "2026-09-29"
+        },
+        {
+          "available_at": "2026-09-30T00:00:00Z",
+          "close_fen": 10171,
+          "trade_day": "2026-09-30"
+        },
+        {
+          "available_at": "2026-10-01T00:00:00Z",
+          "close_fen": 10155,
+          "trade_day": "2026-10-01"
+        },
+        {
+          "available_at": "2026-10-02T00:00:00Z",
+          "close_fen": 10164,
+          "trade_day": "2026-10-02"
+        },
+        {
+          "available_at": "2026-10-05T00:00:00Z",
+          "close_fen": 10194,
+          "trade_day": "2026-10-05"
+        },
+        {
+          "available_at": "2026-10-06T00:00:00Z",
+          "close_fen": 10219,
+          "trade_day": "2026-10-06"
+        },
+        {
+          "available_at": "2026-10-07T00:00:00Z",
+          "close_fen": 10219,
+          "trade_day": "2026-10-07"
+        },
+        {
+          "available_at": "2026-10-08T00:00:00Z",
+          "close_fen": 10198,
+          "trade_day": "2026-10-08"
+        },
+        {
+          "available_at": "2026-10-09T00:00:00Z",
+          "close_fen": 10176,
+          "trade_day": "2026-10-09"
+        },
+        {
+          "available_at": "2026-10-12T00:00:00Z",
+          "close_fen": 10178,
+          "trade_day": "2026-10-12"
+        },
+        {
+          "available_at": "2026-10-13T00:00:00Z",
+          "close_fen": 10204,
+          "trade_day": "2026-10-13"
+        },
+        {
+          "available_at": "2026-10-14T00:00:00Z",
+          "close_fen": 10233,
+          "trade_day": "2026-10-14"
+        },
+        {
+          "available_at": "2026-10-15T00:00:00Z",
+          "close_fen": 10241,
+          "trade_day": "2026-10-15"
+        },
+        {
+          "available_at": "2026-10-16T00:00:00Z",
+          "close_fen": 10223,
+          "trade_day": "2026-10-16"
+        },
+        {
+          "available_at": "2026-10-19T00:00:00Z",
+          "close_fen": 10199,
+          "trade_day": "2026-10-19"
+        },
+        {
+          "available_at": "2026-10-20T00:00:00Z",
+          "close_fen": 10193,
+          "trade_day": "2026-10-20"
+        },
+        {
+          "available_at": "2026-10-21T00:00:00Z",
+          "close_fen": 10214,
+          "trade_day": "2026-10-21"
+        },
+        {
+          "available_at": "2026-10-22T00:00:00Z",
+          "close_fen": 10244,
+          "trade_day": "2026-10-22"
+        },
+        {
+          "available_at": "2026-10-23T00:00:00Z",
+          "close_fen": 10260,
+          "trade_day": "2026-10-23"
+        },
+        {
+          "available_at": "2026-10-26T00:00:00Z",
+          "close_fen": 10249,
+          "trade_day": "2026-10-26"
+        },
+        {
+          "available_at": "2026-10-27T00:00:00Z",
+          "close_fen": 10224,
+          "trade_day": "2026-10-27"
+        },
+        {
+          "available_at": "2026-10-28T00:00:00Z",
+          "close_fen": 10211,
+          "trade_day": "2026-10-28"
+        },
+        {
+          "available_at": "2026-10-29T00:00:00Z",
+          "close_fen": 10225,
+          "trade_day": "2026-10-29"
+        },
+        {
+          "available_at": "2026-10-30T00:00:00Z",
+          "close_fen": 10255,
+          "trade_day": "2026-10-30"
+        },
+        {
+          "available_at": "2026-11-02T00:00:00Z",
+          "close_fen": 10278,
+          "trade_day": "2026-11-02"
+        }
+      ]
+    },
+    {
+      "corporate_actions": "SYNTHETIC_NONE_VERIFIED",
+      "instrument": "000001.SZ",
+      "observations": [
+        {
+          "available_at": "2026-07-08T00:00:00Z",
+          "close_fen": 10025,
+          "trade_day": "2026-07-08"
+        },
+        {
+          "available_at": "2026-07-09T00:00:00Z",
+          "close_fen": 10030,
+          "trade_day": "2026-07-09"
+        },
+        {
+          "available_at": "2026-07-10T00:00:00Z",
+          "close_fen": 10010,
+          "trade_day": "2026-07-10"
+        },
+        {
+          "available_at": "2026-07-13T00:00:00Z",
+          "close_fen": 9987,
+          "trade_day": "2026-07-13"
+        },
+        {
+          "available_at": "2026-07-14T00:00:00Z",
+          "close_fen": 9984,
+          "trade_day": "2026-07-14"
+        },
+        {
+          "available_at": "2026-07-15T00:00:00Z",
+          "close_fen": 10007,
+          "trade_day": "2026-07-15"
+        },
+        {
+          "available_at": "2026-07-16T00:00:00Z",
+          "close_fen": 10037,
+          "trade_day": "2026-07-16"
+        },
+        {
+          "available_at": "2026-07-17T00:00:00Z",
+          "close_fen": 10050,
+          "trade_day": "2026-07-17"
+        },
+        {
+          "available_at": "2026-07-20T00:00:00Z",
+          "close_fen": 10036,
+          "trade_day": "2026-07-20"
+        },
+        {
+          "available_at": "2026-07-21T00:00:00Z",
+          "close_fen": 10011,
+          "trade_day": "2026-07-21"
+        },
+        {
+          "available_at": "2026-07-22T00:00:00Z",
+          "close_fen": 10001,
+          "trade_day": "2026-07-22"
+        },
+        {
+          "available_at": "2026-07-23T00:00:00Z",
+          "close_fen": 10017,
+          "trade_day": "2026-07-23"
+        },
+        {
+          "available_at": "2026-07-24T00:00:00Z",
+          "close_fen": 10048,
+          "trade_day": "2026-07-24"
+        },
+        {
+          "available_at": "2026-07-27T00:00:00Z",
+          "close_fen": 10068,
+          "trade_day": "2026-07-27"
+        },
+        {
+          "available_at": "2026-07-28T00:00:00Z",
+          "close_fen": 10061,
+          "trade_day": "2026-07-28"
+        },
+        {
+          "available_at": "2026-07-29T00:00:00Z",
+          "close_fen": 10037,
+          "trade_day": "2026-07-29"
+        },
+        {
+          "available_at": "2026-07-30T00:00:00Z",
+          "close_fen": 10020,
+          "trade_day": "2026-07-30"
+        },
+        {
+          "available_at": "2026-07-31T00:00:00Z",
+          "close_fen": 10029,
+          "trade_day": "2026-07-31"
+        },
+        {
+          "available_at": "2026-08-03T00:00:00Z",
+          "close_fen": 10058,
+          "trade_day": "2026-08-03"
+        },
+        {
+          "available_at": "2026-08-04T00:00:00Z",
+          "close_fen": 10084,
+          "trade_day": "2026-08-04"
+        },
+        {
+          "available_at": "2026-08-05T00:00:00Z",
+          "close_fen": 10085,
+          "trade_day": "2026-08-05"
+        },
+        {
+          "available_at": "2026-08-06T00:00:00Z",
+          "close_fen": 10063,
+          "trade_day": "2026-08-06"
+        },
+        {
+          "available_at": "2026-08-07T00:00:00Z",
+          "close_fen": 10041,
+          "trade_day": "2026-08-07"
+        },
+        {
+          "available_at": "2026-08-10T00:00:00Z",
+          "close_fen": 10042,
+          "trade_day": "2026-08-10"
+        },
+        {
+          "available_at": "2026-08-11T00:00:00Z",
+          "close_fen": 10069,
+          "trade_day": "2026-08-11"
+        },
+        {
+          "available_at": "2026-08-12T00:00:00Z",
+          "close_fen": 10097,
+          "trade_day": "2026-08-12"
+        },
+        {
+          "available_at": "2026-08-13T00:00:00Z",
+          "close_fen": 10106,
+          "trade_day": "2026-08-13"
+        },
+        {
+          "available_at": "2026-08-14T00:00:00Z",
+          "close_fen": 10089,
+          "trade_day": "2026-08-14"
+        },
+        {
+          "available_at": "2026-08-17T00:00:00Z",
+          "close_fen": 10065,
+          "trade_day": "2026-08-17"
+        },
+        {
+          "available_at": "2026-08-18T00:00:00Z",
+          "close_fen": 10058,
+          "trade_day": "2026-08-18"
+        },
+        {
+          "available_at": "2026-08-19T00:00:00Z",
+          "close_fen": 10078,
+          "trade_day": "2026-08-19"
+        },
+        {
+          "available_at": "2026-08-20T00:00:00Z",
+          "close_fen": 10109,
+          "trade_day": "2026-08-20"
+        },
+        {
+          "available_at": "2026-08-21T00:00:00Z",
+          "close_fen": 10125,
+          "trade_day": "2026-08-21"
+        },
+        {
+          "available_at": "2026-08-24T00:00:00Z",
+          "close_fen": 10114,
+          "trade_day": "2026-08-24"
+        },
+        {
+          "available_at": "2026-08-25T00:00:00Z",
+          "close_fen": 10090,
+          "trade_day": "2026-08-25"
+        },
+        {
+          "available_at": "2026-08-26T00:00:00Z",
+          "close_fen": 10076,
+          "trade_day": "2026-08-26"
+        },
+        {
+          "available_at": "2026-08-27T00:00:00Z",
+          "close_fen": 10089,
+          "trade_day": "2026-08-27"
+        },
+        {
+          "available_at": "2026-08-28T00:00:00Z",
+          "close_fen": 10119,
+          "trade_day": "2026-08-28"
+        },
+        {
+          "available_at": "2026-08-31T00:00:00Z",
+          "close_fen": 10142,
+          "trade_day": "2026-08-31"
+        },
+        {
+          "available_at": "2026-09-01T00:00:00Z",
+          "close_fen": 10139,
+          "trade_day": "2026-09-01"
+        },
+        {
+          "available_at": "2026-09-02T00:00:00Z",
+          "close_fen": 10116,
+          "trade_day": "2026-09-02"
+        },
+        {
+          "available_at": "2026-09-03T00:00:00Z",
+          "close_fen": 10096,
+          "trade_day": "2026-09-03"
+        },
+        {
+          "available_at": "2026-09-04T00:00:00Z",
+          "close_fen": 10102,
+          "trade_day": "2026-09-04"
+        },
+        {
+          "available_at": "2026-09-07T00:00:00Z",
+          "close_fen": 10129,
+          "trade_day": "2026-09-07"
+        },
+        {
+          "available_at": "2026-09-08T00:00:00Z",
+          "close_fen": 10157,
+          "trade_day": "2026-09-08"
+        },
+        {
+          "available_at": "2026-09-09T00:00:00Z",
+          "close_fen": 10162,
+          "trade_day": "2026-09-09"
+        },
+        {
+          "available_at": "2026-09-10T00:00:00Z",
+          "close_fen": 10141,
+          "trade_day": "2026-09-10"
+        },
+        {
+          "available_at": "2026-09-11T00:00:00Z",
+          "close_fen": 10118,
+          "trade_day": "2026-09-11"
+        },
+        {
+          "available_at": "2026-09-14T00:00:00Z",
+          "close_fen": 10116,
+          "trade_day": "2026-09-14"
+        },
+        {
+          "available_at": "2026-09-15T00:00:00Z",
+          "close_fen": 10140,
+          "trade_day": "2026-09-15"
+        },
+        {
+          "available_at": "2026-09-16T00:00:00Z",
+          "close_fen": 10170,
+          "trade_day": "2026-09-16"
+        },
+        {
+          "available_at": "2026-09-17T00:00:00Z",
+          "close_fen": 10182,
+          "trade_day": "2026-09-17"
+        },
+        {
+          "available_at": "2026-09-18T00:00:00Z",
+          "close_fen": 10167,
+          "trade_day": "2026-09-18"
+        },
+        {
+          "available_at": "2026-09-21T00:00:00Z",
+          "close_fen": 10143,
+          "trade_day": "2026-09-21"
+        },
+        {
+          "available_at": "2026-09-22T00:00:00Z",
+          "close_fen": 10133,
+          "trade_day": "2026-09-22"
+        },
+        {
+          "available_at": "2026-09-23T00:00:00Z",
+          "close_fen": 10150,
+          "trade_day": "2026-09-23"
+        },
+        {
+          "available_at": "2026-09-24T00:00:00Z",
+          "close_fen": 10181,
+          "trade_day": "2026-09-24"
+        },
+        {
+          "available_at": "2026-09-25T00:00:00Z",
+          "close_fen": 10200,
+          "trade_day": "2026-09-25"
+        },
+        {
+          "available_at": "2026-09-28T00:00:00Z",
+          "close_fen": 10193,
+          "trade_day": "2026-09-28"
+        },
+        {
+          "available_at": "2026-09-29T00:00:00Z",
+          "close_fen": 10168,
+          "trade_day": "2026-09-29"
+        },
+        {
+          "available_at": "2026-09-30T00:00:00Z",
+          "close_fen": 10152,
+          "trade_day": "2026-09-30"
+        },
+        {
+          "available_at": "2026-10-01T00:00:00Z",
+          "close_fen": 10161,
+          "trade_day": "2026-10-01"
+        },
+        {
+          "available_at": "2026-10-02T00:00:00Z",
+          "close_fen": 10191,
+          "trade_day": "2026-10-02"
+        },
+        {
+          "available_at": "2026-10-05T00:00:00Z",
+          "close_fen": 10216,
+          "trade_day": "2026-10-05"
+        },
+        {
+          "available_at": "2026-10-06T00:00:00Z",
+          "close_fen": 10216,
+          "trade_day": "2026-10-06"
+        },
+        {
+          "available_at": "2026-10-07T00:00:00Z",
+          "close_fen": 10195,
+          "trade_day": "2026-10-07"
+        },
+        {
+          "available_at": "2026-10-08T00:00:00Z",
+          "close_fen": 10173,
+          "trade_day": "2026-10-08"
+        },
+        {
+          "available_at": "2026-10-09T00:00:00Z",
+          "close_fen": 10175,
+          "trade_day": "2026-10-09"
+        },
+        {
+          "available_at": "2026-10-12T00:00:00Z",
+          "close_fen": 10201,
+          "trade_day": "2026-10-12"
+        },
+        {
+          "available_at": "2026-10-13T00:00:00Z",
+          "close_fen": 10230,
+          "trade_day": "2026-10-13"
+        },
+        {
+          "available_at": "2026-10-14T00:00:00Z",
+          "close_fen": 10238,
+          "trade_day": "2026-10-14"
+        },
+        {
+          "available_at": "2026-10-15T00:00:00Z",
+          "close_fen": 10220,
+          "trade_day": "2026-10-15"
+        },
+        {
+          "available_at": "2026-10-16T00:00:00Z",
+          "close_fen": 10196,
+          "trade_day": "2026-10-16"
+        },
+        {
+          "available_at": "2026-10-19T00:00:00Z",
+          "close_fen": 10190,
+          "trade_day": "2026-10-19"
+        },
+        {
+          "available_at": "2026-10-20T00:00:00Z",
+          "close_fen": 10211,
+          "trade_day": "2026-10-20"
+        },
+        {
+          "available_at": "2026-10-21T00:00:00Z",
+          "close_fen": 10241,
+          "trade_day": "2026-10-21"
+        },
+        {
+          "available_at": "2026-10-22T00:00:00Z",
+          "close_fen": 10257,
+          "trade_day": "2026-10-22"
+        },
+        {
+          "available_at": "2026-10-23T00:00:00Z",
+          "close_fen": 10246,
+          "trade_day": "2026-10-23"
+        },
+        {
+          "available_at": "2026-10-26T00:00:00Z",
+          "close_fen": 10221,
+          "trade_day": "2026-10-26"
+        },
+        {
+          "available_at": "2026-10-27T00:00:00Z",
+          "close_fen": 10208,
+          "trade_day": "2026-10-27"
+        },
+        {
+          "available_at": "2026-10-28T00:00:00Z",
+          "close_fen": 10222,
+          "trade_day": "2026-10-28"
+        },
+        {
+          "available_at": "2026-10-29T00:00:00Z",
+          "close_fen": 10252,
+          "trade_day": "2026-10-29"
+        },
+        {
+          "available_at": "2026-10-30T00:00:00Z",
+          "close_fen": 10275,
+          "trade_day": "2026-10-30"
+        },
+        {
+          "available_at": "2026-11-02T00:00:00Z",
+          "close_fen": 10270,
+          "trade_day": "2026-11-02"
+        }
+      ]
+    },
+    {
+      "corporate_actions": "SYNTHETIC_NONE_VERIFIED",
+      "instrument": "600519.SH",
+      "observations": [
+        {
+          "available_at": "2026-07-08T00:00:00Z",
+          "close_fen": 10027,
+          "trade_day": "2026-07-08"
+        },
+        {
+          "available_at": "2026-07-09T00:00:00Z",
+          "close_fen": 10007,
+          "trade_day": "2026-07-09"
+        },
+        {
+          "available_at": "2026-07-10T00:00:00Z",
+          "close_fen": 9984,
+          "trade_day": "2026-07-10"
+        },
+        {
+          "available_at": "2026-07-13T00:00:00Z",
+          "close_fen": 9981,
+          "trade_day": "2026-07-13"
+        },
+        {
+          "available_at": "2026-07-14T00:00:00Z",
+          "close_fen": 10004,
+          "trade_day": "2026-07-14"
+        },
+        {
+          "available_at": "2026-07-15T00:00:00Z",
+          "close_fen": 10034,
+          "trade_day": "2026-07-15"
+        },
+        {
+          "available_at": "2026-07-16T00:00:00Z",
+          "close_fen": 10047,
+          "trade_day": "2026-07-16"
+        },
+        {
+          "available_at": "2026-07-17T00:00:00Z",
+          "close_fen": 10033,
+          "trade_day": "2026-07-17"
+        },
+        {
+          "available_at": "2026-07-20T00:00:00Z",
+          "close_fen": 10008,
+          "trade_day": "2026-07-20"
+        },
+        {
+          "available_at": "2026-07-21T00:00:00Z",
+          "close_fen": 9998,
+          "trade_day": "2026-07-21"
+        },
+        {
+          "available_at": "2026-07-22T00:00:00Z",
+          "close_fen": 10014,
+          "trade_day": "2026-07-22"
+        },
+        {
+          "available_at": "2026-07-23T00:00:00Z",
+          "close_fen": 10045,
+          "trade_day": "2026-07-23"
+        },
+        {
+          "available_at": "2026-07-24T00:00:00Z",
+          "close_fen": 10065,
+          "trade_day": "2026-07-24"
+        },
+        {
+          "available_at": "2026-07-27T00:00:00Z",
+          "close_fen": 10058,
+          "trade_day": "2026-07-27"
+        },
+        {
+          "available_at": "2026-07-28T00:00:00Z",
+          "close_fen": 10034,
+          "trade_day": "2026-07-28"
+        },
+        {
+          "available_at": "2026-07-29T00:00:00Z",
+          "close_fen": 10017,
+          "trade_day": "2026-07-29"
+        },
+        {
+          "available_at": "2026-07-30T00:00:00Z",
+          "close_fen": 10026,
+          "trade_day": "2026-07-30"
+        },
+        {
+          "available_at": "2026-07-31T00:00:00Z",
+          "close_fen": 10055,
+          "trade_day": "2026-07-31"
+        },
+        {
+          "available_at": "2026-08-03T00:00:00Z",
+          "close_fen": 10081,
+          "trade_day": "2026-08-03"
+        },
+        {
+          "available_at": "2026-08-04T00:00:00Z",
+          "close_fen": 10082,
+          "trade_day": "2026-08-04"
+        },
+        {
+          "available_at": "2026-08-05T00:00:00Z",
+          "close_fen": 10060,
+          "trade_day": "2026-08-05"
+        },
+        {
+          "available_at": "2026-08-06T00:00:00Z",
+          "close_fen": 10038,
+          "trade_day": "2026-08-06"
+        },
+        {
+          "available_at": "2026-08-07T00:00:00Z",
+          "close_fen": 10039,
+          "trade_day": "2026-08-07"
+        },
+        {
+          "available_at": "2026-08-10T00:00:00Z",
+          "close_fen": 10066,
+          "trade_day": "2026-08-10"
+        },
+        {
+          "available_at": "2026-08-11T00:00:00Z",
+          "close_fen": 10094,
+          "trade_day": "2026-08-11"
+        },
+        {
+          "available_at": "2026-08-12T00:00:00Z",
+          "close_fen": 10103,
+          "trade_day": "2026-08-12"
+        },
+        {
+          "available_at": "2026-08-13T00:00:00Z",
+          "close_fen": 10086,
+          "trade_day": "2026-08-13"
+        },
+        {
+          "available_at": "2026-08-14T00:00:00Z",
+          "close_fen": 10062,
+          "trade_day": "2026-08-14"
+        },
+        {
+          "available_at": "2026-08-17T00:00:00Z",
+          "close_fen": 10055,
+          "trade_day": "2026-08-17"
+        },
+        {
+          "available_at": "2026-08-18T00:00:00Z",
+          "close_fen": 10075,
+          "trade_day": "2026-08-18"
+        },
+        {
+          "available_at": "2026-08-19T00:00:00Z",
+          "close_fen": 10106,
+          "trade_day": "2026-08-19"
+        },
+        {
+          "available_at": "2026-08-20T00:00:00Z",
+          "close_fen": 10122,
+          "trade_day": "2026-08-20"
+        },
+        {
+          "available_at": "2026-08-21T00:00:00Z",
+          "close_fen": 10111,
+          "trade_day": "2026-08-21"
+        },
+        {
+          "available_at": "2026-08-24T00:00:00Z",
+          "close_fen": 10087,
+          "trade_day": "2026-08-24"
+        },
+        {
+          "available_at": "2026-08-25T00:00:00Z",
+          "close_fen": 10073,
+          "trade_day": "2026-08-25"
+        },
+        {
+          "available_at": "2026-08-26T00:00:00Z",
+          "close_fen": 10086,
+          "trade_day": "2026-08-26"
+        },
+        {
+          "available_at": "2026-08-27T00:00:00Z",
+          "close_fen": 10116,
+          "trade_day": "2026-08-27"
+        },
+        {
+          "available_at": "2026-08-28T00:00:00Z",
+          "close_fen": 10139,
+          "trade_day": "2026-08-28"
+        },
+        {
+          "available_at": "2026-08-31T00:00:00Z",
+          "close_fen": 10136,
+          "trade_day": "2026-08-31"
+        },
+        {
+          "available_at": "2026-09-01T00:00:00Z",
+          "close_fen": 10113,
+          "trade_day": "2026-09-01"
+        },
+        {
+          "available_at": "2026-09-02T00:00:00Z",
+          "close_fen": 10093,
+          "trade_day": "2026-09-02"
+        },
+        {
+          "available_at": "2026-09-03T00:00:00Z",
+          "close_fen": 10099,
+          "trade_day": "2026-09-03"
+        },
+        {
+          "available_at": "2026-09-04T00:00:00Z",
+          "close_fen": 10126,
+          "trade_day": "2026-09-04"
+        },
+        {
+          "available_at": "2026-09-07T00:00:00Z",
+          "close_fen": 10154,
+          "trade_day": "2026-09-07"
+        },
+        {
+          "available_at": "2026-09-08T00:00:00Z",
+          "close_fen": 10159,
+          "trade_day": "2026-09-08"
+        },
+        {
+          "available_at": "2026-09-09T00:00:00Z",
+          "close_fen": 10138,
+          "trade_day": "2026-09-09"
+        },
+        {
+          "available_at": "2026-09-10T00:00:00Z",
+          "close_fen": 10115,
+          "trade_day": "2026-09-10"
+        },
+        {
+          "available_at": "2026-09-11T00:00:00Z",
+          "close_fen": 10113,
+          "trade_day": "2026-09-11"
+        },
+        {
+          "available_at": "2026-09-14T00:00:00Z",
+          "close_fen": 10137,
+          "trade_day": "2026-09-14"
+        },
+        {
+          "available_at": "2026-09-15T00:00:00Z",
+          "close_fen": 10167,
+          "trade_day": "2026-09-15"
+        },
+        {
+          "available_at": "2026-09-16T00:00:00Z",
+          "close_fen": 10179,
+          "trade_day": "2026-09-16"
+        },
+        {
+          "available_at": "2026-09-17T00:00:00Z",
+          "close_fen": 10164,
+          "trade_day": "2026-09-17"
+        },
+        {
+          "available_at": "2026-09-18T00:00:00Z",
+          "close_fen": 10140,
+          "trade_day": "2026-09-18"
+        },
+        {
+          "available_at": "2026-09-21T00:00:00Z",
+          "close_fen": 10130,
+          "trade_day": "2026-09-21"
+        },
+        {
+          "available_at": "2026-09-22T00:00:00Z",
+          "close_fen": 10147,
+          "trade_day": "2026-09-22"
+        },
+        {
+          "available_at": "2026-09-23T00:00:00Z",
+          "close_fen": 10178,
+          "trade_day": "2026-09-23"
+        },
+        {
+          "available_at": "2026-09-24T00:00:00Z",
+          "close_fen": 10197,
+          "trade_day": "2026-09-24"
+        },
+        {
+          "available_at": "2026-09-25T00:00:00Z",
+          "close_fen": 10190,
+          "trade_day": "2026-09-25"
+        },
+        {
+          "available_at": "2026-09-28T00:00:00Z",
+          "close_fen": 10165,
+          "trade_day": "2026-09-28"
+        },
+        {
+          "available_at": "2026-09-29T00:00:00Z",
+          "close_fen": 10149,
+          "trade_day": "2026-09-29"
+        },
+        {
+          "available_at": "2026-09-30T00:00:00Z",
+          "close_fen": 10158,
+          "trade_day": "2026-09-30"
+        },
+        {
+          "available_at": "2026-10-01T00:00:00Z",
+          "close_fen": 10188,
+          "trade_day": "2026-10-01"
+        },
+        {
+          "available_at": "2026-10-02T00:00:00Z",
+          "close_fen": 10213,
+          "trade_day": "2026-10-02"
+        },
+        {
+          "available_at": "2026-10-05T00:00:00Z",
+          "close_fen": 10213,
+          "trade_day": "2026-10-05"
+        },
+        {
+          "available_at": "2026-10-06T00:00:00Z",
+          "close_fen": 10192,
+          "trade_day": "2026-10-06"
+        },
+        {
+          "available_at": "2026-10-07T00:00:00Z",
+          "close_fen": 10170,
+          "trade_day": "2026-10-07"
+        },
+        {
+          "available_at": "2026-10-08T00:00:00Z",
+          "close_fen": 10172,
+          "trade_day": "2026-10-08"
+        },
+        {
+          "available_at": "2026-10-09T00:00:00Z",
+          "close_fen": 10198,
+          "trade_day": "2026-10-09"
+        },
+        {
+          "available_at": "2026-10-12T00:00:00Z",
+          "close_fen": 10227,
+          "trade_day": "2026-10-12"
+        },
+        {
+          "available_at": "2026-10-13T00:00:00Z",
+          "close_fen": 10235,
+          "trade_day": "2026-10-13"
+        },
+        {
+          "available_at": "2026-10-14T00:00:00Z",
+          "close_fen": 10217,
+          "trade_day": "2026-10-14"
+        },
+        {
+          "available_at": "2026-10-15T00:00:00Z",
+          "close_fen": 10193,
+          "trade_day": "2026-10-15"
+        },
+        {
+          "available_at": "2026-10-16T00:00:00Z",
+          "close_fen": 10187,
+          "trade_day": "2026-10-16"
+        },
+        {
+          "available_at": "2026-10-19T00:00:00Z",
+          "close_fen": 10208,
+          "trade_day": "2026-10-19"
+        },
+        {
+          "available_at": "2026-10-20T00:00:00Z",
+          "close_fen": 10238,
+          "trade_day": "2026-10-20"
+        },
+        {
+          "available_at": "2026-10-21T00:00:00Z",
+          "close_fen": 10254,
+          "trade_day": "2026-10-21"
+        },
+        {
+          "available_at": "2026-10-22T00:00:00Z",
+          "close_fen": 10243,
+          "trade_day": "2026-10-22"
+        },
+        {
+          "available_at": "2026-10-23T00:00:00Z",
+          "close_fen": 10218,
+          "trade_day": "2026-10-23"
+        },
+        {
+          "available_at": "2026-10-26T00:00:00Z",
+          "close_fen": 10205,
+          "trade_day": "2026-10-26"
+        },
+        {
+          "available_at": "2026-10-27T00:00:00Z",
+          "close_fen": 10219,
+          "trade_day": "2026-10-27"
+        },
+        {
+          "available_at": "2026-10-28T00:00:00Z",
+          "close_fen": 10249,
+          "trade_day": "2026-10-28"
+        },
+        {
+          "available_at": "2026-10-29T00:00:00Z",
+          "close_fen": 10272,
+          "trade_day": "2026-10-29"
+        },
+        {
+          "available_at": "2026-10-30T00:00:00Z",
+          "close_fen": 10267,
+          "trade_day": "2026-10-30"
+        },
+        {
+          "available_at": "2026-11-02T00:00:00Z",
+          "close_fen": 10244,
+          "trade_day": "2026-11-02"
+        }
+      ]
+    }
+  ],
+  "snapshot_ref": "7a8e4734c6138884b914de3ff7b4ea7ec849bd1dee90d5e4f462504419ee6d9a",
+  "strategy_version": "novel-v1"
+}

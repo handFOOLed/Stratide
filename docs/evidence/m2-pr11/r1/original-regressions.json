@@ -1,0 +1,46 @@
+[
+  {
+    "suite": "original-agent",
+    "command": [
+      "python",
+      "-X",
+      "utf8",
+      "-B",
+      "scripts/test-agent.py",
+      "--assets-dir",
+      "<checkout>\\state\\issue55-r1-regression\\assets",
+      "--output",
+      "<checkout>\\docs\\evidence\\m2-pr11\\r1\\original-agent.json"
+    ],
+    "started_at_utc": "2026-11-02T02:52:25.539032+00:00",
+    "duration_seconds": 27.19,
+    "exit_code": 0
+  },
+  {
+    "suite": "original-candidates",
+    "command": [
+      "python",
+      "-X",
+      "utf8",
+      "-B",
+      "scripts/test-candidates.py"
+    ],
+    "started_at_utc": "2026-11-02T02:52:25.539032+00:00",
+    "duration_seconds": 7.3,
+    "exit_code": 0
+  },
+  {
+    "suite": "original-review",
+    "command": [
+      "python",
+      "-X",
+      "utf8",
+      "-B",
+      "scripts/test-research-review.py",
+      "--evidence"
+    ],
+    "started_at_utc": "2026-11-02T02:52:25.540148+00:00",
+    "duration_seconds": 74.0,
+    "exit_code": 1
+  }
+]

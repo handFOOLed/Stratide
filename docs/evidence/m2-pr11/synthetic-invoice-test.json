@@ -1,0 +1,172 @@
+{
+  "budget_caps_changed": false,
+  "budget_database_rebuilt": false,
+  "calls": [
+    {
+      "call_id": 11,
+      "exit_code": 0,
+      "maximum_micro": 1000,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 12,
+      "exit_code": 0,
+      "maximum_micro": 1000,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 13,
+      "exit_code": 0,
+      "maximum_micro": 1000,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 14,
+      "exit_code": 0,
+      "maximum_micro": 1000,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 21,
+      "exit_code": 0,
+      "maximum_micro": 81920,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 23,
+      "exit_code": 0,
+      "maximum_micro": 81920,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 25,
+      "exit_code": 0,
+      "maximum_micro": 81920,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 32,
+      "exit_code": 0,
+      "maximum_micro": 1000,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 33,
+      "exit_code": 0,
+      "maximum_micro": 1000,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 34,
+      "exit_code": 0,
+      "maximum_micro": 1000,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 35,
+      "exit_code": 0,
+      "maximum_micro": 1000,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 42,
+      "exit_code": 0,
+      "maximum_micro": 81920,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 44,
+      "exit_code": 0,
+      "maximum_micro": 81920,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 46,
+      "exit_code": 0,
+      "maximum_micro": 81920,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 47,
+      "exit_code": 0,
+      "maximum_micro": 1000,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 54,
+      "exit_code": 0,
+      "maximum_micro": 1000,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 55,
+      "exit_code": 0,
+      "maximum_micro": 1000,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 56,
+      "exit_code": 0,
+      "maximum_micro": 1000,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 57,
+      "exit_code": 0,
+      "maximum_micro": 1000,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 65,
+      "exit_code": 0,
+      "maximum_micro": 81920,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 67,
+      "exit_code": 0,
+      "maximum_micro": 81920,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 69,
+      "exit_code": 0,
+      "maximum_micro": 81920,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    },
+    {
+      "call_id": 70,
+      "exit_code": 0,
+      "maximum_micro": 1000,
+      "prior_state": "outcome_uncertain",
+      "synthetic_owner_invoice_micro": 0
+    }
+  ],
+  "calls_deleted": 0,
+  "held_reservations_verified_before_explicit_synthetic_owner_invoice": true,
+  "original_command": "stratided --agent-settle <same-agent-dir> <call-id> 0 <synthetic-test-reference>",
+  "real_bills_claimed": 0,
+  "scope": "prior developer-created TST recorded/loopback tests only"
+}
