@@ -357,7 +357,7 @@ impl Store {
         )?;
         let models=settings.models.iter().map(|m|json!({"id":m.id,"label":m.label,"kind":m.kind,"model":m.model,"endpoint":m.endpoint,
             "authorization":m.authorize(&["owner_task".into()],settings.budget.as_ref()).err().map(|e|e.0).unwrap_or("authorized".into()),
-            "price_version":m.price.as_ref().map(|p|&p.version),"verification":if m.kind=="fake"{"FAKE_SYNTHETIC_ONLY"}else{"REAL_PROVIDER_NOT_VERIFIED"}})).collect::<Vec<_>>();
+            "price_version":crate::risk_cloud::price_version(m).ok(),"verification":if m.kind=="fake"{"FAKE_SYNTHETIC_ONLY"}else if crate::risk_cloud::recorded(m){"RECORDED_ADAPTER_NOT_CLOUD"}else{"REAL_PROVIDER_NOT_VERIFIED"}})).collect::<Vec<_>>();
         let mut q=c.prepare("SELECT provider_id,COUNT(*),COALESCE(SUM(input_tokens),0),COALESCE(SUM(output_tokens),0),COALESCE(SUM(usage_micro),0) FROM calls JOIN tasks ON tasks.id=calls.task_id GROUP BY provider_id")?;
         let usage=q.query_map([],|r|Ok(json!({"provider_id":r.get::<_,String>(0)?,"calls":r.get::<_,i64>(1)?.to_string(),"input_tokens":r.get::<_,i64>(2)?.to_string(),"output_tokens":r.get::<_,i64>(3)?.to_string(),"usage_micro":r.get::<_,i64>(4)?.to_string()})))?.collect::<std::result::Result<Vec<_>,_>>()?;
         Ok(

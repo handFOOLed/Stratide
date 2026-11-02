@@ -131,6 +131,9 @@ def handoff(candidate_id=None, evaluation_id=None):
 
 def snapshot_provenance(task, store_name):
     summary = task["input"] if task else {}
+    if "risk_portfolio_v1" in summary.get("scopes", []):
+        import portfolio_research
+        return portfolio_research.provenance(task, store_name)
     if "multimodal_research_v1" in summary.get("scopes", []):
         import multimodal
         return multimodal.provenance(task, store_name)

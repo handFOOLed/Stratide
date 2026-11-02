@@ -1,0 +1,14 @@
+{
+  "scripts/test-multimodal-research.py": {
+    "unchanged_from_base": true
+  },
+  "scripts/test-multimodal-routing.py": {
+    "unchanged_from_base": true
+  },
+  "scripts/test-forward-readiness.py": {
+    "unchanged_from_base": true
+  },
+  "scripts/test-research-review.py": {
+    "unchanged_from_base": true
+  }
+}

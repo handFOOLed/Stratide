@@ -17,7 +17,7 @@
 - **现金分红模型已合并（PR #40）：** [CASH_DIVIDEND_V1](docs/M1_PR08.md) 完成隔离现金分红的登记→应收/税负→到账、统一 NAV/Risk、七报告和独立算法复算；旧 synthetic CLI、v3/68 日保持兼容。
 - **历史分红桥接已合并（PR #42）：** [历史分红桥接 V1](docs/M1_PR09.md) 将原冻结行情、PR38 证据和显式模型假设接入 v4、原 SMA5/20、七报告及独立算法/双基准；实际运行 77 会话 **EXPLORATORY_EX_POST**，真实 PIT 新增 **0 天**，真实准入继续拒绝。
 - **仍受阻：** 仅 68 个历史交易日、3 笔模拟成交，长窗口公司行为/费用证据 `DATA_BLOCKED`；真实 EOD 两日 `EOD_CONTINUITY_VERIFIED`，开盘源仍 BLOCKED，**尚无真正前向模拟成交或 NAV**。
-- **当前顺序：** PR #50 Operator、PR #52 Time-Series + Fusion 已合并；本分支 [#53 前向研究资格](docs/M1_PR11.md) 将原 observer/PR33/PR38 的逐日证据收据接到原双模型与 Inbox。真实仅两日且缺公司行为当日覆盖，仍 BLOCKED；synthetic 工程通过不解锁历史 PIT、开盘或交易。默认 OFF，真实模型/外发/交易均未授权。[#36](https://github.com/handFOOLed/Stratide/issues/36) 完整多模态研究仍待数据与模型条件；核心完成后按 PR #28 基准统一集成 UI。细节见 [当前状态](docs/STATUS.md)。
+- **当前顺序：** PR #50/#52/#54 已合并。本分支 [#55 云风险专家与自主组合](docs/M2_PR11.md) 将 BigQuery TimesFM 2.5、DeepSeek flash 两套生产 Adapter 经原 Rust Agent/统一预算接到原 Registry/Inbox；完整 recorded/loopback 合成 E2E，支持三只股票+现金及 100% 现金。默认 OFF，真实云 `CLOUD_NOT_AUTHORIZED / NOT_BILLED`，BigQuery 费用上界未核实则禁止付费。真实前向仍两日，PR54 资格及模型 context 仍 BLOCKED；没有 Paper/Live 订单或权限。[#36](https://github.com/handFOOLed/Stratide/issues/36) 的真实研究能力仍待数据和模型证据；核心完成后统一集成 UI。见 [当前状态](docs/STATUS.md)。
 
 ## Windows 本地体验
 

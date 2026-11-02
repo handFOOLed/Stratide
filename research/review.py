@@ -32,9 +32,12 @@ def read(path, limit):
 
 
 class Review:
-    def __init__(self, name, *, fault=lambda point: None, multimodal=False):
-        self.multimodal = multimodal
-        if multimodal:
+    def __init__(self, name, *, fault=lambda point: None, multimodal=False, portfolio=False):
+        self.multimodal = multimodal or portfolio
+        if portfolio:
+            from portfolio_research import ReviewSource
+            self.auto = ReviewSource(name)
+        elif multimodal:
             from multimodal import ReviewSource
             self.auto = ReviewSource(name)
         else:
@@ -298,6 +301,7 @@ def main(argv=None, *, fault=lambda point: None):
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--auto", help="original EOD auto name; no review directory override")
     source.add_argument("--multimodal", help="original Time-Series + Fusion run name")
+    source.add_argument("--risk-portfolio", help="versioned Cloud Risk + Portfolio research batch")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("inbox")
     status = commands.add_parser("status")
@@ -311,7 +315,8 @@ def main(argv=None, *, fault=lambda point: None):
     review.add_argument("--source-dir", type=Path)
     args = parser.parse_args(argv)
     try:
-        service = Review(args.multimodal or args.auto, fault=fault, multimodal=args.multimodal is not None)
+        service = Review(args.risk_portfolio or args.multimodal or args.auto, fault=fault,
+                         multimodal=args.multimodal is not None, portfolio=args.risk_portfolio is not None)
         if args.command == "review":
             value = service.run(args.parent_registration_sha256, args.owner_input, args.evidence_class, args.source_dir)
         else:

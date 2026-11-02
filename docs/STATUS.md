@@ -1,6 +1,6 @@
 # Stratide 当前状态
 
-> 截至 2026-11-01，基于已核验 `main` `c3904a5eb31f40209b32beba559e82ba4e47fd8a`（[PR #50](https://github.com/handFOOLed/Stratide/pull/50) 已合并），附本分支 #51 Time-Series + Fusion V1 开发状态。这是**当前实现快照**，不是实盘承诺。Owner 已决定 **Core-first、UI-later**：后续核心功能先用 CLI/持久报告验收，最后由 Sol 按 PR #28 设计体系统一集成 UI。
+> 截至 2026-11-02，基于已核验 `main a27f466e643cb7dd05e3be72b83402a4599a301f`（[PR #54](https://github.com/handFOOLed/Stratide/pull/54) 已合并），附本分支 #55 Cloud Risk Expert + Autonomous Portfolio V1 开发状态。这是**当前实现快照**，不是实盘承诺。Owner 已决定 **Core-first、UI-later**：后续核心功能先用 CLI/持久报告验收，最后按 PR #28 设计体系统一集成 UI。
 
 ## 已实现
 
@@ -22,7 +22,8 @@
 | Forward EOD Shadow V1（PR #48 已合并） | #47：Owner 本地启停、固定 SMA5/20、来源/时点门禁、唯一不可回填日志与只读复算；原双目录 22 日 synthetic E2E / 并发 / 三节点恢复证据保留；旧真实源日预热不足 | [操作](M1_PR10.md) / [原自测](evidence/m1-pr10/README.md) |
 | 自动 EOD Operator V1（PR #50 已合并） | #49：一次配置/启用，前台每日采集 → Snapshot → Shadow/可选 Fake、原证据恢复、持久停用及只读审计；15:15 检查、16:00 正式采集的授权回退分支，未知/失败槽不重发 | [操作](M2_PR09.md) / [原证据](evidence/m2-pr09/README.md) |
 | Time-Series + Fusion V1（PR #52 已合并） | #51：原 Snapshot 冻结 → Naive/EWMA + 独立可替换本地时序 Adapter → 原 Rust Agent/Budget Fusion fake → 原 Registry/Inbox；双 25 日 synthetic E2E。精确任务领取、实际任务 reserve/dispatch 来源复核及失效 queued 终态已并入 main `1b2c903`。默认 OFF，真实时序/云未授权 | [操作/边界](M2_PR10.md) / [原开发自测](evidence/m2-pr10/README.md) / [P1 修复证据](evidence/m2-pr10/p1/README.md) |
-| M1-PR11 前向研究资格 V1（本分支 Draft） | #53：原 observer/PR33/PR38 只读 → 当日公司行为覆盖证据 → 逐日 21 会话收据 → 原 PR52 实际任务双门禁；完整 synthetic 正反 E2E。真实仍只有两日且缺 feed 覆盖/已过期，结果 BLOCKED；研究资格最多 ALLOW_RESEARCH_ONLY，历史 PIT 和交易权限不提升 | [契约/CLI](M1_PR11.md) / [自测及真实审计](evidence/m1-pr11/README.md) |
+| M1-PR11 前向研究资格 V1（PR #54 已合并） | #53：原 observer/PR33/PR38 只读 → 当日公司行为覆盖证据 → 逐日 21 会话收据 → 原 PR52 实际任务双门禁；完整 synthetic 正反 E2E。真实仍只有两日且缺 feed 覆盖/已过期，结果 BLOCKED；研究资格最多 ALLOW_RESEARCH_ONLY，历史 PIT 和交易权限不提升 | [契约/CLI](M1_PR11.md) / [原自测及真实审计](evidence/m1-pr11/README.md) |
+| Cloud Risk Expert + Autonomous Portfolio V1（本分支 Draft） | #55：BigQuery TimesFM 2.5 + DeepSeek flash 的生产请求/解析、原 Rust 任务与统一预算、Naive/EWMA、严格股票/现金目标组合及原 Registry/Inbox。recorded/loopback 三股票及全现金合成闭环；无真实云调用，真实数据与 BigQuery 费用上界仍 BLOCKED | [契约/CLI](M2_PR11.md) / [开发自测](evidence/m2-pr11/README.md) |
 
 | 现金分红模型 V1（PR #40 已合并） | 登记权益→应收/扣税负债→到账，ledger v4 / NAV / Risk / 七报告 / Python独立算法 / 双基准；仅隔离 synthetic CLI | [CASH_DIVIDEND_V1](M1_PR08.md) / [原自测](evidence/m1-pr08/README.md) |
 | 历史分红情景桥接 V1（PR #42 已合并） | 原冻结历史行情 + PR38 原证据 + 独立假设 → 原 SMA5/20 / v4 / 七报告 / 独立算法 / 双基准；77 会话 EXPLORATORY_EX_POST，真实准入 DENIED、PIT 新增 0 天 | [模块操作](M1_PR09.md) / [原自测](evidence/m1-pr09/README.md) |
@@ -37,7 +38,7 @@
 
 ## 当前执行顺序
 
-1. **Sol / #53：** M1-PR11 完整前向 EOD 证据/研究资格门禁；复用已合并 PR33/38/40/52，`agents=0`，唯一 Draft 待固定 HEAD 审查。真实证据不足保持 BLOCKED；Owner 明确许可前不 Ready/合并。
+1. **Sol / #55：** 云风险专家与自主组合 V1，`agents=0`，唯一 Draft 待固定 HEAD 审查。真实 Provider、完整费用上界/账单、模型校准/alpha、真实数据准入均未验证；Owner 明确许可前不付费/外发、不 Ready/合并。PR #54 已合并，原真实收据不修改。
 2. **后续核心任务：** Owner 再定范围；原 Operator 可继续采集，真实连续 21 日/独立事件覆盖/PIT/开盘及真实供应商仍未验证。[#36](https://github.com/handFOOLed/Stratide/issues/36) 的完整多模态消融尚未实现，真实付费、数据外发和交易均未获本期授权。
 3. **全部核心功能完成后：** Sol 按 PR #28 的设计体系统一集成全部 UI；旧同步 UI 要求被本 Owner 决定取代。
 

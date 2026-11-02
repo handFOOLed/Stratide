@@ -1,0 +1,79 @@
+{
+  "adapter_sha256": "65fe6a53ed4d66e21132af05b76cfff9f453c59f7d6372353edda4b32809629c",
+  "base_sha": "a27f466e643cb7dd05e3be72b83402a4599a301f",
+  "billable_calls": 0,
+  "fixed_head": "recorded in Draft PR and final delivery; source hashes bind this evidence",
+  "independent_acceptance": "NOT_VERIFIED",
+  "new_flow_paper_live_orders": 0,
+  "new_python_tests": 10,
+  "not_verified": [
+    "Real network, credentials, provider retention/license, BigQuery all-dimension billing bounds and invoices",
+    "Real model versions/calibration/alpha and real multi-stock PIT or 84-close forward prefix",
+    "PR52 full Python E2E before 16:00 Asia/Shanghai: setUpClass precondition failed; 0 tests ran",
+    "PR52 routing 4 cases: current synthetic source at 16:xx is future relative to morning wall time; CLOCK_BEFORE_SOURCE_OR_PREVIOUS_SYNC",
+    "PR54 complete Python synthetic suite: fixture clocks exceed morning wall time; READINESS_CLOCK_REGRESSED. Original real receipt replay/current BLOCKED audit passed",
+    "Independent targeted P0 review; Linux/macOS; physical power loss"
+  ],
+  "original_agent_process_api_result": "PASS",
+  "original_candidate_tests_passed": 13,
+  "original_review_unique_tests_passed": 12,
+  "passed_commands": [
+    {
+      "command": "cargo fmt --all -- --check",
+      "exit_code": 0
+    },
+    {
+      "command": "scripts/with-msvc.ps1 check --workspace --all-targets --locked --offline",
+      "exit_code": 0
+    },
+    {
+      "command": "scripts/with-msvc.ps1 clippy --workspace --all-targets --locked --offline -- -D warnings",
+      "exit_code": 0
+    },
+    {
+      "command": "scripts/with-msvc.ps1 test --workspace --locked --offline",
+      "exit_code": 0
+    },
+    {
+      "command": "scripts/with-msvc.ps1 build --workspace --locked --offline",
+      "exit_code": 0
+    },
+    {
+      "command": "python -X utf8 -B scripts/test-risk-portfolio.py --driver <current-library-libtest> --evidence docs/evidence/m2-pr11",
+      "exit_code": 0
+    },
+    {
+      "command": "python -X utf8 -B scripts/test-candidates.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python -X utf8 -B scripts/test-agent.py --output <evidence> --assets-dir <isolated-api-stubs>",
+      "exit_code": 0
+    },
+    {
+      "command": "original ReviewTests.test_owner_parameter_injection_and_junction_never_run targeted Windows rerun",
+      "exit_code": 0
+    }
+  ],
+  "platform": "Windows x64",
+  "real_cloud_calls": 0,
+  "rust_tests_passed": 171,
+  "source_sha256": {
+    "research/agent/src/bin/risk-portfolio-agent.rs": "3e59a321925b270fea031ebffbb4a5d227f0cd9623d812ebf3884e128199151f",
+    "research/agent/src/budget.rs": "f5bf1997b26cdb992cdb64aa27fa32854513d961796e9bb2682d872a23c22da8",
+    "research/agent/src/config.rs": "1921f855ffd626a9920d0fbbb3ee8e4814f3bbc13eb8e33cd3c4dfc927bbb2f6",
+    "research/agent/src/lib.rs": "be5250687ba4127da6124e28da37ba7e229ddafab17ac4277e2f837a4106929c",
+    "research/agent/src/provider.rs": "7c1c7027477c104ba69f2b64c9de45350ac9d6da9feefddeed69e8e514ce91f9",
+    "research/agent/src/risk_cloud.rs": "9d71f7e2038c07a1ce4b07e818587e00140d612478fe84ec3b88f6dbe0fcb8cd",
+    "research/agent/src/risk_portfolio.rs": "3cbc9627aaa251a8d4ab831fef9616546a578453151dc4e0e43fa726d944060a",
+    "research/agent/src/risk_portfolio_tests.rs": "d2f21d13d9be90d6bc07713fb5008c91f7309650e26711a8247157b7c012b32c",
+    "research/agent/src/service.rs": "161b6034b8da8d799d48d32d1bb20d0d57bcd84cce9e952970fd3ab4be6ce8e2",
+    "research/agent/src/store.rs": "ddc80c8d5ae5d1a95362ab84de23afc06db1570d093d29143061105e0bbbb2d8",
+    "research/agent/tests/risk_portfolio.rs": "042693c244127cc1591545bcd2d78d59ef451127670d8ab974d7608275e6fa65",
+    "research/candidates.py": "a2424fd8542d16da4974b51daa2d4dd247de5a068d712371e7cf94a3a4415684",
+    "research/portfolio_research.py": "ac2c7f4936aeab455f517ef3a995f6f57182a072e68668416ebbf50381f2ef42",
+    "research/review.py": "38f88f060b858c74ebd484c34ecc12e70eebb0ad1a033db3fd3983be85f65ad9",
+    "scripts/risk-portfolio.py": "2e098c3f5155623ffc65ee60bc78fb52eac3f1a9d4206579e31eea11445078fd",
+    "scripts/test-risk-portfolio.py": "4fa5fe6db7d797b784ee80b498dcd5cedaeed0548193234ef66a3ec108a7fa47"
+  }
+}

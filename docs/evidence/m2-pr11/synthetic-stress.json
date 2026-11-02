@@ -1,0 +1,421 @@
+{
+  "billing": "NOT_BILLED",
+  "call_refs": {
+    "fusion": [
+      {
+        "day": "2026-11-02",
+        "id": "74",
+        "input_tokens": "1200",
+        "maximum_micro": "81920",
+        "month": "2026-11",
+        "output_tokens": "600",
+        "price_version": "synthetic-price-v1",
+        "reason": null,
+        "settled_micro": "2400",
+        "state": "settled",
+        "usage_micro": "2400"
+      }
+    ],
+    "risk": [
+      {
+        "day": "2026-11-02",
+        "id": "73",
+        "input_tokens": "0",
+        "maximum_micro": "1000",
+        "month": "2026-11",
+        "output_tokens": "0",
+        "price_version": "offline-v1",
+        "reason": null,
+        "settled_micro": "1000",
+        "state": "settled",
+        "usage_micro": "1000"
+      }
+    ]
+  },
+  "can_execute_forward_paper": false,
+  "cloud": "CLOUD_NOT_AUTHORIZED",
+  "cost_comparison": {
+    "actual_cloud_bill": "UNKNOWN_NOT_CALLED",
+    "currency": "TST",
+    "fusion_simulated_settled_micro": "2400",
+    "naive_ewma_model_fee_micro": 0,
+    "note": "synthetic metering only; no provider price claim",
+    "risk_simulated_settled_micro": "1000",
+    "unit": "micro_test_currency"
+  },
+  "discovery": [
+    {
+      "execution_candidate": false,
+      "instrument": "300999.SZ",
+      "status": "DISCOVERY_UNVERIFIED"
+    }
+  ],
+  "eligibility": "ELIGIBILITY_DENIED",
+  "fills": 0,
+  "frozen_input_sha256": "59b3c69451a1a1bd42059ee6962940c3e10675ec7b3c8e18cd2d6188f23528c7",
+  "fusion_receipt": {
+    "actual_bill_micro": null,
+    "adapter_sha256": "65fe6a53ed4d66e21132af05b76cfff9f453c59f7d6372353edda4b32809629c",
+    "billing": "NOT_BILLED",
+    "billing_unit": "input_output_tokens",
+    "bound_source": "synthetic_test",
+    "bound_version": "synthetic-price-v1",
+    "currency": "TST",
+    "frozen_input_sha256": "59b3c69451a1a1bd42059ee6962940c3e10675ec7b3c8e18cd2d6188f23528c7",
+    "input_tokens": 1200,
+    "latency_ms": 1,
+    "maximum_reserved_micro": 81920,
+    "model": "deepseek-flash",
+    "model_version": "deepseek-flash/pinned-policy-v1-provider-alias",
+    "output_tokens": 600,
+    "policy_version": "risk-portfolio-v1",
+    "prompt_sha256": "0918e1bf84c888447eeb98ff166890f4974fcc06dbba44893460ddf91965c64e",
+    "provider_hash": "37c7dce103312c82081fbe3a2521efaff5e14b3d946a43309ebef25c84e23819",
+    "provider_id": "fusion-deepseek",
+    "provider_kind": "deepseek_portfolio_v1",
+    "raw_result_sha256": "ee652420aa822ecf87cf169c617e1b7aadc0ccd8375c33fc2a0e9f8c55968395",
+    "real_model_capability": "NOT_VERIFIED",
+    "request_sha256": "1f1f45cfddb8eb3263bc1fbee6501814e7e33f9ed9b47b2dd64d0319b4a1f517",
+    "transport": "recorded"
+  },
+  "input_mode": "synthetic_test",
+  "live_allowed": false,
+  "name": "rp-test-f105a137-stress-40f2",
+  "nav": null,
+  "orders": 0,
+  "portfolio": {
+    "as_of": "2026-11-02T01:46:21.587506Z",
+    "authority": "RESEARCH_ONLY",
+    "candidate_instruments": [
+      "600000.SH",
+      "000001.SZ",
+      "600519.SH",
+      "300999.SZ"
+    ],
+    "cash_weight_bps": 10000,
+    "estimated_fees_micro": null,
+    "estimated_turnover_bps": null,
+    "evidence_against": [
+      "Fundamentals and news are UNKNOWN"
+    ],
+    "evidence_for": [
+      "Synthetic numerical risk evidence"
+    ],
+    "horizon": 20,
+    "invalidation_conditions": [
+      "Independent forward comparison contradicts the hypothesis"
+    ],
+    "limitations": [
+      "Recorded synthetic response only; no real model capability, alpha or trade eligibility"
+    ],
+    "next_experiment": [
+      "Freeze this version before independent cost-aware evidence evaluation"
+    ],
+    "positions": [],
+    "proposal_id": "synthetic-stress-novel-v2",
+    "rationale": "Use independently computed risk proxies; preserve cash when proxy volatility is high",
+    "risk_assessment": [
+      "Tail probability and cross-instrument covariance are UNKNOWN_UNCALIBRATED"
+    ],
+    "schema_version": 1,
+    "source_refs": [
+      "af7df2309aef9a528efaea8dd0d0a7bcd8b97e295c9d78c589d863e1090f2a76",
+      "27588a9848b1121a79461c810ff9be560d1cb68fbde941a1ad0c80395da777e6"
+    ],
+    "strategy_definition": "Test risk-sensitive diversified quality discovery against an all-cash control",
+    "strategy_hash": "27588a9848b1121a79461c810ff9be560d1cb68fbde941a1ad0c80395da777e6",
+    "strategy_version": "novel-v2"
+  },
+  "prompt_version": "portfolio-json-v1",
+  "real_cloud_calls": 0,
+  "registration_sha256": "4b2b8a449c0642436814c31a6df7b9b65f25d4356a15b98b1e98fee38d8caf1c",
+  "restriction": "RESEARCH_ONLY",
+  "risk_experts": [
+    {
+      "annualization": null,
+      "as_of": "2026-11-02T01:46:21.587506Z",
+      "authority": "RESEARCH_ONLY",
+      "baseline_comparison": {
+        "action_handling": "SYNTHETIC_NONE_VERIFIED",
+        "annualization": null,
+        "ewma": 0.04852170887460637,
+        "ewma_lambda": 0.94,
+        "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+        "instrument": "600000.SH",
+        "missing": 0,
+        "naive": 0.04804448368844477,
+        "observed_history_rms": 0.0491862166706096,
+        "observed_last_return": -0.045180136319376785,
+        "target": "rolling20_rms_daily_return_ratio",
+        "unit": "daily_return_ratio",
+        "window": 20
+      },
+      "calibration_status": "UNKNOWN_UNCALIBRATED",
+      "cost": {
+        "actual_bill": "UNKNOWN",
+        "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+        "receipt": "parent_bundle.receipt"
+      },
+      "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+      "downside_metric": "UNKNOWN_UNCALIBRATED",
+      "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+      "forecast_horizons": [
+        5,
+        20
+      ],
+      "forecast_sessions": [
+        "2026-11-03",
+        "2026-11-04",
+        "2026-11-05",
+        "2026-11-06",
+        "2026-11-09",
+        "2026-11-10",
+        "2026-11-11",
+        "2026-11-12",
+        "2026-11-13",
+        "2026-11-16",
+        "2026-11-17",
+        "2026-11-18",
+        "2026-11-19",
+        "2026-11-20",
+        "2026-11-23",
+        "2026-11-24",
+        "2026-11-25",
+        "2026-11-26",
+        "2026-11-27",
+        "2026-11-30"
+      ],
+      "input_mode": "synthetic_test",
+      "instrument": "600000.SH",
+      "job_ref": {
+        "jobId": "synthetic-timesfm-af7df2309aef9a52",
+        "location": "US",
+        "projectId": "stratide-offline"
+      },
+      "market_regime": "HIGH_VOLATILITY",
+      "quality_blockers": [
+        "SYNTHETIC_ENGINEERING_ONLY"
+      ],
+      "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+      "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+      "schema_version": 1,
+      "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+      "snapshot_ref": "af7df2309aef9a528efaea8dd0d0a7bcd8b97e295c9d78c589d863e1090f2a76",
+      "target": "rolling20_rms_daily_return_ratio",
+      "uncertainty": "UNKNOWN_UNCALIBRATED",
+      "unit": "daily_return_ratio",
+      "volatility_forecast": [
+        {
+          "sessions": 5,
+          "value_ratio": 0.04
+        },
+        {
+          "sessions": 20,
+          "value_ratio": 0.04000000000000001
+        }
+      ]
+    },
+    {
+      "annualization": null,
+      "as_of": "2026-11-02T01:46:21.587506Z",
+      "authority": "RESEARCH_ONLY",
+      "baseline_comparison": {
+        "action_handling": "SYNTHETIC_NONE_VERIFIED",
+        "annualization": null,
+        "ewma": 0.0481541098396189,
+        "ewma_lambda": 0.94,
+        "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+        "instrument": "000001.SZ",
+        "missing": 0,
+        "naive": 0.04795308839299816,
+        "observed_history_rms": 0.04899673436735395,
+        "observed_last_return": 0.01963165351143492,
+        "target": "rolling20_rms_daily_return_ratio",
+        "unit": "daily_return_ratio",
+        "window": 20
+      },
+      "calibration_status": "UNKNOWN_UNCALIBRATED",
+      "cost": {
+        "actual_bill": "UNKNOWN",
+        "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+        "receipt": "parent_bundle.receipt"
+      },
+      "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+      "downside_metric": "UNKNOWN_UNCALIBRATED",
+      "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+      "forecast_horizons": [
+        5,
+        20
+      ],
+      "forecast_sessions": [
+        "2026-11-03",
+        "2026-11-04",
+        "2026-11-05",
+        "2026-11-06",
+        "2026-11-09",
+        "2026-11-10",
+        "2026-11-11",
+        "2026-11-12",
+        "2026-11-13",
+        "2026-11-16",
+        "2026-11-17",
+        "2026-11-18",
+        "2026-11-19",
+        "2026-11-20",
+        "2026-11-23",
+        "2026-11-24",
+        "2026-11-25",
+        "2026-11-26",
+        "2026-11-27",
+        "2026-11-30"
+      ],
+      "input_mode": "synthetic_test",
+      "instrument": "000001.SZ",
+      "job_ref": {
+        "jobId": "synthetic-timesfm-af7df2309aef9a52",
+        "location": "US",
+        "projectId": "stratide-offline"
+      },
+      "market_regime": "HIGH_VOLATILITY",
+      "quality_blockers": [
+        "SYNTHETIC_ENGINEERING_ONLY"
+      ],
+      "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+      "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+      "schema_version": 1,
+      "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+      "snapshot_ref": "af7df2309aef9a528efaea8dd0d0a7bcd8b97e295c9d78c589d863e1090f2a76",
+      "target": "rolling20_rms_daily_return_ratio",
+      "uncertainty": "UNKNOWN_UNCALIBRATED",
+      "unit": "daily_return_ratio",
+      "volatility_forecast": [
+        {
+          "sessions": 5,
+          "value_ratio": 0.04
+        },
+        {
+          "sessions": 20,
+          "value_ratio": 0.04000000000000001
+        }
+      ]
+    },
+    {
+      "annualization": null,
+      "as_of": "2026-11-02T01:46:21.587506Z",
+      "authority": "RESEARCH_ONLY",
+      "baseline_comparison": {
+        "action_handling": "SYNTHETIC_NONE_VERIFIED",
+        "annualization": null,
+        "ewma": 0.04985490938293151,
+        "ewma_lambda": 0.94,
+        "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+        "instrument": "600519.SH",
+        "missing": 0,
+        "naive": 0.04998123425756067,
+        "observed_history_rms": 0.04952916957622166,
+        "observed_last_return": 0.06878306878306883,
+        "target": "rolling20_rms_daily_return_ratio",
+        "unit": "daily_return_ratio",
+        "window": 20
+      },
+      "calibration_status": "UNKNOWN_UNCALIBRATED",
+      "cost": {
+        "actual_bill": "UNKNOWN",
+        "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+        "receipt": "parent_bundle.receipt"
+      },
+      "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+      "downside_metric": "UNKNOWN_UNCALIBRATED",
+      "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+      "forecast_horizons": [
+        5,
+        20
+      ],
+      "forecast_sessions": [
+        "2026-11-03",
+        "2026-11-04",
+        "2026-11-05",
+        "2026-11-06",
+        "2026-11-09",
+        "2026-11-10",
+        "2026-11-11",
+        "2026-11-12",
+        "2026-11-13",
+        "2026-11-16",
+        "2026-11-17",
+        "2026-11-18",
+        "2026-11-19",
+        "2026-11-20",
+        "2026-11-23",
+        "2026-11-24",
+        "2026-11-25",
+        "2026-11-26",
+        "2026-11-27",
+        "2026-11-30"
+      ],
+      "input_mode": "synthetic_test",
+      "instrument": "600519.SH",
+      "job_ref": {
+        "jobId": "synthetic-timesfm-af7df2309aef9a52",
+        "location": "US",
+        "projectId": "stratide-offline"
+      },
+      "market_regime": "HIGH_VOLATILITY",
+      "quality_blockers": [
+        "SYNTHETIC_ENGINEERING_ONLY"
+      ],
+      "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+      "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+      "schema_version": 1,
+      "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+      "snapshot_ref": "af7df2309aef9a528efaea8dd0d0a7bcd8b97e295c9d78c589d863e1090f2a76",
+      "target": "rolling20_rms_daily_return_ratio",
+      "uncertainty": "UNKNOWN_UNCALIBRATED",
+      "unit": "daily_return_ratio",
+      "volatility_forecast": [
+        {
+          "sessions": 5,
+          "value_ratio": 0.04
+        },
+        {
+          "sessions": 20,
+          "value_ratio": 0.04000000000000001
+        }
+      ]
+    }
+  ],
+  "risk_receipt": {
+    "actual_bill_micro": null,
+    "adapter_sha256": "65fe6a53ed4d66e21132af05b76cfff9f453c59f7d6372353edda4b32809629c",
+    "billing": "NOT_BILLED",
+    "billing_unit": "query_bytes+prediction_bytes+storage_byte_seconds",
+    "bound_source": "synthetic_test",
+    "bound_version": "offline-v1",
+    "currency": "TST",
+    "frozen_input_sha256": "59b3c69451a1a1bd42059ee6962940c3e10675ec7b3c8e18cd2d6188f23528c7",
+    "input_tokens": 0,
+    "latency_ms": 1,
+    "maximum_reserved_micro": 1000,
+    "model": "TimesFM 2.5",
+    "model_version": "TimesFM 2.5",
+    "output_tokens": 0,
+    "policy_version": "risk-portfolio-v1",
+    "prompt_sha256": "0918e1bf84c888447eeb98ff166890f4974fcc06dbba44893460ddf91965c64e",
+    "provider_hash": "f4b2e9426d774afc01fbc8d9de1f520a351c9c794fc626eb703427a9cab63494",
+    "provider_id": "risk-timesfm",
+    "provider_kind": "bigquery_forecast_v1",
+    "raw_result_sha256": "8bed7bb16cdcadda74e95893a5f904031ad5e37dc54999a9eba2de8fb891e550",
+    "real_model_capability": "NOT_VERIFIED",
+    "request_sha256": "248496c8f57a37907d9a383ea56078b1289ea4fd02976b6d0776c7ce74078fc8",
+    "transport": "recorded"
+  },
+  "schema_version": 1,
+  "snapshot_sha256": "af7df2309aef9a528efaea8dd0d0a7bcd8b97e295c9d78c589d863e1090f2a76",
+  "state": "RESEARCH_ONLY",
+  "strategy_artifact_sha256": "5448ebd905128959777adeea298f058a10324d5200e076c80b34f43d4e65b198",
+  "strategy_version": "novel-v2",
+  "task_refs": {
+    "fusion": "89",
+    "risk": "88"
+  }
+}

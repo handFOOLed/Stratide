@@ -1,0 +1,27 @@
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-agent.py", line 202, in <module>
+
+    result = run(args.binary.resolve(), args.assets_dir)
+
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\scripts\test-agent.py", line 105, in run
+
+    service.start()
+
+  File "<checkout>\scripts\test-agent.py", line 60, in start
+
+    wait(ready)
+
+  File "<checkout>\scripts\test-agent.py", line 31, in wait
+
+    value = check()
+
+            ^^^^^^^
+
+  File "<checkout>\scripts\test-agent.py", line 55, in ready
+
+    raise AssertionError('service exited before ready: ' + self.process.stderr.read().decode(errors='replace'))
+
+AssertionError: service exited before ready: 缺少前端构建：先执行 npm --prefix apps/dashboard ci 和 npm --prefix apps/dashboard run build

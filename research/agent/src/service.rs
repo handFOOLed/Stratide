@@ -230,7 +230,7 @@ impl Agent {
                     _ => "not_verified",
                 });
                 view["last_reason"] = json!(last.and_then(|v| v.1));
-                if model.kind != "fake" {
+                if model.kind != "fake" && !crate::risk_cloud::recorded(model) {
                     let successes:i64=c.query_row("SELECT COUNT(*) FROM tasks WHERE provider_id=?1 AND provider_hash=?2 AND result IS NOT NULL",params![model.id,model.fingerprint()],|r|r.get(0))?;
                     if successes > 0 {
                         view["verification"] = json!("REAL_PROVIDER_CALL_OBSERVED");
@@ -335,10 +335,23 @@ impl Agent {
             if crate::multimodal::is_input(&input) {
                 crate::multimodal::validate_input(&input, now)?;
             }
+            if crate::risk_portfolio::is_input(&input) {
+                crate::risk_portfolio::gate(
+                    &self.store().connect()?,
+                    trigger.as_deref(),
+                    &input,
+                    now,
+                    &s,
+                )?;
+            }
             let task_limit = request.validate()?;
             m.authorize(&input.scopes, s.budget.as_ref())?;
             let provider_input = json!({"owner_task":request,"published_summary":input});
             let prepared = provider::prepare(m, &provider_input)?;
+            #[cfg(test)]
+            if crate::risk_portfolio::is_input(&input) {
+                crate::risk_portfolio_tests::fault("before_reserve");
+            }
             // Re-read settings after DNS preparation. Revoked grants or changed
             // caps take effect before reserving or entering the send boundary.
             let latest = self.settings()?;
@@ -358,8 +371,21 @@ impl Agent {
                 calls.len() < 2 && calls.iter().all(|v| v["state"] == "no_charge"),
                 "RETRY_UNSAFE_OR_EXHAUSTED",
             )?;
+            ensure(
+                !crate::risk_portfolio::is_input(&input) || calls.is_empty(),
+                "CLOUD_SINGLE_ATTEMPT_REQUIRED",
+            )?;
             let maximum = m.cost(m.max_input_tokens, m.max_output_tokens)?;
             let reservation_time = if m.kind == "fake" { now } else { Utc::now() };
+            if crate::risk_portfolio::is_input(&input) {
+                crate::risk_portfolio::gate(
+                    &c,
+                    trigger.as_deref(),
+                    &input,
+                    reservation_time,
+                    &latest,
+                )?;
+            }
             if crate::multimodal::is_input(&input) {
                 if let Err(error) = crate::multimodal::validate_source(
                     &c,
@@ -380,10 +406,50 @@ impl Agent {
                     task_id: id,
                     maximum_micro: maximum,
                     task_limit,
-                    price_version: &m.price.as_ref().ok_or("PRICE_UNCONFIGURED")?.version,
+                    price_version: crate::risk_cloud::price_version(m)?,
                 },
             )?;
+            #[cfg(test)]
+            if crate::risk_portfolio::is_input(&input) {
+                crate::risk_portfolio_tests::fault("after_reserve");
+            }
             let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
+            if crate::risk_portfolio::is_input(&input) {
+                // Re-read grant/caps at the final dispatch boundary as well as reserve.
+                let checked = self.settings().and_then(|settings| {
+                    let pinned = settings
+                        .models
+                        .iter()
+                        .find(|p| p.id == m.id)
+                        .ok_or("PINNED_MODEL_UNAVAILABLE")?;
+                    ensure(
+                        pinned.fingerprint() == m.fingerprint(),
+                        "PINNED_MODEL_CONFIGURATION_CHANGED",
+                    )?;
+                    budget::check_dispatch(
+                        &tx,
+                        settings.budget.as_ref().ok_or("BUDGET_UNCONFIGURED")?,
+                        Utc::now(),
+                    )?;
+                    crate::risk_portfolio::gate(
+                        &tx,
+                        trigger.as_deref(),
+                        &input,
+                        Utc::now(),
+                        &settings,
+                    )
+                });
+                if let Err(error) = checked {
+                    tx.execute(
+                        "UPDATE calls SET state='no_charge',reason=?1 WHERE id=?2",
+                        params![error.0, call_id],
+                    )?;
+                    tx.commit()?;
+                    return self
+                        .store()
+                        .finish(id, "cancelled", &error.0, None, Utc::now());
+                }
+            }
             if crate::multimodal::is_input(&input) {
                 if let Err(error) = crate::multimodal::validate_source(
                     &tx,
@@ -419,9 +485,27 @@ impl Agent {
                 [call_id],
             )?;
             tx.commit()?;
+            #[cfg(test)]
+            if crate::risk_portfolio::is_input(&input) {
+                crate::risk_portfolio_tests::fault("after_dispatch");
+            }
             let outcome = provider::call(prepared, calls.len() + 1);
+            #[cfg(test)]
+            if crate::risk_portfolio::is_input(&input) {
+                crate::risk_portfolio_tests::fault("after_provider_result");
+            }
             let finished = Utc::now();
             match outcome {
+                Outcome::CloudFailure { reason, receipt } => {
+                    c.execute("UPDATE calls SET state='outcome_uncertain',reason=?1,finished_at=?2 WHERE id=?3",params![reason,finished.to_rfc3339(),call_id])?;
+                    return self.store().finish(
+                        id,
+                        "outcome_uncertain",
+                        &reason,
+                        Some(&json!({"cloud_failure":receipt})),
+                        finished,
+                    );
+                }
                 Outcome::NoCharge { retryable, reason } => {
                     c.execute(
                         "UPDATE calls SET state='no_charge',reason=?1,finished_at=?2 WHERE id=?3",
@@ -463,13 +547,22 @@ impl Agent {
                     if crate::multimodal::is_input(&input) {
                         ensure(research.fusion.is_some(), "FUSION_OUTPUT_REQUIRED")?;
                     }
+                    ensure(
+                        !crate::risk_portfolio::is_input(&input)
+                            || research.risk_portfolio.is_some(),
+                        "RISK_PORTFOLIO_OUTPUT_REQUIRED",
+                    )?;
                     let usage = m.cost(input_tokens, output_tokens)?;
                     let valid = input_tokens <= m.max_input_tokens
                         && output_tokens <= m.max_output_tokens
                         && usage <= maximum;
-                    let fake = m.kind == "fake";
+                    let fake = m.kind == "fake" || crate::risk_cloud::recorded(m);
                     c.execute("UPDATE calls SET state=?1,usage_micro=?2,settled_micro=?3,input_tokens=?4,output_tokens=?5,finished_at=?6,violation=?7 WHERE id=?8",
                         params![if !valid{"outcome_uncertain"}else if fake{"settled"}else{"usage_received"},usage,if fake && valid {usage}else{0},input_tokens,output_tokens,finished.to_rfc3339(),!valid,call_id])?;
+                    #[cfg(test)]
+                    if crate::risk_portfolio::is_input(&input) {
+                        crate::risk_portfolio_tests::fault("after_settled");
+                    }
                     let result = json!({"research":research,"provider_id":m.id,"provider_kind":m.kind,"model":m.model,
                         "input_summary_version":input.version,"source_day":input.source_day,"input_mode":input.mode,
                         "generated_at":finished.to_rfc3339(),"synthetic_provider":fake,"qualification":"EXPLORATORY_NOT_INDEPENDENT",

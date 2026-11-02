@@ -1,0 +1,137 @@
+test_actual_task_gate_blocks_revision_expiry_and_disabled_global_claims (__main__.RoutingTests.test_actual_task_gate_blocks_revision_expiry_and_disabled_global_claims) ... FAIL
+
+test_changed_source_terminates_a_then_new_experiment_b_runs (__main__.RoutingTests.test_changed_source_terminates_a_then_new_experiment_b_runs) ... FAIL
+
+test_cross_task_kill_restart_and_settled_recovery_do_not_reexecute (__main__.RoutingTests.test_cross_task_kill_restart_and_settled_recovery_do_not_reexecute) ... FAIL
+
+test_two_sources_tick_targets_b (__main__.RoutingTests.test_two_sources_tick_targets_b) ... FAIL
+
+
+
+======================================================================
+
+FAIL: test_actual_task_gate_blocks_revision_expiry_and_disabled_global_claims (__main__.RoutingTests.test_actual_task_gate_blocks_revision_expiry_and_disabled_global_claims)
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-multimodal-routing.py", line 126, in test_actual_task_gate_blocks_revision_expiry_and_disabled_global_claims
+
+    a, akey, source, events = queued("gate-" + scenario)
+
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\scripts\test-multimodal-routing.py", line 26, in queued
+
+    name, source, events = f.setup(label)
+
+                           ^^^^^^^^^^^^^^
+
+  File "<checkout>\scripts\test-multimodal-research.py", line 125, in setup
+
+    assert process.returncode == 0, process.stdout
+
+           ^^^^^^^^^^^^^^^^^^^^^^^
+
+AssertionError: b'{\r\n  "schema_version": 1,\r\n  "latest_attempt": {\r\n    "blockers": [],\r\n    "error_code": "CLOCK_BEFORE_SOURCE_OR_PREVIOUS_SYNC",\r\n    "finished_at": 1793583663185,\r\n    "journal_head": "53b96330a5c8470d96603f2e5334052df1b12b7fceb7d493d3777a31f9f4fa43",\r\n    "new_append": null,\r\n    "source_changed": true,\r\n    "source_database_sha256": "a6fc91345a4396ce5bc0da3ce04c9eb55a37ec06f6f6e3de28613a1b317f812e",\r\n    "started_at": 1793583663159,\r\n    "state": "blocked"\r\n  },\r\n  "snapshot": null,\r\n  "can_research": false,\r\n  "can_execute_forward_paper": false,\r\n  "live_allowed": false,\r\n  "opening_source": "BLOCKED",\r\n  "source_checked_only_at_latest_sync": true\r\n}\r\n'
+
+
+
+======================================================================
+
+FAIL: test_changed_source_terminates_a_then_new_experiment_b_runs (__main__.RoutingTests.test_changed_source_terminates_a_then_new_experiment_b_runs)
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-multimodal-routing.py", line 100, in test_changed_source_terminates_a_then_new_experiment_b_runs
+
+    name, akey, source, events = queued("changed-source")
+
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\scripts\test-multimodal-routing.py", line 26, in queued
+
+    name, source, events = f.setup(label)
+
+                           ^^^^^^^^^^^^^^
+
+  File "<checkout>\scripts\test-multimodal-research.py", line 125, in setup
+
+    assert process.returncode == 0, process.stdout
+
+           ^^^^^^^^^^^^^^^^^^^^^^^
+
+AssertionError: b'{\r\n  "schema_version": 1,\r\n  "latest_attempt": {\r\n    "blockers": [],\r\n    "error_code": "CLOCK_BEFORE_SOURCE_OR_PREVIOUS_SYNC",\r\n    "finished_at": 1793583663391,\r\n    "journal_head": "ef12d299faf99dab90fb9fe5e337f8d7a7ed80fa6e6a3f737cf1e559548ee4b1",\r\n    "new_append": null,\r\n    "source_changed": true,\r\n    "source_database_sha256": "87fc6cd7e5c8ba558a94f31e90acea4ca03e5a0c6d504dc3e02f02f133d6c4f5",\r\n    "started_at": 1793583663365,\r\n    "state": "blocked"\r\n  },\r\n  "snapshot": null,\r\n  "can_research": false,\r\n  "can_execute_forward_paper": false,\r\n  "live_allowed": false,\r\n  "opening_source": "BLOCKED",\r\n  "source_checked_only_at_latest_sync": true\r\n}\r\n'
+
+
+
+======================================================================
+
+FAIL: test_cross_task_kill_restart_and_settled_recovery_do_not_reexecute (__main__.RoutingTests.test_cross_task_kill_restart_and_settled_recovery_do_not_reexecute)
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-multimodal-routing.py", line 159, in test_cross_task_kill_restart_and_settled_recovery_do_not_reexecute
+
+    a,akey,_,_ = queued("kill-a")
+
+                 ^^^^^^^^^^^^^^^^
+
+  File "<checkout>\scripts\test-multimodal-routing.py", line 26, in queued
+
+    name, source, events = f.setup(label)
+
+                           ^^^^^^^^^^^^^^
+
+  File "<checkout>\scripts\test-multimodal-research.py", line 125, in setup
+
+    assert process.returncode == 0, process.stdout
+
+           ^^^^^^^^^^^^^^^^^^^^^^^
+
+AssertionError: b'{\r\n  "schema_version": 1,\r\n  "latest_attempt": {\r\n    "blockers": [],\r\n    "error_code": "CLOCK_BEFORE_SOURCE_OR_PREVIOUS_SYNC",\r\n    "finished_at": 1793583663594,\r\n    "journal_head": "7743e5d51f61a086cd814bd2261c6d718c0b85b1f199ce634dc712419ec57076",\r\n    "new_append": null,\r\n    "source_changed": true,\r\n    "source_database_sha256": "3464eeb69b6aff930f929f62974e770232c6702c9cc487309790978f824fc49d",\r\n    "started_at": 1793583663571,\r\n    "state": "blocked"\r\n  },\r\n  "snapshot": null,\r\n  "can_research": false,\r\n  "can_execute_forward_paper": false,\r\n  "live_allowed": false,\r\n  "opening_source": "BLOCKED",\r\n  "source_checked_only_at_latest_sync": true\r\n}\r\n'
+
+
+
+======================================================================
+
+FAIL: test_two_sources_tick_targets_b (__main__.RoutingTests.test_two_sources_tick_targets_b)
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-multimodal-routing.py", line 86, in test_two_sources_tick_targets_b
+
+    a, akey, _, _ = queued("route-a")
+
+                    ^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\scripts\test-multimodal-routing.py", line 26, in queued
+
+    name, source, events = f.setup(label)
+
+                           ^^^^^^^^^^^^^^
+
+  File "<checkout>\scripts\test-multimodal-research.py", line 125, in setup
+
+    assert process.returncode == 0, process.stdout
+
+           ^^^^^^^^^^^^^^^^^^^^^^^
+
+AssertionError: b'{\r\n  "schema_version": 1,\r\n  "latest_attempt": {\r\n    "blockers": [],\r\n    "error_code": "CLOCK_BEFORE_SOURCE_OR_PREVIOUS_SYNC",\r\n    "finished_at": 1793583663807,\r\n    "journal_head": "4803bf57d9acb59b105f91870def8c3ce54f082256e5ebc3fa33728674b25a33",\r\n    "new_append": null,\r\n    "source_changed": true,\r\n    "source_database_sha256": "0aa2ce179ac0e3450a21f0d468c7db3fc9fb6fbbcf32124a4a991edccc07709f",\r\n    "started_at": 1793583663781,\r\n    "state": "blocked"\r\n  },\r\n  "snapshot": null,\r\n  "can_research": false,\r\n  "can_execute_forward_paper": false,\r\n  "live_allowed": false,\r\n  "opening_source": "BLOCKED",\r\n  "source_checked_only_at_latest_sync": true\r\n}\r\n'
+
+
+
+----------------------------------------------------------------------
+
+Ran 4 tests in 0.830s
+
+
+
+FAILED (failures=4)

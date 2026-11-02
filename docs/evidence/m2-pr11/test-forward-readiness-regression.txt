@@ -1,0 +1,551 @@
+test_01_two_independent_journals_daily_coverage_original_fusion_and_inbox (__main__.ReadinessTests.test_01_two_independent_journals_daily_coverage_original_fusion_and_inbox) ... FAIL
+
+test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event (__main__.ReadinessTests.test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event) ...
+
+  test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event (__main__.ReadinessTests.test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event) (label='short') ... ERROR
+
+  test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event (__main__.ReadinessTests.test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event) (label='gap') ... ERROR
+
+  test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event (__main__.ReadinessTests.test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event) (label='missing') ... ERROR
+
+  test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event (__main__.ReadinessTests.test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event) (label='empty-not-proof') ... ERROR
+
+  test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event (__main__.ReadinessTests.test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event) (label='future-publisher') ... ERROR
+
+test_03_ex_post_acquisition_never_rewrites_original_failure (__main__.ReadinessTests.test_03_ex_post_acquisition_never_rewrites_original_failure) ... ERROR
+
+test_04_real_event_units_dates_partial_facts_and_price_semantics (__main__.ReadinessTests.test_04_real_event_units_dates_partial_facts_and_price_semantics) ... ERROR
+
+test_05_sha_editing_json_mode_and_owner_disable_are_not_authority (__main__.ReadinessTests.test_05_sha_editing_json_mode_and_owner_disable_are_not_authority) ... ERROR
+
+test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal (__main__.ReadinessTests.test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal) ...
+
+  test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal (__main__.ReadinessTests.test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal) (mutation='receipt') ... ERROR
+
+  test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal (__main__.ReadinessTests.test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal) (mutation='raw-journal') ... ERROR
+
+  test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal (__main__.ReadinessTests.test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal) (mutation='owner') ... ERROR
+
+test_07_source_revision_late_backfill_and_receipt_replay (__main__.ReadinessTests.test_07_source_revision_late_backfill_and_receipt_replay) ... ERROR
+
+test_08_freshness_asof_label_clock_and_malicious_paths (__main__.ReadinessTests.test_08_freshness_asof_label_clock_and_malicious_paths) ... ERROR
+
+test_09_publication_interruptions_recovery_duplicate_and_concurrent_runs (__main__.ReadinessTests.test_09_publication_interruptions_recovery_duplicate_and_concurrent_runs) ... FAIL
+
+test_10_settled_kill_restart_never_recharges_and_other_task_cannot_attest (__main__.ReadinessTests.test_10_settled_kill_restart_never_recharges_and_other_task_cannot_attest) ... ERROR
+
+test_11_a_later_clean_21_session_window_recovers_without_rewriting_old_observations (__main__.ReadinessTests.test_11_a_later_clean_21_session_window_recovers_without_rewriting_old_observations) ... ERROR
+
+test_12_original_dispatch_gate_releases_reservation_after_owner_disable (__main__.ReadinessTests.test_12_original_dispatch_gate_releases_reservation_after_owner_disable) ... ERROR
+
+test_13_on_day_complete_evidence_and_identical_fact_refresh_create_new_receipts (__main__.ReadinessTests.test_13_on_day_complete_evidence_and_identical_fact_refresh_create_new_receipts) ... ERROR
+
+
+
+======================================================================
+
+ERROR: test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event (__main__.ReadinessTests.test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event) (label='short')
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 179, in test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event
+
+    result = self.assert_blocked(setup(label, **options), reason)
+
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 122, in assert_blocked
+
+    result = ctx["store"].audit()
+
+             ^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\research\forward_readiness.py", line 348, in audit
+
+    j.require(at >= high, "READINESS_CLOCK_REGRESSED")
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: READINESS_CLOCK_REGRESSED
+
+
+
+======================================================================
+
+ERROR: test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event (__main__.ReadinessTests.test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event) (label='gap')
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 179, in test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event
+
+    result = self.assert_blocked(setup(label, **options), reason)
+
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 122, in assert_blocked
+
+    result = ctx["store"].audit()
+
+             ^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\research\forward_readiness.py", line 348, in audit
+
+    j.require(at >= high, "READINESS_CLOCK_REGRESSED")
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: READINESS_CLOCK_REGRESSED
+
+
+
+======================================================================
+
+ERROR: test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event (__main__.ReadinessTests.test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event) (label='missing')
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 179, in test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event
+
+    result = self.assert_blocked(setup(label, **options), reason)
+
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 122, in assert_blocked
+
+    result = ctx["store"].audit()
+
+             ^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\research\forward_readiness.py", line 348, in audit
+
+    j.require(at >= high, "READINESS_CLOCK_REGRESSED")
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: READINESS_CLOCK_REGRESSED
+
+
+
+======================================================================
+
+ERROR: test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event (__main__.ReadinessTests.test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event) (label='empty-not-proof')
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 179, in test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event
+
+    result = self.assert_blocked(setup(label, **options), reason)
+
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 122, in assert_blocked
+
+    result = ctx["store"].audit()
+
+             ^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\research\forward_readiness.py", line 348, in audit
+
+    j.require(at >= high, "READINESS_CLOCK_REGRESSED")
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: READINESS_CLOCK_REGRESSED
+
+
+
+======================================================================
+
+ERROR: test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event (__main__.ReadinessTests.test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event) (label='future-publisher')
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 179, in test_02_insufficient_calendar_gap_missing_feed_and_fake_no_event
+
+    result = self.assert_blocked(setup(label, **options), reason)
+
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 122, in assert_blocked
+
+    result = ctx["store"].audit()
+
+             ^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\research\forward_readiness.py", line 348, in audit
+
+    j.require(at >= high, "READINESS_CLOCK_REGRESSED")
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: READINESS_CLOCK_REGRESSED
+
+
+
+======================================================================
+
+ERROR: test_03_ex_post_acquisition_never_rewrites_original_failure (__main__.ReadinessTests.test_03_ex_post_acquisition_never_rewrites_original_failure)
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 193, in test_03_ex_post_acquisition_never_rewrites_original_failure
+
+    store.capture(path)
+
+  File "<checkout>\research\forward_readiness.py", line 316, in capture
+
+    j.require(src["saved"]["verified_at"] <= at and src["saved"]["content"]["as_of_journal_event_at"] <= at,
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: CAPTURE_SNAPSHOT_CAUSAL_ORDER
+
+
+
+======================================================================
+
+ERROR: test_04_real_event_units_dates_partial_facts_and_price_semantics (__main__.ReadinessTests.test_04_real_event_units_dates_partial_facts_and_price_semantics)
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 214, in test_04_real_event_units_dates_partial_facts_and_price_semantics
+
+    self.assert_blocked(ctx, "EVENT_FACT_PARTIAL")
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 122, in assert_blocked
+
+    result = ctx["store"].audit()
+
+             ^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\research\forward_readiness.py", line 348, in audit
+
+    j.require(at >= high, "READINESS_CLOCK_REGRESSED")
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: READINESS_CLOCK_REGRESSED
+
+
+
+======================================================================
+
+ERROR: test_05_sha_editing_json_mode_and_owner_disable_are_not_authority (__main__.ReadinessTests.test_05_sha_editing_json_mode_and_owner_disable_are_not_authority)
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 226, in test_05_sha_editing_json_mode_and_owner_disable_are_not_authority
+
+    report = ctx["store"].audit()
+
+             ^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\research\forward_readiness.py", line 348, in audit
+
+    j.require(at >= high, "READINESS_CLOCK_REGRESSED")
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: READINESS_CLOCK_REGRESSED
+
+
+
+======================================================================
+
+ERROR: test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal (__main__.ReadinessTests.test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal) (mutation='receipt')
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 261, in test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal
+
+    ctx["store"].audit()
+
+  File "<checkout>\research\forward_readiness.py", line 348, in audit
+
+    j.require(at >= high, "READINESS_CLOCK_REGRESSED")
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: READINESS_CLOCK_REGRESSED
+
+
+
+======================================================================
+
+ERROR: test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal (__main__.ReadinessTests.test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal) (mutation='raw-journal')
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 261, in test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal
+
+    ctx["store"].audit()
+
+  File "<checkout>\research\forward_readiness.py", line 348, in audit
+
+    j.require(at >= high, "READINESS_CLOCK_REGRESSED")
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: READINESS_CLOCK_REGRESSED
+
+
+
+======================================================================
+
+ERROR: test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal (__main__.ReadinessTests.test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal) (mutation='owner')
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 261, in test_06_queued_actual_rust_task_rechecks_receipt_and_original_journal
+
+    ctx["store"].audit()
+
+  File "<checkout>\research\forward_readiness.py", line 348, in audit
+
+    j.require(at >= high, "READINESS_CLOCK_REGRESSED")
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: READINESS_CLOCK_REGRESSED
+
+
+
+======================================================================
+
+ERROR: test_07_source_revision_late_backfill_and_receipt_replay (__main__.ReadinessTests.test_07_source_revision_late_backfill_and_receipt_replay)
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 283, in test_07_source_revision_late_backfill_and_receipt_replay
+
+    old = ctx["store"].audit()
+
+          ^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\research\forward_readiness.py", line 348, in audit
+
+    j.require(at >= high, "READINESS_CLOCK_REGRESSED")
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: READINESS_CLOCK_REGRESSED
+
+
+
+======================================================================
+
+ERROR: test_08_freshness_asof_label_clock_and_malicious_paths (__main__.ReadinessTests.test_08_freshness_asof_label_clock_and_malicious_paths)
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 325, in test_08_freshness_asof_label_clock_and_malicious_paths
+
+    ctx["store"].audit()
+
+  File "<checkout>\research\forward_readiness.py", line 348, in audit
+
+    j.require(at >= high, "READINESS_CLOCK_REGRESSED")
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: READINESS_CLOCK_REGRESSED
+
+
+
+======================================================================
+
+ERROR: test_10_settled_kill_restart_never_recharges_and_other_task_cannot_attest (__main__.ReadinessTests.test_10_settled_kill_restart_never_recharges_and_other_task_cannot_attest)
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 366, in test_10_settled_kill_restart_never_recharges_and_other_task_cannot_attest
+
+    a["store"].audit()
+
+  File "<checkout>\research\forward_readiness.py", line 348, in audit
+
+    j.require(at >= high, "READINESS_CLOCK_REGRESSED")
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: READINESS_CLOCK_REGRESSED
+
+
+
+======================================================================
+
+ERROR: test_11_a_later_clean_21_session_window_recovers_without_rewriting_old_observations (__main__.ReadinessTests.test_11_a_later_clean_21_session_window_recovers_without_rewriting_old_observations)
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 391, in test_11_a_later_clean_21_session_window_recovers_without_rewriting_old_observations
+
+    report = ctx["store"].audit()
+
+             ^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\research\forward_readiness.py", line 348, in audit
+
+    j.require(at >= high, "READINESS_CLOCK_REGRESSED")
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: READINESS_CLOCK_REGRESSED
+
+
+
+======================================================================
+
+ERROR: test_12_original_dispatch_gate_releases_reservation_after_owner_disable (__main__.ReadinessTests.test_12_original_dispatch_gate_releases_reservation_after_owner_disable)
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 401, in test_12_original_dispatch_gate_releases_reservation_after_owner_disable
+
+    ctx["store"].audit()
+
+  File "<checkout>\research\forward_readiness.py", line 348, in audit
+
+    j.require(at >= high, "READINESS_CLOCK_REGRESSED")
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: READINESS_CLOCK_REGRESSED
+
+
+
+======================================================================
+
+ERROR: test_13_on_day_complete_evidence_and_identical_fact_refresh_create_new_receipts (__main__.ReadinessTests.test_13_on_day_complete_evidence_and_identical_fact_refresh_create_new_receipts)
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 430, in test_13_on_day_complete_evidence_and_identical_fact_refresh_create_new_receipts
+
+    old = ctx["store"].audit()
+
+          ^^^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\research\forward_readiness.py", line 348, in audit
+
+    j.require(at >= high, "READINESS_CLOCK_REGRESSED")
+
+  File "<checkout>\research\eod_journal.py", line 26, in require
+
+    raise Rejected(code)
+
+eod_journal.Rejected: READINESS_CLOCK_REGRESSED
+
+
+
+======================================================================
+
+FAIL: test_01_two_independent_journals_daily_coverage_original_fusion_and_inbox (__main__.ReadinessTests.test_01_two_independent_journals_daily_coverage_original_fusion_and_inbox)
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 136, in test_01_two_independent_journals_daily_coverage_original_fusion_and_inbox
+
+    report = cli(name, "audit")
+
+             ^^^^^^^^^^^^^^^^^^
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 39, in cli
+
+    raise AssertionError((command, p.returncode, p.stdout[:1500], p.stderr[:1500]))
+
+AssertionError: (['python', '-I', '-B', '<checkout>\\scripts\\forward-research-readiness.py', '--name', 'mm-test-fr-d360e3af-positive-a-bbaa', 'audit'], 2, b'{"can_execute_forward_paper":false,"eligibility":"ELIGIBILITY_DENIED","error_code":"READINESS_CLOCK_REGRESSED","forward_research_readiness":"BLOCKED","historical_pit_status":"NOT_VERIFIED","live_allowed":false,"opening_source":"BLOCKED","restriction":"RESEARCH_ONLY"}\r\n', b'')
+
+
+
+======================================================================
+
+FAIL: test_09_publication_interruptions_recovery_duplicate_and_concurrent_runs (__main__.ReadinessTests.test_09_publication_interruptions_recovery_duplicate_and_concurrent_runs)
+
+----------------------------------------------------------------------
+
+Traceback (most recent call last):
+
+  File "<checkout>\scripts\test-forward-readiness.py", line 344, in test_09_publication_interruptions_recovery_duplicate_and_concurrent_runs
+
+    self.assertEqual(p.returncode, 86, (p.stdout, p.stderr))
+
+AssertionError: 1 != 86 : (b'', b'Traceback (most recent call last):\r\n  File "<checkout>\\scripts\\test-forward-readiness.py", line 537, in <module>\r\n    raise SystemExit(main())\r\n                     ^^^^^^\r\n  File "<checkout>\\scripts\\test-forward-readiness.py", line 522, in main\r\n    r.Store(request["name"], fault=fault).audit()\r\n  File "<checkout>\\research\\forward_readiness.py", line 348, in audit\r\n    j.require(at >= high, "READINESS_CLOCK_REGRESSED")\r\n  File "<checkout>\\research\\eod_journal.py", line 26, in require\r\n    raise Rejected(code)\r\neod_journal.Rejected: READINESS_CLOCK_REGRESSED\r\n')
+
+
+
+----------------------------------------------------------------------
+
+Ran 13 tests in 96.520s
+
+
+
+FAILED (failures=2, errors=17)

@@ -27,6 +27,19 @@ pub struct Reservation<'a> {
     pub task_limit: Option<i64>,
     pub price_version: &'a str,
 }
+/// Recheck a just-reserved call against current caps/periods before dispatch.
+pub fn check_dispatch(c: &Connection, b: &Budget, now: DateTime<Utc>) -> Result<()> {
+    let (day, month) = periods(b, now)?;
+    let (daily, monthly, held) = totals(c, &day, &month)?;
+    ensure(
+        i128::from(daily) + i128::from(held) <= i128::from(b.daily_limit_micro),
+        "DAILY_BUDGET_EXHAUSTED",
+    )?;
+    ensure(
+        i128::from(monthly) + i128::from(held) <= i128::from(b.monthly_limit_micro),
+        "MONTHLY_BUDGET_EXHAUSTED",
+    )
+}
 pub fn reserve(
     c: &mut Connection,
     b: &Budget,
