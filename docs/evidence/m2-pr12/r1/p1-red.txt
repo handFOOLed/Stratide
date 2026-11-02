@@ -1,0 +1,77 @@
+test_25_incomplete_refresh_keeps_complete_view_and_asof (__main__.WarehouseTests.test_25_incomplete_refresh_keeps_complete_view_and_asof) ...
+  test_25_incomplete_refresh_keeps_complete_view_and_asof (__main__.WarehouseTests.test_25_incomplete_refresh_keeps_complete_view_and_asof) (refresh='empty') ... FAIL
+  test_25_incomplete_refresh_keeps_complete_view_and_asof (__main__.WarehouseTests.test_25_incomplete_refresh_keeps_complete_view_and_asof) (refresh='null') ... FAIL
+  test_25_incomplete_refresh_keeps_complete_view_and_asof (__main__.WarehouseTests.test_25_incomplete_refresh_keeps_complete_view_and_asof) (refresh='missing') ... FAIL
+  test_25_incomplete_refresh_keeps_complete_view_and_asof (__main__.WarehouseTests.test_25_incomplete_refresh_keeps_complete_view_and_asof) (refresh='truncated') ... FAIL
+test_26_sqlite_symlink_rejected_before_foreign_journal_change (__main__.WarehouseTests.test_26_sqlite_symlink_rejected_before_foreign_journal_change) ... skipped 'Windows SeCreateSymbolicLinkPrivilege unavailable (1314); requires privileged rerun'
+test_27_cli_internal_file_links_rejected_before_any_io (__main__.WarehouseTests.test_27_cli_internal_file_links_rejected_before_any_io) ... skipped 'Windows SeCreateSymbolicLinkPrivilege unavailable (1314); requires privileged rerun'
+test_28_windows_raw_junction_rejected_before_any_io (__main__.WarehouseTests.test_28_windows_raw_junction_rejected_before_any_io) ... FAIL
+test_29_foreign_regular_database_rejected_without_wal_mutation (__main__.WarehouseTests.test_29_foreign_regular_database_rejected_without_wal_mutation) ... FAIL
+
+======================================================================
+FAIL: test_25_incomplete_refresh_keeps_complete_view_and_asof (__main__.WarehouseTests.test_25_incomplete_refresh_keeps_complete_view_and_asof) (refresh='empty')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-historical-warehouse.py", line 486, in test_25_incomplete_refresh_keeps_complete_view_and_asof
+    self.assertEqual(h.sha(h.canonical(after)),before_sha,"incomplete refresh degraded the admitted view")
+AssertionError: '606557c76d530870f8ebce7861532ff367c4d7bbc9dc103477a2cbababd059c5' != 'ad7144864729d7cac91f7d406379e7fa4087bacbe7346d98240f6e38daf164b7'
+- 606557c76d530870f8ebce7861532ff367c4d7bbc9dc103477a2cbababd059c5
++ ad7144864729d7cac91f7d406379e7fa4087bacbe7346d98240f6e38daf164b7
+ : incomplete refresh degraded the admitted view
+
+======================================================================
+FAIL: test_25_incomplete_refresh_keeps_complete_view_and_asof (__main__.WarehouseTests.test_25_incomplete_refresh_keeps_complete_view_and_asof) (refresh='null')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-historical-warehouse.py", line 486, in test_25_incomplete_refresh_keeps_complete_view_and_asof
+    self.assertEqual(h.sha(h.canonical(after)),before_sha,"incomplete refresh degraded the admitted view")
+AssertionError: 'ec09fd1d822979573eee1d7e57413edc1206f5ed643abbdda5073065ec8815aa' != 'df53c0f7288f26f695d6146c9801c10ad5f04726f697bf70bd88d0e7c4ed93cf'
+- ec09fd1d822979573eee1d7e57413edc1206f5ed643abbdda5073065ec8815aa
++ df53c0f7288f26f695d6146c9801c10ad5f04726f697bf70bd88d0e7c4ed93cf
+ : incomplete refresh degraded the admitted view
+
+======================================================================
+FAIL: test_25_incomplete_refresh_keeps_complete_view_and_asof (__main__.WarehouseTests.test_25_incomplete_refresh_keeps_complete_view_and_asof) (refresh='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-historical-warehouse.py", line 486, in test_25_incomplete_refresh_keeps_complete_view_and_asof
+    self.assertEqual(h.sha(h.canonical(after)),before_sha,"incomplete refresh degraded the admitted view")
+AssertionError: '889ce5e06a3b5448e3816f26202622c16104ab73b7abe5eddc58a80bd27638d1' != '65048b786c78e5658f7459f1472661b29ebd6397857cf226abf33d94cd388606'
+- 889ce5e06a3b5448e3816f26202622c16104ab73b7abe5eddc58a80bd27638d1
++ 65048b786c78e5658f7459f1472661b29ebd6397857cf226abf33d94cd388606
+ : incomplete refresh degraded the admitted view
+
+======================================================================
+FAIL: test_25_incomplete_refresh_keeps_complete_view_and_asof (__main__.WarehouseTests.test_25_incomplete_refresh_keeps_complete_view_and_asof) (refresh='truncated')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-historical-warehouse.py", line 486, in test_25_incomplete_refresh_keeps_complete_view_and_asof
+    self.assertEqual(h.sha(h.canonical(after)),before_sha,"incomplete refresh degraded the admitted view")
+AssertionError: '92652d67b0725f362f1ce2f158cead4a3ad217136dafb8dc980a940be11acbf6' != 'b82845c7b53d1ce8968e1e9e2f80bcf3a0b52280042da5971d859c5de7fe1ecf'
+- 92652d67b0725f362f1ce2f158cead4a3ad217136dafb8dc980a940be11acbf6
++ b82845c7b53d1ce8968e1e9e2f80bcf3a0b52280042da5971d859c5de7fe1ecf
+ : incomplete refresh degraded the admitted view
+
+======================================================================
+FAIL: test_28_windows_raw_junction_rejected_before_any_io (__main__.WarehouseTests.test_28_windows_raw_junction_rejected_before_any_io)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-historical-warehouse.py", line 583, in test_28_windows_raw_junction_rejected_before_any_io
+    self.assertEqual(result.returncode,0,result.stderr.decode(errors="replace"))
+AssertionError: 1 != 0 : Access is denied.
+
+
+
+======================================================================
+FAIL: test_29_foreign_regular_database_rejected_without_wal_mutation (__main__.WarehouseTests.test_29_foreign_regular_database_rejected_without_wal_mutation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-historical-warehouse.py", line 595, in test_29_foreign_regular_database_rejected_without_wal_mutation
+    self.assertEqual(fingerprint(old),{**before,"writer.lock":fingerprint(old)["writer.lock"]})
+AssertionError: {'sen[138 chars]607683011770200, 'ce42604f38ea8f566f9f53237c4a[143 chars]e9')} != {'sen[138 chars]607682980506900, '0017c9a4b868884915cc44dc6043[143 chars]e9')}
+Diff is 696 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 5 tests in 2.398s
+
+FAILED (failures=6, skipped=2)

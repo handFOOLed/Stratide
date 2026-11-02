@@ -1,0 +1,14 @@
+test_30_cli_refresh_reports_rejection_without_losing_current_data (__main__.WarehouseTests.test_30_cli_refresh_reports_rejection_without_losing_current_data) ... FAIL
+
+======================================================================
+FAIL: test_30_cli_refresh_reports_rejection_without_losing_current_data (__main__.WarehouseTests.test_30_cli_refresh_reports_rejection_without_losing_current_data)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-historical-warehouse.py", line 611, in test_30_cli_refresh_reports_rejection_without_losing_current_data
+    self.assertEqual(result,2)
+AssertionError: 0 != 2
+
+----------------------------------------------------------------------
+Ran 1 test in 0.767s
+
+FAILED (failures=1)

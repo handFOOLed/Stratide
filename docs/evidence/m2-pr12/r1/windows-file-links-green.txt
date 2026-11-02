@@ -1,0 +1,7 @@
+test_26_sqlite_symlink_rejected_before_foreign_journal_change (__main__.WarehouseTests.test_26_sqlite_symlink_rejected_before_foreign_journal_change) ... ok
+test_27_cli_internal_file_links_rejected_before_any_io (__main__.WarehouseTests.test_27_cli_internal_file_links_rejected_before_any_io) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.163s
+
+OK

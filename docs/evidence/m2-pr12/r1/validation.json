@@ -1,0 +1,228 @@
+{
+  "commands": [
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-historical-warehouse.py",
+        "WarehouseTests.test_25_incomplete_refresh_keeps_complete_view_and_asof",
+        "WarehouseTests.test_26_sqlite_symlink_rejected_before_foreign_journal_change",
+        "WarehouseTests.test_27_cli_internal_file_links_rejected_before_any_io",
+        "WarehouseTests.test_28_windows_raw_junction_rejected_before_any_io",
+        "WarehouseTests.test_29_foreign_regular_database_rejected_without_wal_mutation"
+      ],
+      "ended_at_local": "2026-11-02T16:21:23.036980+08:00",
+      "ended_at_utc": "2026-11-02T08:21:23.036980+00:00",
+      "exit": 1,
+      "local_timezone": "Asia/Singapore",
+      "source_sha256": "55ef8788f49b4883644b6e35b39ca0968e5f7163eea2ddb2e7ddfeaa824599bc",
+      "started_at_local": "2026-11-02T16:21:20.481475+08:00",
+      "started_at_utc": "2026-11-02T08:21:20.481475+00:00",
+      "test_sha256": "a4324d24832128a8d102f2247424e6aa06298cc030f1ce0b46d6d7facd2f5a8e"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-historical-warehouse.py",
+        "WarehouseTests.test_28_windows_raw_junction_rejected_before_any_io"
+      ],
+      "ended_at_local": "2026-11-02T16:23:17.188608+08:00",
+      "ended_at_utc": "2026-11-02T08:23:17.188608+00:00",
+      "exit": 1,
+      "local_timezone": "Asia/Singapore",
+      "source_sha256": "55ef8788f49b4883644b6e35b39ca0968e5f7163eea2ddb2e7ddfeaa824599bc",
+      "started_at_local": "2026-11-02T16:23:16.544469+08:00",
+      "started_at_utc": "2026-11-02T08:23:16.544469+00:00",
+      "test_sha256": "fafe33ff3b93c98bd1acb97655c7def9d19e9681576318a3fc5ff5042d9ff76c"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-historical-warehouse.py"
+      ],
+      "ended_at_local": "2026-11-02T16:26:33.423605+08:00",
+      "ended_at_utc": "2026-11-02T08:26:33.423605+00:00",
+      "exit": 1,
+      "local_timezone": "Asia/Singapore",
+      "source_sha256": "35e93474d3336f6013930530b944cb887b98f418c9894a8d5af33489f93ccce2",
+      "started_at_local": "2026-11-02T16:26:16.394901+08:00",
+      "started_at_utc": "2026-11-02T08:26:16.394901+00:00",
+      "test_sha256": "fafe33ff3b93c98bd1acb97655c7def9d19e9681576318a3fc5ff5042d9ff76c"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-historical-warehouse.py"
+      ],
+      "ended_at_local": "2026-11-02T16:30:10.547375+08:00",
+      "ended_at_utc": "2026-11-02T08:30:10.547375+00:00",
+      "exit": 0,
+      "local_timezone": "Asia/Singapore",
+      "source_sha256": "46be18ab610e6f32808ae6a5e702d5a91e63c420ed1e861dad57f9e22f9dea84",
+      "started_at_local": "2026-11-02T16:29:57.749715+08:00",
+      "started_at_utc": "2026-11-02T08:29:57.749715+00:00",
+      "test_sha256": "89b3c326aab973b832a880dda8747643e47ba704d3bf9de58ad7708b56a89b74"
+    },
+    {
+      "at_utc": "2026-11-02T08:36:48.687824+00:00",
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-historical-warehouse.py",
+        "WarehouseTests.test_30_cli_refresh_reports_rejection_without_losing_current_data"
+      ],
+      "exit": 1,
+      "local_timezone": "Asia/Singapore",
+      "source_sha256": "46be18ab610e6f32808ae6a5e702d5a91e63c420ed1e861dad57f9e22f9dea84"
+    },
+    {
+      "administrator": true,
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-historical-warehouse.py",
+        "WarehouseTests.test_26_sqlite_symlink_rejected_before_foreign_journal_change",
+        "WarehouseTests.test_27_cli_internal_file_links_rejected_before_any_io"
+      ],
+      "ended_at_local": "2026-11-02T16:31:08.702828+08:00",
+      "ended_at_utc": "2026-11-02T08:31:08.702828+00:00",
+      "exit": 0,
+      "local_timezone": "Asia/Singapore",
+      "scope": "synthetic temp SQLite and file links only; no real warehouse writes or network",
+      "skipped": false,
+      "source_sha256": "46be18ab610e6f32808ae6a5e702d5a91e63c420ed1e861dad57f9e22f9dea84",
+      "source_unchanged": true,
+      "started_at_local": "2026-11-02T16:31:08.393453+08:00",
+      "started_at_utc": "2026-11-02T08:31:08.393453+00:00",
+      "test_sha256": "89b3c326aab973b832a880dda8747643e47ba704d3bf9de58ad7708b56a89b74",
+      "test_unchanged": true
+    },
+    {
+      "administrator": true,
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-historical-warehouse.py"
+      ],
+      "ended_at_local": "2026-11-02T16:37:09.021333+08:00",
+      "ended_at_utc": "2026-11-02T08:37:09.021333+00:00",
+      "exit": 0,
+      "local_timezone": "Asia/Singapore",
+      "scope": "all regression cases use isolated synthetic temp data; no real market calls or real Owner database writes",
+      "skipped": false,
+      "sources": {
+        "research/historical_warehouse.py": "eefbdf231b381fcfc53813237c6785a70b4291d6462db89d8542dca7cb36fdcf",
+        "scripts/historical-warehouse.py": "27e3a758cab3c0aa4f5f18f2616d5880bec2d464073f6ffc7c7c0df5e9056292",
+        "scripts/test-historical-warehouse.py": "532651284ead6a15d19ae2d531f658613566bae9cd1f292e126eb4e1264ddf54"
+      },
+      "sources_unchanged": true,
+      "started_at_local": "2026-11-02T16:36:51.311781+08:00",
+      "started_at_utc": "2026-11-02T08:36:51.311781+00:00"
+    }
+  ],
+  "real_readonly_commands": [
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "query",
+        "--start",
+        "20211101",
+        "--end",
+        "20211126",
+        "--symbols",
+        "600000.SH,000001.SZ,600519.SH",
+        "--limit",
+        "100"
+      ],
+      "ended_at_local": "2026-11-02T16:47:54.814937+08:00",
+      "ended_at_utc": "2026-11-02T08:47:54.814937+00:00",
+      "exit": 0,
+      "identical_to_prior_query_sha256": "e14f14b767b63304c882ea093e94f07e183bb1ac310bae4abe5fff41a56c664e",
+      "local_timezone": "Asia/Singapore",
+      "name": "real-query20",
+      "started_at_local": "2026-11-02T16:47:53.365032+08:00",
+      "started_at_utc": "2026-11-02T08:47:53.365032+00:00",
+      "stdout_sha256": "e14f14b767b63304c882ea093e94f07e183bb1ac310bae4abe5fff41a56c664e"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "query",
+        "--trade-date",
+        "20261030",
+        "--limit",
+        "10000"
+      ],
+      "ended_at_local": "2026-11-02T16:47:56.504061+08:00",
+      "ended_at_utc": "2026-11-02T08:47:56.504061+00:00",
+      "exit": 0,
+      "identical_to_prior_query_sha256": "ef63109f9a68fdc4c9ba47aee89e2975810cd9fc96874383f9dd9a14307c83b5",
+      "local_timezone": "Asia/Singapore",
+      "name": "real-market",
+      "started_at_local": "2026-11-02T16:47:54.816940+08:00",
+      "started_at_utc": "2026-11-02T08:47:54.816940+00:00",
+      "stdout_sha256": "ef63109f9a68fdc4c9ba47aee89e2975810cd9fc96874383f9dd9a14307c83b5"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "query",
+        "--start",
+        "20211101",
+        "--end",
+        "20211126",
+        "--symbols",
+        "600000.SH,000001.SZ,600519.SH",
+        "--as-of-version",
+        "1212",
+        "--limit",
+        "100"
+      ],
+      "ended_at_local": "2026-11-02T16:47:58.059272+08:00",
+      "ended_at_utc": "2026-11-02T08:47:58.059272+00:00",
+      "exit": 0,
+      "identical_to_prior_query_sha256": "4be9c230edac43b478fa0154bc53a36ebc3d3c5baf005679e6a9a94137c45211",
+      "local_timezone": "Asia/Singapore",
+      "name": "real-asof",
+      "started_at_local": "2026-11-02T16:47:56.531018+08:00",
+      "started_at_utc": "2026-11-02T08:47:56.531018+00:00",
+      "stdout_sha256": "4be9c230edac43b478fa0154bc53a36ebc3d3c5baf005679e6a9a94137c45211"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "report"
+      ],
+      "ended_at_local": "2026-11-02T16:48:08.755974+08:00",
+      "ended_at_utc": "2026-11-02T08:48:08.755974+00:00",
+      "exit": 0,
+      "local_timezone": "Asia/Singapore",
+      "name": "real-report",
+      "started_at_local": "2026-11-02T16:47:58.061275+08:00",
+      "started_at_utc": "2026-11-02T08:47:58.061275+00:00",
+      "stdout_sha256": "db2527a59694c3452139bf10c3dd87110a2a8f115ddc3fbef81f586feeea7d40"
+    }
+  ]
+}

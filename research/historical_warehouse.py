@@ -46,6 +46,7 @@ CONTRACT = dict(version=VERSION, schema=SCHEMA, **SAFE, provider="Tushare",
                 catalog="current_snapshot_not_historical_membership_or_names",
                 license="Owner-authorized existing Tushare account; personal local research; no redistribution grant")
 PERMISSION_SOURCE = "Owner Issue #57 / existing account / only stock_basic,trade_cal,daily"
+REFRESH_REJECTED = "PARTIAL_REFRESH_REJECTED_"
 
 
 class WarehouseError(Exception):
@@ -345,6 +346,8 @@ CREATE INDEX checkpoints_version ON checkpoints(version_id);
 
 @contextlib.contextmanager
 def writer_lock(root, readonly=False):
+    no_links(root)
+    no_links(root/"writer.lock")
     if not readonly:
         root.mkdir(parents=True, exist_ok=True)
     require(not readonly or (root/"writer.lock").is_file(), "WAREHOUSE_NOT_INITIALIZED")
@@ -372,6 +375,8 @@ def writer_lock(root, readonly=False):
 
 
 def connection(path, readonly=False):
+    for p in (path,*(Path(str(path)+suffix) for suffix in ("-wal","-shm","-journal"))):
+        no_links(p)
     if readonly:
         require(path.is_file(), "WAREHOUSE_NOT_INITIALIZED")
         # immutable avoids SQLite creating/updating SHM on a read. Reject live or
@@ -382,9 +387,6 @@ def connection(path, readonly=False):
         db.execute("PRAGMA query_only=ON")
     else:
         db = sqlite3.connect(path, timeout=2)
-        db.execute("PRAGMA journal_mode=WAL")
-        db.execute("PRAGMA synchronous=FULL")
-        db.execute("PRAGMA foreign_keys=ON")
     db.row_factory = sqlite3.Row
     return db
 
@@ -400,19 +402,49 @@ def attempt_hash(row):
     return sha(canonical({k: row[k] for k in row.keys() if k != "metadata_sha"}))
 
 
+def no_links(path):
+    """Same no-follow boundary as the existing journal reader, including junctions."""
+    path=Path(path).absolute()
+    for part in (path,*path.parents):
+        require(not part.is_symlink() and not part.is_junction(),"WAREHOUSE_LINK_DENIED")
+
+
 class Warehouse:
     def __init__(self, root):
-        self.root = Path(root).resolve()
+        # Preserve the lexical path so a linked root is rejected, not resolved away.
+        self.root = Path(root).absolute()
         self.path = self.root / "warehouse.sqlite"
+
+    def check_paths(self, descendants=False):
+        for path in (self.root,self.path,self.root/"writer.lock",self.root/"raw",
+                     *(Path(str(self.path)+suffix) for suffix in ("-wal","-shm","-journal"))):
+            no_links(path)
+        if descendants and self.root.is_dir():
+            pending=[self.root]
+            while pending:
+                for path in pending.pop().iterdir():
+                    no_links(path)
+                    if path.is_dir():pending.append(path)
 
     @contextlib.contextmanager
     def write(self):
+        self.check_paths(descendants=True)
         with writer_lock(self.root):
             db = connection(self.path)
+            owned=False
             try:
-                if db.execute("PRAGMA user_version").fetchone()[0] == 0:
+                new=db.execute("PRAGMA user_version").fetchone()[0] == 0
+                if new:
                     # Only initialize a new empty file, never migrate an Observer/Agent DB.
                     require(not db.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall(), "FOREIGN_DATABASE")
+                else:
+                    check_contract(db)
+                # Never change a foreign database's journal mode before validation.
+                db.execute("PRAGMA journal_mode=WAL")
+                db.execute("PRAGMA synchronous=FULL")
+                db.execute("PRAGMA foreign_keys=ON")
+                owned=True
+                if new:
                     with db:
                         db.executescript("BEGIN IMMEDIATE;" + DDL)
                         db.execute("INSERT INTO meta VALUES(1,?,?)", (canonical(CONTRACT).decode(), sha(canonical(CONTRACT))))
@@ -426,11 +458,12 @@ class Warehouse:
                         self.seal_attempt(db, row["id"])
                 yield db
             finally:
-                db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+                if owned:db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
                 db.close()
 
     @contextlib.contextmanager
     def read(self):
+        self.check_paths(descendants=True)
         # Read an existing lock without creating/writing it, fencing the race
         # between WAL inspection and an immutable read of a changing main file.
         with writer_lock(self.root,readonly=True):
@@ -446,14 +479,19 @@ class Warehouse:
         db.execute("UPDATE attempts SET metadata_sha=? WHERE id=?", (attempt_hash(row), attempt_id))
 
     def raw_path(self, attempt_id):
-        return self.root / "raw" / f"{attempt_id:08d}.json.gz"
+        path=self.root / "raw" / f"{attempt_id:08d}.json.gz"
+        no_links(path)
+        return path
 
     def save_raw(self, attempt_id, raw):
+        self.check_paths()
         target = self.raw_path(attempt_id)
-        target.parent.mkdir(exist_ok=True)
         pending = target.with_suffix(".pending")
+        no_links(pending)
+        target.parent.mkdir(exist_ok=True)
         with pending.open("xb") as f:
             f.write(gzip.compress(raw, mtime=0)); f.flush(); os.fsync(f.fileno())
+        no_links(target)
         os.replace(pending, target)
 
     def latest_objects(self, db, api):
@@ -476,6 +514,18 @@ class Warehouse:
         # Source hashes bind request/time/credential source/units to immutable raw.
         sources = [dict(db.execute("SELECT * FROM attempts WHERE id=?", (a,)).fetchone()) for a in attempts]
         current = db.execute("SELECT v.* FROM checkpoints c JOIN day_versions v ON v.id=c.version_id WHERE c.trade_date=?", (date,)).fetchone()
+        if current and current["status"]=="COMPLETE":
+            previous_codes={r[0] for r in db.execute("SELECT ts_code FROM day_rows WHERE version_id=?",(current["id"],))}
+            if status=="COMPLETE" and not previous_codes <= {r["ts_code"] for r in rows}:
+                status,reason="PARTIAL","MISSING_PRIOR_SYMBOLS"
+            if status!="COMPLETE":
+                # Only the new attempt is classified. The admitted version, its
+                # manifest, checkpoint and old frozen inputs remain untouched.
+                with db:
+                    for a in attempts:
+                        db.execute("UPDATE attempts SET status=? WHERE id=?",(REFRESH_REJECTED+reason,a))
+                        self.seal_attempt(db,a)
+                return dict(version_id=current["id"],status="PARTIAL_REFRESH_REJECTED",reason=reason)
         manifest = dict(contract_sha=sha(canonical(CONTRACT)), revision_of_version=current["id"] if current else None,
                         revision_relation="SOURCE_REVISION_OR_CONFLICT" if current else "INITIAL_DOWNLOAD",
                         attempts=[dict(id=r["id"], metadata_sha=r["metadata_sha"],
@@ -500,13 +550,14 @@ class Warehouse:
                 db.execute("INSERT OR IGNORE INTO day_sources VALUES(?,?)", (version, a))
             # Publishing version, all its rows and checkpoint is one transaction.
             db.execute("INSERT INTO checkpoints VALUES(?,?) ON CONFLICT(trade_date) DO UPDATE SET version_id=excluded.version_id", (date, version))
-        return version
+        return dict(version_id=version,status=status,reason=reason)
 
     def calendar(self, db):
         return {(r["exchange"], r["cal_date"]): r for r in self.latest_objects(db, "trade_cal")}
 
     def report(self, start=START, end=END):
         historical_range(start, end)
+        self.check_paths(descendants=True)
         base = dict(version=VERSION, start=start, end=end, **SAFE)
         if not self.path.exists():
             return dict(base, state="UNINITIALIZED", coverage="UNVERIFIED", calendar_dates=len(dates(start, end)),
@@ -587,7 +638,9 @@ class Warehouse:
                         free_disk_bytes=shutil.disk_usage(self.root).free, permissions=permissions,
                         metadata_queries=stock_queries, remaining_request_estimate=remaining,
                         estimated_additional_disk_bytes=estimate, estimate_basis="actual on-disk raw+SQLite+indexes per sampled date x remaining x1.5; includes metadata overhead; truncation can add requests",
-                        truncation_attempts=states.get("TRUNCATION_SUSPECTED",0),
+                        truncation_attempts=db.execute("SELECT COUNT(*) FROM attempts WHERE api='daily' AND row_count>=?",(CAP,)).fetchone()[0],
+                        rejected_refresh_attempts=sum(n for status,n in states.items() if status.startswith(REFRESH_REJECTED)),
+                        rejected_refresh_reasons={status[len(REFRESH_REJECTED):]:n for status,n in states.items() if status.startswith(REFRESH_REJECTED)},
                         truncation_suspected_dates=sum(r["reason"] in ("TRUNCATION_SUSPECTED","PARTITIONED_KNOWN_UNIVERSE_UNVERIFIED") for r in checkpoints.values()),
                         catalog_symbol_aliases_unverified=sum(r["symbol"]!=r["ts_code"][:6] for r in catalog),
                         catalog_unmatched_daily_symbols=len(unmatched_codes),
@@ -606,13 +659,17 @@ class Warehouse:
         if trade_date:
             require(start <= trade_date <= end, "DATE_SCOPE_MISMATCH")
         with self.read() as db:
-            clauses, args = ["v.trade_date BETWEEN ? AND ?"], [start,end]
+            args = [start,end]
             if as_of_version is not None:
                 require(as_of_version > 0, "INVALID_VERSION")
                 require(db.execute("SELECT 1 FROM day_versions WHERE id=?",(as_of_version,)).fetchone() is not None,
                         "AS_OF_VERSION_NOT_FOUND")
-                clauses.append("v.id<=?"); args.append(as_of_version)
-            cte = "WITH chosen AS (SELECT trade_date,MAX(id) id FROM day_versions v WHERE " + " AND ".join(clauses) + " GROUP BY trade_date) "
+                args.append(as_of_version)
+                # Every stored day_version was admitted. Rejected refreshes keep
+                # only attempts/raw, so historical selection shares that policy.
+                cte="WITH chosen AS (SELECT trade_date,MAX(id) id FROM day_versions v WHERE v.trade_date BETWEEN ? AND ? AND v.id<=? GROUP BY trade_date) "
+            else:
+                cte="WITH chosen AS (SELECT trade_date,version_id id FROM checkpoints WHERE trade_date BETWEEN ? AND ?) "
             sql = cte + """SELECT d.row_json,v.id version_id,v.status,v.source_sha,v.manifest FROM chosen c
                  JOIN day_versions v ON v.id=c.id JOIN day_rows dr ON dr.version_id=v.id
                  JOIN daily_rows d ON d.ts_code=dr.ts_code AND d.trade_date=dr.trade_date AND d.row_sha=dr.row_sha WHERE 1=1"""
@@ -638,7 +695,7 @@ class Warehouse:
                 if r["response_sha"]:
                     raw = gzip.decompress(self.raw_path(r["id"]).read_bytes())
                     require(sha(raw) == r["response_sha"] and len(raw) == r["raw_bytes"], "RAW_HASH_MISMATCH")
-                    if r["status"] in ("OK", "EMPTY", "TRUNCATION_SUSPECTED"):
+                    if r["status"] in ("OK", "EMPTY", "TRUNCATION_SUSPECTED") or r["status"].startswith(REFRESH_REJECTED):
                         status, code, fields, rows = parse_response(raw)
                         require(status == "OK" and code == r["provider_code"] and len(rows) == r["row_count"], "RAW_ENVELOPE_MISMATCH")
                         clean, dup = validate(r["api"],json.loads(r["params"]),fields,rows)
@@ -848,8 +905,8 @@ class Download:
                 # The Phase-1 current catalog cannot certify all past securities.
                 # Partition result is usable but never claims exhaustive market.
                 reason = "PARTITIONED_KNOWN_UNIVERSE_UNVERIFIED"
-        self.w.publish_day(self.db,date,rows,attempts,state,reason,fault=fault)
-        return state
+        publication=self.w.publish_day(self.db,date,rows,attempts,state,reason,fault=fault)
+        return publication["status"]
 
     def preflight(self,samples=SAMPLES):
         self.metadata()
@@ -879,6 +936,7 @@ class Download:
         cal = self.w.calendar(self.db)
         available = {d for (e,d),r in cal.items() if r["is_open"]=="1" and self.start<=d<=self.end}
         require(bool(available),"OFFICIAL_CALENDAR_UNAVAILABLE")
+        rejected_refresh=False
         # No weekday inference or hundreds of probes if calendar access is denied.
         for date in sorted(available):
             if not retry_failed:
@@ -886,9 +944,10 @@ class Download:
                 if failed and failed[0] not in ("OK","EMPTY","TRUNCATION_SUSPECTED"):
                     continue
             state = self.daily(date,refresh=refresh)
+            rejected_refresh |= state=="PARTIAL_REFRESH_REJECTED"
             if self.progress and state != "SKIPPED_COMPLETE":
                 self.progress(dict(trade_date=date,state=state,requests_this_run=self.calls,at_utc=now()))
-        return self.finish("BACKFILL_FINISHED")
+        return self.finish("PARTIAL_REFRESH_REJECTED" if rejected_refresh else "BACKFILL_FINISHED")
 
 
 def cli(argv=None):
@@ -910,6 +969,7 @@ def cli(argv=None):
     # Fixed private root, with no link escape into an old Observer or Agent store.
     require(root.resolve()==root.absolute(),"LINKED_WAREHOUSE_ROOT_DENIED")
     w=Warehouse(root)
+    w.check_paths(descendants=True)
     if args.action in ("plan","status","report"):
         result=w.report(args.start,args.end)
         if args.action=="plan":

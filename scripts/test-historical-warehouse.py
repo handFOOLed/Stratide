@@ -457,6 +457,164 @@ sys.exit(9)
                 d.daily(OPEN[1])
             self.assertFalse(db.execute("SELECT 1 FROM checkpoints WHERE trade_date=?",(OPEN[1],)).fetchone())
 
+    def test_25_incomplete_refresh_keeps_complete_view_and_asof(self):
+        for mode in ("empty","null","missing","truncated"):
+            with self.subTest(refresh=mode):
+                self.w=h.Warehouse(Path(self.temp.name)/mode)
+                self.http=HTTP()
+                self.run_download()
+                before=self.w.query(A,B,trade_date=OPEN[0])
+                original_version=before["rows"][0]["version_id"]
+                frozen=self.w.query(A,B,trade_date=OPEN[0],as_of_version=original_version)
+                before_sha=h.sha(h.canonical(before))
+                raw_before={p.name:h.sha(p.read_bytes()) for p in (self.w.root/"raw").iterdir()}
+                original=self.http
+                def incomplete(api,params,fields):
+                    if api!="daily":return original(api,params,fields)
+                    original.calls.append((api,dict(params)))
+                    rows=daily_rows(params["trade_date"])
+                    if mode=="empty":rows=[]
+                    elif mode=="null":rows=[dict(r,pre_close=None) for r in rows]
+                    elif mode=="missing":rows=rows[:1]
+                    elif not params.get("ts_code"):rows=(rows*3000)[:6000]
+                    return 200,wire(fields.split(","),rows),""
+                with self.w.write() as db:
+                    d=h.Download(self.w,db,"resume",A,B,incomplete,"offline",min_free_bytes=0,sleep=lambda _:None)
+                    state=d.daily(OPEN[0],refresh=True)
+                    d.finish("BACKFILL_FINISHED")
+                after=self.w.query(A,B,trade_date=OPEN[0])
+                self.assertEqual(h.sha(h.canonical(after)),before_sha,"incomplete refresh degraded the admitted view")
+                self.assertEqual(state,"PARTIAL_REFRESH_REJECTED")
+                self.assertEqual(self.w.query(A,B,trade_date=OPEN[0],as_of_version=original_version),frozen)
+                report=self.w.report(A,B)
+                self.assertEqual(report["complete_dates"],3)
+                self.assertEqual(report["versions"],3)
+                self.assertGreater(report["rejected_refresh_attempts"],0)
+                with self.w.read() as db:
+                    rejected=db.execute("SELECT * FROM attempts WHERE status LIKE 'PARTIAL_REFRESH_REJECTED_%'").fetchall()
+                    self.assertTrue(rejected)
+                    for attempt in rejected:
+                        self.assertEqual(attempt["metadata_sha"],h.attempt_hash(attempt))
+                        self.assertTrue(self.w.raw_path(attempt["id"]).is_file())
+                for name,digest in raw_before.items():self.assertEqual(h.sha((self.w.root/"raw"/name).read_bytes()),digest)
+                # A later full valid revision is still admitted atomically.
+                self.http=HTTP();self.http.revision=True
+                with self.w.write() as db:
+                    d=h.Download(self.w,db,"resume",A,B,self.http,"offline",min_free_bytes=0,sleep=lambda _:None)
+                    self.assertEqual(d.daily(OPEN[0],refresh=True),"COMPLETE")
+                revised=self.w.query(A,B,trade_date=OPEN[0])
+                self.assertEqual(revised["count"],2)
+                self.assertEqual(revised["rows"][0]["values"]["close"],"10.20")
+                self.assertGreater(revised["rows"][0]["version_id"],original_version)
+                self.assertEqual(self.w.query(A,B,trade_date=OPEN[0],as_of_version=original_version),frozen)
+                self.w.verify()
+
+    def synthetic_old_store(self,name):
+        folder=Path(self.temp.name)/name
+        folder.mkdir(parents=True)
+        db=sqlite3.connect(folder/"observer.sqlite")
+        db.execute("PRAGMA journal_mode=DELETE")
+        db.execute("PRAGMA user_version=1041")
+        db.execute("CREATE TABLE old_evidence(value TEXT)")
+        db.execute("INSERT INTO old_evidence VALUES('synthetic-preserve-me')")
+        db.commit();db.close()
+        (folder/"sentinel.txt").write_text("synthetic-only",encoding="utf-8")
+        return folder
+
+    def file_link(self,source,link):
+        self.assertTrue(source.resolve().is_relative_to(TEST_ROOT.resolve()))
+        self.assertTrue(link.absolute().is_relative_to(TEST_ROOT.resolve()))
+        try:os.symlink(source,link)
+        except OSError as e:
+            if os.name=="nt" and e.winerror==1314:
+                self.skipTest("Windows SeCreateSymbolicLinkPrivilege unavailable (1314); requires privileged rerun")
+            raise
+        self.addCleanup(lambda:link.unlink() if link.is_symlink() else None)
+
+    def test_26_sqlite_symlink_rejected_before_foreign_journal_change(self):
+        old=self.synthetic_old_store("old-file-link")
+        w=h.Warehouse(Path(self.temp.name)/"linked-db")
+        w.root.mkdir()
+        self.file_link(old/"observer.sqlite",w.path)
+        before=fingerprint(old)
+        reason="NO_REJECTION"
+        try:
+            with w.write():pass
+        except h.WarehouseError as e:reason=str(e)
+        self.assertEqual(fingerprint(old),before,"foreign SQLite changed before schema rejection")
+        self.assertEqual(reason,"WAREHOUSE_LINK_DENIED")
+
+    def assert_cli_link_rejected(self,project,old):
+        before=fingerprint(old)
+        real_connect=h.sqlite3.connect
+        real_download=h.Download
+        def fast_download(*args,**kwargs):
+            kwargs["sleep"]=lambda _:None
+            return real_download(*args,**kwargs)
+        for action in ("preflight","backfill","resume"):
+            with self.subTest(action=action),mock.patch.object(h,"ROOT",project),mock.patch.object(h,"credential",return_value=("offline","offline")) as cred,mock.patch.object(h,"TushareHTTP",return_value=self.http) as transport,mock.patch.object(h.sqlite3,"connect",wraps=real_connect) as connect,mock.patch.object(h,"Download",side_effect=fast_download),contextlib.redirect_stdout(__import__('io').StringIO()):
+                reason="NO_REJECTION"
+                try:h.cli([action,"--start",A,"--end",B])
+                except h.WarehouseError as e:reason=str(e)
+                except (sqlite3.Error,OSError) as e:reason=type(e).__name__
+                self.assertEqual(reason,"WAREHOUSE_LINK_DENIED",f"{action}: connects={connect.call_count}, credential_reads={cred.call_count}, transport_builds={transport.call_count}, old_changed={fingerprint(old)!=before}")
+                self.assertEqual(connect.call_count,0)
+                cred.assert_not_called();transport.assert_not_called()
+                self.assertEqual(fingerprint(old),before)
+
+    def test_27_cli_internal_file_links_rejected_before_any_io(self):
+        old=self.synthetic_old_store("old-cli-links")
+        for i,name in enumerate(("warehouse.sqlite","writer.lock","warehouse.sqlite-wal","warehouse.sqlite-shm","warehouse.sqlite-journal","raw/00000001.json.gz","raw/00000001.json.pending")):
+            project=Path(self.temp.name)/f"cli-link-{i}"
+            store=project/"state/historical-warehouse/main"
+            link=store/name;link.parent.mkdir(parents=True)
+            self.file_link(old/"observer.sqlite",link)
+            self.assert_cli_link_rejected(project,old)
+
+    @unittest.skipUnless(os.name=="nt","native Windows junction test")
+    def test_28_windows_raw_junction_rejected_before_any_io(self):
+        old=self.synthetic_old_store("old-junction-target")
+        project=Path(self.temp.name)/"cli-junction"
+        store=project/"state/historical-warehouse/main"
+        store.mkdir(parents=True)
+        link=store/"raw"
+        # All paths are freshly created beneath this test's workspace temp dir.
+        self.assertTrue(old.resolve().is_relative_to(TEST_ROOT.resolve()))
+        self.assertTrue(store.resolve().is_relative_to(TEST_ROOT.resolve()))
+        result=subprocess.run(["cmd","/c","mklink","/J",str(link),str(old)],capture_output=True)
+        self.assertEqual(result.returncode,0,result.stderr.decode(errors="replace"))
+        self.addCleanup(lambda:link.rmdir() if link.is_junction() else None)
+        self.assertTrue(link.is_junction())
+        self.assert_cli_link_rejected(project,old)
+
+    def test_29_foreign_regular_database_rejected_without_wal_mutation(self):
+        old=self.synthetic_old_store("old-regular")
+        w=h.Warehouse(old)
+        (old/"observer.sqlite").rename(w.path)
+        before=fingerprint(old)
+        with self.assertRaises(h.WarehouseError):
+            with w.write():pass
+        self.assertEqual(fingerprint(old),{**before,"writer.lock":fingerprint(old)["writer.lock"]})
+        with contextlib.closing(sqlite3.connect(w.path)) as db:
+            self.assertEqual(db.execute("PRAGMA journal_mode").fetchone()[0],"delete")
+
+    def test_30_cli_refresh_reports_rejection_without_losing_current_data(self):
+        self.run_download()
+        before=self.w.query(A,B,trade_date=A)
+        self.http.empty_dates.add(A)
+        real_download=h.Download
+        def fast_download(*args,**kwargs):
+            kwargs["sleep"]=lambda _:None
+            return real_download(*args,**kwargs)
+        with mock.patch.object(h,"ROOT",self.w.root.parent),mock.patch.object(h,"Warehouse",return_value=self.w),mock.patch.object(h,"credential",return_value=("offline","offline")),mock.patch.object(h,"TushareHTTP",return_value=self.http),mock.patch.object(h,"Download",side_effect=fast_download),contextlib.redirect_stdout(__import__('io').StringIO()) as output,contextlib.redirect_stderr(__import__('io').StringIO()):
+            result=h.cli(["backfill","--start",A,"--end",A,"--refresh","--max-calls","1","--total-call-cap","1000"])
+        self.assertEqual(result,2)
+        payload=json.loads(output.getvalue())
+        self.assertEqual(payload["state"],"PARTIAL_REFRESH_REJECTED")
+        self.assertEqual(payload["report"]["complete_dates"],1)
+        self.assertEqual(payload["report"]["rejected_refresh_attempts"],1)
+        self.assertEqual(self.w.query(A,B,trade_date=A),before)
+
 
 def fingerprint(root):
     return {str(p.relative_to(root)):(p.stat().st_size,p.stat().st_mtime_ns,hashlib.sha256(p.read_bytes()).hexdigest())
