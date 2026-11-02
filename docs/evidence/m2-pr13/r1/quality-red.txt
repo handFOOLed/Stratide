@@ -1,0 +1,270 @@
+test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) ...
+  test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='adj_factor', field='status') ... FAIL
+  test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='adj_factor', field='reason') ... FAIL
+  test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='adj_factor', field='a_share_count') ... FAIL
+  test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='suspend_d', field='status') ... FAIL
+  test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='suspend_d', field='reason') ... FAIL
+  test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='suspend_d', field='a_share_count') ... FAIL
+  test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='stk_limit', field='status') ... FAIL
+  test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='stk_limit', field='reason') ... FAIL
+  test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='stk_limit', field='a_share_count') ... FAIL
+  test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='daily_basic', field='status') ... FAIL
+  test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='daily_basic', field='reason') ... FAIL
+  test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='daily_basic', field='a_share_count') ... FAIL
+
+======================================================================
+FAIL: test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='adj_factor', field='status')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>\scripts\test-historical-sidecar.py", line 437, in test_verify_cli_rejects_partition_quality_and_count_tampering_readonly
+    self.assertEqual(result.returncode,2,result.stdout.decode())
+AssertionError: 0 != 2 : {
+  "attempts": 10,
+  "data_mode": "historical_backfill_ex_post",
+  "forward_research_readiness": "BLOCKED",
+  "historical_pit_status": "NOT_VERIFIED",
+  "historical_received_at": null,
+  "live_allowed": false,
+  "paper_allowed": false,
+  "provider_published_at": null,
+  "rows": 24,
+  "state": "VERIFIED_STORAGE_SOURCE_BINDING",
+  "versions": 5
+}
+
+
+======================================================================
+FAIL: test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='adj_factor', field='reason')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>\scripts\test-historical-sidecar.py", line 437, in test_verify_cli_rejects_partition_quality_and_count_tampering_readonly
+    self.assertEqual(result.returncode,2,result.stdout.decode())
+AssertionError: 0 != 2 : {
+  "attempts": 10,
+  "data_mode": "historical_backfill_ex_post",
+  "forward_research_readiness": "BLOCKED",
+  "historical_pit_status": "NOT_VERIFIED",
+  "historical_received_at": null,
+  "live_allowed": false,
+  "paper_allowed": false,
+  "provider_published_at": null,
+  "rows": 24,
+  "state": "VERIFIED_STORAGE_SOURCE_BINDING",
+  "versions": 5
+}
+
+
+======================================================================
+FAIL: test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='adj_factor', field='a_share_count')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>\scripts\test-historical-sidecar.py", line 437, in test_verify_cli_rejects_partition_quality_and_count_tampering_readonly
+    self.assertEqual(result.returncode,2,result.stdout.decode())
+AssertionError: 0 != 2 : {
+  "attempts": 10,
+  "data_mode": "historical_backfill_ex_post",
+  "forward_research_readiness": "BLOCKED",
+  "historical_pit_status": "NOT_VERIFIED",
+  "historical_received_at": null,
+  "live_allowed": false,
+  "paper_allowed": false,
+  "provider_published_at": null,
+  "rows": 24,
+  "state": "VERIFIED_STORAGE_SOURCE_BINDING",
+  "versions": 5
+}
+
+
+======================================================================
+FAIL: test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='suspend_d', field='status')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>\scripts\test-historical-sidecar.py", line 437, in test_verify_cli_rejects_partition_quality_and_count_tampering_readonly
+    self.assertEqual(result.returncode,2,result.stdout.decode())
+AssertionError: 0 != 2 : {
+  "attempts": 10,
+  "data_mode": "historical_backfill_ex_post",
+  "forward_research_readiness": "BLOCKED",
+  "historical_pit_status": "NOT_VERIFIED",
+  "historical_received_at": null,
+  "live_allowed": false,
+  "paper_allowed": false,
+  "provider_published_at": null,
+  "rows": 24,
+  "state": "VERIFIED_STORAGE_SOURCE_BINDING",
+  "versions": 5
+}
+
+
+======================================================================
+FAIL: test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='suspend_d', field='reason')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>\scripts\test-historical-sidecar.py", line 437, in test_verify_cli_rejects_partition_quality_and_count_tampering_readonly
+    self.assertEqual(result.returncode,2,result.stdout.decode())
+AssertionError: 0 != 2 : {
+  "attempts": 10,
+  "data_mode": "historical_backfill_ex_post",
+  "forward_research_readiness": "BLOCKED",
+  "historical_pit_status": "NOT_VERIFIED",
+  "historical_received_at": null,
+  "live_allowed": false,
+  "paper_allowed": false,
+  "provider_published_at": null,
+  "rows": 24,
+  "state": "VERIFIED_STORAGE_SOURCE_BINDING",
+  "versions": 5
+}
+
+
+======================================================================
+FAIL: test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='suspend_d', field='a_share_count')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>\scripts\test-historical-sidecar.py", line 437, in test_verify_cli_rejects_partition_quality_and_count_tampering_readonly
+    self.assertEqual(result.returncode,2,result.stdout.decode())
+AssertionError: 0 != 2 : {
+  "attempts": 10,
+  "data_mode": "historical_backfill_ex_post",
+  "forward_research_readiness": "BLOCKED",
+  "historical_pit_status": "NOT_VERIFIED",
+  "historical_received_at": null,
+  "live_allowed": false,
+  "paper_allowed": false,
+  "provider_published_at": null,
+  "rows": 24,
+  "state": "VERIFIED_STORAGE_SOURCE_BINDING",
+  "versions": 5
+}
+
+
+======================================================================
+FAIL: test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='stk_limit', field='status')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>\scripts\test-historical-sidecar.py", line 437, in test_verify_cli_rejects_partition_quality_and_count_tampering_readonly
+    self.assertEqual(result.returncode,2,result.stdout.decode())
+AssertionError: 0 != 2 : {
+  "attempts": 10,
+  "data_mode": "historical_backfill_ex_post",
+  "forward_research_readiness": "BLOCKED",
+  "historical_pit_status": "NOT_VERIFIED",
+  "historical_received_at": null,
+  "live_allowed": false,
+  "paper_allowed": false,
+  "provider_published_at": null,
+  "rows": 24,
+  "state": "VERIFIED_STORAGE_SOURCE_BINDING",
+  "versions": 5
+}
+
+
+======================================================================
+FAIL: test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='stk_limit', field='reason')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>\scripts\test-historical-sidecar.py", line 437, in test_verify_cli_rejects_partition_quality_and_count_tampering_readonly
+    self.assertEqual(result.returncode,2,result.stdout.decode())
+AssertionError: 0 != 2 : {
+  "attempts": 10,
+  "data_mode": "historical_backfill_ex_post",
+  "forward_research_readiness": "BLOCKED",
+  "historical_pit_status": "NOT_VERIFIED",
+  "historical_received_at": null,
+  "live_allowed": false,
+  "paper_allowed": false,
+  "provider_published_at": null,
+  "rows": 24,
+  "state": "VERIFIED_STORAGE_SOURCE_BINDING",
+  "versions": 5
+}
+
+
+======================================================================
+FAIL: test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='stk_limit', field='a_share_count')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>\scripts\test-historical-sidecar.py", line 437, in test_verify_cli_rejects_partition_quality_and_count_tampering_readonly
+    self.assertEqual(result.returncode,2,result.stdout.decode())
+AssertionError: 0 != 2 : {
+  "attempts": 10,
+  "data_mode": "historical_backfill_ex_post",
+  "forward_research_readiness": "BLOCKED",
+  "historical_pit_status": "NOT_VERIFIED",
+  "historical_received_at": null,
+  "live_allowed": false,
+  "paper_allowed": false,
+  "provider_published_at": null,
+  "rows": 24,
+  "state": "VERIFIED_STORAGE_SOURCE_BINDING",
+  "versions": 5
+}
+
+
+======================================================================
+FAIL: test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='daily_basic', field='status')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>\scripts\test-historical-sidecar.py", line 437, in test_verify_cli_rejects_partition_quality_and_count_tampering_readonly
+    self.assertEqual(result.returncode,2,result.stdout.decode())
+AssertionError: 0 != 2 : {
+  "attempts": 10,
+  "data_mode": "historical_backfill_ex_post",
+  "forward_research_readiness": "BLOCKED",
+  "historical_pit_status": "NOT_VERIFIED",
+  "historical_received_at": null,
+  "live_allowed": false,
+  "paper_allowed": false,
+  "provider_published_at": null,
+  "rows": 24,
+  "state": "VERIFIED_STORAGE_SOURCE_BINDING",
+  "versions": 5
+}
+
+
+======================================================================
+FAIL: test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='daily_basic', field='reason')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>\scripts\test-historical-sidecar.py", line 437, in test_verify_cli_rejects_partition_quality_and_count_tampering_readonly
+    self.assertEqual(result.returncode,2,result.stdout.decode())
+AssertionError: 0 != 2 : {
+  "attempts": 10,
+  "data_mode": "historical_backfill_ex_post",
+  "forward_research_readiness": "BLOCKED",
+  "historical_pit_status": "NOT_VERIFIED",
+  "historical_received_at": null,
+  "live_allowed": false,
+  "paper_allowed": false,
+  "provider_published_at": null,
+  "rows": 24,
+  "state": "VERIFIED_STORAGE_SOURCE_BINDING",
+  "versions": 5
+}
+
+
+======================================================================
+FAIL: test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) (api='daily_basic', field='a_share_count')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>\scripts\test-historical-sidecar.py", line 437, in test_verify_cli_rejects_partition_quality_and_count_tampering_readonly
+    self.assertEqual(result.returncode,2,result.stdout.decode())
+AssertionError: 0 != 2 : {
+  "attempts": 10,
+  "data_mode": "historical_backfill_ex_post",
+  "forward_research_readiness": "BLOCKED",
+  "historical_pit_status": "NOT_VERIFIED",
+  "historical_received_at": null,
+  "live_allowed": false,
+  "paper_allowed": false,
+  "provider_published_at": null,
+  "rows": 24,
+  "state": "VERIFIED_STORAGE_SOURCE_BINDING",
+  "versions": 5
+}
+
+
+----------------------------------------------------------------------
+Ran 1 test in 4.469s
+
+FAILED (failures=12)

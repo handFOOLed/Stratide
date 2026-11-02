@@ -1,0 +1,13 @@
+test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) ... ok
+test_adj_factor_documented_scope_has_no_invented_numeric_cap (__main__.Suite.test_adj_factor_documented_scope_has_no_invented_numeric_cap) ... ok
+test_40_days_four_apis_decimal_null_units_and_queries (__main__.Suite.test_40_days_four_apis_decimal_null_units_and_queries) ... ok
+test_documented_caps_and_bounded_partitions (__main__.Suite.test_documented_caps_and_bounded_partitions) ... ok
+test_capped_response_codes_outside_catalog_survive_multiple_partitions (__main__.Suite.test_capped_response_codes_outside_catalog_survive_multiple_partitions) ... ok
+test_refresh_revision_rollback_and_reduced_universe (__main__.Suite.test_refresh_revision_rollback_and_reduced_universe) ... ok
+test_readonly_no_network_credentials_or_mtime (__main__.Suite.test_readonly_no_network_credentials_or_mtime) ... ok
+test_missing_optional_fields_cannot_reduce_admitted_view (__main__.Suite.test_missing_optional_fields_cannot_reduce_admitted_view) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 15.310s
+
+OK

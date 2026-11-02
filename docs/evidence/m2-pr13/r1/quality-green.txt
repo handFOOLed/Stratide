@@ -1,0 +1,6 @@
+test_verify_cli_rejects_partition_quality_and_count_tampering_readonly (__main__.Suite.test_verify_cli_rejects_partition_quality_and_count_tampering_readonly) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 4.359s
+
+OK

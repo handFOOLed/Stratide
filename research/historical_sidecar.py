@@ -37,9 +37,10 @@ FIELDS = {
     "daily_basic": "ts_code,trade_date,close,turnover_rate,turnover_rate_f,volume_ratio,pe,pe_ttm,pb,ps,ps_ttm,dv_ratio,dv_ttm,total_share,float_share,free_share,total_mv,circ_mv,limit_status",
 }
 CAPS = {"adj_factor": None, "suspend_d": 5000, "stk_limit": 5800, "daily_basic": 6000}
-# An undocumented cap cannot establish COMPLETE. This sentinel also catches the
-# common 6000-row response, and rounded plateaus are treated as suspect below.
-ADJ_SENTINEL = 6000
+# doc_id=28 defines a whole-day scope without a numeric cap. Retain the old
+# heuristic only to verify frozen, untagged manifests without rewriting them.
+LEGACY_ADJ_SENTINEL = 6000
+QUALITY_RULES = "documented-scope-v1"
 PERMISSION = "Owner Issue #59 / existing 2000-point account / four APIs only"
 CONTRACT = dict(version=VERSION, schema=SCHEMA, fields=FIELDS, caps=CAPS, **SAFE,
     coverage="PARTIAL", provider="Tushare", account_points=2000,
@@ -180,6 +181,28 @@ def parse(raw):
     return v1.parse_response(raw)
 
 
+def response_truncated(api, count, legacy=False):
+    if api=="adj_factor":
+        return legacy and (count>=LEGACY_ADJ_SENTINEL or (count>=1000 and count%1000==0))
+    return count >= CAPS[api]
+
+
+def partition_quality(api, rows, truncated=False, partitioned=False, legacy=False):
+    if partitioned:
+        return "PARTIAL","PARTITIONED_KNOWN_UNIVERSE_UNVERIFIED"
+    if truncated:
+        return "PARTIAL","TRUNCATION_OR_UNIVERSE_UNVERIFIED"
+    if any(r.get("quality_flags") for r in rows):
+        return "PARTIAL","SOURCE_EXCHANGE_CODE_CONFLICT"
+    if api=="suspend_d":
+        return "COMPLETE","S_AND_R_RESPONSES_NOT_PROOF_OF_TRADABILITY"
+    if not rows:
+        return "PARTIAL","EMPTY_OPEN_DAY_UNVERIFIED"
+    if api=="adj_factor":
+        return ("PARTIAL","TRUNCATION_OR_UNIVERSE_UNVERIFIED_UNDOCUMENTED_CAP") if legacy else ("COMPLETE","SOURCE_RESPONSE_COMPLETE_BY_DOCUMENTED_SCOPE")
+    return "COMPLETE","RESPONSE_BELOW_DOCUMENTED_CAP_UNIVERSE_UNVERIFIED"
+
+
 def check_contract(db):
     require(db.execute("PRAGMA user_version").fetchone()[0] == SCHEMA, "SCHEMA_MISMATCH")
     row = db.execute("SELECT * FROM meta WHERE id=1").fetchone()
@@ -282,7 +305,7 @@ class Sidecar(v1.Warehouse):
                                (api,date,now(),reason,canonical(attempt_ids).decode(),current["id"]))
                 return "PARTIAL_REFRESH_REJECTED"
         sources = [dict(db.execute("SELECT * FROM attempts WHERE id=?",(a,)).fetchone()) for a in attempt_ids]
-        manifest = dict(api=api,fields=FIELDS[api],contract_sha=sha(canonical(CONTRACT)),
+        manifest = dict(api=api,fields=FIELDS[api],quality_rules=QUALITY_RULES,contract_sha=sha(canonical(CONTRACT)),
                         metadata_source_sha=db.execute("SELECT sha FROM metadata_source").fetchone()[0],
                         revision_of_version=current["id"] if current else None,
                         missing_optional_fields=sorted(set(FIELDS[api].split(","))-set(rows[0]) if rows else []),
@@ -411,17 +434,30 @@ class Sidecar(v1.Warehouse):
                 require(sha(version["manifest"].encode())==version["source_sha"], "MANIFEST_HASH")
                 manifest = json.loads(version["manifest"])
                 require(manifest["contract_sha"]==sha(canonical(CONTRACT)) and manifest["metadata_source_sha"]==metadata["sha"] and manifest["api"]==version["api"] and manifest["fields"]==FIELDS[version["api"]],"MANIFEST_CONTRACT")
+                require(manifest.get("quality_rules") in (None,QUALITY_RULES),"UNKNOWN_QUALITY_RULES")
+                legacy = manifest.get("quality_rules") is None
                 merged = {}
+                truncated,partitioned,full_types = False,False,set()
                 for source in manifest["attempts"]:
                     a = db.execute("SELECT * FROM attempts WHERE id=?",(source["id"],)).fetchone()
                     require(a and a["metadata_sha"]==source["metadata_sha"] and a["response_sha"]==source["response_sha"] and a["ended"]==source["obtained_at"], "SOURCE_BINDING")
                     require(a["api"]==version["api"] and json.loads(a["params"])["trade_date"]==version["trade_date"], "SOURCE_SCOPE")
                     state,_,fields,source_rows = parse(gzip.decompress(self.raw_path(a["id"]).read_bytes()))
-                    clean,_ = validate(a["api"],json.loads(a["params"]),fields,source_rows)
+                    require(state=="OK","SOURCE_RESPONSE_STATE")
+                    params = json.loads(a["params"])
+                    clean,_ = validate(a["api"],params,fields,source_rows)
+                    if params.get("ts_code"):
+                        partitioned = True
+                    else:
+                        full_types.add(params.get("suspend_type"))
+                        truncated |= response_truncated(a["api"],len(source_rows),legacy)
                     for r in clean:
                         k = key(r,a["api"])
                         require(k not in merged or merged[k]==r, "SOURCE_CONFLICT")
                         merged[k] = r
+                require(full_types==({"S","R"} if version["api"]=="suspend_d" else {None}),"SOURCE_REQUEST_SCOPE")
+                require((version["status"],version["reason"])==partition_quality(version["api"],list(merged.values()),truncated,partitioned,legacy),"PARTITION_QUALITY_MISMATCH")
+                require(version["row_count"]==len(merged) and version["a_share_count"]==sum(r["security_kind"]=="A_SHARE_CODE_FAMILY" for r in merged.values()),"PARTITION_COUNT_MISMATCH")
                 hashed = []
                 for row in db.execute("SELECT * FROM rows WHERE version_id=? ORDER BY row_key",(version["id"],)):
                     rows_count += 1
@@ -504,8 +540,7 @@ class Download:
                 status,code,fields,source_rows = parse(raw)
                 if status == "OK":
                     clean,duplicates = validate(api,params,fields,source_rows)
-                    cap = CAPS[api] or ADJ_SENTINEL
-                    suspected = len(source_rows)>=cap or (api=="adj_factor" and len(source_rows)>=1000 and len(source_rows)%1000==0)
+                    suspected = response_truncated(api,len(source_rows))
                     status = "TRUNCATION_SUSPECTED" if suspected else ("OK" if source_rows else "EMPTY")
                     cs = sha(canonical(clean))
         except Error as e:
@@ -553,17 +588,8 @@ class Download:
             results.append(result)
         rows = [r for result in results for r in result["rows"]]
         ids = [r["id"] for r in results]
-        state,reason = "COMPLETE","RESPONSE_BELOW_DOCUMENTED_CAP_UNIVERSE_UNVERIFIED"
-        if api=="suspend_d":
-            reason = "S_AND_R_RESPONSES_NOT_PROOF_OF_TRADABILITY"
-        elif not rows:
-            state,reason = "PARTIAL","EMPTY_OPEN_DAY_UNVERIFIED"
-        elif api=="adj_factor":
-            state,reason = "PARTIAL","TRUNCATION_OR_UNIVERSE_UNVERIFIED_UNDOCUMENTED_CAP"
-        if any(r.get("quality_flags") for r in rows):
-            state,reason = "PARTIAL","SOURCE_EXCHANGE_CODE_CONFLICT"
-        if any(r["status"]=="TRUNCATION_SUSPECTED" for r in results):
-            state,reason = "PARTIAL","TRUNCATION_OR_UNIVERSE_UNVERIFIED"
+        truncated = any(r["status"]=="TRUNCATION_SUSPECTED" for r in results)
+        if truncated:
             catalog = self.w.objects(self.db,"stock_basic")
             codes = sorted({r["ts_code"] for r in catalog if r.get("list_date") and r["list_date"]<=date and
                             (not r.get("delist_date") or date<=r["delist_date"])}|{r["ts_code"] for r in rows})
@@ -585,7 +611,7 @@ class Download:
                         merged[k] = r
             require(all(merged.get(key(r,api))==r for r in rows),"PARTITION_RESPONSE_CONFLICT")
             rows = sorted(merged.values(),key=lambda r:key(r,api))
-            reason = "PARTITIONED_KNOWN_UNIVERSE_UNVERIFIED"
+        state,reason = partition_quality(api,rows,truncated,len(ids)>len(results))
         return self.w.publish(self.db,api,date,rows,ids,state,reason,fault)
 
     def finish(self, state):

@@ -104,7 +104,7 @@ class Suite(unittest.TestCase):
         report=self.w.report(A,B)
         self.assertEqual(report["open_days"],40)
         self.assertTrue(all(r["blocked_or_unpublished_dates"]==0 for r in report["apis"].values()))
-        self.assertEqual(report["apis"]["adj_factor"]["partial_dates"],40)
+        self.assertEqual(report["apis"]["adj_factor"]["complete_dates"],40)
         self.assertEqual([m["percent"] for m in marks],[25,50,75,100])
         q=self.w.query("daily_basic",A,B,(CODES[0],),limit=100)
         self.assertEqual(len(q["rows"]),40)
@@ -131,10 +131,11 @@ class Suite(unittest.TestCase):
         self.assertEqual(result["requests_this_run"],0)
         self.assertEqual(len(self.t.calls),before)
 
-    def test_caps_all_four_and_bounded_partitions(self):
+    def test_documented_caps_and_bounded_partitions(self):
         self.preflight()
         for api in h.FIELDS:
-            cap=h.CAPS[api] or h.ADJ_SENTINEL
+            if h.CAPS[api] is None:continue
+            cap=h.CAPS[api]
             calls=[]
             def hook(a,p):
                 if a==api and not p.get("ts_code"):
@@ -401,6 +402,69 @@ class Suite(unittest.TestCase):
             self.assertEqual(result["status"],"NETWORK_OUTCOME_UNKNOWN")
             with self.assertRaisesRegex(h.Error,"REQUIRES_EXPLICIT_RETRY"):
                 d.successful_request("adj_factor",dict(trade_date=A))
+
+    def test_verify_cli_rejects_partition_quality_and_count_tampering_readonly(self):
+        self.preflight()
+        def conflicted(api,p):
+            if api=="stk_limit":
+                rows=[row(api,p["trade_date"],c) for c in CODES]
+                rows[2]["exchange"]="SSE"
+                return 200,wire(api,rows),""
+        self.t.hook=conflicted
+        with self.w.write() as db:
+            self.download(db,"resume").collect("stk_limit",OPEN[2])
+            # Frozen pre-fix factor manifest: keep its old labels, without a rule tag.
+            version=db.execute("SELECT * FROM versions WHERE api='adj_factor'").fetchone()
+            manifest=json.loads(version["manifest"]);manifest.pop("quality_rules",None)
+            db.execute("UPDATE versions SET status='PARTIAL',reason=?,manifest=?,source_sha=? WHERE id=?",
+                       ("TRUNCATION_OR_UNIVERSE_UNVERIFIED_UNDOCUMENTED_CAP",h.canonical(manifest).decode(),h.sha(h.canonical(manifest)),version["id"]));db.commit()
+        self.w.verify()
+        # A disposable checkout lets the actual CLI exercise its exit handling.
+        checkout=Path(self.temp.name)/"cli"
+        for name in ("research/historical_sidecar.py","research/historical_warehouse.py","scripts/historical-sidecar.py"):
+            target=checkout/name;target.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copyfile(ROOT/name,target)
+        store=checkout/"state/historical-sidecar/main"
+        shutil.copytree(self.root,store)
+        fixture=h.Sidecar(store)
+        with fixture.read() as db:
+            versions=[dict(db.execute("SELECT * FROM versions WHERE api=? AND trade_date=?",(api,OPEN[2] if api=="stk_limit" else OPEN[-1])).fetchone()) for api in h.FIELDS]
+        snapshot=lambda:{str(p.relative_to(store)):(p.stat().st_mtime_ns,h.sha(p.read_bytes())) for p in store.rglob("*") if p.is_file()}
+        for version in versions:
+            changes=dict(status="COMPLETE" if version["status"]=="PARTIAL" else "PARTIAL",
+                         reason="TAMPERED_REASON",a_share_count=version["a_share_count"]+1,row_count=version["row_count"]+1)
+            for column,value in changes.items():
+                with self.subTest(api=version["api"],field=column):
+                    with fixture.write() as db:
+                        db.execute(f"UPDATE versions SET {column}=? WHERE id=?",(value,version["id"]));db.commit()
+                    before=snapshot()
+                    try:
+                        result=subprocess.run([sys.executable,"-I","-B",str(checkout/"scripts/historical-sidecar.py"),"verify"],capture_output=True)
+                        self.assertEqual(result.returncode,2,result.stdout.decode())
+                        self.assertEqual(json.loads(result.stdout)["state"],"BLOCKED")
+                        self.assertEqual(json.loads(result.stdout)["reason"],"PARTITION_QUALITY_MISMATCH" if column in ("status","reason") else "PARTITION_COUNT_MISMATCH")
+                        self.assertEqual(snapshot(),before)
+                    finally:
+                        with fixture.write() as db:
+                            db.execute(f"UPDATE versions SET {column}=? WHERE id=?",(version[column],version["id"]));db.commit()
+
+    def test_adj_factor_documented_scope_has_no_invented_numeric_cap(self):
+        for date,count in ((OPEN[2],1000),(OPEN[3],6000)):
+            with self.subTest(rows=count):
+                self.t.hook=lambda api,p:(200,wire(api,[row(api,p["trade_date"],str(600000+i)+".SH") for i in range(count)]),"")
+                with self.w.write() as db:
+                    d=self.download(db,"resume")
+                    response=d.request("adj_factor",dict(trade_date=date))
+                    self.assertEqual(response["status"],"OK")
+                    self.assertEqual(d.collect("adj_factor",date),"COMPLETE")
+                    self.assertEqual(d.calls,1)
+                result=self.w.query("adj_factor",A,B,date=date,limit=10000)
+                self.assertEqual(len(result["rows"]),count)
+                self.assertEqual(result["partitions"][0]["reason"],"SOURCE_RESPONSE_COMPLETE_BY_DOCUMENTED_SCOPE")
+                self.assertEqual(result["coverage"],"PARTIAL")
+                self.assertEqual(result["historical_pit_status"],"NOT_VERIFIED")
+                self.assertFalse(result["paper_allowed"] or result["live_allowed"])
+        self.w.verify()
 
 
 if __name__=="__main__":
