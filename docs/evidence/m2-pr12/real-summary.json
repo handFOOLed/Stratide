@@ -1,0 +1,699 @@
+{
+  "actual_noop_resume_requests": 0,
+  "base_sha": "a27f466e643cb7dd05e3be72b83402a4599a301f",
+  "checked_at_utc": "2026-11-02T07:42:48.528615+00:00",
+  "cloud_llm_calls": 0,
+  "environment": {
+    "local_timezone": "Asia/Singapore",
+    "os": "Windows",
+    "os_release": "11",
+    "python": "3.12.10"
+  },
+  "fills": 0,
+  "limits": {
+    "actual_all_tushare_requests": 1238,
+    "actual_native_requests": 1235,
+    "all_request_cap": 1358,
+    "batch_rpm": 30,
+    "default_rpm": 10,
+    "external_mcp_probes": 3,
+    "native_total_cap": 1355,
+    "workers": 1
+  },
+  "normalization_run_receipts": [
+    {
+      "config": "{\"credential_source\":\"existing-tushare-mcp-config:local-read-only\",\"end\":\"20261030\",\"max_calls\":32,\"permission_source\":\"Owner Issue #57 / existing account / only stock_basic,trade_cal,daily\",\"rpm\":10.0,\"start\":\"20211101\",\"total_cap\":1600,\"version\":\"tushare-historical-warehouse-v1\"}",
+      "config_sha": "f4770b7585a4f4b95ec2b3db220cb48415bd708783fb888f4edd47aa91e6b0ad",
+      "ended": "2026-11-02T05:23:25.302154+00:00",
+      "id": 1,
+      "kind": "preflight",
+      "started": "2026-11-02T05:23:12.892338+00:00",
+      "status": "INVALID_STOCK_CODE"
+    },
+    {
+      "config": "{\"credential_source\":\"existing-tushare-mcp-config:local-read-only\",\"end\":\"20261030\",\"max_calls\":32,\"permission_source\":\"Owner Issue #57 / existing account / only stock_basic,trade_cal,daily\",\"rpm\":10.0,\"start\":\"20211101\",\"total_cap\":1600,\"version\":\"tushare-historical-warehouse-v1\"}",
+      "config_sha": "f4770b7585a4f4b95ec2b3db220cb48415bd708783fb888f4edd47aa91e6b0ad",
+      "ended": "2026-11-02T05:27:30.614845+00:00",
+      "id": 2,
+      "kind": "preflight",
+      "started": "2026-11-02T05:26:12.081305+00:00",
+      "status": "CATALOG_SCOPE_MISMATCH"
+    },
+    {
+      "config": "{\"credential_source\":\"existing-tushare-mcp-config:local-read-only\",\"end\":\"20261030\",\"max_calls\":32,\"permission_source\":\"Owner Issue #57 / existing account / only stock_basic,trade_cal,daily\",\"rpm\":10.0,\"start\":\"20211101\",\"total_cap\":1600,\"version\":\"tushare-historical-warehouse-v1\"}",
+      "config_sha": "f4770b7585a4f4b95ec2b3db220cb48415bd708783fb888f4edd47aa91e6b0ad",
+      "ended": "2026-11-02T05:29:05.249294+00:00",
+      "id": 3,
+      "kind": "preflight",
+      "started": "2026-11-02T05:28:10.069249+00:00",
+      "status": "PREFLIGHT_PASSED"
+    },
+    {
+      "config": "{\"credential_source\":\"existing-tushare-mcp-config:local-read-only\",\"end\":\"20261030\",\"max_calls\":1328,\"permission_source\":\"Owner Issue #57 / existing account / only stock_basic,trade_cal,daily\",\"rpm\":30.0,\"start\":\"20211101\",\"total_cap\":1355,\"version\":\"tushare-historical-warehouse-v1\"}",
+      "config_sha": "3c3f984e304b3a1cd46dbb9c01907d4a6227cd76058524fc1b30044dbd4fc28c",
+      "ended": "2026-11-02T06:13:59.324964+00:00",
+      "id": 4,
+      "kind": "backfill",
+      "started": "2026-11-02T06:12:52.669372+00:00",
+      "status": "INVALID_NUMERIC_TYPE"
+    },
+    {
+      "config": "{\"credential_source\":\"existing-tushare-mcp-config:local-read-only\",\"end\":\"20261030\",\"max_calls\":1296,\"permission_source\":\"Owner Issue #57 / existing account / only stock_basic,trade_cal,daily\",\"rpm\":30.0,\"start\":\"20211101\",\"total_cap\":1355,\"version\":\"tushare-historical-warehouse-v1\"}",
+      "config_sha": "cf5edcb06e0f3cd8391ab7b8cc464201a3bf2089428f2b84ec0fb7ff8023369b",
+      "ended": "2026-11-02T07:30:27.906098+00:00",
+      "id": 5,
+      "kind": "resume",
+      "started": "2026-11-02T06:19:34.715387+00:00",
+      "status": "BACKFILL_FINISHED"
+    },
+    {
+      "config": "{\"credential_source\":\"existing-tushare-mcp-config:local-read-only\",\"end\":\"20211126\",\"max_calls\":1,\"permission_source\":\"Owner Issue #57 / existing account / only stock_basic,trade_cal,daily\",\"rpm\":10.0,\"start\":\"20211101\",\"total_cap\":1355,\"version\":\"tushare-historical-warehouse-v1\"}",
+      "config_sha": "4c1ca729c75d40bbc00683310d50b70216648704762207e13b6bb4eab552fdc4",
+      "ended": "2026-11-02T07:35:57.662999+00:00",
+      "id": 6,
+      "kind": "resume",
+      "started": "2026-11-02T07:35:57.645230+00:00",
+      "status": "BACKFILL_FINISHED"
+    }
+  ],
+  "orders": 0,
+  "provider_billing_independently_verified": false,
+  "purchases": 0,
+  "query20": {
+    "as_of_version": 1212,
+    "end": "20211126",
+    "has_more": false,
+    "output_sha256": "e14f14b767b63304c882ea093e94f07e183bb1ac310bae4abe5fff41a56c664e",
+    "per_symbol": {
+      "000001.SZ": 20,
+      "600000.SH": 20,
+      "600519.SH": 20
+    },
+    "rows": 60,
+    "start": "20211101"
+  },
+  "query_market": {
+    "has_more": false,
+    "output_sha256": "ef63109f9a68fdc4c9ba47aee89e2975810cd9fc96874383f9dd9a14307c83b5",
+    "rows": 5571,
+    "trade_date": "20261030"
+  },
+  "query_plans": {
+    "market_date": [
+      "SEARCH daily_rows USING INDEX daily_date (trade_date=?)"
+    ],
+    "symbol_window": [
+      "SEARCH daily_rows USING INDEX sqlite_autoindex_daily_rows_1 (ts_code=? AND trade_date>? AND trade_date<?)"
+    ]
+  },
+  "readonly_bytes_mtime_sha_unchanged": true,
+  "readonly_file_count": 1237,
+  "real_command_records": [
+    {
+      "all_request_cap": 1358,
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "backfill",
+        "--credential-source",
+        "existing-tushare-mcp-config",
+        "--max-calls",
+        "1328",
+        "--total-call-cap",
+        "1355",
+        "--rpm",
+        "30"
+      ],
+      "derived_from_trial": 1207,
+      "ended_at_local": "2026-11-02T14:13:59.733039+08:00",
+      "ended_at_utc": "2026-11-02T06:13:59.733039+00:00",
+      "estimated_additional_disk_bytes": 8347479712,
+      "exit": 2,
+      "external_mcp_probes": 3,
+      "free_disk_bytes": 280079380480,
+      "local_time_zone": "Asia/Singapore",
+      "native_total_cap": 1355,
+      "record": "real-backfill-command.json",
+      "source_sha256": "4361b58f34db18d1601206efe8caec37e8ebd3051d6f1be6fb39d2e4ce157006",
+      "started_at_local": "2026-11-02T14:12:52.460113+08:00",
+      "started_at_utc": "2026-11-02T06:12:52.460113+00:00"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "preflight",
+        "--max-calls",
+        "32",
+        "--total-call-cap",
+        "1600",
+        "--rpm",
+        "10"
+      ],
+      "ended_at_local": "2026-11-02T13:19:20.395305+08:00",
+      "ended_at_utc": "2026-11-02T05:19:20.395305+00:00",
+      "exit": 2,
+      "local_time_zone": "Asia/Singapore",
+      "record": "real-preflight-command.json",
+      "started_at_local": "2026-11-02T13:19:20.255849+08:00",
+      "started_at_utc": "2026-11-02T05:19:20.255849+00:00"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "preflight",
+        "--credential-source",
+        "existing-tushare-mcp-config",
+        "--max-calls",
+        "32",
+        "--total-call-cap",
+        "1600",
+        "--rpm",
+        "10"
+      ],
+      "ended_at_local": "2026-11-02T13:23:25.345716+08:00",
+      "ended_at_utc": "2026-11-02T05:23:25.345716+00:00",
+      "exit": 0,
+      "local_time_zone": "Asia/Singapore",
+      "record": "real-preflight-https-command.json",
+      "started_at_local": "2026-11-02T13:23:12.687961+08:00",
+      "started_at_utc": "2026-11-02T05:23:12.687961+00:00"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "preflight",
+        "--credential-source",
+        "existing-tushare-mcp-config",
+        "--max-calls",
+        "32",
+        "--total-call-cap",
+        "1600",
+        "--rpm",
+        "10"
+      ],
+      "ended_at_local": "2026-11-02T13:27:30.684325+08:00",
+      "ended_at_utc": "2026-11-02T05:27:30.684325+00:00",
+      "exit": 2,
+      "local_time_zone": "Asia/Singapore",
+      "record": "real-preflight-https-r1-command.json",
+      "source_sha256": "1678efa162c89398b02cc6ee0bdd7247f2dd0f63e9d4b1b6220aab6c319fc8f0",
+      "started_at_local": "2026-11-02T13:26:11.960419+08:00",
+      "started_at_utc": "2026-11-02T05:26:11.960419+00:00"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "preflight",
+        "--credential-source",
+        "existing-tushare-mcp-config",
+        "--max-calls",
+        "32",
+        "--total-call-cap",
+        "1600",
+        "--rpm",
+        "10"
+      ],
+      "ended_at_local": "2026-11-02T13:29:05.357980+08:00",
+      "ended_at_utc": "2026-11-02T05:29:05.357980+00:00",
+      "exit": 0,
+      "local_time_zone": "Asia/Singapore",
+      "record": "real-preflight-https-r2-command.json",
+      "source_sha256": "ad087ce2f603728d7fd06acc478573f87231dbde9a9db21df281fdc98d7972ef",
+      "started_at_local": "2026-11-02T13:28:09.949968+08:00",
+      "started_at_utc": "2026-11-02T05:28:09.949968+00:00"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "preflight",
+        "--max-calls",
+        "32",
+        "--total-call-cap",
+        "1600",
+        "--rpm",
+        "10"
+      ],
+      "ended_at_local": "2026-11-02T13:19:40.481570+08:00",
+      "ended_at_utc": "2026-11-02T05:19:40.481570+00:00",
+      "exit": 2,
+      "local_time_zone": "Asia/Singapore",
+      "record": "real-preflight-user-command.json",
+      "started_at_local": "2026-11-02T13:19:40.370194+08:00",
+      "started_at_utc": "2026-11-02T05:19:40.370194+00:00"
+    },
+    {
+      "all_request_cap": 1358,
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "resume",
+        "--credential-source",
+        "existing-tushare-mcp-config",
+        "--retry-failed",
+        "--max-calls",
+        "1296",
+        "--total-call-cap",
+        "1355",
+        "--rpm",
+        "30"
+      ],
+      "ended_at_local": "2026-11-02T15:32:38.728202+08:00",
+      "ended_at_utc": "2026-11-02T07:32:38.728202+00:00",
+      "exit": 0,
+      "external_mcp_probes": 3,
+      "local_time_zone": "Asia/Singapore",
+      "native_total_cap": 1355,
+      "record": "real-resume-command.json",
+      "source_sha256": "d035c30c98ffecef854533518d66a6c7835ec33fb9adec2b6fed435bfab7687d",
+      "started_at_local": "2026-11-02T14:19:34.215131+08:00",
+      "started_at_utc": "2026-11-02T06:19:34.215131+00:00"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "plan"
+      ],
+      "ended_at_local": "2026-11-02T14:12:51.950327+08:00",
+      "ended_at_utc": "2026-11-02T06:12:51.950327+00:00",
+      "exit": 0,
+      "local_time_zone": "Asia/Singapore",
+      "record": "trial-plan-command.json",
+      "started_at_local": "2026-11-02T14:12:51.753559+08:00",
+      "started_at_utc": "2026-11-02T06:12:51.753559+00:00"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "verify"
+      ],
+      "ended_at_local": "2026-11-02T14:12:51.753559+08:00",
+      "ended_at_utc": "2026-11-02T06:12:51.753559+00:00",
+      "exit": 0,
+      "local_time_zone": "Asia/Singapore",
+      "record": "trial-verify-command.json",
+      "started_at_local": "2026-11-02T14:12:50.249768+08:00",
+      "started_at_utc": "2026-11-02T06:12:50.249768+00:00"
+    }
+  ],
+  "report": {
+    "attempted_full_market_dates": 1212,
+    "calendar_dates": 1825,
+    "calendar_unknown_dates": 0,
+    "catalog_symbol_aliases_unverified": 2,
+    "catalog_unmatched_daily_symbols": 1,
+    "complete_dates": 1201,
+    "coverage": "PARTIAL",
+    "data_mode": "historical_backfill_ex_post",
+    "dates_with_failed_attempts": 1,
+    "disk_bytes": 4544217419,
+    "downloaded_dates": 1212,
+    "end": "20261030",
+    "estimate_basis": "actual on-disk raw+SQLite+indexes per sampled date x remaining x1.5; includes metadata overhead; truncation can add requests",
+    "estimated_additional_disk_bytes": 62430963,
+    "failed_dates": 0,
+    "first_obtained_at": "2026-11-02T05:23:13.322710+00:00",
+    "forward_research_readiness": "BLOCKED",
+    "free_disk_bytes": 275551358976,
+    "historical_pit_status": "NOT_VERIFIED",
+    "historical_received_at": null,
+    "historical_universe": "UNVERIFIED",
+    "known_open_dates": 1212,
+    "last_obtained_at": "2026-11-02T07:30:25.458156+00:00",
+    "limitations": [
+      "CURRENT_CATALOG_NOT_HISTORICAL_MASTER",
+      "BSE_CALENDAR_UNVERIFIED_UNLESS_ACTUALLY_RETURNED",
+      "HISTORICAL_CODE_MAPPING_NOT_VERIFIED",
+      "MISSING_OR_NOT_TRADING_UNVERIFIED",
+      "NO_CORPORATE_ACTION_OR_SUSPENSION_VERIFICATION",
+      "NO_HISTORICAL_PIT"
+    ],
+    "live_allowed": false,
+    "metadata_queries": [
+      {
+        "api": "stock_basic",
+        "normalized_rows": 1,
+        "params": {
+          "exchange": "SSE",
+          "list_status": "L",
+          "ts_code": "600000.SH"
+        },
+        "response_sha": "128f040812b67dd4d3858bddfe74d23ca305a40ad9a77d2a6bf4f7e8fac1d6ca",
+        "rows": 1,
+        "status": "OK"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 2318,
+        "params": {
+          "exchange": "SSE",
+          "list_status": "L"
+        },
+        "response_sha": "0ae81e695fcff6d4e609e93ad2452ce5428851e321625f0aac96cf9e860b8561",
+        "rows": 2318,
+        "status": "OK"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 0,
+        "params": {
+          "exchange": "SSE",
+          "list_status": "D"
+        },
+        "response_sha": "c2e7fbf2f4ad7da27220a890169f9cf71a499eb72b0a0910e85427eb5bd6d151",
+        "rows": 149,
+        "status": "INVALID_STOCK_CODE"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 77,
+        "params": {
+          "exchange": "SSE",
+          "list_status": "D"
+        },
+        "response_sha": "32e3cd48cb6c8a7a128f4c593bafaa6f90a2f00e0da5ea925037cf18a69c721b",
+        "rows": 149,
+        "status": "OK"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 0,
+        "params": {
+          "exchange": "SSE",
+          "list_status": "P"
+        },
+        "response_sha": "9c1bdb60ede88bbd6289643075c4e2866db3130a531c7aaf88731b6cc2eb6ac0",
+        "rows": 0,
+        "status": "EMPTY"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 0,
+        "params": {
+          "exchange": "SSE",
+          "list_status": "G"
+        },
+        "response_sha": "79839e2fdde4f1a0623160bf25e760539f075001c9288925a2374dd6e639bfe4",
+        "rows": 0,
+        "status": "EMPTY"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 1,
+        "params": {
+          "exchange": "SSE",
+          "list_status": "UN"
+        },
+        "response_sha": "fe57ba675c45544efc8083115acda7a8c3e75623f019d171c43d424e5c27ec5b",
+        "rows": 1,
+        "status": "OK"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 2905,
+        "params": {
+          "exchange": "SZSE",
+          "list_status": "L"
+        },
+        "response_sha": "52ed52991642b446a0fccb0c031c18b2f7645c80080f5c9cc383ef3ff6b62652",
+        "rows": 2905,
+        "status": "OK"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 115,
+        "params": {
+          "exchange": "SZSE",
+          "list_status": "D"
+        },
+        "response_sha": "c9f686487b76c3ce321f7f02a66928cc642abd6600dda65df1b6fcff469a8ca6",
+        "rows": 189,
+        "status": "OK"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 0,
+        "params": {
+          "exchange": "SZSE",
+          "list_status": "P"
+        },
+        "response_sha": "031e3eddf98ece56b8d3e3db1d02fa47652c69641cf56ee655191eb933742f08",
+        "rows": 0,
+        "status": "EMPTY"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 0,
+        "params": {
+          "exchange": "SZSE",
+          "list_status": "G"
+        },
+        "response_sha": "763d3a0dcd8dfe433bf087543023e619948e32e885dc19bc16389dc80b5e2d20",
+        "rows": 0,
+        "status": "EMPTY"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 1,
+        "params": {
+          "exchange": "SZSE",
+          "list_status": "UN"
+        },
+        "response_sha": "2b0ca32e18bb758e1c2877076ce33e533b43e1edc5210100a7a8b5a71c8ee336",
+        "rows": 1,
+        "status": "OK"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 354,
+        "params": {
+          "exchange": "BSE",
+          "list_status": "L"
+        },
+        "response_sha": "e9431c4f888ce775113b77327ddceadb9c10191e89dff51c1ad2d4468e0e9b53",
+        "rows": 354,
+        "status": "OK"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 5,
+        "params": {
+          "exchange": "BSE",
+          "list_status": "D"
+        },
+        "response_sha": "aa60935cdacbb3510ea1bd319a34598996eabcee8938cd4c0fce3bbcf4c38943",
+        "rows": 5,
+        "status": "OK"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 0,
+        "params": {
+          "exchange": "BSE",
+          "list_status": "P"
+        },
+        "response_sha": "d0ab477b8d9b4f789a5850b5aa9208b4b93e28fc3d50f92cb89bdcf750236c2e",
+        "rows": 0,
+        "status": "EMPTY"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 0,
+        "params": {
+          "exchange": "BSE",
+          "list_status": "G"
+        },
+        "response_sha": "9c229305a7ae9f29f5d00920b4a185673d2d793bd34d8cc7b845e065e4ac2f85",
+        "rows": 0,
+        "status": "EMPTY"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 0,
+        "params": {
+          "exchange": "BSE",
+          "list_status": "UN"
+        },
+        "response_sha": "cb191de82e2ab5e440fa154ac744f697d34c8adf1547763b1fad253b4b2712b6",
+        "rows": 3,
+        "status": "CATALOG_SCOPE_MISMATCH"
+      },
+      {
+        "api": "stock_basic",
+        "normalized_rows": 3,
+        "params": {
+          "exchange": "BSE",
+          "list_status": "UN"
+        },
+        "response_sha": "eb120da9075516682accf5e2d7a064e69598323414ef7a97df21e4a161620d2b",
+        "rows": 3,
+        "status": "OK"
+      },
+      {
+        "api": "trade_cal",
+        "normalized_rows": 1,
+        "params": {
+          "end_date": "20211101",
+          "exchange": "SSE",
+          "start_date": "20211101"
+        },
+        "response_sha": "24bdddbef9ba912c120c7f5cb05d6674737d1a33c2e486be1e077d5a61e1b85a",
+        "rows": 1,
+        "status": "OK"
+      },
+      {
+        "api": "trade_cal",
+        "normalized_rows": 1825,
+        "params": {
+          "end_date": "20261030",
+          "exchange": "SSE",
+          "start_date": "20211101"
+        },
+        "response_sha": "86ed5b8dbbdf95f3c900580a80f05479792fa5d3c6a1e07a90deda4042a5a412",
+        "rows": 1825,
+        "status": "OK"
+      },
+      {
+        "api": "trade_cal",
+        "normalized_rows": 1825,
+        "params": {
+          "end_date": "20261030",
+          "exchange": "SZSE",
+          "start_date": "20211101"
+        },
+        "response_sha": "b0c6dcbf36549f2e0ae9ac84f0d8157f22679ce8dc5aa89606b303585ee8e6e7",
+        "rows": 1825,
+        "status": "OK"
+      }
+    ],
+    "missing_known_open_dates": [
+      "20211215",
+      "20211222",
+      "20220107",
+      "20220218",
+      "20220221",
+      "20220329",
+      "20220527",
+      "20220606",
+      "20220630",
+      "20220824",
+      "20220913"
+    ],
+    "missing_or_not_trading_unverified": 14430,
+    "paper_allowed": false,
+    "partial_dates": 11,
+    "per_exchange": {
+      "BSE": {
+        "calendar_coverage": "PARTIAL",
+        "calendar_days": 0,
+        "catalog_symbols": 359,
+        "catalog_unmatched_daily_symbols": 0,
+        "daily_rows": 277129,
+        "daily_symbols": 358,
+        "missing_or_not_trading_unverified": null,
+        "snapshot_expected_symbol_days_unverified": null
+      },
+      "SSE": {
+        "calendar_coverage": "COVERAGE_COMPLETE",
+        "calendar_days": 1825,
+        "catalog_symbols": 2395,
+        "catalog_unmatched_daily_symbols": 0,
+        "daily_rows": 2690818,
+        "daily_symbols": 2395,
+        "missing_or_not_trading_unverified": 5532,
+        "snapshot_expected_symbol_days_unverified": 2673640
+      },
+      "SZSE": {
+        "calendar_coverage": "COVERAGE_COMPLETE",
+        "calendar_days": 1825,
+        "catalog_symbols": 3020,
+        "catalog_unmatched_daily_symbols": 1,
+        "daily_rows": 3379834,
+        "daily_symbols": 3021,
+        "missing_or_not_trading_unverified": 8898,
+        "snapshot_expected_symbol_days_unverified": 3359318
+      }
+    },
+    "permissions": {
+      "daily": {
+        "api": "daily",
+        "attempt_id": 1235,
+        "status": "ALLOWED_OBSERVED"
+      },
+      "stock_basic": {
+        "api": "stock_basic",
+        "attempt_id": 18,
+        "status": "ALLOWED_OBSERVED"
+      },
+      "trade_cal": {
+        "api": "trade_cal",
+        "attempt_id": 21,
+        "status": "ALLOWED_OBSERVED"
+      }
+    },
+    "persisted_batch_total_call_cap": 1355,
+    "provider_published_at": null,
+    "raw_response_bytes": 602732068,
+    "recommended_batch_total_call_cap": 1266,
+    "remaining_request_estimate": 11,
+    "request_statuses": {
+      "CATALOG_SCOPE_MISMATCH": 1,
+      "EMPTY": 6,
+      "INVALID_NUMERIC_TYPE": 1,
+      "INVALID_STOCK_CODE": 1,
+      "OK": 1226
+    },
+    "requests": 1235,
+    "resumable": true,
+    "row_count": 6347781,
+    "source_field_unverified_dates": 11,
+    "source_revision_rows": 0,
+    "start": "20211101",
+    "state": "PARTIAL",
+    "truncation_attempts": 0,
+    "truncation_suspected_dates": 0,
+    "unattempted_known_open_dates": 0,
+    "uncommitted_successful_dates": 0,
+    "version": "tushare-historical-warehouse-v1",
+    "versions": 1212
+  },
+  "storage_verification": {
+    "attempts": 1235,
+    "daily_row_versions": 6347781,
+    "data_mode": "historical_backfill_ex_post",
+    "forward_research_readiness": "BLOCKED",
+    "historical_pit_status": "NOT_VERIFIED",
+    "historical_received_at": null,
+    "live_allowed": false,
+    "null_pre_close_row_versions": 12,
+    "object_rows": 9431,
+    "paper_allowed": false,
+    "provider_published_at": null,
+    "sqlite_integrity": "ok",
+    "state": "VERIFIED_STORAGE_ONLY"
+  }
+}

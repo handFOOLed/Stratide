@@ -1,0 +1,14 @@
+{
+  "checked_at_utc": "2026-11-02T07:25:43.796Z",
+  "pr56": {
+    "url": "https://github.com/handFOOLed/Stratide/pull/56",
+    "head_sha": "4ad0a3d716ee8acc3f43e58db463714cf51a2bbc",
+    "state": "open",
+    "draft": true,
+    "merged": false,
+    "head_unchanged_from_task_start": true
+  },
+  "issue57_existing_prs_before_publish": 0,
+  "old_regression_tests_run_by_this_task": false,
+  "ready_or_merge_authorized": false
+}

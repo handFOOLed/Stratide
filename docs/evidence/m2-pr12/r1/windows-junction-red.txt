@@ -1,0 +1,42 @@
+test_28_windows_raw_junction_rejected_before_any_io (__main__.WarehouseTests.test_28_windows_raw_junction_rejected_before_any_io) ...
+  test_28_windows_raw_junction_rejected_before_any_io (__main__.WarehouseTests.test_28_windows_raw_junction_rejected_before_any_io) (action='preflight') ... FAIL
+  test_28_windows_raw_junction_rejected_before_any_io (__main__.WarehouseTests.test_28_windows_raw_junction_rejected_before_any_io) (action='backfill') ... FAIL
+  test_28_windows_raw_junction_rejected_before_any_io (__main__.WarehouseTests.test_28_windows_raw_junction_rejected_before_any_io) (action='resume') ... FAIL
+
+======================================================================
+FAIL: test_28_windows_raw_junction_rejected_before_any_io (__main__.WarehouseTests.test_28_windows_raw_junction_rejected_before_any_io) (action='preflight')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-historical-warehouse.py", line 560, in assert_cli_link_rejected
+    self.assertEqual(reason,"WAREHOUSE_LINK_DENIED",f"{action}: connects={connect.call_count}, credential_reads={cred.call_count}, transport_builds={transport.call_count}, old_changed={fingerprint(old)!=before}")
+AssertionError: 'NO_REJECTION' != 'WAREHOUSE_LINK_DENIED'
+- NO_REJECTION
++ WAREHOUSE_LINK_DENIED
+ : preflight: connects=2, credential_reads=1, transport_builds=1, old_changed=True
+
+======================================================================
+FAIL: test_28_windows_raw_junction_rejected_before_any_io (__main__.WarehouseTests.test_28_windows_raw_junction_rejected_before_any_io) (action='backfill')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-historical-warehouse.py", line 560, in assert_cli_link_rejected
+    self.assertEqual(reason,"WAREHOUSE_LINK_DENIED",f"{action}: connects={connect.call_count}, credential_reads={cred.call_count}, transport_builds={transport.call_count}, old_changed={fingerprint(old)!=before}")
+AssertionError: 'NO_REJECTION' != 'WAREHOUSE_LINK_DENIED'
+- NO_REJECTION
++ WAREHOUSE_LINK_DENIED
+ : backfill: connects=3, credential_reads=1, transport_builds=1, old_changed=True
+
+======================================================================
+FAIL: test_28_windows_raw_junction_rejected_before_any_io (__main__.WarehouseTests.test_28_windows_raw_junction_rejected_before_any_io) (action='resume')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-historical-warehouse.py", line 560, in assert_cli_link_rejected
+    self.assertEqual(reason,"WAREHOUSE_LINK_DENIED",f"{action}: connects={connect.call_count}, credential_reads={cred.call_count}, transport_builds={transport.call_count}, old_changed={fingerprint(old)!=before}")
+AssertionError: 'NO_REJECTION' != 'WAREHOUSE_LINK_DENIED'
+- NO_REJECTION
++ WAREHOUSE_LINK_DENIED
+ : resume: connects=3, credential_reads=1, transport_builds=1, old_changed=True
+
+----------------------------------------------------------------------
+Ran 1 test in 0.516s
+
+FAILED (failures=3)

@@ -1,0 +1,35 @@
+test_01_full_15_session_three_security_lifecycles (__main__.WarehouseTests.test_01_full_15_session_three_security_lifecycles) ... ok
+test_02_decimal_ohlc_schema_and_units (__main__.WarehouseTests.test_02_decimal_ohlc_schema_and_units) ... ok
+test_03_missing_token_zero_requests_or_store_creation (__main__.WarehouseTests.test_03_missing_token_zero_requests_or_store_creation) ... ok
+test_04_permission_denial_one_probe_then_persistently_skip (__main__.WarehouseTests.test_04_permission_denial_one_probe_then_persistently_skip) ... ok
+test_05_total_and_run_caps_zero_unauthorized (__main__.WarehouseTests.test_05_total_and_run_caps_zero_unauthorized) ... ok
+test_06_timeout_unknown_and_explicit_resume (__main__.WarehouseTests.test_06_timeout_unknown_and_explicit_resume) ... ok
+test_07_http_429_persisted_cooldown_and_no_internal_retry (__main__.WarehouseTests.test_07_http_429_persisted_cooldown_and_no_internal_retry) ... ok
+test_08_cap_partition_merge_keeps_partial_unknown_universe (__main__.WarehouseTests.test_08_cap_partition_merge_keeps_partial_unknown_universe) ... ok
+test_09_empty_unknown_missing_not_filled (__main__.WarehouseTests.test_09_empty_unknown_missing_not_filled) ... ok
+test_10_same_day_revision_old_version_and_raw_survive (__main__.WarehouseTests.test_10_same_day_revision_old_version_and_raw_survive) ... ok
+test_11_conflicting_duplicate_and_bad_raw_no_checkpoint (__main__.WarehouseTests.test_11_conflicting_duplicate_and_bad_raw_no_checkpoint) ... ok
+test_12_kill_mid_transaction_restart_and_no_false_complete (__main__.WarehouseTests.test_12_kill_mid_transaction_restart_and_no_false_complete) ... ok
+test_13_two_processes_one_writer_before_any_network (__main__.WarehouseTests.test_13_two_processes_one_writer_before_any_network) ... ok
+test_14_read_only_commands_no_network_bytes_mtime_unchanged (__main__.WarehouseTests.test_14_read_only_commands_no_network_bytes_mtime_unchanged) ... ok
+test_15_attempt_metadata_and_raw_tampering_rejected (__main__.WarehouseTests.test_15_attempt_metadata_and_raw_tampering_rejected) ... ok
+test_16_insufficient_disk_and_unfinished_dates_zero_requests (__main__.WarehouseTests.test_16_insufficient_disk_and_unfinished_dates_zero_requests) ... ok
+test_17_calendar_denied_no_weekday_inference_or_batch_requests (__main__.WarehouseTests.test_17_calendar_denied_no_weekday_inference_or_batch_requests) ... ok
+test_18_real_catalog_legacy_t_code_and_b_shares_raw_preserved (__main__.WarehouseTests.test_18_real_catalog_legacy_t_code_and_b_shares_raw_preserved) ... ok
+test_19_cli_readonly_all_commands_do_not_create_or_change_files (__main__.WarehouseTests.test_19_cli_readonly_all_commands_do_not_create_or_change_files) ... ok
+test_20_live_writer_fences_readonly_no_partial_snapshot (__main__.WarehouseTests.test_20_live_writer_fences_readonly_no_partial_snapshot) ... ok
+test_21_provider_null_pre_close_is_flagged_not_fabricated (__main__.WarehouseTests.test_21_provider_null_pre_close_is_flagged_not_fabricated) ... ok
+test_22_real_transport_secret_echo_never_enters_raw_or_sqlite (__main__.WarehouseTests.test_22_real_transport_secret_echo_never_enters_raw_or_sqlite) ... ok
+test_23_cli_failed_validation_has_nonzero_exit (__main__.WarehouseTests.test_23_cli_failed_validation_has_nonzero_exit) ... ok
+test_24_bar_must_match_its_own_exchange_calendar (__main__.WarehouseTests.test_24_bar_must_match_its_own_exchange_calendar) ... ok
+test_25_incomplete_refresh_keeps_complete_view_and_asof (__main__.WarehouseTests.test_25_incomplete_refresh_keeps_complete_view_and_asof) ... ok
+test_26_sqlite_symlink_rejected_before_foreign_journal_change (__main__.WarehouseTests.test_26_sqlite_symlink_rejected_before_foreign_journal_change) ... ok
+test_27_cli_internal_file_links_rejected_before_any_io (__main__.WarehouseTests.test_27_cli_internal_file_links_rejected_before_any_io) ... ok
+test_28_windows_raw_junction_rejected_before_any_io (__main__.WarehouseTests.test_28_windows_raw_junction_rejected_before_any_io) ... ok
+test_29_foreign_regular_database_rejected_without_wal_mutation (__main__.WarehouseTests.test_29_foreign_regular_database_rejected_without_wal_mutation) ... ok
+test_30_cli_refresh_reports_rejection_without_losing_current_data (__main__.WarehouseTests.test_30_cli_refresh_reports_rejection_without_losing_current_data) ... ok
+
+----------------------------------------------------------------------
+Ran 30 tests in 17.582s
+
+OK

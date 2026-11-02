@@ -6,6 +6,7 @@
 
 ## 当前状态
 
+- **历史仓库 V1（本分支 Draft / #57）：** [M2-PR12](docs/M2_PR12.md) 提供独立 SQLite 证券目录、交易日历、未复权日线的预检/试采/有界回填、断点续传与只读查询。真实取得范围与缺口见[证据](docs/evidence/m2-pr12/README.md)；`historical_backfill_ex_post / PIT NOT_VERIFIED`，不增加前向或交易资格。
 - **已实现：** Paper Risk Kernel、持久账本、六报告、真实历史 EOD 探索性回测、只观察的前向 EOD journal、[Web Dashboard V1](apps/dashboard/README.md)。
 - **Agent V1 已在 main：** 持久任务、日/月预算、受控 Provider、本地 fake、EOD 去重及 [API](docs/AGENT_API.md)；真实 Provider **REAL_PROVIDER_NOT_VERIFIED**，未配置 Owner 预算/授权不付费。
 - **候选链路已合并：** [M2-PR04 / PR #30](docs/M2_PR04.md) 提供登记 → 冻结 → 独立评价 → 隔离历史回放 CLI；#31 双线独立 PASS，研究证据不足、资格默认拒绝继续有效。

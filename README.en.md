@@ -6,6 +6,7 @@ A local-first, **paper-only** personal quantitative research system: Rust risk/l
 
 ## Status
 
+- **Historical Warehouse V1 (this Draft branch / #57):** [M2-PR12](docs/M2_PR12.md) adds an isolated SQLite catalog, calendar and unadjusted daily-bar warehouse with preflight, trial sampling, bounded backfill, resume and read-only queries. See [actual coverage evidence](docs/evidence/m2-pr12/README.md). `historical_backfill_ex_post / PIT NOT_VERIFIED`; no forward or trading qualification.
 - **Implemented:** paper Risk Kernel, durable ledger and reports, exploratory historical EOD replay, observe-only forward EOD journal, and [Web Dashboard V1](apps/dashboard/README.md).
 - **Agent V1 is in main:** persistent tasks, daily/monthly spending gates, controlled Providers, a local fake, EOD deduplication and [APIs](docs/AGENT_API.md). **REAL_PROVIDER_NOT_VERIFIED**; no paid requests without Owner budgets/consent.
 - **Candidate pipeline merged:** [M2-PR04 / PR #30](docs/M2_PR04.md) provides registration → freeze → independent evaluation → isolated historical replay. Both #31 independent tracks passed; research evidence remains insufficient and eligibility is denied.
