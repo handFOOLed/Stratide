@@ -1,0 +1,24 @@
+{
+  "base_sha": "a27f466e643cb7dd05e3be72b83402a4599a301f",
+  "independent_acceptance": false,
+  "real_verify_source": "same production parser and raw binding on final source",
+  "source_files": [
+    {
+      "git_blob_sha1": "834a23c056d9222917d8f5ece4a79ded9651161d",
+      "path": "research/historical_warehouse.py",
+      "sha256": "55ef8788f49b4883644b6e35b39ca0968e5f7163eea2ddb2e7ddfeaa824599bc"
+    },
+    {
+      "git_blob_sha1": "2cc7f6bd7d2eff3f635d4f83ec43862d60e30ffa",
+      "path": "scripts/historical-warehouse.py",
+      "sha256": "27e3a758cab3c0aa4f5f18f2616d5880bec2d464073f6ffc7c7c0df5e9056292"
+    },
+    {
+      "git_blob_sha1": "22651695f732a0eb1e0fe85fad8b5cc6f43286f6",
+      "path": "scripts/test-historical-warehouse.py",
+      "sha256": "48b0c9727bd504663103d6506d47f6280bdd203ed849bca17ec9c85db6342721"
+    }
+  ],
+  "synthetic_command": "python -I -B scripts/test-historical-warehouse.py",
+  "synthetic_tests": 24
+}

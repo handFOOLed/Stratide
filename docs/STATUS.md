@@ -6,6 +6,7 @@
 
 | 领域 | 实际状态 | 证据 |
 | --- | --- | --- |
+| M2-PR12 历史仓库 V1（本分支 Draft） | #57：独立本地证券目录/日历/未复权日线，权限预检、五日真实试采及有界五年回填；覆盖缺口按真实报告，历史 PIT/forward/交易资格不提升。与仍在 Draft 的 PR #56 隔离 | [契约/操作](M2_PR12.md) / [实际证据](evidence/m2-pr12/README.md) |
 | M0 Paper 内核 | Rust Risk Kernel、单账户 SQLite 事件账本、保守模拟撮合、确定性重放及六报告 | [PR #2](https://github.com/handFOOLed/Stratide/pull/2) / [#4](https://github.com/handFOOLed/Stratide/pull/4) / [#6](https://github.com/handFOOLed/Stratide/pull/6) |
 | 真实来源前向 EOD | **observe-only** 独立 journal；10/28、10/29 两个有效日，`EOD_CONTINUITY_VERIFIED`；0 策略提案/成交 | [#10 独立结论](https://github.com/handFOOLed/Stratide/issues/10#issuecomment-6512598875) |
 | 历史探索性回测 | 600000.SH，2026-07-17—10-28，68 个交易日、3 笔模拟成交；初始 ¥100,000，末 NAV ¥99,966.51，**不是可交易盈利证据** | [PR #12](https://github.com/handFOOLed/Stratide/pull/12) |

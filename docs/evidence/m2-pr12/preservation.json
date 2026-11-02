@@ -1,0 +1,15 @@
+{
+  "after_at_utc": "2026-11-02T07:42:48.518601+00:00",
+  "after_manifest_sha256": "95604a0c3dc828a2fc2e8e7534a21295af131bd80a5818b8356f9da6d9463ce9",
+  "before_at_utc": "2026-11-02T05:13:25.109450+00:00",
+  "before_manifest_sha256": "28430327fe69c5c7659465b31745a7b7e913397f84ea7616905430fe0eef57b4",
+  "changed_count": 0,
+  "full_private_manifest_published": false,
+  "protected_bytes": 270189557,
+  "protected_files": 14902,
+  "unchanged_dimensions": [
+    "bytes",
+    "mtime_ns",
+    "SHA256"
+  ]
+}

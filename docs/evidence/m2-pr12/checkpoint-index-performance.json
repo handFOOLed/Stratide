@@ -1,0 +1,18 @@
+{
+  "after_plan": [
+    "SEARCH dr USING COVERING INDEX day_rows_symbol (ts_code=? AND trade_date>? AND trade_date<?)",
+    "SEARCH c USING COVERING INDEX checkpoints_version (version_id=?)"
+  ],
+  "after_single_symbol_seconds": 0.0005901999975321814,
+  "at_utc": "2026-11-02T07:34:34.556816+00:00",
+  "before_plan": [
+    "SEARCH dr USING COVERING INDEX day_rows_symbol (ts_code=? AND trade_date>? AND trade_date<?)",
+    "SCAN c"
+  ],
+  "before_single_symbol_seconds": 0.023486800011596642,
+  "change": "one index on this new warehouse only",
+  "checkpoint_rows": 1212,
+  "data_rows": 6347781,
+  "data_values_changed": false,
+  "final_report_seconds": 8.562766799994279
+}

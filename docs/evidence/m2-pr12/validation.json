@@ -1,0 +1,241 @@
+{
+  "command_records": [
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "resume",
+        "--start",
+        "20211101",
+        "--end",
+        "20211126",
+        "--credential-source",
+        "existing-tushare-mcp-config",
+        "--max-calls",
+        "1",
+        "--total-call-cap",
+        "1355",
+        "--rpm",
+        "10"
+      ],
+      "ended_at_local": "2026-11-02T15:36:00.217395+08:00",
+      "ended_at_utc": "2026-11-02T07:36:00.217395+00:00",
+      "exit": 0,
+      "local_time_zone": "Asia/Singapore",
+      "name": "real-resume-noop",
+      "started_at_local": "2026-11-02T15:35:55.004724+08:00",
+      "started_at_utc": "2026-11-02T07:35:55.004724+00:00",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "63f87729a5401a42f8ea0d5f003bbe1544464c3f5647af7e7ec59652d194c383"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "verify"
+      ],
+      "ended_at_local": "2026-11-02T15:42:01.802417+08:00",
+      "ended_at_utc": "2026-11-02T07:42:01.802417+00:00",
+      "exit": 0,
+      "local_time_zone": "Asia/Singapore",
+      "name": "real-final-verify",
+      "started_at_local": "2026-11-02T15:36:06.643494+08:00",
+      "started_at_utc": "2026-11-02T07:36:06.643494+00:00",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "2655674d539a46865f7e299f8633c9ac582750d4640d795465e68377b15fb8cf"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "report"
+      ],
+      "ended_at_local": "2026-11-02T15:42:10.482807+08:00",
+      "ended_at_utc": "2026-11-02T07:42:10.482807+00:00",
+      "exit": 0,
+      "local_time_zone": "Asia/Singapore",
+      "name": "real-final-report",
+      "started_at_local": "2026-11-02T15:42:01.802417+08:00",
+      "started_at_utc": "2026-11-02T07:42:01.802417+00:00",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "73b213d37b33641819efd0e9d5394f1514d35d4d757b82e27332e6a27557eb96"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "status"
+      ],
+      "ended_at_local": "2026-11-02T15:42:19.178830+08:00",
+      "ended_at_utc": "2026-11-02T07:42:19.178830+00:00",
+      "exit": 0,
+      "local_time_zone": "Asia/Singapore",
+      "name": "real-final-status",
+      "started_at_local": "2026-11-02T15:42:10.482807+08:00",
+      "started_at_utc": "2026-11-02T07:42:10.482807+00:00",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "01cd31c7349d78c965228ac922a2456fd2b7917def0a33b79be6a99d795f3850"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "plan"
+      ],
+      "ended_at_local": "2026-11-02T15:42:27.924106+08:00",
+      "ended_at_utc": "2026-11-02T07:42:27.924106+00:00",
+      "exit": 0,
+      "local_time_zone": "Asia/Singapore",
+      "name": "real-final-plan",
+      "started_at_local": "2026-11-02T15:42:19.178830+08:00",
+      "started_at_utc": "2026-11-02T07:42:19.178830+00:00",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "8b0174a30274eeea2456fee4cc1d1177df79ba09e5bb95f7a23f11a7c84f56ad"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "query",
+        "--start",
+        "20211101",
+        "--end",
+        "20211126",
+        "--symbols",
+        "600000.SH,000001.SZ,600519.SH",
+        "--limit",
+        "100"
+      ],
+      "ended_at_local": "2026-11-02T15:42:28.059947+08:00",
+      "ended_at_utc": "2026-11-02T07:42:28.059947+00:00",
+      "exit": 0,
+      "local_time_zone": "Asia/Singapore",
+      "name": "real-query20",
+      "started_at_local": "2026-11-02T15:42:27.924106+08:00",
+      "started_at_utc": "2026-11-02T07:42:27.924106+00:00",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e14f14b767b63304c882ea093e94f07e183bb1ac310bae4abe5fff41a56c664e"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "query",
+        "--trade-date",
+        "20261030",
+        "--limit",
+        "10000"
+      ],
+      "ended_at_local": "2026-11-02T15:42:29.049221+08:00",
+      "ended_at_utc": "2026-11-02T07:42:29.049221+00:00",
+      "exit": 0,
+      "local_time_zone": "Asia/Singapore",
+      "name": "real-query-market",
+      "started_at_local": "2026-11-02T15:42:28.059947+08:00",
+      "started_at_utc": "2026-11-02T07:42:28.059947+00:00",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "ef63109f9a68fdc4c9ba47aee89e2975810cd9fc96874383f9dd9a14307c83b5"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/historical-warehouse.py",
+        "query",
+        "--start",
+        "20211101",
+        "--end",
+        "20211126",
+        "--symbols",
+        "600000.SH,000001.SZ,600519.SH",
+        "--as-of-version",
+        "1212",
+        "--limit",
+        "100"
+      ],
+      "ended_at_local": "2026-11-02T15:42:29.206341+08:00",
+      "ended_at_utc": "2026-11-02T07:42:29.206341+00:00",
+      "exit": 0,
+      "local_time_zone": "Asia/Singapore",
+      "name": "real-query-asof",
+      "started_at_local": "2026-11-02T15:42:29.071135+08:00",
+      "started_at_utc": "2026-11-02T07:42:29.071135+00:00",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "4be9c230edac43b478fa0154bc53a36ebc3d3c5baf005679e6a9a94137c45211"
+    }
+  ],
+  "old_rust_or_pr56_tests_run": false,
+  "reason": "No Rust/Observer/Agent changes; targeted new Python E2E only",
+  "red_checks": [
+    {
+      "ended_at_utc": "2026-11-02T05:19:04.122206+00:00",
+      "exit": 1,
+      "sha256": "516c55f525468d24bdcc03b96ce6fe34c5db765ab5c65bf7f5412bc9cdc325dd",
+      "sources": {
+        "research\\historical_warehouse.py": "9f65194ffdbbaaa35ab19e7a44166edf801219e96ab91a88839fbb8413ccd195",
+        "scripts\\test-historical-warehouse.py": "6d33e39360b43fcae0c6f0f45c2469eaf97f6856a74428de80e4a35dc88d6a99"
+      },
+      "started_at_utc": "2026-11-02T05:18:59.359201+00:00"
+    },
+    {
+      "at_utc": "2026-11-02T06:33:22.479648+00:00",
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-historical-warehouse.py",
+        "WarehouseTests.test_24_bar_must_match_its_own_exchange_calendar"
+      ],
+      "exit": 1,
+      "source_sha256": "d035c30c98ffecef854533518d66a6c7835ec33fb9adec2b6fed435bfab7687d"
+    },
+    {
+      "command": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-historical-warehouse.py"
+      ],
+      "ended_at_utc": "2026-11-02T06:56:15.031014+00:00",
+      "exit": 1,
+      "sources": {
+        "research\\historical_warehouse.py": "c95b58c33de4ff0f127dd5d385876d762326de734fff76047dfe5edf33e9ea4e",
+        "scripts\\historical-warehouse.py": "27e3a758cab3c0aa4f5f18f2616d5880bec2d464073f6ffc7c7c0df5e9056292",
+        "scripts\\test-historical-warehouse.py": "81f2bab8ef324a3e8047dee7c8ca66f8ba5172b828bdbe7df54c1ffbc0b650be"
+      },
+      "started_at_utc": "2026-11-02T06:56:04.351006+00:00"
+    }
+  ],
+  "synthetic": {
+    "command": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/test-historical-warehouse.py"
+    ],
+    "ended_at_utc": "2026-11-02T07:34:46.176529+00:00",
+    "exit": 0,
+    "sources": {
+      "research\\historical_warehouse.py": "55ef8788f49b4883644b6e35b39ca0968e5f7163eea2ddb2e7ddfeaa824599bc",
+      "scripts\\historical-warehouse.py": "27e3a758cab3c0aa4f5f18f2616d5880bec2d464073f6ffc7c7c0df5e9056292",
+      "scripts\\test-historical-warehouse.py": "48b0c9727bd504663103d6506d47f6280bdd203ed849bca17ec9c85db6342721"
+    },
+    "started_at_utc": "2026-11-02T07:34:35.057046+00:00"
+  },
+  "zero_purchases": true
+}

@@ -1,0 +1,15 @@
+test_24_bar_must_match_its_own_exchange_calendar (__main__.WarehouseTests.test_24_bar_must_match_its_own_exchange_calendar) ... FAIL
+
+======================================================================
+FAIL: test_24_bar_must_match_its_own_exchange_calendar (__main__.WarehouseTests.test_24_bar_must_match_its_own_exchange_calendar)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<ISSUE57_WORKTREE>\scripts\test-historical-warehouse.py", line 441, in test_24_bar_must_match_its_own_exchange_calendar
+    with self.assertRaisesRegex(h.WarehouseError,"DAILY_ON_CLOSED_EXCHANGE"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: WarehouseError not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.695s
+
+FAILED (failures=1)
