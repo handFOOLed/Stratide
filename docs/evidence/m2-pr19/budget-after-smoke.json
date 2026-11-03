@@ -1,0 +1,35 @@
+{
+  "billing": "provider_usage_is_estimate_cloud_maximum_held_until_owner_invoice_reconciliation",
+  "call_count": "1",
+  "currency": "CNY",
+  "daily_limit_micro": "5000000",
+  "daily_remaining_micro": "4901696",
+  "daily_settled_micro": "0",
+  "daily_usage_estimate_micro": "7514",
+  "day": "2026-11-03",
+  "input_tokens": "1021",
+  "month": "2026-11",
+  "monthly_limit_micro": "100000000",
+  "monthly_remaining_micro": "99901696",
+  "monthly_settled_micro": "0",
+  "monthly_usage_estimate_micro": "7514",
+  "output_tokens": "684",
+  "recent_calls": [
+    {
+      "api_model": null,
+      "id": 1,
+      "input_tokens": 1021,
+      "maximum_micro": 98304,
+      "model_id": "ds4.1flash-fusion",
+      "output_tokens": 684,
+      "state": "outcome_uncertain",
+      "task_id": 2,
+      "usage_estimate_micro": 7514
+    }
+  ],
+  "reserved_micro": "98304",
+  "state": "configured",
+  "timezone": "Asia/Shanghai",
+  "unit": "micro_currency_1e-6",
+  "usage_estimate_micro": "7514"
+}

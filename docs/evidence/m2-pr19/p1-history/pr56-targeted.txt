@@ -1,0 +1,7 @@
+test_01_two_scenarios_original_inbox_versions_readonly_and_fee_baselines (pr56.PortfolioTests.test_01_two_scenarios_original_inbox_versions_readonly_and_fee_baselines) ... ok
+test_07_bad_input_weights_receipts_never_self_approve (pr56.PortfolioTests.test_07_bad_input_weights_receipts_never_self_approve) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 4.330s
+
+OK

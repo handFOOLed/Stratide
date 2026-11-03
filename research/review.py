@@ -32,9 +32,12 @@ def read(path, limit):
 
 
 class Review:
-    def __init__(self, name, *, fault=lambda point: None, multimodal=False, portfolio=False):
-        self.multimodal = multimodal or portfolio
-        if portfolio:
+    def __init__(self, name, *, fault=lambda point: None, multimodal=False, portfolio=False, local_fusion=False):
+        self.multimodal = multimodal or portfolio or local_fusion
+        if local_fusion:
+            from local_fusion import Run
+            self.auto = Run(name)
+        elif portfolio:
             from portfolio_research import ReviewSource
             self.auto = ReviewSource(name)
         elif multimodal:

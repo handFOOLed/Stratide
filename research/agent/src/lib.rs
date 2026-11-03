@@ -2,6 +2,9 @@ pub mod budget;
 pub mod config;
 pub mod deepseek;
 pub mod eod_snapshot;
+pub mod local_fusion;
+#[cfg(test)]
+mod local_fusion_tests;
 pub mod multimodal;
 pub mod provider;
 pub mod risk_binding;

@@ -1,0 +1,104 @@
+{
+  "base_sha": "10804ea7231f24bdb84667802587c06ae8397bba",
+  "checks": [
+    {
+      "command": "cargo build --workspace --locked --offline",
+      "exit": 0,
+      "result": "Ubuntu ext4, final implementation"
+    },
+    {
+      "command": "cargo test --workspace --locked --offline -- --test-threads=1",
+      "exit": 0,
+      "result": "204 passed; 0 failed; includes CNY/shared Budget/Risk/Ledger/data validation"
+    },
+    {
+      "command": "PR19_TEST_DRIVER=<LIBTEST> .venv/bin/python -B scripts/test-local-timesfm-fusion.py",
+      "exit": 0,
+      "result": "6 passed, including nine HTTP/output fault scenarios; loopback only"
+    },
+    {
+      "command": "cargo test -p stratide-research --test cny_budget --test shared_budget --locked --offline -- --test-threads=1",
+      "exit": 0,
+      "result": "3+6 passed"
+    },
+    {
+      "command": "python3 -B scripts/test-deepseek-structured.py",
+      "exit": 0,
+      "result": "5 passed; unchanged PR17 path"
+    },
+    {
+      "command": "python3 -B scripts/test-timesfm-cpu.py",
+      "exit": 0,
+      "result": "11 passed, 1 Windows-only diagnostic skipped on Linux"
+    },
+    {
+      "command": "python3 -B scripts/test-timesfm-linux.py",
+      "exit": 0,
+      "result": "4/4 Linux isolation tests"
+    },
+    {
+      "command": "python3 -B scripts/test-risk-portfolio.py --driver <LIBTEST>",
+      "exit": 1,
+      "result": "12/13 passed; existing FUTURE_OR_STALE_SNAPSHOT before revocation fault marker"
+    },
+    {
+      "command": "original unmodified PortfolioTests.test_05_reserve_dispatch_rechecks_revocation_receipt_and_lowered_caps",
+      "exit": 0,
+      "result": "targeted rerun 1/1 passed"
+    },
+    {
+      "command": "python3 -B scripts/timesfm-cpu.py preflight / enable / synthetic-freeze / once / verify",
+      "exit": 0,
+      "result": "real pinned CPU weights; original completed task; 0 cloud calls"
+    },
+    {
+      "command": "python3 -B scripts/local-timesfm-fusion.py once --name <AUTHORIZED_SMOKE>",
+      "exit": 2,
+      "result": "one real HTTP call; PORTFOLIO_SCHEMA; no valid real portfolio"
+    },
+    {
+      "command": "python3 -B scripts/local-timesfm-fusion.py once --name <SAME_SMOKE>",
+      "exit": 2,
+      "result": "same immutable failed task; call count remains 1; no network retry"
+    },
+    {
+      "command": "python3 -B scripts/timesfm-cpu.py preflight / enable / synthetic-freeze / once / verify --name <NEW_AUTHORIZED_BATCH>",
+      "exit": 0,
+      "result": "real CPU task 3 completed/verified; 0 calls"
+    },
+    {
+      "command": "python3 -B scripts/local-timesfm-fusion.py preflight / enable / once --name <NEW_AUTHORIZED_BATCH>",
+      "exit": 0,
+      "result": "one explicitly authorized additional real call; strict V1 portfolio accepted and archived"
+    },
+    {
+      "command": "python3 -B scripts/local-timesfm-fusion.py verify / report / inbox --name <NEW_AUTHORIZED_BATCH>",
+      "exit": 0,
+      "result": "all exit 0; saved-byte SHA verified; original Registry/Inbox count 1"
+    },
+    {
+      "command": "python3 -B scripts/local-timesfm-fusion.py disable; once --name <SAME_NEW_BATCH>",
+      "exit": 0,
+      "result": "original successful task reused; real call count remains 2; first failure retained"
+    },
+    {
+      "command": "python3 -B scripts/local-timesfm-fusion.py budget status",
+      "exit": 0,
+      "result": "CNY cap unchanged; total usage estimate 15420 micro; reserved 196608 micro"
+    }
+  ],
+  "actual_paid_network_calls": 2,
+  "final_adapter_sha256": "a5bd6c9a53d223a60fdfb25633d077b4f5ef1a2df93170af3a5f41f18db57474",
+  "review_status": "DRAFT_ONLY_NOT_INDEPENDENT_ACCEPTANCE",
+  "current_real_status": "REAL_SYNTHETIC_FUSION_CHAIN_VERIFIED",
+  "production_code_changed_after_initial_PR": true,
+  "regressions_reused": "204 Rust + 6 Fusion + prior targeted suites; identical production bytes; followup only changes docs/evidence",
+  "p1_review_fix": {
+    "review_comment": 6604866896,
+    "evidence": "p1-history/validation.json",
+    "new_real_api_calls": 0,
+    "history_fusion_tests_passed": 9,
+    "rust_workspace_passed": 204,
+    "owner_database_rows_unchanged": true
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "task_id": 1,
+  "state": "completed",
+  "verified": true,
+  "billing": "LOCAL_NO_BILLING",
+  "calls": 0,
+  "model_revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+  "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+  "manifest_sha256": "d5e54a409cc4aa4e1aa7a2b308bab3500124e90644071a210aab4fbce23f2597",
+  "development_only": false,
+  "isolation": {
+    "mechanism": "systemd-cgroup-v2+bubblewrap",
+    "memory_max_bytes": 6442450944,
+    "memory_oom_group": true,
+    "memory_swap_max_bytes": 0
+  },
+  "metrics": {
+    "batch_timings": [
+      {
+        "seconds": 0.12926930399999037,
+        "series": 1
+      },
+      {
+        "seconds": 0.09654062099998839,
+        "series": 1
+      }
+    ],
+    "cgroup_cpu_seconds": 3.690976,
+    "cgroup_memory_peak_bytes": 1412726784,
+    "cpu_seconds": 3.651931335,
+    "failures": 0,
+    "load_seconds": 1.3880427220000087,
+    "peak_rss_bytes": 2076205056,
+    "resource_scope": "WHOLE_WORKER_CGROUP",
+    "wall_seconds": 4.047756402999994
+  },
+  "N100_ACCEPTANCE": "NOT_VERIFIED",
+  "input_mode": "synthetic_test"
+}

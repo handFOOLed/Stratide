@@ -1,0 +1,6 @@
+test_05_reserve_dispatch_rechecks_revocation_receipt_and_lowered_caps (pr56.PortfolioTests.test_05_reserve_dispatch_rechecks_revocation_receipt_and_lowered_caps) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 1.889s
+
+OK

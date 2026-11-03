@@ -64,6 +64,7 @@ pub const SYSTEM: &str = "你是 Paper 阶段研究助手。输入只是已发�
 pub enum Prepared {
     Structured(Box<crate::structured::Prepared>),
     RiskCloud(Box<crate::risk_cloud::Prepared>),
+    LocalFusion(Box<crate::local_fusion::Prepared>),
     Fake {
         scenario: String,
         input_tokens: u32,
@@ -100,6 +101,9 @@ pub enum Outcome {
 }
 
 pub fn prepare(m: &Model, input: &Value) -> Result<Prepared> {
+    if crate::local_fusion::is_model(m) {
+        return crate::local_fusion::prepare(m, input).map(|p| Prepared::LocalFusion(Box::new(p)));
+    }
     if crate::structured::is_model(m) {
         return crate::structured::prepare(m, input).map(|p| Prepared::Structured(Box::new(p)));
     }
@@ -148,7 +152,7 @@ pub fn prepare(m: &Model, input: &Value) -> Result<Prepared> {
 /// The same pinned, proxy-free TLS boundary for the structured DeepSeek route.
 pub(crate) fn https_client(m: &Model) -> Result<(Client, Url)> {
     #[cfg(test)]
-    if crate::deepseek::is_model(m) {
+    if crate::deepseek::is_model(m) || crate::local_fusion::is_model(m) {
         return Err("LIBTEST_REQUIRES_LOOPBACK_NO_EXTERNAL_DNS".into());
     }
     let url = endpoint(m.endpoint.as_deref().ok_or("ENDPOINT_REQUIRED")?)?;
@@ -179,6 +183,7 @@ pub(crate) fn https_client(m: &Model) -> Result<(Client, Url)> {
 pub fn call(prepared: Prepared, attempt: usize) -> Outcome {
     match prepared {
         Prepared::Structured(p) => crate::structured::call(*p),
+        Prepared::LocalFusion(p) => crate::local_fusion::call(*p),
         Prepared::RiskCloud(p) => crate::risk_cloud::call(*p),
         Prepared::Fake {
             scenario,

@@ -1,0 +1,434 @@
+
+running 5 tests
+test replay::historical::tests::future_prices_and_appended_sessions_cannot_change_frozen_today_signal ... ok
+test replay::historical::tests::historical_adapter_cannot_supply_forward_opening_or_change_assumption_labels ... ok
+test replay::report::publish::tests::conflicting_or_nonsequential_content_is_never_archived_or_overwritten ... ok
+test replay::report::publish::tests::crash_child ... ok
+test replay::report::publish::tests::process_death_during_write_archive_and_publish_can_resume_same_path ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+
+running 2 tests
+test eod_step_publishes_diagnostics_and_does_not_automatically_retry_after_restart ... ok
+test real_cli_process_restart_blocked_attempts_and_report_no_money_mutation ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+
+running 4 tests
+test actual_cli_create_submit_fill_reopen_retry_and_deterministic_second_run ... ok
+test expiry_window_is_persisted_across_real_cli_processes_without_replayed_fills ... ok
+test missing_session_retry_and_open_then_close_order_survive_real_cli_processes ... ok
+test real_process_restarts_preserve_peak_flow_rejected_order_locks_and_missing_valuation ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+
+
+running 5 tests
+test bad_hash_future_data_and_absent_opening_evidence_cannot_make_a_fill ... ok
+test independent_directories_and_restarts_produce_identical_paper_reports ... ok
+test interrupted_export_resumes_in_same_directory_and_preserves_partial_evidence ... ok
+test legacy_v3_synthetic_demo_cannot_be_relabelled_as_replay_report ... ok
+test unverified_session_is_an_explicit_nav_gap_and_never_generates_its_close_signal ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+
+running 2 tests
+test missing_negative_fractional_or_overflowing_principal_is_not_defaulted ... ok
+test synthetic_demo_is_deterministic_and_does_not_claim_fills ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 1 test
+test tests::scaffold_does_not_claim_trading_readiness ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 27 tests
+test tests::backfill_before_observation_start_does_not_invent_old_gap ... ok
+test tests::blocked_license_survives_restart_pending_recovery_and_immutable_reports ... ok
+test tests::calendar_missing_closed_and_permission_are_distinct ... ok
+test tests::continuity::continuity_counts_open_gaps_failed_days_closed_days_and_late_attempts ... ok
+test tests::continuity::early_probe_and_late_backfill_do_not_consume_todays_eod_slot ... ok
+test tests::continuity::point_in_time_view_excludes_eod_at_open_and_future_revisions_and_late_receipts ... ok
+test tests::continuity::real_process_death_during_response_commit_recovers_actual_committed_state ... ok
+test tests::continuity::response_crossing_midnight_is_late_and_never_a_ready_on_day_step ... ok
+test tests::continuity::step_waits_without_http_and_restart_does_not_retry_completed_failure ... ok
+test tests::continuity::unknown_calendar_and_later_conflict_do_not_certify_continuity_or_asof ... ok
+test tests::crash_child ... ok
+test tests::duplicate_revision_backfill_preserve_original_and_no_financial_ledger ... ok
+test tests::exact_fen_and_volume_no_float_rounding ... ok
+test tests::journal_tamper_tail_loss_raw_tamper_and_transaction_rollback_fail_closed ... ok
+test tests::late_backfill_keeps_missed_day_gap_in_json_csv_and_after_restart ... ok
+test tests::later_calendar_evidence_marks_missed_days_and_does_not_rewrite_prior_attempt ... ok
+test tests::local_single_writer_and_durable_clock_halt ... ok
+test tests::r1::r1_automatic_recovery_does_not_start_a_new_collection ... ok
+test tests::r1::r1_calendar_conflict_is_scoped_to_its_date_in_asof_and_report ... ok
+test tests::r1::r1_interrupted_attempt_consumes_automatic_slot_before_and_after_recovery ... ok
+test tests::r1::r1_later_rollback_cannot_erase_an_earlier_asof_view ... ok
+test tests::r1::r1_process_death_at_start_and_finish_commit_boundaries_respects_automatic_slot ... ok
+test tests::r2::audit_backfill_conflict_must_invalidate_current_ready ... ok
+test tests::r2::r2_first_eod_still_conservatively_rejects_a_response_with_other_date_conflict ... ok
+test tests::r2::r2_readiness_matches_target_date_evidence_after_backfill_and_restart ... ok
+test tests::real_process_death_at_commit_boundaries_recovers_without_invented_response ... ok
+test tests::same_day_failure_remains_explicit_without_inventing_no_attempt_gap ... ok
+
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.65s
+
+
+running 45 tests
+test store::tests::acceptance_closing_mark_cannot_retroactively_block_intraday_fill ... ok
+test store::tests::acceptance_intraday_expiry_cannot_use_unordered_full_day_crossing ... ok
+test store::tests::acceptance_missing_bar_can_be_retried_after_evidence_arrives ... ok
+test store::tests::corrupted_empty_old_or_missing_ledger_never_initializes ... ok
+test store::tests::crash_child ... ok
+test store::tests::dividends::crash_before_and_after_each_dividend_commit_is_atomic_and_idempotent ... ok
+test store::tests::dividends::dividend_100_shares_gross_tax_receivable_cash_and_no_second_profit ... ok
+test store::tests::dividends::dividend_crash_child ... ok
+test store::tests::dividends::duplicate_conflict_ordering_backfill_and_unknown_marks_fail_closed ... ok
+test store::tests::dividends::event_contract_source_tax_units_overflow_and_real_gate ... ok
+test store::tests::dividends::ex_tax_loss_uses_one_nav_and_financial_locks_survive_payment_restart ... ok
+test store::tests::dividends::historical_v3_still_rejects_same_open_state_without_frozen_dividend_boundary ... ok
+test store::tests::dividends::historical_v4_crash_commit_recovery_then_same_open_replay_uses_one_reducer ... ok
+test store::tests::dividends::historical_v4_open_boundary_cancels_pre_ex_orders_and_preserves_net_assets ... ok
+test store::tests::dividends::receivable_cannot_fund_orders_and_old_pending_order_expires ... ok
+test store::tests::dividends::record_day_session_buy_is_eligible_despite_post_close_accounting_timestamp ... ok
+test store::tests::dividends::registration_empty_then_buy_gets_no_entitlement_and_sell_does_not_remove_it ... ok
+test store::tests::dividends::successive_events_are_accounted_per_event_and_overlaps_are_explicitly_rejected ... ok
+test store::tests::dividends::v3_is_never_migrated_and_v4_tamper_tail_or_genesis_is_rejected ... ok
+test store::tests::expiry_releases_reservations_but_never_clears_uncertainty_or_loss_locks ... ok
+test store::tests::failed_storage_write_poisons_handle_and_preserves_committed_locks ... ok
+test store::tests::fee_expiry_and_updated_risk_block_previously_accepted_buy ... ok
+test store::tests::historical::historical_fen_fees_tplusone_reservations_and_restart_are_conserved ... ok
+test store::tests::historical::historical_later_extrema_volume_and_close_do_not_select_open_fills ... ok
+test store::tests::historical::historical_mode_gate_limit_jump_suspension_capacity_and_locks_are_binding ... ok
+test store::tests::independent_observation_rejection_peak_flows_and_financial_locks_survive_disk ... ok
+test store::tests::no_same_day_future_stale_unverified_suspended_limit_touch_or_missing_data_fills ... ok
+test store::tests::opening_nav_overflow_blocks_fill_without_discarding_closing_loss_lock ... ok
+test store::tests::partial_fills_event_order_idempotency_restart_and_exact_accounting ... ok
+test store::tests::process_death_before_after_reservation_fill_expiry_and_lock_commits_is_atomic ... ok
+test store::tests::r1::closing_price_only_changes_post_execution_nav_not_fill_eligibility ... ok
+test store::tests::r1::committed_close_observation_cannot_be_rolled_back_to_replay_opening_risk ... ok
+test store::tests::r1::genuine_opening_loss_blocks_buy_even_when_close_recovers ... ok
+test store::tests::r1::incomplete_bar_or_rules_retry_survives_restart_without_reusing_valid_capacity ... ok
+test store::tests::r1::legacy_v1_and_v2_ledgers_are_preserved_without_automatic_reinterpretation ... ok
+test store::tests::r1::missing_future_or_stale_opening_evidence_never_gets_invented_from_daily_bar ... ok
+test store::tests::r2::delayed_receipt_uses_market_window_not_receipt_time_for_expiry ... ok
+test store::tests::r2::favorable_open_is_not_an_exception_for_short_validity ... ok
+test store::tests::r2::full_day_evidence_requires_exclusive_expiry_after_close_for_buys_and_sells ... ok
+test store::tests::r2::intraday_expiry_reservation_cannot_be_released_for_other_opening_reviews ... ok
+test store::tests::r2::partial_fill_remaining_expiry_never_adds_later_fills_or_fees_after_restart ... ok
+test store::tests::stale_approvals_cannot_double_reserve_cash_or_sellable_shares ... ok
+test store::tests::suspended_or_single_price_session_still_observes_unrealized_loss ... ok
+test store::tests::t_plus_one_lots_sell_costs_and_shared_liquidity ... ok
+test store::tests::writer_exclusion_is_real_process_and_lock_releases_on_exit ... ok
+
+test result: ok. 45 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.54s
+
+
+running 27 tests
+test local_fusion_tests::process_driver ... ok
+test multimodal::tests::expert_numbers_and_timezone_are_bounded ... ok
+test multimodal::tests::fusion_rejects_paths_commands_urls_oversize_and_missing_fields ... ok
+test multimodal::tests::fusion_strict_schema_rejects_authority_finance_and_tools ... ok
+test risk_portfolio_tests::process_driver ... ok
+test structured_tests::cancel_or_revoke_after_reserve_has_no_send_or_charge ... ok
+test structured_tests::crash_after_dispatch_holds_original_reservation_across_month ... ok
+test structured_tests::deepseek_blank_truncated_missing_usage_forgery_http_and_disconnect_no_retry ... ok
+test structured_tests::deepseek_cny_usage_is_estimate_maximum_held_once_consumed_and_not_real_observed ... ok
+test structured_tests::deepseek_crash_dispatch_consumes_permit_and_preserves_unknown_on_restart ... ok
+test structured_tests::deepseek_default_off_metadata_only_preflight_and_peak_price ... ok
+test structured_tests::deepseek_disabled_revoked_cancelled_or_mutated_after_reserve_cannot_dispatch ... ok
+test structured_tests::deepseek_expired_price_or_tst_currency_cannot_authorize_real_route ... ok
+test structured_tests::deepseek_https_cannot_accept_an_unapproved_receiver ... ok
+test structured_tests::deepseek_key_parser_rejects_multiple_other_credentials_and_placeholders ... ok
+test structured_tests::deepseek_key_source_must_be_untracked_and_ignored_without_content_read ... ok
+test structured_tests::deepseek_remaining_budget_and_synthetic_scope_checked_before_key_read ... ok
+test structured_tests::insufficient_original_budget_and_revoked_grant_never_dispatch ... ok
+test structured_tests::loopback_production_dispatch_and_unknown_no_retry ... ok
+test structured_tests::old_grants_cannot_authorize_new_scope ... ok
+test structured_tests::paused_after_reserve_can_explicitly_resume_without_second_dispatch ... ok
+test structured_tests::process_driver ... ok
+test structured_tests::process_driver_init_cny ... ok
+test structured_tests::recorded_exact_task_shared_budget_and_no_repeat ... ok
+test structured_tests::recorded_status_after_settlement_is_not_cloud ... ok
+test structured_tests::recorded_status_before_dispatch_is_not_cloud ... ok
+test structured_tests::usage_overrun_and_duplicate_wire_keys_keep_unknown_reservation ... ok
+
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.32s
+
+
+running 1 test
+test tests::fixture_cli ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test tests::routing_fixture ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 3 tests
+test five_yuan_is_shared_between_structured_and_fusion ... ok
+test hundred_yuan_monthly_total_rejects_new_day_and_both_models ... ok
+test shanghai_month_rollover_keeps_unknown_holds_after_restart ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+
+
+running 3 tests
+test local_fake_frozen_task_survives_restart_and_snapshot_never_schedules_eod ... ok
+test new_scope_cannot_use_cloud_even_with_copied_or_matching_grant_and_reserves_nothing ... ok
+test snapshot_new_tasks_recheck_within_cache_interval_while_queued_input_stays_frozen ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+
+running 1 test
+test multimodal_scope_rejects_cloud_even_with_a_copied_grant_before_key_lookup ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 8 tests
+test bigquery_https_fails_closed_without_a_verified_all_dimension_bound ... ok
+test bigquery_response_status_context_axis_and_finite_ratio_are_checked ... ok
+test cloud_grants_prices_fields_endpoints_and_legacy_scopes_are_closed ... ok
+test copied_old_grant_cannot_authorize_new_cloud_scope ... ok
+test forecast_context_units_calendar_availability_and_readiness_are_independent ... ok
+test portfolio_entire_artifact_is_rejected_for_weights_tools_unknown_holdings_or_authority ... ok
+test production_adapter_config_is_supported_offline ... ok
+test production_request_templates_are_bounded_and_do_not_leak_raw_bars_to_fusion ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+
+running 11 tests
+test concurrent_reservations_use_one_cap_and_each_period_enforces_its_own_limit ... ok
+test crash_before_dispatch_is_recoverable_after_dispatch_is_uncertain ... ok
+test eod_off_stale_synthetic_pause_latest_only_and_crash_marker_deduplication ... ok
+test malicious_text_is_data_network_targets_and_generated_tool_payloads_are_rejected ... ok
+test missing_budget_grant_price_and_scope_prevent_any_dispatch ... ok
+test new_default_does_not_migrate_queued_tasks_config_revocation_blocks_send_and_task_cap_applies ... ok
+test price_rounding_invoice_overrun_and_resource_capacity_are_enforced_outside_provider ... ok
+test queue_cancel_pause_persist_and_running_cancel_keeps_result_and_charges ... ok
+test queued_old_eod_expires_while_switch_off_without_discarding_manual_work ... ok
+test safe_no_charge_retries_once_unknown_charge_never_retries_even_after_switch_or_restart ... ok
+test unsettled_commitments_carry_across_midnight_month_and_restart_without_currency_timezone_reset ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.99s
+
+
+running 6 tests
+test cross_entry_process ... ok
+test existing_authority_rejects_a_second_settings_file_or_database ... ok
+test legacy_unknown_survives_restart_and_month_change_in_cloud_budget ... ok
+test original_spend_and_cloud_quotes_share_both_period_caps ... ok
+test selecting_cloud_task_preserves_existing_default_and_shared_call_table ... ok
+test two_processes_from_legacy_and_cloud_share_one_atomic_reservation ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+
+
+running 9 tests
+test confirmed_no_charge_provider_rejection_still_marks_provider_unavailable ... ok
+test eod_failure_and_uncertainty_follow_actual_task_without_releasing_holds ... ok
+test eod_latest_reflects_completed_task_and_restart_does_not_schedule_another_call ... ok
+test eod_latest_reflects_running_cancel_requested_and_cancelled ... ok
+test local_budget_authorization_and_price_rejections_are_not_provider_failures ... ok
+test local_denial_and_queued_cancellation_preserve_prior_provider_success_or_uncertainty ... ok
+test provider_dns_preparation_failure_is_distinct_from_local_policy_rejection ... ok
+test safe_not_sent_attempt_then_lower_owner_budget_preserves_prior_provider_health ... ok
+test verification_preserves_fake_pr56_recorded_and_nonrecorded_projection ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.87s
+
+
+running 1 test
+test exact_claim_checks_id_and_trigger_without_consuming_the_queue_head ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+
+running 33 tests
+test tests::both_risk_layers_enforce_order_and_exposure_caps ... ok
+test tests::buys_include_fees_and_cash_boundary_is_exact ... ok
+test tests::cost_is_bound_to_every_proposal_and_rule_field_and_expiry ... ok
+test tests::deposits_and_withdrawals_are_not_trading_profit_or_loss ... ok
+test tests::deposits_cannot_hide_losses_and_observed_peak_cannot_be_lowered ... ok
+test tests::explicit_initial_capital_and_authorization_are_required ... ok
+test tests::fee_evidence_must_be_present_and_bound_to_proposal ... ok
+test tests::financial_freezes_deny_buys_but_allow_verified_settled_reduction ... ok
+test tests::future_data_expiry_and_invalid_snapshot_are_rejected ... ok
+test tests::identity_changes_cannot_reuse_account_or_risk_state ... ok
+test tests::invalid_lots_ticks_price_bands_suspensions_and_evidence_are_rejected ... ok
+test tests::invalid_positions_and_overreservations_fail_closed ... ok
+test tests::invalid_quantity_id_symbol_price_and_overflows_fail_closed ... ok
+test tests::missing_stale_duplicate_and_future_marks_never_imply_zero_loss ... ok
+test tests::no_position_and_overselling_are_rejected ... ok
+test tests::normal_buy_is_bound_repeatable_and_does_not_fill_or_reserve ... ok
+test tests::observation::regression_bad_or_incomplete_marks_cannot_partially_update_state ... ok
+test tests::observation::regression_invalid_equity_basis_cannot_partially_commit_state ... ok
+test tests::observation::regression_invalid_proposals_cannot_skip_trusted_loss_observation ... ok
+test tests::observation::regression_missing_cost_evidence_still_records_trusted_peak ... ok
+test tests::observation::regression_missing_market_evidence_still_latches_trusted_loss ... ok
+test tests::observation::regression_observation_without_proposal_records_loss_and_peak ... ok
+test tests::observation::regression_restore_repeat_and_next_day_observation_preserve_locks_and_peak ... ok
+test tests::observation::regression_wrong_identity_or_expired_snapshot_cannot_pollute_state ... ok
+test tests::overflowing_nav_and_invalid_flow_adjustment_fail_closed ... ok
+test tests::pending_buys_reserve_shared_cash_and_exposure ... ok
+test tests::pending_sells_and_duplicate_ids_cannot_be_reused ... ok
+test tests::sell_fees_cannot_create_an_unreserved_cash_debit ... ok
+test tests::settlement_is_instrument_specific_and_unknown_rules_fail_closed ... ok
+test tests::strategy_loss_and_account_drawdown_are_separate_checks ... ok
+test tests::t_plus_one_only_releases_earlier_day_lots ... ok
+test tests::uncertainty_and_manual_freezes_deny_both_sides ... ok
+test tests::unrealized_nav_loss_latches_at_threshold_and_memory_restore_retains_it ... ok
+
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 2 tests
+test cloud_summary_is_a_versioned_projection_without_account_identity_cash_or_private_strategy_payloads ... ok
+test eod_snapshot_source_is_opt_in_and_cannot_silently_mix_report_dates_or_modes ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 7 tests
+test exact_integer_transport_and_research_never_change_account_nav ... ok
+test invalid_incomplete_or_mixed_publications_fail_closed ... ok
+test no_input_is_an_honest_empty_state_with_healthy_service ... ok
+test null_valuation_is_unavailable_and_not_zero_or_skipped_for_daily_pnl ... ok
+test pinning_refresh_and_restart_are_readonly_even_with_busy_writer_lock ... ok
+test real_loopback_http_has_no_write_file_or_cross_origin_routes ... ok
+test sample_fields_fills_and_unfilled_orders_are_separate ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Compiling stratide-risk v0.0.1 (<WSL_EXT4_WORKTREE>/state/pr19-p1/fixed/crates/risk)
+   Compiling stratide-contracts v0.0.1 (<WSL_EXT4_WORKTREE>/state/pr19-p1/fixed/crates/contracts)
+   Compiling stratide-ledger v0.0.1 (<WSL_EXT4_WORKTREE>/state/pr19-p1/fixed/crates/ledger)
+   Compiling stratide-forward v0.0.1 (<WSL_EXT4_WORKTREE>/state/pr19-p1/fixed/crates/forward)
+   Compiling stratide-cli v0.0.1 (<WSL_EXT4_WORKTREE>/state/pr19-p1/fixed/apps/stratide-cli)
+warning: variable does not need to be mutable
+  --> research/agent/src/eod_snapshot.rs:39:17
+   |
+39 |             let mut linked = meta.file_type().is_symlink();
+   |                 ----^^^^^^
+   |                 |
+   |                 help: remove this `mut`
+   |
+   = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling stratide-research v0.0.1 (<WSL_EXT4_WORKTREE>/state/pr19-p1/fixed/research/agent)
+warning: `stratide-research` (lib) generated 1 warning (run `cargo fix --lib -p stratide-research` to apply 1 suggestion)
+   Compiling stratided v0.0.1 (<WSL_EXT4_WORKTREE>/state/pr19-p1/fixed/apps/stratided)
+warning: `stratide-research` (lib test) generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.85s
+     Running unittests src/main.rs (target/debug/deps/stratide_cli-146ab6d1dba14be1)
+     Running tests/forward.rs (target/debug/deps/forward-9477af8c74b50dd8)
+     Running tests/paper_ledger.rs (target/debug/deps/paper_ledger-1ae7f3f83ad85988)
+     Running tests/replay.rs (target/debug/deps/replay-9398354d9c495005)
+     Running tests/risk_demo.rs (target/debug/deps/risk_demo-9a14b99a37bc06b6)
+     Running unittests src/lib.rs (target/debug/deps/stratide_contracts-18b30cabf066a591)
+     Running unittests src/lib.rs (target/debug/deps/stratide_forward-9155546f514d46d9)
+     Running unittests src/lib.rs (target/debug/deps/stratide_ledger-8194ece35bd5a0e9)
+     Running unittests src/lib.rs (target/debug/deps/stratide_research-22fdff2f3ac7d843)
+     Running unittests src/bin/eod-auto-agent.rs (target/debug/deps/eod_auto_agent-b518ada7e094e0fb)
+     Running unittests src/bin/eod-research.rs (target/debug/deps/eod_research-a8db436f0842eb31)
+     Running unittests src/bin/local-fusion-agent.rs (target/debug/deps/local_fusion_agent-7b3339abde302d42)
+     Running unittests src/bin/multimodal-agent.rs (target/debug/deps/multimodal_agent-0148257abb6a6799)
+     Running unittests src/bin/risk-portfolio-agent.rs (target/debug/deps/risk_portfolio_agent-ca69436f5b817aa7)
+     Running unittests src/bin/structured-research-agent.rs (target/debug/deps/structured_research_agent-cdcaa44ba346262c)
+     Running unittests src/bin/timesfm-risk-agent.rs (target/debug/deps/timesfm_risk_agent-708aa4effb8eb3d9)
+     Running tests/cny_budget.rs (target/debug/deps/cny_budget-e9669e6b06e92a6a)
+     Running tests/eod_scope.rs (target/debug/deps/eod_scope-c18d4f9dba7f89f1)
+     Running tests/multimodal_scope.rs (target/debug/deps/multimodal_scope-a54122dfc8ea5bb8)
+     Running tests/risk_portfolio.rs (target/debug/deps/risk_portfolio-e91de74ee0ac5f98)
+     Running tests/safety.rs (target/debug/deps/safety-527bcef2ef4ae91c)
+     Running tests/shared_budget.rs (target/debug/deps/shared_budget-a9e1d5256833cca8)
+     Running tests/status_regression.rs (target/debug/deps/status_regression-bc2c708873ade173)
+     Running tests/task_routing.rs (target/debug/deps/task_routing-89e71085b36f4e85)
+     Running unittests src/lib.rs (target/debug/deps/stratide_risk-ecf9fe47d5905af3)
+     Running unittests src/lib.rs (target/debug/deps/stratided-f4fe5484cf6c4fa7)
+     Running unittests src/main.rs (target/debug/deps/stratided-0fd43449a5fdbcd5)
+     Running tests/agent.rs (target/debug/deps/agent-3e2c0ab6ade743f9)
+     Running tests/dashboard.rs (target/debug/deps/dashboard-923b1efc144b6564)
+   Doc-tests stratide_contracts
+   Doc-tests stratide_forward
+   Doc-tests stratide_ledger
+   Doc-tests stratide_research
+   Doc-tests stratide_risk
+   Doc-tests stratided
