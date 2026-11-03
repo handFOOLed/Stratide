@@ -1,0 +1,46 @@
+test_post_seal_failure_audit_tamper_delete_extra_and_recovery (__main__.Suite.test_post_seal_failure_audit_tamper_delete_extra_and_recovery) ...
+  test_post_seal_failure_audit_tamper_delete_extra_and_recovery (__main__.Suite.test_post_seal_failure_audit_tamper_delete_extra_and_recovery) (mode='tamper') ... FAIL
+  test_post_seal_failure_audit_tamper_delete_extra_and_recovery (__main__.Suite.test_post_seal_failure_audit_tamper_delete_extra_and_recovery) (mode='delete') ... FAIL
+test_post_seal_failure_audit_tamper_delete_extra_and_recovery (__main__.Suite.test_post_seal_failure_audit_tamper_delete_extra_and_recovery) ... FAIL
+test_seed3_without_contraction_has_bounded_novel_second_round (__main__.Suite.test_seed3_without_contraction_has_bounded_novel_second_round) ... FAIL
+
+======================================================================
+FAIL: test_post_seal_failure_audit_tamper_delete_extra_and_recovery (__main__.Suite.test_post_seal_failure_audit_tamper_delete_extra_and_recovery) (mode='tamper')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-autonomous-research.py", line 334, in test_post_seal_failure_audit_tamper_delete_extra_and_recovery
+    with self.assertRaises((a.Error, OSError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (<class 'warehouse_v1.WarehouseError'>, <class 'OSError'>) not raised
+
+======================================================================
+FAIL: test_post_seal_failure_audit_tamper_delete_extra_and_recovery (__main__.Suite.test_post_seal_failure_audit_tamper_delete_extra_and_recovery) (mode='delete')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-autonomous-research.py", line 334, in test_post_seal_failure_audit_tamper_delete_extra_and_recovery
+    with self.assertRaises((a.Error, OSError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (<class 'warehouse_v1.WarehouseError'>, <class 'OSError'>) not raised
+
+======================================================================
+FAIL: test_post_seal_failure_audit_tamper_delete_extra_and_recovery (__main__.Suite.test_post_seal_failure_audit_tamper_delete_extra_and_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-autonomous-research.py", line 341, in test_post_seal_failure_audit_tamper_delete_extra_and_recovery
+    with self.assertRaisesRegex(a.Error, "AUDIT_FILE_SET"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: WarehouseError not raised
+
+======================================================================
+FAIL: test_seed3_without_contraction_has_bounded_novel_second_round (__main__.Suite.test_seed3_without_contraction_has_bounded_novel_second_round)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-autonomous-research.py", line 380, in test_seed3_without_contraction_has_bounded_novel_second_round
+    self.assertFalse(seen & {p["ast_sha"] for p in second})
+AssertionError: {'aff76a315e017caf86d3dd77f9b4ced8ec56fba0a181b68b177681ad192659cf', '253a7be56bbb1b07761f675df3fcb3dd8becfee788ea5cffd38e5025b027cc2e', '4ee66a118dbe1e42fddd0021cff33e1c40b3624ca7e8a65b3103e0149b783f67', 'f602fda2fceb33c6e18a551b11349ee8e7e652742852e95d7e43df8f67247c9b'} is not false
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.868s
+
+FAILED (failures=4)
+exit_code=1 (expected 1 before repair)

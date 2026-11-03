@@ -2,6 +2,8 @@
 
 本证据对应独立分支 `codex/issue63-autonomous-research`，base `cb624bc6308add4ee9d1f04b35cbac591f0cd7e8`。固定提交 HEAD 见唯一 Draft PR。全部为开发者自测和真实本机历史研究记录，**不构成独立验收、PIT 认证、Alpha 或 Paper/Live 资格**。
 
+以下真实运行与 12 项测试记录冻结于初次提交 `6ed034edf9d776efdbe96a3aab89865dac8bd353`。[R1 审查修复](r1/README.md)另列封存后审计/P2 去重回退、14 项定向测试及原档案只读复用证据；按审查要求未重跑五年研究，原 JSON/报告/SHA 保留。
+
 ## 交付与实际执行
 
 完整 CLI、受限 AST/提案器、同源多候选评价和恢复控制见 [M2_PR15](../../M2_PR15.md)。真实实验一次授权后实际运行 **2 轮 / 8 个不同合法 AST / 0 提案拒绝**，每轮四个候选、现金、受 50 个实际持仓上限约束的确定性等权和简单正收益基准，均报告 gross/base/stress 与分窗/重置 Walk-forward。最终状态 `COMPLETED`、累计 trial=8，达到两轮上限后不再启动。
@@ -46,7 +48,7 @@ Windows、Python 3.12.10、SQLite 3.49.1。默认每次 1800 秒、512 MiB、整
 - [新增定向测试](tests-autonomous.txt)：**12/12，exit 0**。四种结构/seed/去重、非法类型/单位/未来 lag/复杂度、旧文本与伪造来源、两轮 E2E/不可覆盖、开发段投影和 hidden holdout 拒绝、时点/成本/基准/实际持仓上限、独立 Decimal 小账、freeze/evaluate/publish/archive/已封存后状态恢复、失败保全/篡改、暂停取消/资源/并发、NULL 估值、空提案和只读零副作用。
 - [PR62 定向回归](tests-pr62-regression.txt)：**12/12，exit 0**。保留复权/现金/费用、下一开盘时点、未来成交量反例、只读/WAL/schema/修订/复现等原基线。没有重算其真实 25m 行或修改旧报告。
 - [费用符号红色反证](cost-sign-red.txt)：可信测试进程内暂时将原 `cost_rate` 符号反转，独立几日 Decimal 账立即出现 **1 个预期失败，exit 1**；撤去进程内 mutation 后完整定向测试 exit 0。预期账用字面 buy/sell/滑点/费率和 cash/units/index 逐步独立计算，没有调用实现的价格/成本/统计函数计算期待值；同时对照四本同源候选账。测试涉及亏损，亏损本身不触发失败。
-- [新增档案核验](verification.json)：两轮均 `SEALED`，日账重建指标和源/代码/AST/产物/尝试审计哈希通过；原源码 SHA 与冻结代码完全一致（见 `real-summary.json` 的 `frozen_code_matches_current=true`）。仅核验新档案，不是独立评价员认证。
+- [新增档案核验](verification.json)：两轮均 `SEALED`，日账重建指标和源/代码/AST/产物/尝试审计哈希通过；运行当时的初次提交 `6ed034e` 源码与冻结代码一致（`real-summary.json` 的 `frozen_code_matches_current=true` 仅描述该时点，不代表后续修复 HEAD）。仅核验新档案，不是独立评价员认证。
 
 Linux/macOS、真实 Provider、真实前向观察、PIT/历史身份/完整历史 Universe、真实可成交性未验证。Rust Agent/预算/Risk/账本、Operator/Observer 和 Dashboard 均未修改，未运行无关 Rust 全套测试；没有新增模型或云服务。
 

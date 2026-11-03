@@ -310,6 +310,78 @@ class Suite(unittest.TestCase):
             tomorrow["rows"][0]["daily"]["close"] = "999999"
             self.assertEqual(first,f.targets(dsl.propose(63,1,2)[0]["ast"],eligible))
 
+    def test_post_seal_failure_audit_tamper_delete_extra_and_recovery(self):
+        root = self.setup_experiment()
+        def fault(stage, n):
+            if stage == "archived":
+                raise RuntimeError("post_seal_failure")
+        with self.assertRaises(RuntimeError):
+            a.once(root, fault=fault)
+        folder = root/"round-01"
+        sealed = (folder/"archive.json").read_bytes()
+        # Reach the exact old bug, then the replacement verifiable post-seal journal.
+        tail = folder/"post-seal.json"
+        if not tail.exists():
+            tail = folder/"attempts"/"01-failed.json"
+        saved = tail.read_bytes()
+        for mode in ("tamper", "delete"):
+            with self.subTest(mode=mode):
+                try:
+                    if mode == "tamper":
+                        tail.write_bytes(saved.replace(b'RuntimeError', b'HiddenError'))
+                    else:
+                        tail.unlink()
+                    with self.assertRaises((a.Error, OSError)):
+                        a.verify(root)
+                finally:
+                    tail.write_bytes(saved)
+        extra = folder/"attempts"/"99-failed.json"
+        try:
+            extra.write_bytes(b'{}')
+            with self.assertRaisesRegex(a.Error, "AUDIT_FILE_SET"):
+                a.verify(root)
+        finally:
+            extra.unlink()
+        missing = folder/"attempts"/"01.json"
+        content = missing.read_bytes()
+        try:
+            missing.unlink()
+            with self.assertRaises((a.Error, OSError)):
+                a.verify(root)
+        finally:
+            missing.write_bytes(content)
+        with mock.patch.object(a.m.data.Dataset, "__enter__", side_effect=AssertionError("completed research repeated")):
+            restored = a.once(root)
+            self.assertTrue(a.verify(root)["verified"])
+        self.assertEqual(restored["status"]["completed_rounds"], 1)
+        self.assertEqual(sealed, (folder/"archive.json").read_bytes())
+        journal = a.read(folder/"post-seal.json")
+        self.assertEqual([r["kind"] for r in journal["records"]], ["STAGE_FAILED", "ARCHIVE_STATUS_RECOVERY"])
+        # Deleting or rewriting a past entry after recovery must also be detected.
+        saved = (folder/"post-seal.json").read_bytes()
+        journal["records"].pop(0)
+        try:
+            a.put(folder/"post-seal.json", journal, immutable=False)
+            with self.assertRaises(a.Error):
+                a.verify(root)
+        finally:
+            (folder/"post-seal.json").write_bytes(saved)
+
+    def test_seed3_without_contraction_has_bounded_novel_second_round(self):
+        feedback = dsl.development_feedback("round", dict(windows=dict(dev={
+            "candidate_01/base":dict(total_return="0.1", max_drawdown="-0.1")})),
+            [dict(name="dev", role="development")])
+        self.assertFalse(feedback["reduce_exposure"])
+        first = dsl.propose(3, 1, 2)
+        seen = {p["ast_sha"] for p in first}
+        with mock.patch.object(dsl, "validate", wraps=dsl.validate) as validate:
+            second = dsl.propose(3, 2, 2, feedback, seen)
+        self.assertEqual(len(second), 4)
+        self.assertFalse(seen & {p["ast_sha"] for p in second})
+        self.assertEqual(second, dsl.propose(3, 2, 2, feedback, seen))
+        self.assertLessEqual(validate.call_count, 16)
+        self.assertTrue(all(dsl.validate(p["ast"], 2) for p in second))
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -25,6 +25,7 @@ SOURCE_FILES = tuple(dict.fromkeys((*m.SOURCE_FILES, "research/autonomous_dsl.py
 require, Error, canonical, sha = m.require, m.Error, m.canonical, m.sha
 DEFAULT_LIMITS = dict(candidates=4, rounds=2, workers=1, wall_seconds=1800,
                       memory_mib=512, disk_mib=256, checkpoint_sessions=100, max_attempts_per_round=3)
+POST_SEAL_AUDIT = "post-seal-audit-v1"
 
 
 def read(path):
@@ -266,6 +267,54 @@ def verify_chunks(folder, receipts):
     return end
 
 
+def post_seal_body(receipt):
+    return dict(version=POST_SEAL_AUDIT, archive_output_sha=receipt["output_sha"],
+                archive_audit_sha=receipt["audit_sha"], records=[])
+
+
+def verify_post_seal(folder, receipt):
+    path = folder/"post-seal.json"
+    if "post_seal_audit" not in receipt:
+        # Legacy seals remain readable, with an exact attempt set. Never silently adopt a tail.
+        require(not path.exists(), "UNBOUND_POST_SEAL_AUDIT")
+        return None
+    require(receipt["post_seal_audit"] == POST_SEAL_AUDIT and path.is_file(), "POST_SEAL_AUDIT_MISSING_OR_VERSION")
+    m.data.v1.no_links(path)
+    tail = read(path)
+    dsl.fields(tail, "version archive_output_sha archive_audit_sha records tail_sha")
+    body = {k:v for k,v in tail.items() if k != "tail_sha"}
+    require(sha(canonical(body)) == tail["tail_sha"], "POST_SEAL_AUDIT_HASH_MISMATCH")
+    require({k:v for k,v in body.items() if k != "records"} ==
+            {k:v for k,v in post_seal_body(receipt).items() if k != "records"}, "POST_SEAL_AUDIT_BINDING")
+    require(type(tail["records"]) is list, "POST_SEAL_AUDIT_RECORDS")
+    previous, keys = receipt["audit_sha"], set()
+    for i,record in enumerate(tail["records"], 1):
+        dsl.fields(record, "sequence previous_sha key kind at details record_sha")
+        material = {k:v for k,v in record.items() if k != "record_sha"}
+        require(record["sequence"] == i and record["previous_sha"] == previous and
+                sha(canonical(material)) == record["record_sha"] and record["key"] not in keys,
+                "POST_SEAL_AUDIT_CHAIN")
+        require(record["kind"] in ("STAGE_FAILED", "ARCHIVE_STATUS_RECOVERY"), "POST_SEAL_AUDIT_KIND")
+        previous = record["record_sha"]
+        keys.add(record["key"])
+    return tail
+
+
+def append_post_seal(folder, kind, key, **details):
+    # Called only under the experiment writer lock. One atomic file contains the full append history.
+    receipt = read(folder/"archive.json")
+    tail = verify_post_seal(folder, receipt)
+    require(tail is not None, "LEGACY_POST_SEAL_AUDIT_REQUIRES_FROZEN_CONTROLLER")
+    if any(record["key"] == key for record in tail["records"]):
+        return
+    material = dict(sequence=len(tail["records"])+1,
+        previous_sha=tail["records"][-1]["record_sha"] if tail["records"] else receipt["audit_sha"],
+        key=key, kind=kind, at=m.data.v1.now(), details=details)
+    tail["records"].append(dict(material, record_sha=sha(canonical(material))))
+    body = {k:v for k,v in tail.items() if k != "tail_sha"}
+    put(folder/"post-seal.json", dict(body, tail_sha=sha(canonical(body))), immutable=False)
+
+
 def once(out, progress=None, fault=None):
     root = output(out)
     with m.data.v1.writer_lock(root):
@@ -286,6 +335,8 @@ def once(out, progress=None, fault=None):
             verify(root)
             result = read(folder/"results.json")
             complete = finished(result, frozen, n)
+            append_post_seal(folder, "ARCHIVE_STATUS_RECOVERY", "status-recovery", round=n,
+                             previous_state=s["state"], target_state="COMPLETED" if complete else "PLANNED")
             put(root/"status.json", dict({k:v for k,v in s.items() if k not in ("control","effective_state")},
                 state="COMPLETED" if complete else "PLANNED", phase="ARCHIVED", completed_rounds=n), immutable=False)
             event(root, "ARCHIVE_STATUS_RECOVERED", round=n)
@@ -366,8 +417,13 @@ def once(out, progress=None, fault=None):
                 files = {p:m.hash_file(folder/p) for p in ("proposals.json", "results.json", "feedback.json")}
                 files.update({v["chunk"]+"/commit.json":m.hash_file(folder/v["chunk"]/"commit.json") for v in receipts})
                 audit_files = {p.relative_to(folder).as_posix():m.hash_file(p) for p in sorted((folder/"attempts").glob("*.json"))}
-                put(folder/"archive.json", dict(**m.SAFE, round_sha=r["round_sha"], files=files,
-                    output_sha=sha(canonical(files)), audit_files=audit_files, audit_sha=sha(canonical(audit_files)), sealed_results=True))
+                receipt = dict(**m.SAFE, round_sha=r["round_sha"], files=files,
+                    output_sha=sha(canonical(files)), audit_files=audit_files, audit_sha=sha(canonical(audit_files)),
+                    post_seal_audit=POST_SEAL_AUDIT, sealed_results=True)
+                tail = post_seal_body(receipt)
+                # Before the immutable seal this is an unpublished local stage, safe to recreate after a kill.
+                put(folder/"post-seal.json", dict(tail, tail_sha=sha(canonical(tail))), immutable=False)
+                put(folder/"archive.json", receipt)
                 if fault:
                     fault("archived", n)
                 event(root, "ROUND_ARCHIVED", round=n, round_sha=r["round_sha"], output_sha=sha(canonical(files)))
@@ -376,7 +432,10 @@ def once(out, progress=None, fault=None):
             return report(root)
         except BaseException as exc:
             reason = str(exc) if isinstance(exc, Error) else type(exc).__name__
-            put(folder/"attempts"/f"{attempt:02d}-failed.json", dict(state="FAILED", reason=reason, at=m.data.v1.now()))
+            if (folder/"archive.json").exists():
+                append_post_seal(folder, "STAGE_FAILED", f"attempt-{attempt}-failed", attempt=attempt, reason=reason)
+            else:
+                put(folder/"attempts"/f"{attempt:02d}-failed.json", dict(state="FAILED", reason=reason, at=m.data.v1.now()))
             event(root, "STAGE_FAILED", round=n, attempt=attempt, reason=reason,
                   committed_sessions=receipts[-1]["end"] if "receipts" in locals() and receipts else 0)
             set_status("PARTIAL_RESOURCE_LIMIT" if reason == "DISK_RESOURCE_LIMIT" else "BLOCKED", "RECOVER_LOCAL_STAGE")
@@ -405,9 +464,13 @@ def verify(out):
         for relative,digest in receipt["files"].items():
             require(m.hash_file(folder/relative) == digest, "ARCHIVE_HASH_MISMATCH")
         require(sha(canonical(receipt["audit_files"])) == receipt["audit_sha"], "AUDIT_SHA_MISMATCH")
+        present = {p.relative_to(folder).as_posix() for p in (folder/"attempts").iterdir()}
+        require(present == set(receipt["audit_files"]), "AUDIT_FILE_SET_MISMATCH")
         for relative,digest in receipt["audit_files"].items():
             require(Path(relative).parent == Path("attempts") and not Path(relative).is_absolute(), "AUDIT_PATH")
+            m.data.v1.no_links(folder/relative)
             require(m.hash_file(folder/relative) == digest, "FAILURE_AUDIT_HASH_MISMATCH")
+        verify_post_seal(folder, receipt)
         with localcontext() as ctx:
             ctx.prec = 50
             result = read(folder/"results.json")

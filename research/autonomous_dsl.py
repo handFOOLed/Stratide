@@ -137,24 +137,31 @@ def propose(seed, round_number, cap, feedback=None, seen=()):
     learning = dict(reduce_exposure=feedback["reduce_exposure"]) if feedback else None
     rng = random.Random(f"{seed}:{round_number}:{sha(canonical(learning))}")
     w = rng.choice([10, 15, 20, 30])
-    ret, vol, amount = feature("returns", w), feature("volatility", 20), feature("amount", 5)
-    positive = threshold(ret, "0", "ratio")
-    liquid = threshold(amount, "10000", "thousand_CNY")
     # Development evidence can shrink prospective exposure; no validation/evaluation inputs.
     reduced = bool(feedback and feedback["reduce_exposure"])
-    scores = [ret, dict(op="negate", arg=ret), dict(op="negate", arg=vol),
-              dict(op="blend", terms=[dict(weight="0.5", arg=rank(ret)),
-                    dict(weight="0.5", arg=rank(dict(op="negate", arg=vol)))])]
-    filters = [positive, dict(op="true"), dict(op="and", args=[liquid, threshold(vol, "0.08", "ratio", "le")]),
-               dict(op="or", args=[positive, threshold(rank(amount), "0.7", "rank_ratio")])]
     hypotheses = ["检验已完成收益的延续", "反对延续，检验逆向收益", "检验低波动与流动性交集", "检验收益/低波动组合和流动性替代条件"]
-    out = []
+    out, accepted = [], set(seen)
     for i in range(4):
-        ast = dict(version=VERSION, score=scores[i], filter=filters[i], top_k=cap,
-                   exposure="0.5" if reduced else ("0.8" if i == 3 else "1"),
-                   rebalance_sessions=5, min_hold_sessions=5)
-        digest = validate(ast, cap)
-        out.append(dict(ast=ast, hypothesis=hypotheses[i], ast_sha=digest))
+        preferred = 20 if i == 2 else w
+        # At most four grammar choices per family; no outcome is evaluated to choose a fallback.
+        for window in [preferred]+[v for v in (10,15,20,30) if v != preferred]:
+            ret = feature("returns", window)
+            vol = feature("volatility", window if i == 2 else 20)
+            amount = feature("amount", 5)
+            positive, liquid = threshold(ret, "0", "ratio"), threshold(amount, "10000", "thousand_CNY")
+            scores = [ret, dict(op="negate", arg=ret), dict(op="negate", arg=vol),
+                dict(op="blend", terms=[dict(weight="0.5", arg=rank(ret)),
+                                        dict(weight="0.5", arg=rank(dict(op="negate", arg=vol)))])]
+            filters = [positive, dict(op="true"), dict(op="and", args=[liquid, threshold(vol, "0.08", "ratio", "le")]),
+                       dict(op="or", args=[positive, threshold(rank(amount), "0.7", "rank_ratio")])]
+            ast = dict(version=VERSION, score=scores[i], filter=filters[i], top_k=cap,
+                       exposure="0.5" if reduced else ("0.8" if i == 3 else "1"),
+                       rebalance_sessions=5, min_hold_sessions=5)
+            digest = validate(ast, cap)
+            if digest not in accepted:
+                accepted.add(digest)
+                out.append(dict(ast=ast, hypothesis=hypotheses[i], ast_sha=digest))
+                break
     return out
 
 
