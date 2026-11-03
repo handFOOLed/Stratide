@@ -1,6 +1,6 @@
 # Stratide Paper 阶段路线图（当前执行版）
 
-> 2026-11-02；最新实现与数据边界见 [STATUS](STATUS.md)。Owner 已决定 **Core-first、UI-later**：后续核心功能不要求同期 Dashboard/UI，最终按已合并 PR #28 的视觉基准统一集成。旧各 PR 实施/验收细节仍保存在 `docs/M0_*.md`、`docs/M1_*.md`、`docs/M2_PR01.md` 与 `docs/evidence/`。
+> 2026-11-03；最新实现与数据边界见 [STATUS](STATUS.md)。Owner 已决定 **Core-first、UI-later**：后续核心功能不要求同期 Dashboard/UI，最终按已合并 PR #28 的视觉基准统一集成。旧各 PR 实施/验收细节仍保存在 `docs/M0_*.md`、`docs/M1_*.md`、`docs/M2_PR01.md` 与 `docs/evidence/`。
 
 ## 已完成（已并入 main）
 
@@ -34,11 +34,13 @@ PR #42 的[历史公司行为桥接 V1](M1_PR09.md)、PR #44 的[EOD 自动研�
 
 **M2-PR12 已合并（PR #58）：** [历史仓库 V1](M2_PR12.md) 已真实下载 1212 日期、6347781 行；历史身份/BSE 日历/PIT 仍未核实，本地旧库保留。
 
-**当前 M2-PR13 Draft（#59）：** [四接口历史 sidecar V2](M2_PR13.md)，仅用现有 2000 积分 Tushare 账号，极窄预检后立即执行五年全量回填，已实际提交 4848 个 API×日期分区、6068 次请求；支持持久硬预算、断点续传、只读版本查询和冻结锚点复权。真实覆盖与限制见 [本期证据](evidence/m2-pr13/README.md)；不接云外发、策略评价或交易。
+**M2-PR13 已合并（PR #60）：** [四接口历史 sidecar V2](M2_PR13.md)，原五年回填 4848 个 API×日期分区及 6068 次请求保留；支持持久预算、恢复、只读版本和冻结复权。旧因子 PARTIAL 标签不重写，也不依据未声明 cap 推断截断，见 [增量修复](evidence/m2-pr13/r1/README.md)。
+
+**当前 M2-PR14 Draft（#61）：** [多股票历史研究 V1](M2_PR14.md) 只读消费上述本机 V1/V2，交三策略/三基准、三个成本情景、开发/验证/后期时间隔离和逐年重置 Walk-forward，以及冻结/复现报告。真实运行与资源见 [本期证据](evidence/m2-pr14/README.md)。历史 PIT、开盘可成交性及无偏历史 Universe 未获证；不连接 Agent、资格门禁或资金账本。
 
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |
-| **当前 #59** | **Sol** | M2-PR13 四 API 真实历史回填与可复现查询；完整/部分/受阻以实际证据为准。唯一 Draft，固定 HEAD 审查及 Owner 明确批准后才可合并。 |
+| **当前 #61** | **Sol** | M2-PR14 真实五年只读多股票研究、成本/基准/Walk-forward 与冻结证据；只做增量验证，唯一 Draft，固定 HEAD 审查及 Owner 明确批准后才可合并。 |
 | **后续核心** | Owner 再定范围 | #10 真实开盘、PIT、账户税/到账仍受阻；#36 完整多模态消融及真实供应商未验证。 |
 | **核心全部完成后** | **Sol** | 按 PR #28 的设计体系统一集成 UI；本期不改 UI。 |
 

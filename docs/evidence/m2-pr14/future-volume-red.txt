@@ -1,0 +1,15 @@
+Deliberate in-memory mutation only; production files unchanged.
+test_next_open_gate_does_not_read_next_close_or_volume (research_tests.Suite.test_next_open_gate_does_not_read_next_close_or_volume) ... FAIL
+
+======================================================================
+FAIL: test_next_open_gate_does_not_read_next_close_or_volume (research_tests.Suite.test_next_open_gate_does_not_read_next_close_or_volume)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-multistock-research.py", line 262, in test_next_open_gate_does_not_read_next_close_or_volume
+    self.assertEqual(m.execution_block(changed,"buy"),original)
+AssertionError: 'FUTURE_VOLUME_BAD' != None
+
+----------------------------------------------------------------------
+Ran 1 test in 2.264s
+
+FAILED (failures=1)
