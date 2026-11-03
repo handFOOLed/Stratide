@@ -333,3 +333,91 @@ fn safe_not_sent_attempt_then_lower_owner_budget_preserves_prior_provider_health
     assert_eq!(after["availability"], previous["availability"]);
     assert_eq!(after["last_reason"], previous["last_reason"]);
 }
+
+#[test]
+fn verification_preserves_fake_pr56_recorded_and_nonrecorded_projection() {
+    let mut settings = Settings::fake();
+    settings
+        .models
+        .extend(stratide_research::risk_binding::recorded_models());
+    let mut real = settings.models[0].clone();
+    real.id = "nonrecorded-status-fixture".into();
+    real.kind = "chat_completions_v1".into();
+    real.model = "status-projection-only".into();
+    real.endpoint = Some("https://status.example.com/chat/completions".into());
+    real.api_key_env = Some("STRATIDE_RESEARCH_KEY_STATUS_FIXTURE_NEVER_SET".into());
+    real.fake_scenario = None;
+    real.grant.as_mut().unwrap().receiver = real.endpoint.clone().unwrap();
+    settings.models.push(real);
+    let (_dir, agent) = setup(&settings);
+    assert_eq!(model(&agent, "fake")["verification"], "FAKE_SYNTHETIC_ONLY");
+    assert_eq!(
+        model(&agent, "nonrecorded-status-fixture")["verification"],
+        "REAL_PROVIDER_NOT_VERIFIED"
+    );
+    for id in ["risk-timesfm", "fusion-deepseek"] {
+        assert_eq!(
+            model(&agent, id)["verification"],
+            "RECORDED_ADAPTER_NOT_CLOUD"
+        );
+    }
+    let fake = agent.create(&request(), now()).unwrap();
+    agent.tick(now()).unwrap();
+    assert_eq!(agent.store().task(fake).unwrap()["status"], "completed");
+    assert_eq!(model(&agent, "fake")["verification"], "FAKE_SYNTHETIC_ONLY");
+
+    // Existing persisted-history projection only. No DNS, key configuration or
+    // external request: these synthetic rows do not verify a real provider.
+    for id in [
+        "risk-timesfm",
+        "fusion-deepseek",
+        "nonrecorded-status-fixture",
+    ] {
+        let task = agent
+            .store()
+            .create_for_model(&settings, &request(), &input(), now(), None, id)
+            .unwrap();
+        let mut c = agent.store().connect().unwrap();
+        let call = budget::reserve(
+            &mut c,
+            settings.budget.as_ref().unwrap(),
+            now(),
+            budget::Reservation {
+                task_id: task,
+                maximum_micro: 100,
+                task_limit: None,
+                price_version: "synthetic-status-history",
+            },
+        )
+        .unwrap();
+        c.execute(
+            "UPDATE calls SET state='usage_received' WHERE id=?1",
+            [call],
+        )
+        .unwrap();
+        agent
+            .store()
+            .settle(call, 64, "synthetic-status-projection", now())
+            .unwrap();
+        agent
+            .store()
+            .finish(
+                task,
+                "completed",
+                "RESEARCH_SAVED",
+                Some(&json!({"synthetic_status_history":true})),
+                now(),
+            )
+            .unwrap();
+        let view = model(&agent, id);
+        assert_eq!(view["availability"], "last_task_completed");
+        assert_eq!(
+            view["verification"],
+            if id == "nonrecorded-status-fixture" {
+                "REAL_PROVIDER_CALL_OBSERVED"
+            } else {
+                "RECORDED_ADAPTER_NOT_CLOUD"
+            }
+        );
+    }
+}

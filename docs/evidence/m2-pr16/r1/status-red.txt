@@ -1,0 +1,36 @@
+
+running 2 tests
+test structured_tests::recorded_status_after_settlement_is_not_cloud ... FAILED
+test structured_tests::recorded_status_before_dispatch_is_not_cloud ... FAILED
+
+failures:
+
+---- structured_tests::recorded_status_after_settlement_is_not_cloud stdout ----
+
+thread 'structured_tests::recorded_status_after_settlement_is_not_cloud' (4036) panicked at research\agent\src\structured_tests.rs:274:5:
+assertion `left == right` failed
+  left: String("REAL_PROVIDER_CALL_OBSERVED")
+ right: "RECORDED_ADAPTER_NOT_CLOUD"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- structured_tests::recorded_status_before_dispatch_is_not_cloud stdout ----
+
+thread 'structured_tests::recorded_status_before_dispatch_is_not_cloud' (26120) panicked at research\agent\src\structured_tests.rs:252:9:
+assertion `left == right` failed
+  left: String("REAL_PROVIDER_NOT_VERIFIED")
+ right: "RECORDED_ADAPTER_NOT_CLOUD"
+
+
+failures:
+    structured_tests::recorded_status_after_settlement_is_not_cloud
+    structured_tests::recorded_status_before_dispatch_is_not_cloud
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 13 filtered out; finished in 0.53s
+
+   Compiling stratide-research v0.0.1 (<WORKTREE>\research\agent)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<WORKTREE>\target\debug\incremental\stratide_research-3mnwn5c8fg717\s-hnt2nrchu7-1qm40n3-working`
+
+warning: `stratide-research` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.44s
+     Running unittests src\lib.rs (target\debug\deps\stratide_research-f40faafca20d7995.exe)
+error: test failed, to rerun pass `-p stratide-research --lib`

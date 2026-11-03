@@ -231,7 +231,10 @@ impl Agent {
                     _ => "not_verified",
                 });
                 view["last_reason"] = json!(last.and_then(|v| v.1));
-                if model.kind != "fake" && !crate::risk_cloud::recorded(model) {
+                if model.kind != "fake"
+                    && !crate::risk_cloud::recorded(model)
+                    && !crate::structured::recorded(model)
+                {
                     let successes:i64=c.query_row("SELECT COUNT(*) FROM tasks WHERE provider_id=?1 AND provider_hash=?2 AND result IS NOT NULL",params![model.id,model.fingerprint()],|r|r.get(0))?;
                     if successes > 0 {
                         view["verification"] = json!("REAL_PROVIDER_CALL_OBSERVED");

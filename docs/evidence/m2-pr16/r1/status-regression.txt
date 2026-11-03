@@ -1,0 +1,38 @@
+
+running 9 tests
+test confirmed_no_charge_provider_rejection_still_marks_provider_unavailable ... ok
+test eod_failure_and_uncertainty_follow_actual_task_without_releasing_holds ... ok
+test eod_latest_reflects_completed_task_and_restart_does_not_schedule_another_call ... ok
+test eod_latest_reflects_running_cancel_requested_and_cancelled ... ok
+test local_budget_authorization_and_price_rejections_are_not_provider_failures ... ok
+test local_denial_and_queued_cancellation_preserve_prior_provider_success_or_uncertainty ... ok
+test provider_dns_preparation_failure_is_distinct_from_local_policy_rejection ... ok
+test safe_not_sent_attempt_then_lower_owner_budget_preserves_prior_provider_health ... ok
+test verification_preserves_fake_pr56_recorded_and_nonrecorded_projection ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.45s
+
+   Compiling stratide-research v0.0.1 (<WORKTREE>\research\agent)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<WORKTREE>\target\debug\incremental\stratide_research-34r7b9k123m3b\s-hnt2o2otul-0v33ehu-working`
+
+warning: `stratide-research` (lib) generated 1 warning
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<WORKTREE>\target\debug\incremental\status_regression-19b2ccghlcvtq\s-hnt2o3dhmw-0gpvr67-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<WORKTREE>\target\debug\incremental\eod_auto_agent-09yckw4m4i0il\s-hnt2o3dhsh-09tw69v-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<WORKTREE>\target\debug\incremental\risk_portfolio_agent-20gqxrroe3gzr\s-hnt2o3dn89-1fzbuhr-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<WORKTREE>\target\debug\incremental\structured_research_agent-2vpmu4vebax0p\s-hnt2o3dw8c-1lh89x4-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<WORKTREE>\target\debug\incremental\eod_research-1qnjso9h5s2ue\s-hnt2o3e3ox-1xxlyzm-working`
+
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<WORKTREE>\target\debug\incremental\multimodal_agent-28hlb7zehqfjo\s-hnt2o3edf0-14ucfzw-working`
+
+warning: `stratide-research` (bin "structured-research-agent") generated 1 warning
+warning: `stratide-research` (bin "eod-research") generated 1 warning
+warning: `stratide-research` (bin "eod-auto-agent") generated 1 warning
+warning: `stratide-research` (bin "risk-portfolio-agent") generated 1 warning
+warning: `stratide-research` (bin "multimodal-agent") generated 1 warning
+warning: `stratide-research` (test "status_regression") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.76s
+     Running tests\status_regression.rs (target\debug\deps\status_regression-eac20daa74561183.exe)

@@ -2,6 +2,8 @@
 
 Issue [#65](https://github.com/handFOOLed/Stratide/issues/65)，base `7f12f12b321cdd7c24c90458f4ae4859f59ec3bd`，独立分支 `codex/issue65-cloud-structured`。单人、`agents=0`，以下为开发自测，不是独立验收。CLI 和授权/数据契约见 [M2_PR16](../../M2_PR16.md)。唯一 Draft，Owner 授权前不 Ready/merge。
 
+**审查修复 R1：** 修复原 Agent status 将 structured recorded 成功任务误标为真实 Provider 调用的 P1。两层状态保持 `RECORDED_ADAPTER_NOT_CLOUD`，新增同一原 AgentDir 实际结算后的红绿反例；本轮 structured 11/11、status 9/9 均 exit 0。详见 [R1 证据](r1/README.md)。以下五年研究与原测试继续保留其 `eddd6a2` 冻结基线，没有在 R1 重跑真实数据。
+
 ## 运行结果
 
 | 验证 | 实际结果 | 收据 |
@@ -61,7 +63,7 @@ Issue [#65](https://github.com/handFOOLed/Stratide/issues/65)，base `7f12f12b32
 | 真实研究 output | `f8424942de56d2581e136f21faf8ad06a7b0e9163a5b240b3c42fb8ff9b09ba9` |
 | 合成 loopback output | `4f1b4dede9411ba18e4bafec6c9c01691bc0735b03261ed7aae0d0731d403d6f` |
 
-四个 AST、每份代码、原 task/call ID、模型/价格/Grant/TST 上限和三费用指标都在两份 summary；`frozen_code_matches_current=true` 的逐文件检查见 [comparison.json](comparison.json)。Git 不包含真实原始 payload、行情、证券序列、账户本金、密钥和源库绝对路径。
+四个 AST、每份代码、原 task/call ID、模型/价格/Grant/TST 上限和三费用指标都在两份 summary；[comparison.json](comparison.json) 的 `frozen_code_matches_current=true` 描述原 `eddd6a2` 运行时点，不作为状态修复 HEAD 的新五年证据。Git 不包含真实原始 payload、行情、证券序列、账户本金、密钥和源库绝对路径。
 
 ```powershell
 # 完整本机演示；真实历史仅显式提供已有 locator 时跑一轮：

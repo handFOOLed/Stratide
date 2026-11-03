@@ -1,0 +1,103 @@
+[
+  {
+    "stage": "red",
+    "argv": [
+      "powershell",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "scripts/with-msvc.ps1",
+      "test",
+      "--locked",
+      "-p",
+      "stratide-research",
+      "--lib",
+      "structured_tests::recorded_status_",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "expected": "2 assertion failures; initial REAL_PROVIDER_NOT_VERIFIED and settled REAL_PROVIDER_CALL_OBSERVED are both incorrect for recorded"
+  },
+  {
+    "stage": "status-green",
+    "argv": [
+      "powershell",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "scripts/with-msvc.ps1",
+      "test",
+      "--locked",
+      "-p",
+      "stratide-research",
+      "--lib",
+      "structured_tests::recorded_status_",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0
+  },
+  {
+    "stage": "status-regression",
+    "argv": [
+      "powershell",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "scripts/with-msvc.ps1",
+      "test",
+      "--locked",
+      "-p",
+      "stratide-research",
+      "--test",
+      "status_regression",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0
+  },
+  {
+    "stage": "structured-regression",
+    "argv": [
+      "powershell",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "scripts/with-msvc.ps1",
+      "test",
+      "--locked",
+      "-p",
+      "stratide-research",
+      "--lib",
+      "structured_tests",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0
+  },
+  {
+    "stage": "format",
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0
+  },
+  {
+    "stage": "format",
+    "argv": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit": 0
+  }
+]

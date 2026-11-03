@@ -237,6 +237,64 @@ fn recorded_exact_task_shared_budget_and_no_repeat() {
         "queued"
     );
 }
+
+#[test]
+fn recorded_status_before_dispatch_is_not_cloud() {
+    let f = fixture();
+    let settings = Settings::load(&f.owner.join("settings.json")).unwrap();
+    let agent = crate::Agent::open(&f.owner, None, blank()).unwrap();
+    for status in [
+        agent.store().status(&settings, chrono::Utc::now()).unwrap(),
+        agent.status(chrono::Utc::now()).unwrap(),
+    ] {
+        let model = status["models"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|m| m["id"] == "structured-recorded")
+            .unwrap();
+        assert_eq!(model["verification"], "RECORDED_ADAPTER_NOT_CLOUD");
+    }
+    assert_eq!(
+        agent.status(chrono::Utc::now()).unwrap()["budget"]["call_count"],
+        "0"
+    );
+}
+
+#[test]
+fn recorded_status_after_settlement_is_not_cloud() {
+    let f = fixture();
+    let task = s::execute(&f.root, 1, false).unwrap();
+    assert_eq!(task["status"], "completed");
+    assert_eq!(task["calls"][0]["state"], "settled");
+    assert_eq!(task["calls"][0]["settled_micro"], "6144");
+    assert!(task["result"]["research"]["structured_research"].is_object());
+
+    // Reopen exactly the original Owner directory after its real recorded
+    // task/reserve/dispatch/settlement path; status must preserve that origin.
+    let settings = Settings::load(&f.owner.join("settings.json")).unwrap();
+    let agent = crate::Agent::open(&f.owner, None, blank()).unwrap();
+    let status = agent.status(chrono::Utc::now()).unwrap();
+    let model = status["models"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|m| m["id"] == "structured-recorded")
+        .unwrap();
+    assert_eq!(model["availability"], "last_task_completed");
+    assert_eq!(model["verification"], "RECORDED_ADAPTER_NOT_CLOUD");
+    let stored = agent.store().status(&settings, chrono::Utc::now()).unwrap();
+    let model = stored["models"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|m| m["id"] == "structured-recorded")
+        .unwrap();
+    assert_eq!(model["verification"], "RECORDED_ADAPTER_NOT_CLOUD");
+    assert_eq!(status["budget"]["call_count"], "1");
+    assert_eq!(status["budget"]["daily_settled_micro"], "6144");
+    assert_eq!(status["budget"]["reserved_micro"], "0");
+}
 #[test]
 fn insufficient_original_budget_and_revoked_grant_never_dispatch() {
     for revoked in [false, true] {
