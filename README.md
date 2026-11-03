@@ -6,7 +6,7 @@
 
 ## 当前状态
 
-- **M2-PR19 真实 Fusion（#71 / Draft）：** 原本地 TimesFM 任务接真实 `deepseek-flash`，同一真实 Agent 共享 CNY ¥5/日、¥100/月（Asia/Shanghai）。唯一真实首验收到 1021/684 token，估算 ¥0.007514，但组合 schema 拒绝，保持 `BLOCKED`，无重试；Paper/Live 不开放。见[运行与状态](docs/M2_PR19.md)和[证据](docs/evidence/m2-pr19/README.md)。
+- **M2-PR19 真实 Fusion（#71 / Draft PR #72）：** 原本地 TimesFM → 真实 `deepseek-flash` → 严格组合 → 原 Registry/Inbox/report/verify 已通过。Owner 追加授权的一次调用收到 1065/722 token，返回合法 100% 现金研究组合；两次授权合计估算 ¥0.015420，首次失败及预留保留。同一真实 Agent 共享 CNY ¥5/日、¥100/月（Asia/Shanghai），Fusion 已 OFF，Paper/Live 不开放。见[运行与状态](docs/M2_PR19.md)和[真实证据](docs/evidence/m2-pr19/README.md)。
 
 - **M2-PR18 本地 TimesFM CPU（#69 / Draft / 默认 OFF）：** 固定官方 TimesFM 2.5 200M 权重与 CPU 依赖，按需 Python Worker 接原风险结果/Naive/EWMA；WSL2 Linux 隔离 4/4、真实 CPU 生产闭环及 16 点压力矩阵已实测；生产目标 N100 Linux，N100 验收仍 `NOT_VERIFIED`。不改变旧云路径或 Paper/Live 权限。见[运行与隔离边界](docs/M2_PR18.md)、[Linux 证据与回归限制](docs/evidence/m2-pr18/linux-r1/README.md)。
 

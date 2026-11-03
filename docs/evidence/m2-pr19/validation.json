@@ -60,9 +60,37 @@
       "command": "python3 -B scripts/local-timesfm-fusion.py once --name <SAME_SMOKE>",
       "exit": 2,
       "result": "same immutable failed task; call count remains 1; no network retry"
+    },
+    {
+      "command": "python3 -B scripts/timesfm-cpu.py preflight / enable / synthetic-freeze / once / verify --name <NEW_AUTHORIZED_BATCH>",
+      "exit": 0,
+      "result": "real CPU task 3 completed/verified; 0 calls"
+    },
+    {
+      "command": "python3 -B scripts/local-timesfm-fusion.py preflight / enable / once --name <NEW_AUTHORIZED_BATCH>",
+      "exit": 0,
+      "result": "one explicitly authorized additional real call; strict V1 portfolio accepted and archived"
+    },
+    {
+      "command": "python3 -B scripts/local-timesfm-fusion.py verify / report / inbox --name <NEW_AUTHORIZED_BATCH>",
+      "exit": 0,
+      "result": "all exit 0; saved-byte SHA verified; original Registry/Inbox count 1"
+    },
+    {
+      "command": "python3 -B scripts/local-timesfm-fusion.py disable; once --name <SAME_NEW_BATCH>",
+      "exit": 0,
+      "result": "original successful task reused; real call count remains 2; first failure retained"
+    },
+    {
+      "command": "python3 -B scripts/local-timesfm-fusion.py budget status",
+      "exit": 0,
+      "result": "CNY cap unchanged; total usage estimate 15420 micro; reserved 196608 micro"
     }
   ],
-  "actual_paid_network_calls": 1,
+  "actual_paid_network_calls": 2,
   "final_adapter_sha256": "a5bd6c9a53d223a60fdfb25633d077b4f5ef1a2df93170af3a5f41f18db57474",
-  "review_status": "DRAFT_ONLY_NOT_INDEPENDENT_ACCEPTANCE"
+  "review_status": "DRAFT_ONLY_NOT_INDEPENDENT_ACCEPTANCE",
+  "current_real_status": "REAL_SYNTHETIC_FUSION_CHAIN_VERIFIED",
+  "production_code_changed_after_initial_PR": false,
+  "regressions_reused": "204 Rust + 6 Fusion + prior targeted suites; identical production bytes; followup only changes docs/evidence"
 }

@@ -1,0 +1,129 @@
+{
+  "contract": "m2-pr19-real-synthetic-smoke-r1-v1",
+  "status": "REAL_SYNTHETIC_FUSION_CHAIN_VERIFIED",
+  "owner_authorization": "one additional synthetic request explicitly granted in this chat; consumed once",
+  "verified_implementation_head": "fbc05bbb290a35da38ce1f104ac4e8df19917e01",
+  "adapter_sha256": "a5bd6c9a53d223a60fdfb25633d077b4f5ef1a2df93170af3a5f41f18db57474",
+  "real_network_requests_this_authorization": 1,
+  "total_real_network_requests": 2,
+  "total_real_successful_portfolios": 1,
+  "local_cpu_task_id": 3,
+  "local_cpu_calls": 0,
+  "local_cpu_verified": true,
+  "local_parent_result_sha256": "a1eb2661c59f8ee33b13970429c70ac4ceab44a12595cf6fbde939e01a6750be",
+  "local_parent_plan_sha256": "e2d8e886a96975bf60609e3ff5fffcbf1eaab733f72fb2c25dc2351755496308",
+  "fusion_task_id": 4,
+  "task_created_at": "2026-11-03T13:05:01.287962522+00:00",
+  "task_finished_at": "2026-11-03T13:05:06.552218570+00:00",
+  "internal_model_alias": "ds4.1flash",
+  "fusion_route_model_id": "ds4.1flash-fusion",
+  "requested_api_model": "deepseek-flash",
+  "response_model": "deepseek-flash",
+  "provider_request_id": "31e765b2-66f0-4c4c-b7c5-9b3199e7bfdd",
+  "system_fingerprint": "bc19ba97cbe016479903222bb1578db6",
+  "provider_hash": "4d0249e5c495c52ccb32df6f718c3fa772bce8ca7587138fec5e7dcd831d826c",
+  "request_sha256": "13121891b5b7eb8284eb92ab9034e87bf6543268d123a752c15102487958172a",
+  "response_sha256": "246d9fa86abf378d004ff17848b2fedf81530aef68659d6b0d0d405ab33b5f4f",
+  "result_storage_sha256": "5cbfb7c920bdf9f4e8048fd6b49d0f25944c8e250728c6a55866168946a941ea",
+  "private_response_mode_octal": "0600",
+  "private_response_published": false,
+  "input_tokens": 1065,
+  "output_tokens": 722,
+  "total_tokens": 1787,
+  "currency": "CNY",
+  "usage_estimate_micro": 7906,
+  "maximum_reserved_micro": 98304,
+  "estimate_basis": "official peak CNY; all input cache miss; usage estimate is not invoice",
+  "actual_provider_invoice_micro": null,
+  "portfolio": {
+    "as_of": "2026-11-03T13:04:17.796194Z",
+    "authority": "RESEARCH_ONLY",
+    "candidate_instruments": [
+      "600000.SH",
+      "600001.SH"
+    ],
+    "cash_weight_bps": 10000,
+    "estimated_fees_micro": null,
+    "estimated_turnover_bps": null,
+    "evidence_against": [
+      "No return, covariance, or downside evidence is calibrated; synthetic volatility ratios alone cannot justify a directional position.",
+      "Opportunity and account facts are UNKNOWN, so any non-cash weight would embed unfalsifiable assumptions."
+    ],
+    "evidence_for": [
+      "Synthetic EWMA and naive daily-return-ratio forecasts for both instruments are near 0.002 under a NORMAL_VOLATILITY regime, indicating low modeled dispersion but not expected return.",
+      "Both candidates are present in the evidence set with consistent local hashes, enabling a bounded research check."
+    ],
+    "horizon": 20,
+    "invalidation_conditions": [
+      "If a pre-registered 20-session return series for either instrument shows realized RMS daily-return ratio outside the stated forecast band, the low-volatility premise is rejected.",
+      "If data quality blockers beyond SYNTHETIC_ENGINEERING_ONLY appear, the hypothesis is invalidated."
+    ],
+    "limitations": [
+      "Evidence is synthetic engineering data only and is never market alpha.",
+      "Return, opportunity, covariance, downside, and account facts remain UNKNOWN or UNKNOWN_UNCALIBRATED.",
+      "No fees, turnover, liquidity, borrow, or execution evidence is available."
+    ],
+    "next_experiment": [
+      "Pre-register a 20-session out-of-sample check comparing realized RMS daily-return ratio against the stated 5- and 20-session forecast band for both instruments.",
+      "Add calibrated return and covariance evidence before considering any non-cash weight."
+    ],
+    "positions": [],
+    "proposal_id": "synthetic-risk-v1-cash-001",
+    "rationale": "No calibrated return or opportunity evidence exists, and all risk metrics are uncalibrated synthetic engineering values. The hypothesis is that both instruments will realize RMS daily-return ratios near 0.002 over 20 sessions, but this is not sufficient to justify market exposure. A 100 percent cash portfolio is the only falsifiable, evidence-consistent proposal; positions are withheld until return and quality evidence exist.",
+    "risk_assessment": [
+      "Cash avoids uncalibrated downside and covariance exposure.",
+      "Synthetic volatility forecasts are low and tightly clustered, but UNKNOWN_UNCALIBRATED uncertainty prevents sizing.",
+      "No account, order, or execution facts are available."
+    ],
+    "schema_version": 1,
+    "source_refs": [
+      "3dde0ebe7aceeedbd531c252c3d3c4ab32168f007f70a6cc26f4b52dfefb2732",
+      "2488a3e40913c73dac44b10d9e0def8bde8df14db97458addcca5b737576ba18"
+    ],
+    "strategy_definition": "Over 20 sessions, synthetic 600000.SH and 600001.SH RMS daily-return ratios remain within 0.0015-0.0025; if realized ratios breach this band, the low-volatility premise fails.",
+    "strategy_hash": "2488a3e40913c73dac44b10d9e0def8bde8df14db97458addcca5b737576ba18",
+    "strategy_version": "local-risk-v1"
+  },
+  "strict_V1_verified": true,
+  "registration_sha256": "024e0ceb6f47d507a99bfb094baf758bfa48130138d666362effe2a176599b04",
+  "inbox_count": 1,
+  "inbox_state": "AWAITING_OWNER_TEMPLATE",
+  "report_verified": true,
+  "verify_uses_saved_response_bytes": true,
+  "call_count_after_duplicate_once": 2,
+  "first_failure_storage_sha256_unchanged": true,
+  "original_call_reservations_preserved": true,
+  "all_real_calls": [
+    {
+      "id": 1,
+      "task_id": 2,
+      "state": "outcome_uncertain",
+      "maximum_micro": 98304,
+      "usage_micro": 7514,
+      "input_tokens": 1021,
+      "output_tokens": 684
+    },
+    {
+      "id": 2,
+      "task_id": 4,
+      "state": "usage_received",
+      "maximum_micro": 98304,
+      "usage_micro": 7906,
+      "input_tokens": 1065,
+      "output_tokens": 722
+    }
+  ],
+  "fusion_enabled": false,
+  "automatic_paid_research_enabled": false,
+  "real_payload": "two synthetic derived risk summaries only",
+  "paper_allowed": false,
+  "can_execute_forward_paper": false,
+  "live_allowed": false,
+  "orders": 0,
+  "fills": 0,
+  "N100_ACCEPTANCE": "NOT_VERIFIED",
+  "new_tushare_calls": 0,
+  "old_raw_reparses": 0,
+  "full_historical_verifications": 0,
+  "independent_acceptance": "NOT_VERIFIED"
+}

@@ -6,7 +6,7 @@ A local-first, **paper-only** personal quantitative research system: Rust risk/l
 
 ## Status
 
-- **M2-PR19 real Fusion (#71 / Draft):** original local TimesFM tasks feed real `deepseek-flash`, sharing one CNY Agent cap of ¥5/day and ¥100/month (Asia/Shanghai). The single real smoke returned 1021/684 tokens (¥0.007514 conservative estimate), but its portfolio schema was rejected: `BLOCKED`, no retry, Paper/Live disabled. See [operation/status](docs/M2_PR19.md) and [evidence](docs/evidence/m2-pr19/README.md).
+- **M2-PR19 real Fusion (#71 / Draft PR #72):** real local TimesFM → real `deepseek-flash` → strict portfolio validation → original Registry/Inbox/report/verify passed. The Owner-authorized additional call returned 1065/722 tokens and a valid 100% cash research portfolio. Both authorized calls total a conservative ¥0.015420 estimate; the first failure and all reservations remain. One real Agent shares ¥5/day and ¥100/month (Asia/Shanghai). Fusion is OFF; Paper/Live remain blocked. See [operation/status](docs/M2_PR19.md) and [real evidence](docs/evidence/m2-pr19/README.md).
 
 - **M2-PR18 local TimesFM CPU (#69 / Draft / OFF by default):** pinned official TimesFM 2.5 200M weights and CPU dependencies, with an on-demand Python Worker producing the original risk result and Naive/EWMA comparison. WSL2 Linux isolation passed 4/4, with a real CPU production cycle and 16 stress points completed. Production target: N100 Linux; N100 acceptance remains `NOT_VERIFIED`. Existing cloud paths and Paper/Live permissions are unchanged. See [operation and isolation](docs/M2_PR18.md) and [Linux evidence and regression limits](docs/evidence/m2-pr18/linux-r1/README.md).
 

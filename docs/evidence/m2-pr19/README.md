@@ -1,18 +1,17 @@
 # M2-PR19 脱敏证据
 
-真实首验 **BLOCKED / PORTFOLIO_SCHEMA**，不是通过的真实组合。最终 HEAD 的本地工程回归通过，真实完整链路的组合验收尚缺。
+**真实合成完整链路已验证**：原本地 TimesFM CPU 任务 3 → 真实 DeepSeek Fusion 任务 4 → 原 TargetPortfolioProposal V1 严格校验 → 原 Registry/Inbox/report/verify。结果为合法的 100% 现金研究组合，Paper/Live 仍 BLOCKED，独立评价尚未进行。
 
-- [唯一真实调用](real-api-smoke.json)：原 CNY Agent 任务 2，一次请求，1021 输入 + 684 输出 token，按高峰全 cache miss 估算 **¥0.007514**；最大预留 **¥0.098304** 仍占用，未冒充 invoice。原任务/调用记录不重置；重复 once 后仍 1 次调用。
-- [预算](budget-after-smoke.json)：整个真实 Agent 的 **CNY ¥5/日、¥100/月，Asia/Shanghai**。日剩 **¥4.901696**，月剩 **¥99.901696**；旧 TST 没有换币种。Fusion 已 OFF，没有开启 EOD 自动付费研究。
-- [真实本地 CPU](local-cpu.json)：原任务 1，真实 pinned TimesFM CPU 完成并 verify，0 calls，`development_only=false`；维持 cgroup 6 GiB/bwrap/无网络。N100 真机仍 NOT_VERIFIED。
-- [新 Fusion 回归](fusion-regression.txt)：**6/6**，合成 loopback 完整经过原 Registry/Inbox/report/verify；本地失败、跨 Owner/来源变化、全现金/非法组合、撤销竞态、重复 once、429/500/超时/断开/缺 usage、Key 回显及私有响应 SHA 改动均有断言。libtest 不调用外网，也不编译进生产 CLI。
-- [Rust workspace](rust-workspace.txt)：**204/204**，串行运行，含 Risk、Ledger、研究数据校验；[精确 CNY/原共享预算](shared-budget.txt)为 **3+6**。
-- [PR17](pr17-regression.txt) **5/5**；[PR18](pr18-regression.txt) **11 通过 + 1 Windows 专属项跳过**；[Linux 隔离](linux-isolation.txt) **4/4**。
-- [旧 PR56 完整首轮](pr56-full-initial.txt) **12/13**：原 `FUTURE_OR_STALE_SNAPSHOT` 在撤销测试到达 fault marker 前拒绝；未改门禁或旧测试。[单独复测](pr56-targeted.txt) **1/1** 通过。原 Ledger 默认并行锁抖动不扩展修复，workspace 使用 `--test-threads=1`。
-- [命令和退出码](validation.json)。base `10804ea7231f24bdb84667802587c06ae8397bba`；最终 HEAD 记录在 Draft PR，避免自引用提交哈希。
+- [追加授权的真实成功调用](real-api-smoke-r1.json)：Owner 另授权一次后发送 **1 次**，输入 **1065**、输出 **722** token；保守估算 **¥0.007906**，最大预留 **¥0.098304**。Provider model 为 `deepseek-flash`，request ID、请求/响应/来源 SHA、registration 和组合见 JSON。原始 Provider 响应仅本机私有保存，没有公开。
+- [真实 CPU 任务 3](local-cpu-r1.json)：真实 pinned CPU 权重，completed + verify，`development_only=false`，0 calls。继续 systemd/cgroup 6 GiB/bwrap/无网络；N100 真机仍 NOT_VERIFIED。
+- [当前共享预算](budget-after-r1.json)：**CNY ¥5/日、¥100/月，Asia/Shanghai**。累计两次授权调用共 **2086 输入 + 1406 输出 token**，估算 **¥0.015420**；两次最大预留共 **¥0.196608** 未释放，日/月剩余 **¥4.803392 / ¥99.803392**。这不是 invoice；不清空旧账或把 TST 转为 CNY。
+- verify/report/Inbox 全部 exit 0；Inbox 1 条，`AWAITING_OWNER_TEMPLATE / NOT_EVALUATED`。关闭外发后重复 once 仍复用任务 4，累计 calls **仍为 2**，没有第三次调用或 EOD 自动付费研究。
+- [首次真实失败](real-api-smoke.json)和[首次预算快照](budget-after-smoke.json)原样保留：`PORTFOLIO_SCHEMA`、1021/684 token、估算 ¥0.007514。核对旧结果存储 SHA 未变，旧 call 仍 `outcome_uncertain` 且预留未释放；它没有被改写为成功。
+- 新请求使用原 PR 生产代码 `fbc05bbb290a35da38ce1f104ac4e8df19917e01`，adapter SHA 与首次交付最终代码一致。此次只更新文档/证据，沿用 [Rust 204/204](rust-workspace.txt)、[Fusion 6/6](fusion-regression.txt)、[精确 CNY/原共享 Budget 3+6](shared-budget.txt)。
+- [PR17 5/5](pr17-regression.txt)、[PR18 11 通过 + 1 Windows 专属跳过](pr18-regression.txt)、[Linux 隔离 4/4](linux-isolation.txt)。
+- [旧 PR56 完整首轮](pr56-full-initial.txt) 12/13：原 `FUTURE_OR_STALE_SNAPSHOT` 在到达 fault marker 前拒绝；未改旧测试或门禁，[单独复测 1/1](pr56-targeted.txt)通过。Rust workspace 使用 `--test-threads=1`，不扩展修复原并行锁抖动。
+- [命令/退出码与追加验证](validation.json)。base `10804ea7231f24bdb84667802587c06ae8397bba`，最终 HEAD 记录在同一 Draft PR #72。
 
-首验在响应诊断补丁前运行，只保留了 SHA 和 usage，没有具体响应或 Provider request ID。其 decoder 已经过官方 model/usage 检查后在 Portfolio schema 处拒绝，但无法确定实际缺少/多出哪个字段。最终补丁保留本机私有有界 HTTP 成功响应供离线诊断，并提示精确根字段/类型；原 V1 严格校验、费用未知预留和禁止自动重试均保留。**补丁没有再次真实调用，不能宣称最终 HEAD 已解决真实返回格式。**
+首次失败的具体回包没有留存，因此其字段差异仍无法还原。已有诊断补丁明确根字段/类型，并仅在本机私有保存有界且无 Key 回显的 HTTP 成功响应；追加调用使用该原代码通过严格校验，verify 对保存的实际字节复算 SHA，没有重新推理、补写组合或自动重发。
 
-这里没有密钥、真实密钥路径、账户/真实行情、模型权重或原始 Provider 响应。只外发两条合成风险摘要；无新 Tushare 请求、RAW 解析、全量历史复验、订单、Paper/Live 准入。真实失败没有进入 Registry，合成归档不能替代真实成功。
-
-后续若要补齐真实组合验收，需 Owner **另授权一次**有界合成请求；不能沿用已消费的单次许可或通过新 batch 重放。
+这里只包含合成研究输出与必要脱敏审计；无密钥、真实密钥路径、真实行情/账户、原始响应、模型权重。只外发两条合成风险摘要；无新 Tushare 请求、RAW 重解析、全量历史复验或订单。该通过结果证明工程链路，不构成 alpha、真实市场、独立资格或 Paper/Live 准入。
