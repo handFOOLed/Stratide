@@ -1,0 +1,133 @@
+{
+  "ast_contract": "research-ast-v1",
+  "base_sha": "cb624bc6308add4ee9d1f04b35cbac591f0cd7e8",
+  "code_sha": {
+    "research/autonomous_dsl.py": "b6dedeec293e340c07d0520c2f6eabd4ec663ebbfaba6727e50696690499253f",
+    "research/autonomous_research.py": "c629da595ed7333515fb3d54becc2f36330376b6b5559cc9cdd90a02c464c398",
+    "research/autonomous_runner.py": "32ef12e1cd100ec166adc0251f7f813979618a8c6dbb1c5b99998547514563f3",
+    "research/candidates.py": "a2424fd8542d16da4974b51daa2d4dd247de5a068d712371e7cf94a3a4415684",
+    "research/historical_sidecar.py": "ced928920e89888dd73f0fd12786ed2760e285d969e42ea104620589c6cb44d0",
+    "research/historical_warehouse.py": "eefbdf231b381fcfc53813237c6785a70b4291d6462db89d8542dca7cb36fdcf",
+    "research/multistock_data.py": "7b45a2872f4131e1e55195f5a4c37aef490f34770915c879e5e6c4679f6be04b",
+    "research/multistock_research.py": "4a6743cb5a006e188ab94783a758a78992aec52f31617c547e556242c47a5265",
+    "scripts/autonomous-research.py": "795534d61000d8eb886a040e42d915f31c443d3fa45bbc5b49f15d33045dae31",
+    "scripts/multistock-research.py": "a02022def5984956af44ed8924ac0ca269f0237fb7c5e27df4c4bda15d70f31a"
+  },
+  "config": {
+    "annual_sessions": 252,
+    "cash_rate": "0",
+    "cost_scenarios": [
+      {
+        "commission_bps": "0",
+        "name": "gross",
+        "slippage_bps": "0",
+        "stamp_post_bps": "0",
+        "stamp_pre_bps": "0",
+        "transfer_bps": "0"
+      },
+      {
+        "commission_bps": "3",
+        "name": "base",
+        "slippage_bps": "10",
+        "stamp_post_bps": "5",
+        "stamp_pre_bps": "10",
+        "transfer_bps": "0.1"
+      },
+      {
+        "commission_bps": "5",
+        "name": "stress",
+        "slippage_bps": "30",
+        "stamp_post_bps": "5",
+        "stamp_pre_bps": "10",
+        "transfer_bps": "0.2"
+      }
+    ],
+    "embargo_sessions": 1,
+    "end": "20261030",
+    "execution": "next_session_open_ex_post_uncertified_fractional_exposure",
+    "label_horizon": 1,
+    "max_memory_mib": 512,
+    "max_positions": 50,
+    "max_sessions": 1500,
+    "max_symbols": 20000,
+    "min_amount_thousand_cny": "10000",
+    "momentum": [
+      20,
+      60
+    ],
+    "normalization": "dimensionless_index_1_no_account_principal_no_shares",
+    "purge_sessions": 1,
+    "rebalance_sessions": 5,
+    "return_scale": "adjusted_price_approximation_ex_post_not_taxed_total_return",
+    "reversal": 5,
+    "selection": "precommitted_rules_no_fit_no_hyperparameter_or_winner_selection",
+    "sma": [
+      20,
+      60
+    ],
+    "stamp_switch": "20230828",
+    "start": "20211101",
+    "turnover_cap": "2",
+    "universe": "daily_observed_SSE_SZSE_A_code_families_consecutive_history_no_current_status_filter",
+    "version": "multistock-research-v1",
+    "volatility": 20,
+    "windows": [
+      {
+        "end": "20221230",
+        "name": "development",
+        "role": "development",
+        "start": "20211101"
+      },
+      {
+        "end": "20231229",
+        "name": "validation",
+        "role": "validation",
+        "start": "20230103"
+      },
+      {
+        "end": "20241231",
+        "name": "wf2024",
+        "role": "evaluation",
+        "start": "20240101",
+        "train_end": "20231229"
+      },
+      {
+        "end": "20251231",
+        "name": "wf2025",
+        "role": "evaluation",
+        "start": "20250101",
+        "train_end": "20241231"
+      },
+      {
+        "end": "20261030",
+        "name": "wf2026",
+        "role": "evaluation",
+        "start": "20260101",
+        "train_end": "20251231"
+      }
+    ]
+  },
+  "evidence_allowed_for_next_round": "DEVELOPMENT_ONLY",
+  "exposure_label": "EXPLORATORY_EX_POST / REUSED_EXPOSED_PERIOD",
+  "historical_pit_status": "NOT_VERIFIED",
+  "limits": {
+    "candidates": 4,
+    "checkpoint_sessions": 100,
+    "disk_mib": 256,
+    "max_attempts_per_round": 3,
+    "memory_mib": 512,
+    "rounds": 2,
+    "wall_seconds": 1800,
+    "workers": 1
+  },
+  "paid_limit_micro": 0,
+  "plan_sha": "41e5b2cde6792fdf8ab9787283584067f910b273450b6ae1b63734745c3e1c80",
+  "query_sha": "09c5bb6761e762c03a8ad58c1c193917427c5a876c928b8cd50411b2453c9bcf",
+  "seed": 63,
+  "source_origin": "REAL_LOCAL_HISTORY",
+  "source_sha": "f8eafe09ebce5538775faa7539ceb466f2284205f32f689f95c0d95570f58a96",
+  "version_bounds": {
+    "v1": 1212,
+    "v2": 4848
+  }
+}

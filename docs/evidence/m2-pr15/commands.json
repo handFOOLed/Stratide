@@ -1,0 +1,20 @@
+{
+  "base_sha": "cb624bc6308add4ee9d1f04b35cbac591f0cd7e8",
+  "cwd": "<ISSUE63_WORKTREE>",
+  "path_redaction": "Only the existing V1/V2 private locators are replaced; no Token was read.",
+  "commands": [
+    {"command": "python -I -B scripts/test-autonomous-research.py", "exit": 0, "tests": 12},
+    {"command": "python -I -B scripts/test-multistock-research.py", "exit": 0, "tests": 12},
+    {"command": "python -I -B state/issue63-counterproof-cost-sign.py", "exit": 1, "expected": "one independent-arithmetic failure under an in-memory reversed-cost mutation"},
+    {"command": "python -I -B scripts/autonomous-research.py init --v1-root '<V1_ROOT>' --v2-root '<V2_ROOT>' --v1-version 1212 --v2-version 4848 --seed 63 --out state/autonomous-research/issue63-real-20261103 --authorize-local", "exit": 0},
+    {"command": "python -I -B scripts/autonomous-research.py once --out state/autonomous-research/issue63-real-20261103", "round": 1, "exit": 0},
+    {"command": "python -I -B scripts/autonomous-research.py verify --out state/autonomous-research/issue63-real-20261103", "after_round": 1, "exit": 0},
+    {"command": "python -I -B scripts/autonomous-research.py once --out state/autonomous-research/issue63-real-20261103", "round": 2, "exit": 0},
+    {"command": "python -I -B scripts/autonomous-research.py plan --v1-root '<V1_ROOT>' --v2-root '<V2_ROOT>' --v1-version 1212 --v2-version 4848 --seed 63", "exit": 0, "same_plan_sha": true},
+    {"command": "python -I -B scripts/autonomous-research.py status --out state/autonomous-research/issue63-real-20261103", "exit": 0},
+    {"command": "python -I -B scripts/autonomous-research.py history --out state/autonomous-research/issue63-real-20261103", "exit": 0},
+    {"command": "python -I -B scripts/autonomous-research.py report --out state/autonomous-research/issue63-real-20261103", "exit": 0},
+    {"command": "python -I -B scripts/autonomous-research.py verify --out state/autonomous-research/issue63-real-20261103", "after_round": 2, "exit": 0}
+  ],
+  "not_run": ["unrelated Rust suites", "Linux/macOS", "real Provider", "new market-data collection", "old raw/full-database re-verification"]
+}
