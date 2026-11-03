@@ -1,12 +1,13 @@
 # Stratide 当前状态
 
-> 截至 2026-11-02，基于已核验 `main 9a030459127da60028098a43adc8316c3988da35`，PR #56 / #58 均已合并；附本分支 #59 四接口历史 sidecar 开发状态。这是**当前实现快照**，不是实盘承诺。Owner 已决定 **Core-first、UI-later**：后续核心功能先用 CLI/持久报告验收，最后按 PR #28 设计体系统一集成 UI。
+> 截至 2026-11-03，基于已取得 `main 525f0633a7b9a62c96b1a1ab48b3f917b9b2df9f`，PR #56 / #58 / #60 已合并；附本分支 #61 只读多股票历史研究开发状态。这是**当前实现快照**，不是实盘承诺。Owner 已决定 **Core-first、UI-later**：后续核心功能先用 CLI/持久报告验收，最后按 PR #28 设计体系统一集成 UI。
 
 ## 已实现
 
 | 领域 | 实际状态 | 证据 |
 | --- | --- | --- |
-| M2-PR13 历史 sidecar V2（本分支 Draft） | #59：2000 积分现有账号，四接口各 1212 日期已落地，6068 次请求；因子 1212 日 PARTIAL，限价 33 日 PARTIAL，质量不冒充全市场完整。持久预算/断点续传、只读版本查询和冻结锚点复权；旧 V1/forward/Agent/交易权限不改 | [契约/操作](M2_PR13.md) / [实际证据](evidence/m2-pr13/README.md) |
+| M2-PR14 多股票历史研究 V1（本分支 Draft） | #61：只读处理 1212 会话 / 25569182 规范行，实测 5774 代码、5387 代码曾入研究子集；三策略/三基准、三成本情景及重置 Walk-forward，541 秒 / 267.5 MiB，12 项定向自测。三规则未建立相对等权优势；历史 PIT、可成交性仍未验证，研究指数不是账户 NAV 或 Paper/Live 准入 | [契约/操作](M2_PR14.md) / [本期开发证据](evidence/m2-pr14/README.md) |
+| M2-PR13 历史 sidecar V2（PR #60 已合并） | #59：2000 积分现有账号，四接口各 1212 日期已落地，6068 次原请求；因子 1212 日旧 PARTIAL 标签保留且不再推断数字 cap，限价 33 日 PARTIAL。历史市场覆盖仍未验证；持久预算/断点续传、只读版本查询和冻结锚点复权 | [契约/操作](M2_PR13.md) / [实际证据](evidence/m2-pr13/README.md) / [增量修复](evidence/m2-pr13/r1/README.md) |
 | M2-PR12 历史仓库 V1（PR #58 已合并） | #57：独立本地证券目录/日历/未复权日线；1212 日期、6347781 行，1201 COMPLETE / 11 PARTIAL。历史身份/BSE 日历/PIT 仍未核实；4.54 GB 本地旧库保留 | [契约/操作](M2_PR12.md) / [实际证据](evidence/m2-pr12/README.md) |
 | M0 Paper 内核 | Rust Risk Kernel、单账户 SQLite 事件账本、保守模拟撮合、确定性重放及六报告 | [PR #2](https://github.com/handFOOLed/Stratide/pull/2) / [#4](https://github.com/handFOOLed/Stratide/pull/4) / [#6](https://github.com/handFOOLed/Stratide/pull/6) |
 | 真实来源前向 EOD | **observe-only** 独立 journal；10/28、10/29 两个有效日，`EOD_CONTINUITY_VERIFIED`；0 策略提案/成交 | [#10 独立结论](https://github.com/handFOOLed/Stratide/issues/10#issuecomment-6512598875) |
@@ -40,7 +41,7 @@
 
 ## 当前执行顺序
 
-1. **Sol / #59：** 从 `main 9a03045` 独立实现四 API 历史 sidecar；最小真实预检后立即执行 2021-11-01—2026-10-30 全区间回填，按四个里程碑检查；真实 4848 个 API×日期分区均已提交，3 次网络未知结果保留并显式恢复。真实数量、质量缺口、恢复及定向测试以 [本期证据](evidence/m2-pr13/README.md) 为准。唯一 Draft，Owner 明确批准前不 Ready/合并。PR #56 / #58 已在 main；原 PR52/54 盘后回归和旧收据保留，不在本期重写。
+1. **Sol / #61：** 从 `main 525f063` 独立实现 V1/V2 只读多股票历史研究；不再采集或全量复核旧库，交三策略/三基准、时间隔离、成本敏感性、冻结报告及真实五年执行证据。唯一 Draft，固定 HEAD 风险审查及 Owner 明确批准前不 Ready/合并。PR #58 / #60 已在 main；原采集/前向/Agent 收据保留，不在本期重写。
 2. **后续核心任务：** Owner 再定范围；原 Operator 可继续采集，真实连续 21 日/独立事件覆盖/PIT/开盘及真实供应商仍未验证。[#36](https://github.com/handFOOLed/Stratide/issues/36) 的完整多模态消融尚未实现，真实付费、数据外发和交易均未获本期授权。
 3. **全部核心功能完成后：** Sol 按 PR #28 的设计体系统一集成全部 UI；旧同步 UI 要求被本 Owner 决定取代。
 
