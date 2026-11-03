@@ -142,7 +142,7 @@ def provenance(value, store_name):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=["init-cny", "configure", "preflight", "enable", "once", "disable",
-                                          "status", "report", "verify", "inbox", "budget"])
+                                          "status", "report", "verify", "inbox", "budget", "capture-model"])
     parser.add_argument("action", nargs="?", choices=["status"])
     parser.add_argument("--name", default="pr19-synthetic-smoke")
     parser.add_argument("--config", type=Path)
@@ -162,7 +162,7 @@ def main():
         elif args.command in ("report", "verify"):
             out = Run(args.name).report()
         else:
-            out = bridge(args.command, args.name) if args.command == "status" else bridge(args.command)
+            out = bridge(args.command, args.name) if args.command in ("status", "capture-model") else bridge(args.command)
         print(json.dumps(out, ensure_ascii=False, allow_nan=False))
         return 2 if out.get("state") == "BLOCKED" else 0
     except (OSError, ValueError, KeyError, subprocess.SubprocessError, j.Rejected, c.Rejected):

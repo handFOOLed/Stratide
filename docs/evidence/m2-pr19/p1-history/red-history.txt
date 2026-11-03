@@ -1,0 +1,14 @@
+test_07_history_survives_current_model_rotation_without_keys_or_calls (__main__.Tests.test_07_history_survives_current_model_rotation_without_keys_or_calls) ... FAIL
+
+======================================================================
+FAIL: test_07_history_survives_current_model_rotation_without_keys_or_calls (__main__.Tests.test_07_history_survives_current_model_rotation_without_keys_or_calls)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WSL_EXT4_WORKTREE>/state/pr19-p1/baseline/scripts/test-local-timesfm-fusion.py", line 312, in test_07_history_survives_current_model_rotation_without_keys_or_calls
+    self.assertTrue(checked.get("verified"), checked)
+AssertionError: None is not true : {'error_code': 'FUSION_RESULT_CHANGED', 'state': 'BLOCKED'}
+
+----------------------------------------------------------------------
+Ran 1 test in 0.752s
+
+FAILED (failures=1)

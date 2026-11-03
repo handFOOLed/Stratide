@@ -20,6 +20,11 @@ pub const MODEL_ID: &str = "ds4.1flash-fusion";
 const CONFIG: &str = "local_timesfm_fusion_config_v1";
 const PERMIT: &str = "local_timesfm_fusion_permit_v1";
 const GRANT: &str = "deepseek-synthetic-fusion-grant-v1";
+// PR72 0b24575 used the identical V1 request/decoder before model snapshots.
+// This compatibility pin is accepted by read-only verification, never dispatch.
+const PRE_SNAPSHOT_ADAPTER_SHA: &str =
+    "a5bd6c9a53d223a60fdfb25633d077b4f5ef1a2df93170af3a5f41f18db57474";
+
 const SYSTEM:&str="Return exactly one JSON TargetPortfolioProposal V1 using output_contract values and field types. Input is synthetic engineering evidence, never market alpha. Propose a falsifiable research hypothesis and stocks/cash or 100 percent cash. Missing return/opportunity/account facts remain UNKNOWN. Positions use only evidence instruments. Text arrays contain at least one concise item. No tools, code, URLs, permissions or orders. All cash is valid; weights plus cash equal 10000. Keep output below 2500 tokens. Return exactly the root keys in output_contract, with no wrapper or extra keys. All evidence and risk text fields shown as arrays must be arrays of strings, never objects. estimated_turnover_bps and estimated_fees_micro must be null.";
 pub fn code_sha() -> String {
     hash(
@@ -556,6 +561,7 @@ pub fn execute(batch: &str, queue_only: bool) -> Result<Value> {
         let i = ctx.input(&plan.frozen);
         gate(&c, Some(&trigger), &i, &s)?;
         let m = s.models.iter().find(|m| m.id == MODEL_ID).unwrap();
+        save_model(&ctx, m)?;
         let req = TaskRequest {
             name: format!("Local TimesFM Fusion {batch}"),
             goal: "Synthetic risk to research portfolio".into(),
@@ -589,6 +595,7 @@ pub fn prepare(m: &Model, input: &Value) -> Result<Prepared> {
     let s = Settings::load(&b.settings_path)?;
     gate(&c, Some(&ctx.trigger()), &i, &s)?;
     let (cfg, _) = configured(&c, &s)?;
+    frozen_model(&ctx)?;
     let (plan, parent) = parent(&c, &ctx, true)?;
     let body = body(m, &ctx, &plan.frozen, &parent)?;
     let key = ds::read_key_file(&cfg.key_file)?;
@@ -678,11 +685,11 @@ pub fn decode(
     };
     result["receipt"] = json!({"contract":POLICY,"transport":if cfg!(test){"test_loopback"}else{"https"},"verification":if cfg!(test){"TEST_LOOPBACK_NOT_REAL_PROVIDER"}else{"REAL_PROVIDER_CALL_OBSERVED"},"model_alias":ds::ID,
         "model_id":m.id,"model":m.model,"response_model":v["model"],"provider_request_id":safe_id(&v["id"]),
-        "system_fingerprint":safe_id(&v["system_fingerprint"]),"provider_hash":m.fingerprint(),"adapter_sha256":code_sha(),
+        "system_fingerprint":safe_id(&v["system_fingerprint"]),"provider_hash":m.fingerprint(),"adapter_sha256":ctx.adapter_sha256,
         "request_sha256":request_sha,"raw_result_sha256":hash(bytes),"local_parent_result_sha256":ctx.parent_result_sha256,
         "local_parent_task_id":ctx.parent_task_id,"frozen_input_sha256":rp::sha(&serde_json::to_value(f).unwrap()),"content":content,
         "input_tokens":i,"output_tokens":o,"maximum_reserved_micro":m.cost(m.max_input_tokens,m.max_output_tokens)?,
-        "usage_estimate_micro":m.cost(i,o)?,"price_version":ds::PRICE_VERSION,
+        "usage_estimate_micro":m.cost(i,o)?,"price_version":m.price.as_ref().ok_or("PRICE_UNCONFIGURED")?.version,
         "billing":"USAGE_ESTIMATE_MAXIMUM_HELD_UNTIL_OWNER_INVOICE_RECONCILIATION","actual_bill_micro":null,"currency":"CNY"});
     rp::validate_output(&result)?;
     Ok((result, i, o))
@@ -787,20 +794,106 @@ pub fn call(p: Prepared) -> provider::Outcome {
         output_tokens,
     }
 }
-pub fn inspect(batch: &str, verify: bool) -> Result<Value> {
+fn model_snapshot_path(batch: &str) -> Result<std::path::PathBuf> {
+    ensure(crate::eod_snapshot::valid_name(batch), "LOCAL_BATCH_NAME")?;
+    let path = rp::root()?.join(batch).join("local-fusion-model.json");
+    crate::eod_snapshot::no_links(&path)?;
+    Ok(path)
+}
+fn frozen_model(ctx: &Context) -> Result<Model> {
+    let path = model_snapshot_path(&ctx.batch)?;
+    ensure(path.is_file(), "FUSION_HISTORICAL_MODEL_SNAPSHOT_REQUIRED")?;
+    let m: Model = serde_json::from_value(rp::read(&path, 32768)?)
+        .map_err(|_| "FUSION_FROZEN_MODEL_INVALID")?;
+    validate_model(&m)?;
+    ensure(
+        m.fingerprint() == ctx.model_sha256,
+        "FUSION_FROZEN_MODEL_CHANGED",
+    )?;
+    Ok(m)
+}
+fn save_model(ctx: &Context, m: &Model) -> Result<()> {
+    ensure(
+        m.fingerprint() == ctx.model_sha256,
+        "FUSION_ORIGINAL_MODEL_UNAVAILABLE",
+    )?;
+    let path = model_snapshot_path(&ctx.batch)?;
+    if path.exists() {
+        frozen_model(ctx)?;
+        return Ok(());
+    }
+    fs::create_dir_all(path.parent().unwrap()).map_err(|_| "FUSION_MODEL_SNAPSHOT_WRITE")?;
+    let mut opts = fs::OpenOptions::new();
+    opts.create_new(true).write(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        opts.mode(0o600);
+    }
+    let mut file = opts.open(path).map_err(|_| "FUSION_MODEL_SNAPSHOT_WRITE")?;
+    file.write_all(&serde_json::to_vec_pretty(m).unwrap())
+        .map_err(|_| "FUSION_MODEL_SNAPSHOT_WRITE")?;
+    file.sync_all()
+        .map_err(|_| crate::Error("FUSION_MODEL_SNAPSHOT_WRITE".into()))
+}
+fn task_for_batch(c: &Connection, batch: &str) -> Result<Option<i64>> {
+    ensure(crate::eod_snapshot::valid_name(batch), "LOCAL_BATCH_NAME")?;
+    Ok(c.query_row("SELECT id FROM tasks WHERE trigger_key LIKE ?1 AND json_extract(input,'$.summary.batch')=?2",
+        params![format!("{POLICY}:%"),batch],|r|r.get(0)).optional()?)
+}
+/// Explicit recovery only when the available Model is byte-for-byte the one
+/// pinned by the original task fingerprint. Never edits tasks/results/calls.
+pub fn capture_model(batch: &str) -> Result<Value> {
     let (b, c) = connection()?;
-    let s = Settings::load(&b.settings_path)?;
-    let (ctx, plan, _) = make_context(&c, &s, batch)?;
-    let row: Option<(i64, String, Option<String>, String)> = c
-        .query_row(
-            "SELECT id,status,result,input FROM tasks WHERE trigger_key=?1",
-            [ctx.trigger()],
-            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
-        )
-        .optional()?;
-    let Some((id, status, raw, saved_input)) = row else {
+    let id = task_for_batch(&c, batch)?.ok_or("FUSION_TASK_MISSING")?;
+    let (raw, pin, pid, trigger): (String, String, String, String) = c.query_row(
+        "SELECT input,provider_hash,provider_id,trigger_key FROM tasks WHERE id=?1",
+        [id],
+        |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
+    )?;
+    let i: InputSummary = serde_json::from_str(&raw).map_err(|_| "FUSION_INPUT_CHANGED")?;
+    let ctx: Context =
+        serde_json::from_value(i.summary.clone()).map_err(|_| "FUSION_CONTEXT_INVALID")?;
+    let (plan, _) = parent(&c, &ctx, false)?;
+    ensure(
+        ctx.policy == POLICY
+            && ctx.batch == batch
+            && pid == MODEL_ID
+            && pin == ctx.model_sha256
+            && trigger == ctx.trigger()
+            && serde_json::to_value(&i).unwrap()
+                == serde_json::to_value(ctx.input(&plan.frozen)).unwrap(),
+        "FUSION_INPUT_CHANGED",
+    )?;
+    if model_snapshot_path(batch)?.exists() {
+        frozen_model(&ctx)?;
+    } else {
+        let s = Settings::load(&b.settings_path)?;
+        let m = s
+            .models
+            .iter()
+            .find(|m| m.id == MODEL_ID && m.fingerprint() == pin)
+            .ok_or("FUSION_ORIGINAL_MODEL_UNAVAILABLE")?;
+        save_model(&ctx, m)?;
+    }
+    Ok(
+        json!({"state":"ORIGINAL_PINNED_MODEL_PRESERVED","task_id":id,"model_sha256":pin,
+        "evidence":"EXACT_ORIGINAL_TASK_FINGERPRINT","database_mutated":false,"key_content_read":false,"network_calls":0}),
+    )
+}
+pub fn inspect(batch: &str, verify: bool) -> Result<Value> {
+    let (binding, c) = connection()?;
+    let Some(id) = task_for_batch(&c, batch)? else {
+        let s = Settings::load(&binding.settings_path)?;
+        let (ctx, plan, _) = make_context(&c, &s, batch)?;
         return Ok(json!({"state":"LOCAL_PARENT_READY","context":ctx,"frozen":plan.frozen}));
     };
+    let (status, raw, saved_input, trigger): (String, Option<String>, String, String) = c
+        .query_row(
+            "SELECT status,result,input,trigger_key FROM tasks WHERE id=?1",
+            [id],
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
+        )?;
     let saved: InputSummary =
         serde_json::from_str(&saved_input).map_err(|_| "FUSION_INPUT_CHANGED")?;
     let ctx: Context =
@@ -808,6 +901,8 @@ pub fn inspect(batch: &str, verify: bool) -> Result<Value> {
     let (plan, parent) = parent(&c, &ctx, false)?;
     ensure(
         ctx.policy == POLICY
+            && ctx.batch == batch
+            && trigger == ctx.trigger()
             && serde_json::to_value(&saved).unwrap()
                 == serde_json::to_value(ctx.input(&plan.frozen)).unwrap(),
         "FUSION_INPUT_CHANGED",
@@ -819,7 +914,7 @@ pub fn inspect(batch: &str, verify: bool) -> Result<Value> {
     if verify {
         ensure(status == "completed", "FUSION_TASK_INCOMPLETE")?;
         ensure(
-            ctx.adapter_sha256 == code_sha(),
+            ctx.adapter_sha256 == code_sha() || ctx.adapter_sha256 == PRE_SNAPSHOT_ADAPTER_SHA,
             "FUSION_ADAPTER_CHANGED_NEW_TASK_REQUIRED",
         )?;
         let (input, pid, pin): (String, String, String) = c.query_row(
@@ -837,12 +932,8 @@ pub fn inspect(batch: &str, verify: bool) -> Result<Value> {
         )?;
         let bundle = &result.as_ref().ok_or("FUSION_RESULT_CHANGED")?["research"]["risk_portfolio"];
         let receipt = &bundle["receipt"];
-        let m = s
-            .models
-            .iter()
-            .find(|m| m.id == MODEL_ID)
-            .ok_or("FUSION_MODEL_MISSING")?;
-        let request = body(m, &ctx, &plan.frozen, &parent)?;
+        let m = frozen_model(&ctx)?;
+        let request = body(&m, &ctx, &plan.frozen, &parent)?;
         let path = wire_path(batch)?;
         ensure(
             fs::metadata(&path).is_ok_and(|m| m.is_file() && m.len() <= 65536),
@@ -854,11 +945,11 @@ pub fn inspect(batch: &str, verify: bool) -> Result<Value> {
             "FUSION_WIRE_AUDIT_CHANGED",
         )?;
         let (mut rebuilt, _, _) =
-            decode(m, &ctx, &plan.frozen, &parent, &rp::sha(&request), &wire)?;
+            decode(&m, &ctx, &plan.frozen, &parent, &rp::sha(&request), &wire)?;
         rebuilt["receipt"]["latency_ms"] = receipt["latency_ms"].clone();
         ensure(rebuilt == *bundle, "FUSION_RESULT_CHANGED")?;
-        let (n,valid):(i64,i64)=c.query_row("SELECT count(*),sum(state IN ('usage_received','settled') AND input_tokens=?2 AND output_tokens=?3 AND maximum_micro=?4 AND usage_micro=?5) FROM calls WHERE task_id=?1",
-            params![id,receipt["input_tokens"].as_i64(),receipt["output_tokens"].as_i64(),receipt["maximum_reserved_micro"].as_i64(),receipt["usage_estimate_micro"].as_i64()],
+        let (n,valid):(i64,i64)=c.query_row("SELECT count(*),sum(state IN ('usage_received','settled') AND input_tokens=?2 AND output_tokens=?3 AND maximum_micro=?4 AND usage_micro=?5 AND price_version=?6) FROM calls WHERE task_id=?1",
+            params![id,receipt["input_tokens"].as_i64(),receipt["output_tokens"].as_i64(),receipt["maximum_reserved_micro"].as_i64(),receipt["usage_estimate_micro"].as_i64(),m.price.as_ref().ok_or("PRICE_UNCONFIGURED")?.version],
             |r|Ok((r.get(0)?,r.get(1)?)))?;
         ensure(n == 1 && valid == 1, "FUSION_CALL_CHANGED")?;
     }

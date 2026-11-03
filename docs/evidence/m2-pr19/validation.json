@@ -91,6 +91,14 @@
   "final_adapter_sha256": "a5bd6c9a53d223a60fdfb25633d077b4f5ef1a2df93170af3a5f41f18db57474",
   "review_status": "DRAFT_ONLY_NOT_INDEPENDENT_ACCEPTANCE",
   "current_real_status": "REAL_SYNTHETIC_FUSION_CHAIN_VERIFIED",
-  "production_code_changed_after_initial_PR": false,
-  "regressions_reused": "204 Rust + 6 Fusion + prior targeted suites; identical production bytes; followup only changes docs/evidence"
+  "production_code_changed_after_initial_PR": true,
+  "regressions_reused": "204 Rust + 6 Fusion + prior targeted suites; identical production bytes; followup only changes docs/evidence",
+  "p1_review_fix": {
+    "review_comment": 6604866896,
+    "evidence": "p1-history/validation.json",
+    "new_real_api_calls": 0,
+    "history_fusion_tests_passed": 9,
+    "rust_workspace_passed": 204,
+    "owner_database_rows_unchanged": true
+  }
 }

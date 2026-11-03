@@ -284,6 +284,176 @@ class Tests(unittest.TestCase):
             self.assertEqual(server.count, 0)
             self.assertEqual(self.calls(name)[0][0], "no_charge")
 
+    def test_07_history_survives_current_model_rotation_without_keys_or_calls(self):
+        name = self.batch()
+        f.bridge("enable", name)
+        with Server() as server:
+            value = driver(name, server.http.server_port)
+            self.assertEqual(value["status"], "completed")
+            original_bridge = f.bridge
+            def offline(action, arg=None):
+                return driver(arg, action="verify") if action == "verify" else original_bridge(action, arg)
+            with patch.object(f, "bridge", side_effect=offline):
+                run = f.Run(name)
+                run.archive(f.task(value["id"]))
+                original_report = run.report()
+                original_task = f.task(value["id"])
+                original_calls = self.calls(name)
+                path = self.owner/"settings.json"
+                original_settings = path.read_bytes()
+                key_backup = self.key.with_suffix(".hidden")
+                self.key.rename(key_backup)
+                try:
+                    from review import Review
+                    snapshot = run.root/"local-fusion-model.json"
+                    snapshot_bytes = snapshot.read_bytes()
+                    for change in ("grant-renewed", "revoked", "price-revised", "model-version", "removed"):
+                        with self.subTest(change=change):
+                            settings = json.loads(original_settings)
+                            current = next(m for m in settings["models"] if m["id"] == "ds4.1flash-fusion")
+                            if change == "grant-renewed":
+                                current["grant"]["authorized_at"] = dt.datetime.now(dt.timezone.utc).isoformat()
+                            elif change == "revoked":
+                                current["grant"]["revoked"] = True
+                            elif change == "price-revised":
+                                current["price"].update(version="offline-price-rotation-v2",
+                                    source="https://api-docs.deepseek.com/zh-cn/quick_start/pricing/#updated",
+                                    input_micro_per_million=4000000, output_micro_per_million=16000000)
+                                current["cloud"]["max_call_micro"] = 200000
+                            elif change == "model-version":
+                                current["cloud"]["model_version"] = "offline-model-rotation-v2"
+                            else:
+                                settings["models"] = [m for m in settings["models"] if m["id"] != "ds4.1flash-fusion"]
+                            path.write_text(json.dumps(settings))
+                            checked = driver(name, action="verify")
+                            self.assertTrue(checked.get("verified"), checked)
+                            self.assertEqual(f.bridge("status", name)["state"], "completed")
+                            self.assertEqual(run.report(), original_report)
+                            self.assertEqual(Review(name, local_fusion=True).inbox()["count"], 1)
+                            self.assertEqual(f.task(value["id"]), original_task)
+                            self.assertEqual(self.calls(name), original_calls)
+                            self.assertEqual(snapshot.read_bytes(), snapshot_bytes)
+                            self.assertEqual(server.count, 1)
+                finally:
+                    path.write_bytes(original_settings)
+                    key_backup.rename(self.key)
+
+    def test_08_snapshot_recovery_requires_original_pin_and_tampering_is_rejected(self):
+        name = self.batch()
+        f.bridge("enable", name)
+        with Server() as server:
+            value = driver(name, server.http.server_port)
+            self.assertEqual(value["status"], "completed")
+            folder = rp.root()/name
+            snapshot = folder/"local-fusion-model.json"
+            original_snapshot = snapshot.read_bytes()
+            original_task = f.task(value["id"])
+            original_calls = self.calls(name)
+            settings_path = self.owner/"settings.json"
+            original_settings = settings_path.read_bytes()
+            snapshot.unlink()
+            self.assertEqual(driver(name, action="verify")["error_code"], "FUSION_HISTORICAL_MODEL_SNAPSHOT_REQUIRED")
+            try:
+                settings = json.loads(original_settings)
+                current = next(m for m in settings["models"] if m["id"] == "ds4.1flash-fusion")
+                current["grant"]["revoked"] = True
+                settings_path.write_text(json.dumps(settings))
+                with self.assertRaisesRegex(Exception, "FUSION_ORIGINAL_MODEL_UNAVAILABLE"):
+                    f.bridge("capture-model", name)
+                self.assertFalse(snapshot.exists())
+            finally:
+                settings_path.write_bytes(original_settings)
+            saved = f.bridge("capture-model", name)
+            self.assertFalse(saved["database_mutated"])
+            self.assertFalse(saved["key_content_read"])
+            self.assertEqual(saved["network_calls"], 0)
+            self.assertEqual(snapshot.read_bytes(), original_snapshot)
+            self.assertTrue(driver(name, action="verify")["verified"])
+            changed = json.loads(original_snapshot)
+            changed["price"]["output_micro_per_million"] += 1
+            snapshot.write_text(json.dumps(changed))
+            self.assertEqual(driver(name, action="verify")["error_code"], "FUSION_FROZEN_MODEL_CHANGED")
+            snapshot.write_bytes(original_snapshot)
+            wire = folder/"local-fusion-wire.json"
+            original_wire = wire.read_bytes()
+            wire.write_bytes(original_wire+b" ")
+            self.assertEqual(driver(name, action="verify")["error_code"], "FUSION_WIRE_AUDIT_CHANGED")
+            wire.write_bytes(original_wire)
+            with rp.agent_db() as db:
+                raw = db.execute("SELECT result FROM tasks WHERE id=?", (value["id"],)).fetchone()[0]
+                parent_id = value["input"]["summary"]["parent_task_id"]
+                parent_raw = db.execute("SELECT result FROM tasks WHERE id=?", (parent_id,)).fetchone()[0]
+                price_version = db.execute("SELECT price_version FROM calls WHERE task_id=?", (value["id"],)).fetchone()[0]
+            try:
+                altered = json.loads(raw)
+                altered["research"]["risk_portfolio"]["receipt"]["price_version"] = "forged-price"
+                self.mutate("UPDATE tasks SET result=? WHERE id=?", (json.dumps(altered), value["id"]))
+                self.assertEqual(driver(name, action="verify")["error_code"], "FUSION_RESULT_CHANGED")
+            finally:
+                self.mutate("UPDATE tasks SET result=? WHERE id=?", (raw, value["id"]))
+            try:
+                self.mutate("UPDATE tasks SET result=? WHERE id=?", (parent_raw+" ", parent_id))
+                self.assertEqual(driver(name, action="verify")["error_code"], "FUSION_LOCAL_PARENT_CHANGED")
+            finally:
+                self.mutate("UPDATE tasks SET result=? WHERE id=?", (parent_raw, parent_id))
+            try:
+                self.mutate("UPDATE calls SET price_version=? WHERE task_id=?", ("forged-price", value["id"]))
+                self.assertEqual(driver(name, action="verify")["error_code"], "FUSION_CALL_CHANGED")
+            finally:
+                self.mutate("UPDATE calls SET price_version=? WHERE task_id=?", (price_version, value["id"]))
+            self.assertTrue(driver(name, action="verify")["verified"])
+            self.assertEqual(f.task(value["id"]), original_task)
+            self.assertEqual(self.calls(name), original_calls)
+            self.assertEqual(server.count, 1)
+
+    def test_09_new_tasks_use_latest_grant_price_expiry_and_budget(self):
+        settings_path = self.owner/"settings.json"
+        original_settings = settings_path.read_bytes()
+        with rp.agent_db() as db:
+            original_cfg = db.execute("SELECT value FROM meta WHERE key='local_timesfm_fusion_config_v1'").fetchone()[0]
+        with Server() as server:
+            for change in ("revoked", "price-revised", "expired", "consumed"):
+                with self.subTest(change=change):
+                    name = self.batch()
+                    if change == "revoked":
+                        settings = json.loads(original_settings)
+                        next(m for m in settings["models"] if m["id"] == "ds4.1flash-fusion")["grant"]["revoked"] = True
+                        settings_path.write_text(json.dumps(settings))
+                    elif change == "price-revised":
+                        settings = json.loads(original_settings)
+                        next(m for m in settings["models"] if m["id"] == "ds4.1flash-fusion")["price"]["version"] = "unreviewed-price-v2"
+                        settings_path.write_text(json.dumps(settings))
+                    elif change == "expired":
+                        cfg = json.loads(original_cfg)
+                        cfg["price_valid_until"] = (dt.datetime.now(dt.timezone.utc)-dt.timedelta(days=1)).isoformat()
+                        self.mutate("UPDATE meta SET value=? WHERE key='local_timesfm_fusion_config_v1'", (json.dumps(cfg),))
+                    try:
+                        blocked = driver(name, server.http.server_port)
+                        expected = dict(revoked="FUSION_PURPOSE_GRANT_REQUIRED",
+                                        **{"price-revised":"DEEPSEEK_CURRENT_CNY_PEAK_PRICE_REQUIRED"},
+                                        expired="DEEPSEEK_PRICE_EXPIRED_REFRESH_FROZEN_CONFIG",
+                                        consumed="FUSION_DISABLED_OR_ONCE_CONSUMED")[change]
+                        self.assertEqual(blocked.get("error_code", blocked.get("reason")), expected, blocked)
+                        self.assertEqual(self.calls(name), [])
+                    finally:
+                        settings_path.write_bytes(original_settings)
+                        self.mutate("UPDATE meta SET value=? WHERE key='local_timesfm_fusion_config_v1'", (original_cfg,))
+            name = self.batch()
+            f.bridge("enable", name)
+            f.bridge("queue", name)
+            settings = json.loads(original_settings)
+            held = int(f.bridge("budget")["reserved_micro"])
+            settings["budget"]["daily_limit_micro"] = max(held, 1)
+            settings_path.write_text(json.dumps(settings))
+            try:
+                blocked = driver(name, server.http.server_port)
+                self.assertEqual(blocked.get("reason", blocked.get("error_code")), "DAILY_BUDGET_EXHAUSTED", blocked)
+                self.assertEqual(self.calls(name), [])
+            finally:
+                settings_path.write_bytes(original_settings)
+                f.bridge("disable")
+            self.assertEqual(server.count, 0)
+
     def test_06_init_cannot_relabel_TST_or_reset_history(self):
         with rp.agent_db() as db:
             count = db.execute("SELECT count(*) FROM calls").fetchone()[0]

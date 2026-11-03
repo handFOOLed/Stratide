@@ -1,0 +1,104 @@
+{
+  "contract": "pr72-p1-owner-offline-verification-v1",
+  "starting_head": "0b24575aba343194ce14ec5f72cc5330286600c5",
+  "commands": [
+    {
+      "action": "status",
+      "exit": 0,
+      "result": {
+        "state": "completed",
+        "task_id": 4,
+        "verified": false
+      }
+    },
+    {
+      "action": "verify",
+      "exit": 0,
+      "result": {
+        "state": "RESEARCH_ONLY",
+        "task_id": "4",
+        "verified": true,
+        "registration_sha256": "024e0ceb6f47d507a99bfb094baf758bfa48130138d666362effe2a176599b04"
+      }
+    },
+    {
+      "action": "report",
+      "exit": 0,
+      "result": {
+        "state": "RESEARCH_ONLY",
+        "task_id": "4",
+        "verified": true,
+        "registration_sha256": "024e0ceb6f47d507a99bfb094baf758bfa48130138d666362effe2a176599b04"
+      }
+    },
+    {
+      "action": "inbox",
+      "exit": 0,
+      "result": {
+        "count": 1
+      }
+    },
+    {
+      "action": "budget",
+      "exit": 0,
+      "result": {
+        "state": "configured",
+        "call_count": "2",
+        "reserved_micro": "196608",
+        "usage_estimate_micro": "15420"
+      }
+    }
+  ],
+  "before": {
+    "tasks": {
+      "count": 4,
+      "sha256": "ad03a0911aa45798d732558237e6f1efdae965d99805860c09a5327babb829aa"
+    },
+    "calls": {
+      "count": 2,
+      "sha256": "0fdbd0dc5c1b404b8984d652d41918ae89eb39f5ad48efc056775165bf655dfe"
+    },
+    "meta": {
+      "count": 9,
+      "sha256": "484a7a58670a438f48f5809ac255510c144fcebaea0c1ceed9eb51650d17571a"
+    }
+  },
+  "after": {
+    "tasks": {
+      "count": 4,
+      "sha256": "ad03a0911aa45798d732558237e6f1efdae965d99805860c09a5327babb829aa"
+    },
+    "calls": {
+      "count": 2,
+      "sha256": "0fdbd0dc5c1b404b8984d652d41918ae89eb39f5ad48efc056775165bf655dfe"
+    },
+    "meta": {
+      "count": 9,
+      "sha256": "484a7a58670a438f48f5809ac255510c144fcebaea0c1ceed9eb51650d17571a"
+    }
+  },
+  "all_task_call_meta_rows_unchanged": true,
+  "exact_original_model_snapshots": [
+    {
+      "task_id": 2,
+      "model_fingerprint": "4d0249e5c495c52ccb32df6f718c3fa772bce8ca7587138fec5e7dcd831d826c",
+      "snapshot_file_sha256": "ebdc1f56141c2c8919dc77a0ae3f1f1be8cc3ca0e65878cfa6345e3530be19f4",
+      "mode": "0o600"
+    },
+    {
+      "task_id": 4,
+      "model_fingerprint": "4d0249e5c495c52ccb32df6f718c3fa772bce8ca7587138fec5e7dcd831d826c",
+      "snapshot_file_sha256": "ebdc1f56141c2c8919dc77a0ae3f1f1be8cc3ca0e65878cfa6345e3530be19f4",
+      "mode": "0o600"
+    }
+  ],
+  "existing_real_calls": 2,
+  "new_real_api_calls": 0,
+  "key_content_reads": 0,
+  "total_usage_estimate_micro": 15420,
+  "total_reserved_micro": 196608,
+  "grant_or_budget_changes": 0,
+  "historical_receipt_rewrites": 0,
+  "snapshot_capture": "explicit, fingerprint equal to original task/provider pin, no database update",
+  "build": "cargo build --workspace --locked --offline"
+}

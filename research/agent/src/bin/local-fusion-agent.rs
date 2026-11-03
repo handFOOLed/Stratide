@@ -7,6 +7,7 @@ fn run(a: &[String]) -> Result<Value> {
         ("configure", 2) => f::configure(std::path::Path::new(&a[1])),
         ("budget", 1) => f::budget_status(),
         ("disable", 1) => f::disable(),
+        ("capture-model", 2) => f::capture_model(&a[1]),
         ("preflight", 2) => f::preflight(&a[1]),
         ("enable", 2) => f::enable(&a[1]),
         ("once", 2) => f::execute(&a[1], false),

@@ -1,0 +1,76 @@
+{
+  "contract": "pr72-p1-history-regression-v1",
+  "review": "https://github.com/handFOOLed/Stratide/pull/72#issuecomment-6604866896",
+  "before_head": "0b24575aba343194ce14ec5f72cc5330286600c5",
+  "adapter_sha256": "b2a855cd86acd7acd7cd09c224ba5946e67dd35a0fb7584209fc558fced188ab",
+  "checks": [
+    {
+      "command": "original code + new Tests.test_07_history_survives_current_model_rotation_without_keys_or_calls",
+      "exit": 1,
+      "result": "FUSION_RESULT_CHANGED after authorized_at renewal; deterministic offline reproduction"
+    },
+    {
+      "command": "cargo build --workspace --locked --offline",
+      "exit": 0,
+      "result": "standard ext4 workspace build"
+    },
+    {
+      "command": "PR19_TEST_DRIVER=<LIBTEST> .venv/bin/python -B scripts/test-local-timesfm-fusion.py",
+      "exit": 0,
+      "result": "9/9: original 6 + 3 history/snapshot/latest-admission tests"
+    },
+    {
+      "command": "cargo test --workspace --locked --offline -- --test-threads=1",
+      "exit": 0,
+      "result": "204/204, includes CNY Budget 3 + original shared Budget 6"
+    },
+    {
+      "command": "python3 -B scripts/test-deepseek-structured.py",
+      "exit": 1,
+      "result": "4/5 initial; DEEPSEEK_OWNER_AUTHORIZATION_REQUIRED in unchanged time-sensitive fixture"
+    },
+    {
+      "command": "unmodified PR17 Suite.test_blank_truncation_refusal_partial_and_invalid_source_keep_cost_and_audit",
+      "exit": 0,
+      "result": "targeted 1/1"
+    },
+    {
+      "command": "python3 -B scripts/test-timesfm-cpu.py",
+      "exit": 0,
+      "result": "11 passed + 1 Windows-only skip"
+    },
+    {
+      "command": "python3 -B scripts/test-timesfm-linux.py",
+      "exit": 0,
+      "result": "4/4"
+    },
+    {
+      "command": "python3 -B scripts/test-risk-portfolio.py --driver <LIBTEST>",
+      "exit": 1,
+      "result": "11/13 initial: temporary target symlink rejected by original LINK_PATH_DENIED, plus existing FUTURE_OR_STALE_SNAPSHOT"
+    },
+    {
+      "command": "unmodified PR56 tests 01 and 07 after using native target directory",
+      "exit": 0,
+      "result": "targeted 2/2; no gate/test changes"
+    },
+    {
+      "command": "local-timesfm-fusion.py capture-model --name <EXISTING_BATCH>, both original batches",
+      "exit": 0,
+      "result": "exact original fingerprint matches; new private snapshot files only; original SQLite unchanged"
+    },
+    {
+      "command": "local-timesfm-fusion.py status / verify / report / inbox / budget status",
+      "exit": 0,
+      "result": "original completed task 4 verified; Inbox count 1; calls still 2; all tasks/calls/meta row hashes identical"
+    }
+  ],
+  "new_real_api_calls": 0,
+  "key_content_reads": 0,
+  "historical_receipt_rewrites": 0,
+  "owner_database_row_mutations": 0,
+  "reservations_micro": 196608,
+  "independent_acceptance": "NOT_VERIFIED",
+  "paper_allowed": false,
+  "live_allowed": false
+}

@@ -1,0 +1,6 @@
+test_blank_truncation_refusal_partial_and_invalid_source_keep_cost_and_audit (pr17.Suite.test_blank_truncation_refusal_partial_and_invalid_source_keep_cost_and_audit) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 2.710s
+
+OK
