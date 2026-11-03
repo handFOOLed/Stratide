@@ -1,0 +1,70 @@
+
+==================================================
+ Memory Estimate for Dataset
+==================================================
+  Dataset: 100 series × 512 context length
+  Horizon: 20 steps
+  Batch size: 1
+  Model: v2.5
+--------------------------------------------------
+  Model weights:     0.80 GB
+  Overhead:          0.50 GB
+  Input data:        0.00 GB
+  Batch processing:  0.00 GB
+  Output data:       0.00 GB
+--------------------------------------------------
+  Total (raw):       1.30 GB
+  Total (+20% buf):  1.56 GB
+--------------------------------------------------
+  System RAM:        31.7 GB
+  Available RAM:     16.7 GB
+==================================================
+  ✅ Dataset fits comfortably: 1.6 GB needed, 31.7 GB available.
+==================================================
+
+{
+  "model": "TimesFM 2.5 (200M)",
+  "passed": true,
+  "mode": "cpu",
+  "recommended_batch_size": 32,
+  "verdict": "\u2705 System is ready for TimesFM 2.5 (200M) (CPU mode)",
+  "verdict_detail": "Recommended: per_core_batch_size=32",
+  "checks": [
+    {
+      "name": "RAM",
+      "status": "pass",
+      "detail": "System has 31.7 GB RAM, meets 4 GB recommendation.",
+      "value": "Total: 31.7 GB | Available: 16.8 GB"
+    },
+    {
+      "name": "GPU",
+      "status": "warn",
+      "detail": "No GPU detected. TimesFM will run on CPU (slower but functional). Install CUDA-enabled PyTorch for GPU acceleration.",
+      "value": "None (CPU only)"
+    },
+    {
+      "name": "Disk",
+      "status": "pass",
+      "detail": "86.3 GB available, exceeds 2 GB requirement.",
+      "value": "Free: 86.3 GB (in <REDACTED_CACHE_DIR>)"
+    },
+    {
+      "name": "Python",
+      "status": "pass",
+      "detail": "Python 3.12.10 meets >= 3.10 requirement.",
+      "value": "3.12.10"
+    },
+    {
+      "name": "timesfm",
+      "status": "pass",
+      "detail": "timesfm unknown is installed.",
+      "value": "Installed (unknown)"
+    },
+    {
+      "name": "torch",
+      "status": "pass",
+      "detail": "torch 2.8.0+cpu is installed.",
+      "value": "Installed (2.8.0+cpu)"
+    }
+  ]
+}

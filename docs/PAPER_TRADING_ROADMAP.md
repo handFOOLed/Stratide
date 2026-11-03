@@ -1,5 +1,7 @@
 # Stratide Paper 阶段路线图（当前执行版）
 
+**当前 #69 / M2-PR18（Draft）：** Owner 选定本地 CPU TimesFM 2.5 → N100 Linux。交付按需离线风险 Worker 和原 RiskExpertResult 接线；[执行说明](M2_PR18.md)、[验收证据](evidence/m2-pr18/README.md)。N100 未实测前不宣称性能达标；本期不接 DeepSeek Fusion、不调 EOD、不增真实前向/交易权限。
+
 > 2026-11-03；最新实现与数据边界见 [STATUS](STATUS.md)。Owner 已决定 **Core-first、UI-later**：后续核心功能不要求同期 Dashboard/UI，最终按已合并 PR #28 的视觉基准统一集成。旧各 PR 实施/验收细节仍保存在 `docs/M0_*.md`、`docs/M1_*.md`、`docs/M2_PR01.md` 与 `docs/evidence/`。
 
 ## 已完成（已并入 main）

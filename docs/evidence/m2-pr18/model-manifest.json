@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "model": "google/timesfm-2.5-200m-pytorch",
+  "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+  "license": "Apache-2.0",
+  "versions": {
+    "timesfm": "2.0.2",
+    "torch": "2.8.0+cpu",
+    "numpy": "2.2.6",
+    "huggingface-hub": "0.34.4",
+    "safetensors": "0.6.2"
+  },
+  "files": {
+    "model.safetensors": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+    "config.json": "cd3315b760d5cc7e278d7afdf41b897031ced888fc6c115bd9b3ac0ea2c47408",
+    "README.md": "4c3f16633a3d8b9324904bf004429aced2ee009b84e64effb59a902520cc7f2e",
+    "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "label": "SYNTHETIC_RISK_CORE_CONCURRENT_WITH_DEVELOPMENT_CPU_BENCHMARK",
+  "command": "stratide-cli risk-demo with explicit synthetic fen limits",
+  "exit": 0,
+  "wall_seconds": 0.08877209998900071,
+  "stdout": "模式：synthetic_test；固定人工价格/规则/费用；无行情抓取、无成交、无磁盘账本\n显式本金：10000.00 元；初始 NAV：10000.00 元；持仓：0 股\n买入申请 #1：接受提案；不是成交；最大现金支出 1005.00 元\n重复审查：结果一致\n超现金买入 #2：拒绝：可用资金不足：需要 11005.00 元，扣除预留后仅有 10000.00 元\n无持仓卖出 #3：拒绝：持仓不足：申请卖出 100 股，扣除预留后仅有 0 股\n冻结后买入 #4：拒绝：账户风险冻结（人工冻结），该提案不获许可\n审查后现金：10000.00 元；持仓：0 股；未完成委托：0；审查未改变资金或仓位\n",
+  "actual_principal_authorization": false
+}

@@ -1,0 +1,10 @@
+
+running 6 tests
+test cross_entry_process ... ok
+test existing_authority_rejects_a_second_settings_file_or_database ... ok
+test legacy_unknown_survives_restart_and_month_change_in_cloud_budget ... ok
+test original_spend_and_cloud_quotes_share_both_period_caps ... ok
+test selecting_cloud_task_preserves_existing_default_and_shared_call_table ... ok
+test two_processes_from_legacy_and_cloud_share_one_atomic_reservation ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.17s

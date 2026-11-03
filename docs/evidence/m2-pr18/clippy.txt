@@ -1,0 +1,96 @@
+    Checking serde_core v1.0.229
+   Compiling ring v0.17.14
+   Compiling libsqlite3-sys v0.36.0
+    Checking fastrand v2.5.0
+    Checking getrandom v0.4.3
+    Checking csv-core v0.1.13
+    Checking ureq-proto v0.6.5
+    Checking utf8-zero v0.8.1
+    Checking httpdate v1.0.3
+    Checking ascii v1.1.0
+    Checking chunked_transfer v1.5.0
+    Checking tempfile v3.27.0
+    Checking tiny_http v0.12.0
+    Checking serde v1.0.229
+    Checking serde_json v1.0.154
+    Checking csv v1.4.0
+   Compiling rustls v0.23.46
+    Checking rusqlite v0.38.0
+    Checking chrono v0.4.45
+    Checking serde_urlencoded v0.7.1
+    Checking stratide-contracts v0.0.1 (<CHECKOUT>\crates\contracts)
+    Checking stratide-risk v0.0.1 (<CHECKOUT>\crates\risk)
+    Checking rustls-webpki v0.103.16
+    Checking stratide-ledger v0.0.1 (<CHECKOUT>\crates\ledger)
+    Checking chrono-tz v0.10.4
+    Checking tokio-rustls v0.26.6
+    Checking ureq v3.5.0
+    Checking hyper-rustls v0.27.10
+    Checking stratide-forward v0.0.1 (<CHECKOUT>\crates\forward)
+    Checking reqwest v0.12.28
+    Checking stratide-cli v0.0.1 (<CHECKOUT>\apps\stratide-cli)
+    Checking stratide-research v0.0.1 (<CHECKOUT>\research\agent)
+warning: large size difference between variants
+   --> research\agent\src\provider.rs:79:1
+    |
+ 79 | /   pub enum Outcome {
+ 80 | | /     CloudFailure {
+ 81 | | |         reason: String,
+ 82 | | |         receipt: Value,
+ 83 | | |     },
+    | | |_____- the second-largest variant contains at least 56 bytes
+ 84 | | /     Success {
+ 85 | | |         research: Research,
+ 86 | | |         input_tokens: u32,
+ 87 | | |         output_tokens: u32,
+ 88 | | |     },
+    | | |_____- the largest variant contains at least 376 bytes
+...   |
+ 99 | |       },
+100 | |   }
+    | |___^ the entire enum is at least 376 bytes
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#large_enum_variant
+    = note: `#[warn(clippy::large_enum_variant)]` on by default
+help: consider boxing the large fields or introducing indirection in some other way to reduce the total size of the enum
+    |
+ 85 -         research: Research,
+ 85 +         research: Box<Research>,
+    |
+
+warning: this expression creates a reference which is immediately dereferenced by the compiler
+   --> research\agent\src\risk_binding.rs:134:35
+    |
+134 |     crate::eod_snapshot::no_links(&root)?;
+    |                                   ^^^^^ help: change this to: `root`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_borrow
+    = note: `#[warn(clippy::needless_borrow)]` on by default
+
+warning: the borrowed expression implements the required traits
+   --> research\agent\src\risk_binding.rs:135:24
+    |
+135 |     fs::create_dir_all(&root).map_err(|_| "CLOUD_STATE_ROOT")?;
+    |                        ^^^^^ help: change this to: `root`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_borrows_for_generic_args
+    = note: `#[warn(clippy::needless_borrows_for_generic_args)]` on by default
+
+warning: enclosing `Ok` and `?` operator are unneeded
+   --> research\agent\src\structured.rs:764:5
+    |
+764 |     Ok(a.store().task(id)?)
+    |     ^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_question_mark
+    = note: `#[warn(clippy::needless_question_mark)]` on by default
+help: remove the enclosing `Ok` and `?` operator
+    |
+764 -     Ok(a.store().task(id)?)
+764 +     a.store().task(id)
+    |
+
+warning: `stratide-research` (lib) generated 4 warnings (run `cargo clippy --fix --lib -p stratide-research -- ` to apply 3 suggestions)
+    Checking stratided v0.0.1 (<CHECKOUT>\apps\stratided)
+warning: `stratide-research` (lib test) generated 4 warnings (4 duplicates)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 20.20s

@@ -1,0 +1,14 @@
+{
+  "backend": "REAL_TIMESFM_2_5_CPU",
+  "forecasts_sha256": "0c7d2d7c60980226d2b44cf4b5e4046adbfd5e2d18ef24f147351f212395b0e6",
+  "socket_connect_calls": 0,
+  "http_calls": 0,
+  "offline_load_and_forecast": true,
+  "metrics": {
+    "job_memory_peak_bytes": 3446796288,
+    "job_cpu_seconds": 3.203125,
+    "job_total_processes": 3,
+    "job_memory_max_bytes": 6442450944,
+    "resource_scope": "WHOLE_WINDOWS_JOB"
+  }
+}

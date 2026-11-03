@@ -4,6 +4,8 @@ Status: **agreed product principles**, not a profitability claim.
 
 ## Current phase and responsibility
 
+**2026-11-03 Owner decision / Issue #69:** TimesFM 2.5 forecasting has a specific local CPU-only exception: an offline on-demand Python Worker, targeting an N100 Linux mini host. This is not local LLM inference. Cloud LLM research remains separately authorized; no CUDA, cloud TimesFM, desktop remote fallback, EOD scheduling or trading admission is introduced by [M2-PR18](M2_PR18.md).
+
 **Paper-first, Web + research Agent during the paper phase, no live trading.** The M0 simulation core and read-only Web V1 are merged; M1 forward observations are still observe-only and incomplete. Source-of-truth implementation facts: [STATUS](STATUS.md) and [roadmap](PAPER_TRADING_ROADMAP.md).
 
 **2026-10-29 Owner workflow:** Sol builds backend/Agent/API; DeepSeek owns the final UI/UX and shared frontend design system ([handoff](UI_HANDOFF_DEEPSEEK.md)); ChatGPT reviews a fixed commit and merges only with Owner authorization. Ordinary UI does not require redundant full independent testing; financial, credential, cloud-sharing and paid-budget changes require targeted independent challenge. Original [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md) remains historical Accepted text pending explicit review of the process update; its old "Terra merges" phrasing is **superseded in current practice**. No acceptance or authorization for real-money activity is implied.
