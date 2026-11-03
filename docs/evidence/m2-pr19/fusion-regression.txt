@@ -1,0 +1,11 @@
+test_01_full_task_projection_archive_inbox_and_readonly_verify (__main__.Tests.test_01_full_task_projection_archive_inbox_and_readonly_verify) ... ok
+test_02_bad_parent_status_sha_provider_development_and_cross_authority (__main__.Tests.test_02_bad_parent_status_sha_provider_development_and_cross_authority) ... ok
+test_03_grant_revocation_and_disabled_gate_do_not_dispatch (__main__.Tests.test_03_grant_revocation_and_disabled_gate_do_not_dispatch) ... ok
+test_04_http_and_output_faults_hold_maximum_and_never_repeat (__main__.Tests.test_04_http_and_output_faults_hold_maximum_and_never_repeat) ... ok
+test_05_final_dispatch_revocation_releases_only_confirmed_not_sent (__main__.Tests.test_05_final_dispatch_revocation_releases_only_confirmed_not_sent) ... ok
+test_06_init_cannot_relabel_TST_or_reset_history (__main__.Tests.test_06_init_cannot_relabel_TST_or_reset_history) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 10.902s
+
+OK

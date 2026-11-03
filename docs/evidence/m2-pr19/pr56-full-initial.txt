@@ -1,0 +1,29 @@
+test_01_two_scenarios_original_inbox_versions_readonly_and_fee_baselines (__main__.PortfolioTests.test_01_two_scenarios_original_inbox_versions_readonly_and_fee_baselines) ... ok
+test_02_loopback_production_requests_auth_projection_and_no_proxy (__main__.PortfolioTests.test_02_loopback_production_requests_auth_projection_and_no_proxy) ... ok
+test_03_timeout_and_redirect_never_resend_or_release_budget (__main__.PortfolioTests.test_03_timeout_and_redirect_never_resend_or_release_budget) ... ok
+test_04_real_kill_at_dispatch_result_and_settlement_commit (__main__.PortfolioTests.test_04_real_kill_at_dispatch_result_and_settlement_commit) ... ok
+test_05_reserve_dispatch_rechecks_revocation_receipt_and_lowered_caps (__main__.PortfolioTests.test_05_reserve_dispatch_rechecks_revocation_receipt_and_lowered_caps) ... FAIL
+test_06_single_daily_monthly_batch_caps_two_processes_and_cross_period_holds (__main__.PortfolioTests.test_06_single_daily_monthly_batch_caps_two_processes_and_cross_period_holds) ... ok
+test_07_bad_input_weights_receipts_never_self_approve (__main__.PortfolioTests.test_07_bad_input_weights_receipts_never_self_approve) ... ok
+test_08_sensitive_error_is_hashed_and_redacted_with_held_reservation (__main__.PortfolioTests.test_08_sensitive_error_is_hashed_and_redacted_with_held_reservation) ... ok
+test_09_renaming_batches_or_git_environment_cannot_reset_shared_authority (__main__.PortfolioTests.test_09_renaming_batches_or_git_environment_cannot_reset_shared_authority) ... ok
+test_10_actual_task_provider_must_match_the_frozen_stage_pin (__main__.PortfolioTests.test_10_actual_task_provider_must_match_the_frozen_stage_pin) ... ok
+test_11_original_agent_spend_and_both_cloud_stages_share_daily_monthly_caps (__main__.PortfolioTests.test_11_original_agent_spend_and_both_cloud_stages_share_daily_monthly_caps) ... ok
+test_12_original_agent_unknown_cost_survives_month_boundary_into_cloud_gate (__main__.PortfolioTests.test_12_original_agent_unknown_cost_survives_month_boundary_into_cloud_gate) ... ok
+test_13_binding_does_not_create_or_switch_cost_authority (__main__.PortfolioTests.test_13_binding_does_not_create_or_switch_cost_authority) ... ok
+
+======================================================================
+FAIL: test_05_reserve_dispatch_rechecks_revocation_receipt_and_lowered_caps (__main__.PortfolioTests.test_05_reserve_dispatch_rechecks_revocation_receipt_and_lowered_caps)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WSL_EXT4_CHECKOUT>r19/state/pr19-regression/legacy/scripts/test-risk-portfolio.py", line 274, in test_05_reserve_dispatch_rechecks_revocation_receipt_and_lowered_caps
+    marker(run)
+  File "<WSL_EXT4_CHECKOUT>r19/state/pr19-regression/legacy/scripts/test-risk-portfolio.py", line 99, in marker
+    assert time.monotonic() < until, "fault marker not reached"
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: fault marker not reached
+
+----------------------------------------------------------------------
+Ran 13 tests in 22.039s
+
+FAILED (failures=1)

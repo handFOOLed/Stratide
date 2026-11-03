@@ -165,6 +165,19 @@ impl Agent {
         }
         Ok(s)
     }
+    fn risk_gate(
+        c: &rusqlite::Connection,
+        trigger: Option<&str>,
+        input: &InputSummary,
+        now: DateTime<Utc>,
+        settings: &Settings,
+    ) -> Result<()> {
+        if crate::local_fusion::is_input(input) {
+            crate::local_fusion::gate(c, trigger, input, settings)
+        } else {
+            crate::risk_portfolio::gate(c, trigger, input, now, settings)
+        }
+    }
     pub fn start(&self) -> Result<()> {
         let agent = self.clone();
         std::thread::Builder::new()
@@ -343,7 +356,7 @@ impl Agent {
                 crate::structured::gate(&self.store().connect()?, trigger.as_deref(), &input, &s)?;
             }
             if crate::risk_portfolio::is_input(&input) {
-                crate::risk_portfolio::gate(
+                Self::risk_gate(
                     &self.store().connect()?,
                     trigger.as_deref(),
                     &input,
@@ -385,13 +398,7 @@ impl Agent {
             let maximum = m.cost(m.max_input_tokens, m.max_output_tokens)?;
             let reservation_time = if m.kind == "fake" { now } else { Utc::now() };
             if crate::risk_portfolio::is_input(&input) {
-                crate::risk_portfolio::gate(
-                    &c,
-                    trigger.as_deref(),
-                    &input,
-                    reservation_time,
-                    &latest,
-                )?;
+                Self::risk_gate(&c, trigger.as_deref(), &input, reservation_time, &latest)?;
             }
             if crate::multimodal::is_input(&input) {
                 if let Err(error) = crate::multimodal::validate_source(
@@ -470,13 +477,7 @@ impl Agent {
                         settings.budget.as_ref().ok_or("BUDGET_UNCONFIGURED")?,
                         Utc::now(),
                     )?;
-                    crate::risk_portfolio::gate(
-                        &tx,
-                        trigger.as_deref(),
-                        &input,
-                        Utc::now(),
-                        &settings,
-                    )
+                    Self::risk_gate(&tx, trigger.as_deref(), &input, Utc::now(), &settings)
                 });
                 if let Err(error) = checked {
                     tx.execute(
@@ -523,6 +524,9 @@ impl Agent {
                 "UPDATE calls SET state='dispatched' WHERE id=?1 AND state='reserved'",
                 [call_id],
             )?;
+            if crate::local_fusion::is_model(m) {
+                crate::local_fusion::consume(&tx)?;
+            }
             if crate::deepseek::is_model(m) {
                 // The one-shot switch and the durable dispatch marker commit together.
                 crate::deepseek::consume(&tx)?;
@@ -544,7 +548,17 @@ impl Agent {
             let finished = Utc::now();
             match outcome {
                 Outcome::CloudFailure { reason, receipt } => {
-                    c.execute("UPDATE calls SET state='outcome_uncertain',reason=?1,finished_at=?2 WHERE id=?3",params![reason,finished.to_rfc3339(),call_id])?;
+                    let (input, output, usage) = if crate::local_fusion::is_model(m) {
+                        (
+                            receipt["input_tokens"].as_i64(),
+                            receipt["output_tokens"].as_i64(),
+                            receipt["usage_estimate_micro"].as_i64(),
+                        )
+                    } else {
+                        (None, None, None)
+                    };
+                    c.execute("UPDATE calls SET state='outcome_uncertain',reason=?1,finished_at=?2,input_tokens=?3,output_tokens=?4,usage_micro=?5 WHERE id=?6",
+                        params![reason,finished.to_rfc3339(),input,output,usage,call_id])?;
                     return self.store().finish(
                         id,
                         "outcome_uncertain",

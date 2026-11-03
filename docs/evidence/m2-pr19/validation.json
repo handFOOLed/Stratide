@@ -1,0 +1,68 @@
+{
+  "base_sha": "10804ea7231f24bdb84667802587c06ae8397bba",
+  "checks": [
+    {
+      "command": "cargo build --workspace --locked --offline",
+      "exit": 0,
+      "result": "Ubuntu ext4, final implementation"
+    },
+    {
+      "command": "cargo test --workspace --locked --offline -- --test-threads=1",
+      "exit": 0,
+      "result": "204 passed; 0 failed; includes CNY/shared Budget/Risk/Ledger/data validation"
+    },
+    {
+      "command": "PR19_TEST_DRIVER=<LIBTEST> .venv/bin/python -B scripts/test-local-timesfm-fusion.py",
+      "exit": 0,
+      "result": "6 passed, including nine HTTP/output fault scenarios; loopback only"
+    },
+    {
+      "command": "cargo test -p stratide-research --test cny_budget --test shared_budget --locked --offline -- --test-threads=1",
+      "exit": 0,
+      "result": "3+6 passed"
+    },
+    {
+      "command": "python3 -B scripts/test-deepseek-structured.py",
+      "exit": 0,
+      "result": "5 passed; unchanged PR17 path"
+    },
+    {
+      "command": "python3 -B scripts/test-timesfm-cpu.py",
+      "exit": 0,
+      "result": "11 passed, 1 Windows-only diagnostic skipped on Linux"
+    },
+    {
+      "command": "python3 -B scripts/test-timesfm-linux.py",
+      "exit": 0,
+      "result": "4/4 Linux isolation tests"
+    },
+    {
+      "command": "python3 -B scripts/test-risk-portfolio.py --driver <LIBTEST>",
+      "exit": 1,
+      "result": "12/13 passed; existing FUTURE_OR_STALE_SNAPSHOT before revocation fault marker"
+    },
+    {
+      "command": "original unmodified PortfolioTests.test_05_reserve_dispatch_rechecks_revocation_receipt_and_lowered_caps",
+      "exit": 0,
+      "result": "targeted rerun 1/1 passed"
+    },
+    {
+      "command": "python3 -B scripts/timesfm-cpu.py preflight / enable / synthetic-freeze / once / verify",
+      "exit": 0,
+      "result": "real pinned CPU weights; original completed task; 0 cloud calls"
+    },
+    {
+      "command": "python3 -B scripts/local-timesfm-fusion.py once --name <AUTHORIZED_SMOKE>",
+      "exit": 2,
+      "result": "one real HTTP call; PORTFOLIO_SCHEMA; no valid real portfolio"
+    },
+    {
+      "command": "python3 -B scripts/local-timesfm-fusion.py once --name <SAME_SMOKE>",
+      "exit": 2,
+      "result": "same immutable failed task; call count remains 1; no network retry"
+    }
+  ],
+  "actual_paid_network_calls": 1,
+  "final_adapter_sha256": "a5bd6c9a53d223a60fdfb25633d077b4f5ef1a2df93170af3a5f41f18db57474",
+  "review_status": "DRAFT_ONLY_NOT_INDEPENDENT_ACCEPTANCE"
+}

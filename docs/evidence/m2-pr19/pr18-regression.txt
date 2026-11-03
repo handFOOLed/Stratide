@@ -1,0 +1,17 @@
+test_01_production_1_4_8_and_risk_result_v1 (__main__.Tests.test_01_production_1_4_8_and_risk_result_v1) ... ok
+test_02_future_observation_rejected (__main__.Tests.test_02_future_observation_rejected) ... ok
+test_03_original_limits_real_readiness_sessions_and_units (__main__.Tests.test_03_original_limits_real_readiness_sessions_and_units) ... ok
+test_04_negative_nan_duplicate_and_output_schema (__main__.Tests.test_04_negative_nan_duplicate_and_output_schema) ... ok
+test_05_missing_and_tampered_weights_never_download (__main__.Tests.test_05_missing_and_tampered_weights_never_download) ... ok
+test_06_restart_idempotency_and_changed_pins (__main__.Tests.test_06_restart_idempotency_and_changed_pins) ... ok
+test_07_once_success_no_repeat_stop_and_failed_model (__main__.Tests.test_07_once_success_no_repeat_stop_and_failed_model) ... ok
+test_08_default_off_and_unsupported_isolation (__main__.Tests.test_08_default_off_and_unsupported_isolation) ... ok
+test_09_timeout_crash_output_and_input_limits (__main__.Tests.test_09_timeout_crash_output_and_input_limits) ... ok
+test_10_two_processes_single_worker_and_release (__main__.Tests.test_10_two_processes_single_worker_and_release) ... ok
+test_11_synthetic_10_30_50_100_contexts_without_frozen_expansion (__main__.Tests.test_11_synthetic_10_30_50_100_contexts_without_frozen_expansion) ... ok
+test_12_os_memory_limit_and_terminated_child (__main__.Tests.test_12_os_memory_limit_and_terminated_child) ... skipped 'Windows diagnostic Job test; Linux cgroup tests are separate'
+
+----------------------------------------------------------------------
+Ran 12 tests in 2.053s
+
+OK (skipped=1)

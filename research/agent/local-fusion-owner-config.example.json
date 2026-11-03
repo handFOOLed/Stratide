@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "key_file": "<LOCAL_KEY_FILE_ABSOLUTE_PATH>",
+  "grant_version": "deepseek-synthetic-fusion-grant-v1",
+  "synthetic_only": true,
+  "provider_terms_reviewed": false,
+  "authorized_at": "",
+  "price_reviewed_at": "",
+  "price_valid_until": "",
+  "max_call_micro": 100000
+}

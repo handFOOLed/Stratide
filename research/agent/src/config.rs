@@ -167,7 +167,8 @@ impl Settings {
                         .id
                         .bytes()
                         .all(|c| c.is_ascii_alphanumeric() || c == b'-' || c == b'_')
-                        || m.id == crate::deepseek::ID)
+                        || m.id == crate::deepseek::ID
+                        || m.id == crate::local_fusion::MODEL_ID)
                     && ids.insert(m.id.as_str())
                     && m.label.len() <= 120
                     && !m.label.is_empty()
@@ -179,6 +180,7 @@ impl Settings {
                 "MODEL_CONFIG_INVALID",
             )?;
             match m.kind.as_str() {
+                crate::local_fusion::POLICY => crate::local_fusion::validate_model(m)?,
                 "structured_research_v1" => crate::structured::validate_model(m)?,
                 "bigquery_forecast_v1" | "deepseek_portfolio_v1" => {
                     crate::risk_cloud::validate_model(m)?;
@@ -285,6 +287,9 @@ impl Model {
         hash(&serde_json::to_vec(self).expect("model JSON"))
     }
     pub fn authorize(&self, scopes: &[String], budget: Option<&Budget>) -> Result<()> {
+        if crate::local_fusion::is_model(self) {
+            return crate::local_fusion::authorize(self, scopes, budget);
+        }
         if crate::structured::is_model(self) {
             return crate::structured::authorize(self, scopes, budget);
         }

@@ -37,7 +37,7 @@ pub struct Config {
     pub max_call_micro: i64,
 }
 impl Config {
-    fn validate(&self) -> Result<()> {
+    pub(crate) fn validate(&self) -> Result<()> {
         let now = Utc::now();
         let reviewed = DateTime::parse_from_rfc3339(&self.price_reviewed_at)
             .map_err(|_| "DEEPSEEK_PRICE_REVIEW_REQUIRED")?;
@@ -338,8 +338,11 @@ pub(crate) fn parse_key(raw: &str) -> Result<Zeroizing<String>> {
     found.ok_or("DEEPSEEK_KEY_FILE_REQUIRES_EXACTLY_ONE_KEY".into())
 }
 pub(crate) fn read_key(cfg: &Config) -> Result<Zeroizing<String>> {
-    key_metadata(&cfg.key_file)?;
-    let bytes = Zeroizing::new(fs::read(&cfg.key_file).map_err(|_| "DEEPSEEK_KEY_READ_FAILED")?);
+    read_key_file(&cfg.key_file)
+}
+pub(crate) fn read_key_file(path: &Path) -> Result<Zeroizing<String>> {
+    key_metadata(path)?;
+    let bytes = Zeroizing::new(fs::read(path).map_err(|_| "DEEPSEEK_KEY_READ_FAILED")?);
     let raw = std::str::from_utf8(&bytes).map_err(|_| "DEEPSEEK_KEY_FILE_INVALID")?;
     parse_key(raw)
 }

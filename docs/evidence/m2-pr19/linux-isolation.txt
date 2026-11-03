@@ -1,0 +1,9 @@
+test_01_network_filesystem_environment_and_6gib (__main__.LinuxIsolation.test_01_network_filesystem_environment_and_6gib) ... ok
+test_02_oom_kills_cgroup_and_next_start_works (__main__.LinuxIsolation.test_02_oom_kills_cgroup_and_next_start_works) ... ok
+test_03_timeout_crash_and_recovery (__main__.LinuxIsolation.test_03_timeout_crash_and_recovery) ... ok
+test_04_controller_death_reclaims_real_worker (__main__.LinuxIsolation.test_04_controller_death_reclaims_real_worker) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 4.755s
+
+OK
