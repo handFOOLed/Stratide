@@ -5,10 +5,10 @@ use stratide_research::{ensure, risk_cpu as cpu, risk_portfolio as rp, Result};
 fn run() -> Result<Value> {
     let mut raw = Vec::new();
     std::io::stdin()
-        .take(524289)
+        .take(2097153)
         .read_to_end(&mut raw)
         .map_err(|_| "LOCAL_IPC_READ")?;
-    ensure(raw.len() <= 524288, "LOCAL_IPC_SIZE")?;
+    ensure(raw.len() <= 2097152, "LOCAL_IPC_SIZE")?;
     let args: Vec<String> = std::env::args().skip(1).collect();
     ensure(args.len() == 1, "LOCAL_ARGUMENTS")?;
     let v: Value = if raw.is_empty() {
@@ -35,6 +35,18 @@ fn run() -> Result<Value> {
             } else {
                 cpu::decode(&plan, &response)
             }
+        }
+        "verify-result" => {
+            let mut result = v;
+            let expected = result
+                .as_object_mut()
+                .ok_or("LOCAL_RESULT_CHANGED")?
+                .remove("result_sha256");
+            ensure(
+                expected == Some(json!(rp::sha(&result))),
+                "LOCAL_RESULT_SHA",
+            )?;
+            Ok(json!({"verified":true}))
         }
         "begin" => cpu::begin(&serde_json::from_value(v).map_err(|_| "LOCAL_PLAN_SCHEMA")?),
         "complete" | "fail" => {

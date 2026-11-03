@@ -244,8 +244,10 @@ class Sidecar(v1.Warehouse):
                 db.close()
 
     @contextlib.contextmanager
-    def read(self):
-        self.check_paths(descendants=True)
+    def read(self, *, inspect_raw_paths=True):
+        # SQLite-only consumers never open raw descendants. Default verification
+        # retains the original full path inventory; both modes fence DB/WAL/lock.
+        self.check_paths(descendants=inspect_raw_paths)
         with v1.writer_lock(self.root, readonly=True):
             db = v1.connection(self.path, True)
             try:
@@ -370,7 +372,7 @@ class Sidecar(v1.Warehouse):
         result["state"] = "RANGE_COLLECTED_COVERAGE_PARTIAL" if all(a["blocked_or_unpublished_dates"]==0 for a in result["apis"].values()) else "CONTINUE_FROM_CHECKPOINT"
         return result
 
-    def query(self, api, start, end, symbols=(), date=None, as_of=None, limit=100, offset=0):
+    def query(self, api, start, end, symbols=(), date=None, as_of=None, limit=100, offset=0, *, inspect_raw_paths=True):
         require(api in FIELDS and 1 <= limit <= 10000 and offset >= 0, "INVALID_QUERY")
         v1.historical_range(start,end)
         if date:
@@ -378,7 +380,7 @@ class Sidecar(v1.Warehouse):
             start = end = date
         for code in symbols:
             security_kind(code)
-        with self.read() as db:
+        with self.read(inspect_raw_paths=inspect_raw_paths) as db:
             conditions, args = ["v.api=?", "v.trade_date BETWEEN ? AND ?"], [api,start,end]
             if as_of is None:
                 join = "JOIN checkpoints c ON c.version_id=v.id AND c.api=v.api AND c.trade_date=v.trade_date"

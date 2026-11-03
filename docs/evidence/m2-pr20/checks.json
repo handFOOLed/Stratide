@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "base_sha": "971eb4ba90507142b1d32ca80af2d15859790933",
+  "checks": [
+    {
+      "command": "cargo fmt --all --check",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo build --workspace --locked --offline",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo test --workspace --locked --offline -- --test-threads=1",
+      "exit_code": 0,
+      "passed": 204,
+      "failed": 0
+    },
+    {
+      "command": "python3 -B scripts/test-timesfm-history.py",
+      "exit_code": 0,
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "python3 -B scripts/test-timesfm-cpu.py",
+      "exit_code": 0,
+      "passed": 11,
+      "failed": 0,
+      "skipped": 1,
+      "skip_reason": "Windows Job diagnostic only"
+    },
+    {
+      "command": "python3 -B scripts/test-timesfm-linux.py",
+      "exit_code": 0,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "PR19_TEST_DRIVER=<LIBTEST> python3 -B scripts/test-local-timesfm-fusion.py",
+      "exit_code": 0,
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "python3 -B scripts/test-historical-warehouse.py",
+      "exit_code": 0,
+      "passed": 29,
+      "failed": 0,
+      "skipped": 1,
+      "skip_reason": "Windows NTFS junction only"
+    },
+    {
+      "command": "python3 -B scripts/test-historical-sidecar.py",
+      "exit_code": 0,
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "not_run": [
+    "full real warehouse/raw verification",
+    "paid cloud API regression",
+    "physical N100 acceptance",
+    "independent fixed-HEAD review"
+  ]
+}

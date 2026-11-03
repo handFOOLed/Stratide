@@ -1,0 +1,61 @@
+{
+  "base_sha": "971eb4ba90507142b1d32ca80af2d15859790933",
+  "files": {
+    "research/agent/src/bin/timesfm-risk-agent.rs": {
+      "sha256": "66f60135c79eaf66b7a44850822b3c7cc667e520db79f6464e2018351d440276",
+      "git_blob_sha": "52e548f888eec5633397f6b274c2c63039407460"
+    },
+    "research/agent/src/lib.rs": {
+      "sha256": "720681ecb695ef807bb94461a52a77c4c30b7b9319e54f43878f88ccdb48a3ea",
+      "git_blob_sha": "2e58b9737bc71b32ff74547a8f64c925b23bcbdd"
+    },
+    "research/agent/src/local_fusion.rs": {
+      "sha256": "ad57a7bf7a1d17cbba2be64fe72071627ff88ce3a992a17b02ebc90e1ea7474b",
+      "git_blob_sha": "af69889c19f33cffdafe347e1395e1bb2b7563c0"
+    },
+    "research/agent/src/risk_cpu.rs": {
+      "sha256": "e833b652220fc9089c8082c150948994d010c4039192e0d6bf91b52e30dc3464",
+      "git_blob_sha": "8a4d6a39a6d81533e9026144557149ed662964f4"
+    },
+    "research/agent/src/risk_history.rs": {
+      "sha256": "209ee0529fd16281eb63d9c0949684e92493f8ed40c70240a2c73621ef21d793",
+      "git_blob_sha": "f543503c56805524e541b28a8e34700c019acdd4"
+    },
+    "research/candidates.py": {
+      "sha256": "da8b4b692a815a91cf450fda7ca58805f5316e46fef6840f4cbff83d95b4da0e",
+      "git_blob_sha": "6f5ae7c33a98757c149df6d54fd09a2048f608dc"
+    },
+    "research/historical_sidecar.py": {
+      "sha256": "a7972b64370dd53bb68684221a55839c181928af43983545cf4f0827016546fa",
+      "git_blob_sha": "ec7b7e79bd4e58ea36dd1011712931af5c787b9f"
+    },
+    "research/historical_warehouse.py": {
+      "sha256": "c5c128e78e3b0486195b537448f87541f0786e790630ef57e07f5e268889fac5",
+      "git_blob_sha": "bd09055dc71028ef7d8c553239ae8583d54b8457"
+    },
+    "research/local_fusion.py": {
+      "sha256": "1dfa1240b865dfbc44b7489c424cc700dc8da20284b12ee81114c85b25fb87df",
+      "git_blob_sha": "26bbc5e4793cf6f8fbccd387db6fc9797e8f5cdf"
+    },
+    "research/timesfm_cpu/cli.py": {
+      "sha256": "12ef0c2d06bc6fa980ffba24fbb6915316aeee92a745871e83c3555c3aeaecca",
+      "git_blob_sha": "2d454fc5eb0b8cd3791318f01c88601f89baab56"
+    },
+    "research/timesfm_cpu/history.py": {
+      "sha256": "6b76d7cc9aadf4147f1ad54561d43f706b92fb4107578aae36ecc3e693ff64cc",
+      "git_blob_sha": "2917dc2626fe53d3546232251c3a3968b4fcaee8"
+    },
+    "research/timesfm_cpu/model.py": {
+      "sha256": "dcb9a7c6ef6af98618ecf841ed5c29c5e401ef87f833f3bfee17a1b789155381",
+      "git_blob_sha": "4b5345b425026cc4f7543dd39244d7fa9f619cbc"
+    },
+    "scripts/test-local-timesfm-fusion.py": {
+      "sha256": "9b906fb30a0986bc0246ea2621dbcd27ccb783e9aaeab08f937b2882d2b568df",
+      "git_blob_sha": "19fb26eb3c53322e170f114f04416ed63a06c2bc"
+    },
+    "scripts/test-timesfm-history.py": {
+      "sha256": "d196ddd4175b0d2f24a926b59f5c1fd00b4e41e648ed14cf8a341b2b8d8afd2f",
+      "git_blob_sha": "7753e0e9981129a1a78315a3042358bf3cb60d0e"
+    }
+  }
+}

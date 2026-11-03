@@ -8,6 +8,8 @@ use rusqlite::{params, Connection, OpenFlags, OptionalExtension, TransactionBeha
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
+// Exact merged PR18 implementation; accepted only for read-only old synthetic receipts.
+const PR18_CODE_SHA: &str = "26c92639fd78b143c4bd400988f447f29fcb52294319734555bae14efe669f2a";
 pub const POLICY: &str = "timesfm-cpu-v1";
 pub const REVISION: &str = "1d952420fba87f3c6dee4f240de0f1a0fbc790e3";
 pub const WEIGHT_SHA: &str = "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8";
@@ -15,6 +17,10 @@ pub fn code_sha() -> String {
     hash(
         concat!(
             include_str!("risk_cpu.rs"),
+            include_str!("risk_history.rs"),
+            include_str!("../../../research/timesfm_cpu/history.py"),
+            include_str!("../../../research/historical_warehouse.py"),
+            include_str!("../../../research/historical_sidecar.py"),
             include_str!("../../../research/timesfm_cpu/model.py"),
             include_str!("../../../research/timesfm_cpu/worker.py"),
             include_str!("../../../research/timesfm_cpu/runtime.py"),
@@ -40,20 +46,27 @@ pub struct Plan {
     pub max_context: usize,
     pub batch_size: usize,
     pub threads: usize,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub history: Option<super::risk_history::History>,
 }
 impl Plan {
     pub fn validate(&self, fresh: bool) -> Result<()> {
         ensure(
             crate::eod_snapshot::valid_name(&self.batch)
                 && rp::valid_sha(&self.manifest_sha256)
-                && self.code_sha256 == code_sha(),
+                && (self.code_sha256 == code_sha()
+                    || (!fresh && self.history.is_none() && self.code_sha256 == PR18_CODE_SHA)),
             "LOCAL_PIN_CHANGED_NEW_TASK_REQUIRED",
         )?;
-        self.frozen.validate(if fresh {
-            Utc::now()
+        if let Some(h) = &self.history {
+            h.validate(&self.frozen)?;
         } else {
-            self.frozen.as_of.parse().map_err(|_| "RISK_AS_OF")?
-        })?;
+            self.frozen.validate(if fresh {
+                Utc::now()
+            } else {
+                self.frozen.as_of.parse().map_err(|_| "RISK_AS_OF")?
+            })?;
+        }
         ensure(
             matches!(self.max_context, 256 | 512)
                 && (1..=4).contains(&self.batch_size)
@@ -62,13 +75,15 @@ impl Plan {
         )
     }
     pub fn pin(&self) -> String {
-        rp::sha(
-            &json!({"code":self.code_sha256,"manifest":self.manifest_sha256,
-            "revision":REVISION,"weight":WEIGHT_SHA,"context":self.max_context,"batch":self.batch_size,"threads":self.threads}),
-        )
+        let mut pin = json!({"code":self.code_sha256,"manifest":self.manifest_sha256,
+            "revision":REVISION,"weight":WEIGHT_SHA,"context":self.max_context,"batch":self.batch_size,"threads":self.threads});
+        if let Some(h) = &self.history {
+            pin["history_sha256"] = json!(h.payload_sha256);
+        }
+        rp::sha(&pin)
     }
     pub fn request(&self) -> Value {
-        json!({"schema_version":1,"input_mode":"synthetic_test","horizon":20,"max_context":self.max_context,
+        json!({"schema_version":1,"input_mode":self.frozen.input_mode,"horizon":20,"max_context":self.max_context,
             "batch_size":self.batch_size,"threads":self.threads,"repeats":1,
             "series":rp::baselines(&self.frozen).iter().map(|b|json!({"instrument":b["instrument"],"values":b["rolling_context"]})).collect::<Vec<_>>()})
     }
@@ -178,6 +193,20 @@ fn decode_inner(plan: &Plan, response: &Response, development: bool) -> Result<V
         "weight_sha256":WEIGHT_SHA,"code_sha256":plan.code_sha256,"manifest_sha256":plan.manifest_sha256,
         "frozen_input_sha256":rp::sha(&serde_json::to_value(f).unwrap()),"request_sha256":response.request_sha256,
         "clamp_policy":response.clamp_policy,"clamp_count":0,"metrics":response.metrics,"isolation":response.isolation,"development_only":!isolated});
+    if let Some(h) = &plan.history {
+        for e in bundle["risk_experts"].as_array_mut().unwrap() {
+            e["quality_blockers"] = h.payload["blockers"].clone();
+            e["session_mapping"] = json!("ordinal_future_sessions_dates_unknown");
+            e["historical_pit_status"] = json!("NOT_VERIFIED");
+            e["coverage"] = json!("PARTIAL");
+        }
+        bundle["historical_research"] = json!({"input_sha256":h.payload_sha256,
+            "adapter_version":"historical-timesfm-v1","quality":h.payload["quality"],
+            "historical_pit_status":"NOT_VERIFIED","coverage":"PARTIAL",
+            "cloud_egress":"REAL_MARKET_DATA_EGRESS_DENIED"});
+        bundle["receipt"]["historical_input_sha256"] = json!(h.payload_sha256);
+        bundle["receipt"]["plan_sha256"] = json!(rp::sha(&serde_json::to_value(plan).unwrap()));
+    }
     rp::validate_output(&bundle)?;
     Ok(bundle)
 }
@@ -279,8 +308,19 @@ pub fn finish(
     )?;
     let active = gate(&tx).is_ok() && status == "local_running";
     let result = bundle.map(|b| {
-        json!({"billing":"LOCAL_NO_BILLING","backend":"TimesFM 2.5 CPU",
-        "worker_response":response,"research":{"risk_portfolio":b}})
+        let mut result = json!({"billing":"LOCAL_NO_BILLING","backend":"TimesFM 2.5 CPU",
+        "worker_response":response,"research":{"risk_portfolio":b}});
+        if plan.history.is_some() {
+            result["source_day"] = json!(plan.input().source_day);
+            result["input_mode"] = json!(plan.frozen.input_mode);
+            result["input_summary_version"] = json!(plan.input().version);
+            result["model"] = json!("local-timesfm-2.5-cpu");
+            result["synthetic_provider"] = json!(false);
+            result["task_id"] = json!(id);
+            result["attempt"] = json!(1);
+            result["result_sha256"] = json!(rp::sha(&result));
+        }
+        result
     });
     let (state, reason) = if !active {
         ("cancelled", "OWNER_STOPPED")

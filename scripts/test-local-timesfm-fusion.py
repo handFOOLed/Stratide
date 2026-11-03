@@ -112,7 +112,9 @@ class Tests(unittest.TestCase):
         cls.key.parent.mkdir(parents=True, exist_ok=True)
         cls.key.write_text("sk-" + "Q" * 32)
         cls.cfg = ROOT / "state/fusion-config.json"
-        now = dt.datetime.now(dt.timezone.utc)
+        # Match the existing as_of fixture margin when WSL clocks synchronize.
+        # Production grant/price checks stay unchanged.
+        now = dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=5)
         cls.cfg.write_text(json.dumps(dict(version=1, key_file=str(cls.key), grant_version="deepseek-synthetic-fusion-grant-v1",
             synthetic_only=True, provider_terms_reviewed=True, authorized_at=now.isoformat(),
             price_reviewed_at=now.isoformat(), price_valid_until=(now+dt.timedelta(days=1)).isoformat(), max_call_micro=100000)))

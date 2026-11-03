@@ -1,6 +1,6 @@
 # Stratide Paper 阶段路线图（当前执行版）
 
-**当前 #69 / M2-PR18（Draft）：** Owner 选定本地 CPU TimesFM 2.5 → N100 Linux。交付按需离线风险 Worker 和原 RiskExpertResult 接线；[执行说明](M2_PR18.md)、[验收证据](evidence/m2-pr18/README.md)。N100 未实测前不宣称性能达标；本期不接 DeepSeek Fusion、不调 EOD、不增真实前向/交易权限。
+**当前 #74 / M2-PR20（本分支 Draft）：** [真实历史 → 本地 TimesFM](M2_PR20.md) 已完成实际三证券 CPU 推理、原任务/Registry 和 report/verify；[开发证据](evidence/m2-pr20/README.md)。真实数据外发拒绝，新云调用/计费/行情请求为 0。ENGINEERING_PASS 不提升 PIT、样本外优势、Paper/Live 或 N100 资格。PR #70/#72 已在当前 main；下方旧阶段记录保留原发生时状态。
 
 > 2026-11-03；最新实现与数据边界见 [STATUS](STATUS.md)。Owner 已决定 **Core-first、UI-later**：后续核心功能不要求同期 Dashboard/UI，最终按已合并 PR #28 的视觉基准统一集成。旧各 PR 实施/验收细节仍保存在 `docs/M0_*.md`、`docs/M1_*.md`、`docs/M2_PR01.md` 与 `docs/evidence/`。
 
@@ -48,7 +48,7 @@ PR #42 的[历史公司行为桥接 V1](M1_PR09.md)、PR #44 的[EOD 自动研�
 
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |
-| **当前 #67** | **Sol** | M2-PR17 DeepSeek 真实 HTTPS 功能与原预算/外发双门禁，合成及 loopback 验证；唯一 Draft，固定 HEAD 审查及 Owner 明确批准后才可合并。 |
+| **当前 #74** | **Sol** | M2-PR20 真实历史/质量 → 本地 TimesFM → 原任务/Registry；单个 Draft，固定 HEAD 审查及 Owner 明确批准后才可合并，真实数据不外发。 |
 | **后续核心** | Owner 再定范围 | #10 真实开盘、PIT、账户税/到账仍受阻；#36 完整多模态消融及真实供应商未验证。 |
 | **核心全部完成后** | **Sol** | 按 PR #28 的设计体系统一集成 UI；本期不改 UI。 |
 
