@@ -1,0 +1,14 @@
+test_development_feedback_projection_and_second_round_new_source (__main__.Suite.test_development_feedback_projection_and_second_round_new_source) ... ok
+test_duplicate_nonfinite_unknown_fields_and_code_are_not_repaired (__main__.Suite.test_duplicate_nonfinite_unknown_fields_and_code_are_not_repaired) ... ok
+test_insufficient_budget_repeat_and_revocation_no_calls (__main__.Suite.test_insufficient_budget_repeat_and_revocation_no_calls) ... ok
+test_loopback_original_agent_to_ast_evaluation_and_single_settlement (__main__.Suite.test_loopback_original_agent_to_ast_evaluation_and_single_settlement) ... ok
+test_model_refusal_and_malformed_inner_json_preserve_cost_without_candidates (__main__.Suite.test_model_refusal_and_malformed_inner_json_preserve_cost_without_candidates) ... ok
+test_original_agent_end_to_end_four_asts_three_costs_and_replay (__main__.Suite.test_original_agent_end_to_end_four_asts_three_costs_and_replay) ... ok
+test_partial_invalid_future_source_injection_and_all_rejected_archive (__main__.Suite.test_partial_invalid_future_source_injection_and_all_rejected_archive) ... ok
+test_pause_cancel_and_local_permission_do_not_create_wallet (__main__.Suite.test_pause_cancel_and_local_permission_do_not_create_wallet) ... ok
+test_task_and_result_tamper_or_recording_replacement_rejected (__main__.Suite.test_task_and_result_tamper_or_recording_replacement_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 17.402s
+
+OK

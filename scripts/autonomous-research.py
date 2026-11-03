@@ -1,4 +1,4 @@
-"""Local deterministic autonomous research. No HTTP, credentials or Agent dispatch."""
+"""Autonomous research CLI. Default deterministic; recorded Agent requires explicit selection."""
 from decimal import InvalidOperation
 import json
 from pathlib import Path

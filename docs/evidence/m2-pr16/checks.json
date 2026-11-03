@@ -1,0 +1,114 @@
+{
+  "base_sha": "7f12f12b321cdd7c24c90458f4ae4859f59ec3bd",
+  "developer_self_tests_not_independent_acceptance": true,
+  "rust_new": {
+    "argv": [
+      "powershell",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "scripts/with-msvc.ps1",
+      "test",
+      "-p",
+      "stratide-research",
+      "--lib",
+      "structured_tests",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "passed": 9,
+    "includes_process_driver": 1
+  },
+  "rust_original": {
+    "argv": [
+      "powershell",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "scripts/with-msvc.ps1",
+      "test",
+      "--locked",
+      "-p",
+      "stratide-research",
+      "--test",
+      "safety",
+      "--test",
+      "shared_budget",
+      "--test",
+      "task_routing",
+      "--test",
+      "risk_portfolio",
+      "--test",
+      "status_regression",
+      "--test",
+      "eod_scope",
+      "--test",
+      "multimodal_scope",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "passed": 38
+  },
+  "python": [
+    {
+      "argv": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-cloud-structured.py"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-autonomous-research.py"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "python",
+        "-I",
+        "-B",
+        "scripts/test-multistock-research.py"
+      ],
+      "exit": 0
+    }
+  ],
+  "python_counts": [
+    9,
+    14,
+    12
+  ],
+  "ci": "NO_GITHUB_WORKFLOWS_LOCAL_ONLY",
+  "market_data_downloads": 0,
+  "old_data_full_revalidation": 0,
+  "real_paid_cloud_calls": 0,
+  "final_checks": [
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0
+    }
+  ]
+}

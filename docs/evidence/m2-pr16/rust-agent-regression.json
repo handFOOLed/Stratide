@@ -1,0 +1,1 @@
+{"argv": ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts/with-msvc.ps1", "test", "--locked", "-p", "stratide-research", "--test", "safety", "--test", "shared_budget", "--test", "task_routing", "--test", "risk_portfolio", "--test", "status_regression", "--test", "eod_scope", "--test", "multimodal_scope", "--", "--test-threads=1"], "exit": 0}

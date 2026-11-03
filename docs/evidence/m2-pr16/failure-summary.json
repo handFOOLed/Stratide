@@ -1,0 +1,130 @@
+{
+  "authority": "RESEARCH_ONLY",
+  "selection": "ALL_FROZEN_TRIALS_KEPT_NO_WINNER",
+  "failures": {
+    "candidate_01/base": {
+      "negative_return": true,
+      "stale_warning": 303,
+      "rejection_reasons": {
+        "DAILY_MISSING": 114,
+        "DOWN_LIMIT_REFERENCE": 25,
+        "POSITION_CAP": 122,
+        "UP_LIMIT_REFERENCE": 12
+      }
+    },
+    "candidate_01/gross": {
+      "negative_return": true,
+      "stale_warning": 303,
+      "rejection_reasons": {
+        "DAILY_MISSING": 114,
+        "DOWN_LIMIT_REFERENCE": 25,
+        "POSITION_CAP": 122,
+        "UP_LIMIT_REFERENCE": 12
+      }
+    },
+    "candidate_01/stress": {
+      "negative_return": true,
+      "stale_warning": 303,
+      "rejection_reasons": {
+        "DAILY_MISSING": 114,
+        "DOWN_LIMIT_REFERENCE": 25,
+        "POSITION_CAP": 122,
+        "UP_LIMIT_REFERENCE": 12
+      }
+    },
+    "candidate_02/base": {
+      "negative_return": true,
+      "stale_warning": 971,
+      "rejection_reasons": {
+        "DAILY_MISSING": 2816,
+        "DOWN_LIMIT_REFERENCE": 155,
+        "POSITION_CAP": 2893,
+        "SUSPENSION_EVENT": 2,
+        "UP_LIMIT_REFERENCE": 15
+      }
+    },
+    "candidate_02/gross": {
+      "negative_return": true,
+      "stale_warning": 971,
+      "rejection_reasons": {
+        "DAILY_MISSING": 2816,
+        "DOWN_LIMIT_REFERENCE": 155,
+        "POSITION_CAP": 2893,
+        "SUSPENSION_EVENT": 2,
+        "UP_LIMIT_REFERENCE": 15
+      }
+    },
+    "candidate_02/stress": {
+      "negative_return": true,
+      "stale_warning": 971,
+      "rejection_reasons": {
+        "DAILY_MISSING": 2816,
+        "DOWN_LIMIT_REFERENCE": 155,
+        "POSITION_CAP": 2893,
+        "SUSPENSION_EVENT": 2,
+        "UP_LIMIT_REFERENCE": 15
+      }
+    },
+    "candidate_03/base": {
+      "negative_return": true,
+      "stale_warning": 97,
+      "rejection_reasons": {
+        "DAILY_MISSING": 22,
+        "DOWN_LIMIT_REFERENCE": 58,
+        "POSITION_CAP": 51,
+        "UP_LIMIT_REFERENCE": 57
+      }
+    },
+    "candidate_03/gross": {
+      "negative_return": true,
+      "stale_warning": 97,
+      "rejection_reasons": {
+        "DAILY_MISSING": 22,
+        "DOWN_LIMIT_REFERENCE": 58,
+        "POSITION_CAP": 51,
+        "UP_LIMIT_REFERENCE": 57
+      }
+    },
+    "candidate_03/stress": {
+      "negative_return": true,
+      "stale_warning": 97,
+      "rejection_reasons": {
+        "DAILY_MISSING": 22,
+        "DOWN_LIMIT_REFERENCE": 58,
+        "POSITION_CAP": 51,
+        "UP_LIMIT_REFERENCE": 57
+      }
+    },
+    "candidate_04/base": {
+      "negative_return": true,
+      "stale_warning": 648,
+      "rejection_reasons": {
+        "DAILY_MISSING": 135,
+        "DOWN_LIMIT_REFERENCE": 13,
+        "POSITION_CAP": 129,
+        "UP_LIMIT_REFERENCE": 15
+      }
+    },
+    "candidate_04/gross": {
+      "negative_return": false,
+      "stale_warning": 648,
+      "rejection_reasons": {
+        "DAILY_MISSING": 135,
+        "DOWN_LIMIT_REFERENCE": 13,
+        "POSITION_CAP": 129,
+        "UP_LIMIT_REFERENCE": 15
+      }
+    },
+    "candidate_04/stress": {
+      "negative_return": true,
+      "stale_warning": 648,
+      "rejection_reasons": {
+        "DAILY_MISSING": 135,
+        "DOWN_LIMIT_REFERENCE": 13,
+        "POSITION_CAP": 129,
+        "UP_LIMIT_REFERENCE": 15
+      }
+    }
+  },
+  "detail_location": "Full per-day/per-security attribution remains ignored local output; no source rows in Git"
+}

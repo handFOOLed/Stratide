@@ -446,6 +446,7 @@ pub fn call(p: Prepared) -> Outcome {
             next_steps: vec!["Owner review and independent frozen evaluation; no orders".into()],
             fusion: None,
             risk_portfolio: Some(result),
+            structured_research: None,
         },
         input_tokens,
         output_tokens,

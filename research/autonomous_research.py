@@ -1,4 +1,4 @@
-"""Owner-authorized, zero-provider local research lifecycle. No financial authority."""
+"""Frozen research lifecycle: explicit deterministic or controlled recorded Agent source."""
 from __future__ import annotations
 
 import argparse
@@ -57,7 +57,14 @@ def output(path, existing=True):
     return p
 
 
-def plan(ds, config, seed=63, limits=None):
+def source_files(frozen=None):
+    if frozen and "cloud" in frozen:
+        import cloud_structured as cloud
+        return (*SOURCE_FILES, *cloud.FILES)
+    return SOURCE_FILES
+
+
+def plan(ds, config, seed=63, limits=None, cloud=None):
     limits = dict(DEFAULT_LIMITS, **(limits or {}))
     require(set(limits) == set(DEFAULT_LIMITS), "RESOURCE_FIELDS")
     for key,hi in dict(candidates=8, rounds=2, workers=1, wall_seconds=3600, memory_mib=512,
@@ -83,6 +90,10 @@ def plan(ds, config, seed=63, limits=None):
         validation_stop="stop_next_round_if_all_candidate_base_validation_metrics_have_zero_sessions",
         proposal_created_before_evaluation=True, evidence_allowed_for_next_round="DEVELOPMENT_ONLY",
         sealed_results=True, provider_integration="NONE_NO_AGENT_DISPATCH_OR_NEW_BUDGET_LEDGER")
+    if cloud is not None:
+        base.update(version="autonomous-cloud-plan-v1",cloud=cloud,proposer="rust_agent_structured_v1",
+            provider_integration="ORIGINAL_RUST_AGENT_EXACT_TASK_SHARED_BUDGET_RECORDED_ONLY")
+        base["code_sha"]={p:m.hash_file(ROOT/p) for p in source_files(base)}
     return dict(base, plan_sha=sha(canonical(base)))
 
 
@@ -96,11 +107,11 @@ def event(root, kind, **details):
     return sequence
 
 
-def initialize(ds, config, out, seed=63, limits=None, authorized=False):
+def initialize(ds, config, out, seed=63, limits=None, authorized=False, cloud=None):
     require(authorized, "EXPLICIT_LOCAL_START_AUTHORIZATION_REQUIRED")
     root = output(out, existing=False)
     with ds:
-        frozen = plan(ds, config, seed, limits)
+        frozen = plan(ds, config, seed, limits, cloud)
         locators = dict(v1=str(ds.roots[0]), v2=str(ds.roots[1]))
     root.mkdir(parents=True, exist_ok=True)
     with m.data.v1.writer_lock(root):
@@ -109,16 +120,21 @@ def initialize(ds, config, out, seed=63, limits=None, authorized=False):
         else:
             put(root/"plan.json", frozen)
         put(root/"locators.json", locators)
-        for relative in SOURCE_FILES:
+        for relative in source_files(frozen):
             put(root/"frozen-source"/relative, (ROOT/relative).read_bytes(), raw=True)
         put(root/"authorization.json", dict(plan_sha=frozen["plan_sha"], authority="OWNER_LOCAL_START",
-            scope="LOCAL_DETERMINISTIC_RESEARCH_ONLY", paid_limit_micro=0, providers=[], trading=False))
+            scope="CLOUD_RECORDED_LOCAL_RESEARCH_ONLY" if cloud else "LOCAL_DETERMINISTIC_RESEARCH_ONLY",
+            paid_limit_micro=0, providers=[cloud["model"]["id"]] if cloud else [], trading=False))
         if not (root/"control"/"state.json").exists():
             put(root/"control"/"state.json", dict(paused=False, cancelled=False))
         if not (root/"status.json").exists():
             put(root/"status.json", dict(**m.SAFE, state="PLANNED", phase="FROZEN_PLAN", completed_rounds=0,
                 cumulative_trials=0, current_round=None, plan_sha=frozen["plan_sha"]))
             event(root, "OWNER_AUTHORIZED_PLAN", plan_sha=frozen["plan_sha"])
+        if cloud:
+            import cloud_structured as source
+            source.freeze_boundary(root,frozen)
+            source.prepare_request(root,frozen,1)
     return status(root)
 
 
@@ -129,7 +145,7 @@ def check_plan(root, current_code=False):
     require(sha(canonical(body)) == digest, "PLAN_SHA_MISMATCH")
     require(frozen["authority"] == "RESEARCH_ONLY" and frozen["paid_limit_micro"] == 0 and
             all(frozen[k] == m.SAFE[k] for k in m.SAFE), "PLAN_AUTHORITY_INVALID")
-    require(set(frozen["code_sha"]) == set(SOURCE_FILES), "FROZEN_CODE_FILES")
+    require(set(frozen["code_sha"]) == set(source_files(frozen)), "FROZEN_CODE_FILES")
     for relative,digest in frozen["code_sha"].items():
         require(m.hash_file(root/"frozen-source"/relative) == digest, "FROZEN_CODE_SHA")
         if current_code:
@@ -185,12 +201,16 @@ def report(out, full=False):
         require(m.hash_file(folder/"results.json") == receipt["files"]["results.json"], "RESULT_HASH_MISMATCH")
         reports.append(dict(round=n, result=result if full else brief_result(result), output_sha=receipt["output_sha"]))
     # Compatible narrow consumer surface; the old fixed-template registry is not modified.
-    return dict(**m.SAFE, contract="autonomous-research-inbox-v1", authority="RESEARCH_ONLY", status=s,
+    value = dict(**m.SAFE, contract="autonomous-research-inbox-v1", authority="RESEARCH_ONLY", status=s,
                 rounds=reports, handoff=candidates.handoff(), independent_acceptance="NOT_VERIFIED",
                 selection_warning="CUMULATIVE_TRIALS_MULTIPLE_COMPARISONS_REUSED_EXPOSED_DATA_NOT_ALPHA")
+    if "cloud" in check_plan(root):
+        import cloud_structured as cloud
+        value["cloud"]=cloud.report(root)
+    return value
 
 
-def freeze_round(root, frozen, n):
+def freeze_round(root, frozen, n, recording=None):
     folder = root/f"round-{n:02d}"
     if (folder/"proposals.json").exists():
         record = read(folder/"proposals.json")
@@ -203,6 +223,26 @@ def freeze_round(root, frozen, n):
         seen.update(p["ast_sha"] for p in previous["proposals"].values())
     source = dict(kind="trusted_local_deterministic_v1", task_ref=f"local:{frozen['plan_sha']}:{n}",
                   producer_sha=frozen["code_sha"]["research/autonomous_dsl.py"], seed=frozen["seed"], round=n)
+    if "cloud" in frozen:
+        import cloud_structured as cloud
+        generated,receipt=cloud.obtain(root,frozen,n,feedback,seen,recording)
+        if generated is None:
+            s=read(root/"status.json")
+            put(root/"status.json",dict(s,state=receipt["state"],phase="ORIGINAL_AGENT",reason=receipt.get("reason")),immutable=False)
+            event(root,"CLOUD_PROPOSAL_BLOCKED",round=n,**receipt)
+            return None
+        source=cloud.expected_source(frozen,n)
+        proposals,rejected=generated
+        body=dict(**m.SAFE,version="autonomous-round-v1",plan_sha=frozen["plan_sha"],round=n,
+            source_sha=frozen["source_sha"],source_origin=frozen["source_origin"],
+            version_bounds=frozen["source_refs"]["version_bounds"],config=frozen["config"],proposals=proposals,rejected=rejected,
+            feedback=feedback,feedback_sha=sha(canonical(feedback)),source=source,cloud_receipt=receipt,
+            proposal_created_before_evaluation=True,evidence_allowed_for_next_round="DEVELOPMENT_ONLY",
+            exposure_label=frozen["exposure_label"],sealed_results=True)
+        record=dict(body,round_sha=sha(canonical(body)))
+        put(folder/"proposals.json",record)
+        event(root,"PROPOSALS_FROZEN",round=n,round_sha=record["round_sha"],count=len(proposals),rejected=len(rejected))
+        return record
     generated = dsl.propose(frozen["seed"], n, frozen["config"]["max_positions"], feedback, seen)
     require(len(generated) <= frozen["limits"]["candidates"], "CANDIDATE_RESOURCE_LIMIT")
     proposals, rejected = {}, []
@@ -236,13 +276,16 @@ def validate_round(r, frozen, n):
             "ROUND_SHA_MISMATCH")
     expected = dict(kind="trusted_local_deterministic_v1", task_ref=f"local:{frozen['plan_sha']}:{n}",
                     producer_sha=frozen["code_sha"]["research/autonomous_dsl.py"], seed=frozen["seed"], round=n)
+    if "cloud" in frozen:
+        import cloud_structured as cloud
+        expected=cloud.expected_source(frozen,n)
     require(r["source"] == expected and len(r["proposals"])+len(r["rejected"]) <= frozen["limits"]["candidates"],
             "ROUND_SOURCE_OR_CANDIDATE_LIMIT")
     require(r["proposal_created_before_evaluation"] and r["sealed_results"] and
             r["evidence_allowed_for_next_round"] == "DEVELOPMENT_ONLY", "PREREGISTRATION_REQUIRED")
     for p in r["proposals"].values():
         require(dsl.validate(p["ast"], frozen["config"]["max_positions"]) == p["ast_sha"], "AST_SHA_MISMATCH")
-        dsl.parse_proposal(canonical({k:v for k,v in p.items() if k != "ast_sha"}), expected, frozen["config"]["max_positions"])
+        dsl.parse_proposal(canonical({k:v for k,v in p.items() if k != "ast_sha"}), expected, frozen["config"]["max_positions"],cloud="cloud" in frozen)
 
 
 def finished(result, frozen, n):
@@ -315,13 +358,14 @@ def append_post_seal(folder, kind, key, **details):
     put(folder/"post-seal.json", dict(body, tail_sha=sha(canonical(body))), immutable=False)
 
 
-def once(out, progress=None, fault=None):
+def once(out, progress=None, fault=None, recording=None):
     root = output(out)
     with m.data.v1.writer_lock(root):
         frozen = check_plan(root, current_code=True)
         auth = read(root/"authorization.json")
-        require(auth["plan_sha"] == frozen["plan_sha"] and auth["scope"] == "LOCAL_DETERMINISTIC_RESEARCH_ONLY"
-                and auth["paid_limit_micro"] == 0 and not auth["providers"] and not auth["trading"], "LOCAL_AUTHORIZATION_INVALID")
+        require(auth["plan_sha"] == frozen["plan_sha"] and auth["scope"] == ("CLOUD_RECORDED_LOCAL_RESEARCH_ONLY" if "cloud" in frozen else "LOCAL_DETERMINISTIC_RESEARCH_ONLY")
+                and auth["paid_limit_micro"] == 0 and auth["providers"] == ([frozen["cloud"]["model"]["id"]] if "cloud" in frozen else [])
+                and not auth["trading"], "LOCAL_AUTHORIZATION_INVALID")
         s = status(root)
         if s["control"]["cancelled"] or s["control"]["paused"] or s["state"] == "COMPLETED":
             return report(root)
@@ -343,7 +387,9 @@ def once(out, progress=None, fault=None):
             return report(root)
         if n > 1:
             verify(root)
-        r = freeze_round(root, frozen, n)
+        r = freeze_round(root, frozen, n, recording)
+        if r is None:
+            return report(root)
         if fault:
             fault("freeze", n)
         attempts = len(list((folder/"attempts").glob("[0-9][0-9].json")))
@@ -452,6 +498,9 @@ def verify(out):
             continue
         r = read(folder/"proposals.json")
         validate_round(r, frozen, n)
+        if "cloud" in frozen:
+            import cloud_structured as cloud
+            cloud.verify_round(root,frozen,n,r)
         trials += len(r["proposals"])+len(r["rejected"])
         receipts = chunk_receipts(folder)
         verify_chunks(folder, receipts)
@@ -481,8 +530,12 @@ def verify(out):
         if n > 1:
             require(r["feedback"] == read(root/f"round-{n-1:02d}"/"feedback.json"), "FEEDBACK_PROVENANCE")
         checked.append(dict(round=n, state="SEALED", output_sha=receipt["output_sha"]))
-    return dict(**m.SAFE, verified=True, plan_sha=frozen["plan_sha"], rounds=checked, cumulative_trials=trials,
+    result=dict(**m.SAFE, verified=True, plan_sha=frozen["plan_sha"], rounds=checked, cumulative_trials=trials,
                 scope="NEW_ARTIFACT_HASHES_AND_JOURNAL_METRICS_NOT_OLD_SOURCE_REVERIFY_NOT_INDEPENDENT_ACCEPTANCE")
+    if "cloud" in frozen:
+        import cloud_structured as cloud
+        result["cloud"]=cloud.verify_pending(root,frozen)
+    return result
 
 
 def cli():
@@ -499,7 +552,13 @@ def cli():
     parser.add_argument("--config", type=Path)
     parser.add_argument("--authorize-local", action="store_true")
     parser.add_argument("--full", action="store_true")
+    parser.add_argument("--source",choices=("deterministic","recorded_cloud","authorized_cloud"),default="deterministic")
+    parser.add_argument("--agent-dir",type=Path)
+    parser.add_argument("--model-id",default="structured-recorded")
+    parser.add_argument("--configure-recorded",action="store_true")
+    parser.add_argument("--recording",type=Path)
     args = parser.parse_args()
+    require(args.source!="authorized_cloud","AUTHORIZED_CLOUD_BLOCKED_OWNER_PROVIDER_DATA_PERMISSION_REQUIRED")
     with localcontext() as ctx:
         ctx.prec = 50
         if args.command in ("plan", "init"):
@@ -510,16 +569,28 @@ def cli():
             require(set(options) <= {"research_config", "limits"}, "LOCAL_CONFIG_FIELDS")
             config.update(options.get("research_config", {}))
             if args.command == "plan":
+                require(args.source=="deterministic","CLOUD_PLAN_REQUIRES_EXPLICIT_INIT_AND_EXISTING_AGENT")
                 with ds:
                     p = plan(ds, config, args.seed, options.get("limits"))
                 return p if args.full else dict(**m.SAFE, plan_sha=p["plan_sha"], source_sha=p["source_sha"], limits=p["limits"], seed=p["seed"])
             require(args.out is not None, "OUTPUT_REQUIRED")
-            return initialize(ds, config, args.out, args.seed, options.get("limits"), args.authorize_local)
+            cloud=None
+            if args.source=="recorded_cloud":
+                import cloud_structured as source
+                cloud=source.configuration(output(args.out,existing=False),args.agent_dir,args.source,args.model_id,args.configure_recorded)
+            return initialize(ds, config, args.out, args.seed, options.get("limits"), args.authorize_local,cloud)
         require(args.out is not None, "OUTPUT_REQUIRED")
         if args.command in ("pause", "resume", "cancel"):
-            return control(args.out, args.command)
+            result=control(args.out, args.command)
+            if args.command=="cancel" and "cloud" in check_plan(output(args.out)):
+                import cloud_structured as cloud
+                try:
+                    result["agent_cancel"]=cloud.rust("cancel",output(args.out))
+                except Error as exc:
+                    result["agent_cancel"]=dict(state="CONTROL_PERSISTED",reason=str(exc))
+            return result
         if args.command == "once":
-            return once(args.out, lambda v:print(json.dumps(dict(progress=v)), flush=True))
+            return once(args.out, lambda v:print(json.dumps(dict(progress=v)), flush=True),recording=args.recording)
         if args.command == "report":
             return report(args.out, args.full)
         return {"status":status, "history":history, "verify":verify}[args.command](args.out)

@@ -101,17 +101,25 @@ def unique(pairs):
     return out
 
 
-def parse_proposal(raw, expected_source, position_cap):
+def parse_proposal(raw, expected_source, position_cap, *, cloud=False):
     """A local equivalent of an Agent result, explicitly distinct from Rust text tasks."""
     require(type(raw) is bytes and len(raw) <= 32768, "PROPOSAL_SIZE")
     p = json.loads(raw, object_pairs_hook=unique,
                    parse_constant=lambda _: require(False, "NONFINITE_JSON"))
-    fields(p, "contract source hypothesis ast authority")
+    fields(p, "contract source hypothesis ast authority" + (" constraints counterexample" if cloud else ""))
     require(p["contract"] == "structured-research-proposal-v1", "STRUCTURED_PROPOSAL_REQUIRED")
-    require(p["source"] == expected_source and expected_source["kind"] == "trusted_local_deterministic_v1",
+    require(p["source"] == expected_source and expected_source["kind"] ==
+            ("rust_agent_structured_v1" if cloud else "trusted_local_deterministic_v1"),
             "PROPOSAL_SOURCE_MISMATCH")
     require(p["authority"] == "RESEARCH_ONLY", "PROPOSAL_AUTHORITY_DENIED")
     require(type(p["hypothesis"]) is str and 1 <= len(p["hypothesis"]) <= 1000, "PROPOSAL_HYPOTHESIS")
+    if cloud:
+        require(type(p["constraints"]) is list and 1 <= len(p["constraints"]) <= 4, "PROPOSAL_CONSTRAINTS")
+        for text in [p["hypothesis"], p["counterexample"], *p["constraints"]]:
+            require(type(text) is str and 1 <= len(text) <= 1000 and not any(ord(c)<32 for c in text), "PROPOSAL_TEXT_BOUND")
+            require(not any(s in text.casefold() for s in ("```", "://", "$(", "`", "../", "\\", "exec(", "eval(",
+                "import ", "powershell", "ignore previous instructions", "system prompt", "忽略之前的指令", "绕过预算")),
+                "PROPOSAL_INJECTION_OR_CODE_DENIED")
     return dict(p, ast_sha=validate(p["ast"], position_cap))
 
 

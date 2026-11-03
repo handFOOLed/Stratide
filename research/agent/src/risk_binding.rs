@@ -78,7 +78,11 @@ impl Binding {
     }
 }
 pub fn read() -> Result<Binding> {
-    let path = rp::root()?.join("agent-binding.json");
+    read_at(&rp::root()?)
+}
+/// Other research entry points bind the same Owner database and config identity.
+pub fn read_at(root: &Path) -> Result<Binding> {
+    let path = root.join("agent-binding.json");
     ensure(path.is_file(), "CLOUD_AGENT_BINDING_REQUIRED")?;
     let binding: Binding = serde_json::from_value(rp::read(&path, 8192)?)
         .map_err(|_| "CLOUD_AGENT_BINDING_INVALID")?;
@@ -101,6 +105,9 @@ pub fn read() -> Result<Binding> {
     Ok(binding)
 }
 pub fn bind(dir: &Path, config: Option<&Path>) -> Result<Binding> {
+    bind_at(&rp::root()?, dir, config)
+}
+pub fn bind_at(root: &Path, dir: &Path, config: Option<&Path>) -> Result<Binding> {
     let dir = canonical(dir)?;
     let config = canonical(
         &config
@@ -124,7 +131,6 @@ pub fn bind(dir: &Path, config: Option<&Path>) -> Result<Binding> {
     )?;
     ensure(restricted == 0, "CLOUD_AGENT_SCOPE_RESTRICTED")?;
     drop(c);
-    let root = rp::root()?;
     crate::eod_snapshot::no_links(&root)?;
     fs::create_dir_all(&root).map_err(|_| "CLOUD_STATE_ROOT")?;
     let lock = OpenOptions::new()
@@ -137,7 +143,7 @@ pub fn bind(dir: &Path, config: Option<&Path>) -> Result<Binding> {
     lock.try_lock_exclusive()
         .map_err(|_| "CLOUD_BINDING_BUSY")?;
     if root.join("agent-binding.json").exists() {
-        let old = read()?;
+        let old = read_at(root)?;
         ensure(
             old.agent_dir == dir && old.settings_path == config,
             "CLOUD_AGENT_BINDING_IMMUTABLE",

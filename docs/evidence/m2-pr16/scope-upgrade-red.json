@@ -1,0 +1,20 @@
+{
+  "command": [
+    "powershell",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "scripts/with-msvc.ps1",
+    "test",
+    "-p",
+    "stratide-research",
+    "--lib",
+    "structured_tests::old_grants_cannot_authorize_new_scope",
+    "--",
+    "--exact"
+  ],
+  "exit": 101,
+  "mutation": "Remove only new-scope denial from old Model::authorize; restore source in finally",
+  "expected": "assert old paper grant cannot authorize new structured scope fails"
+}
