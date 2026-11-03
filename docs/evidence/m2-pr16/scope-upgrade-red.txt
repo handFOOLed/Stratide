@@ -1,0 +1,25 @@
+
+running 1 test
+test structured_tests::old_grants_cannot_authorize_new_scope ... FAILED
+
+failures:
+
+---- structured_tests::old_grants_cannot_authorize_new_scope stdout ----
+
+thread 'structured_tests::old_grants_cannot_authorize_new_scope' (7720) panicked at research\agent\src\structured_tests.rs:175:5:
+assertion failed: old.models[0].authorize(&[s::SCOPE.into()], old.budget.as_ref()).is_err()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    structured_tests::old_grants_cannot_authorize_new_scope
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.00s
+
+   Compiling stratide-research v0.0.1 (<WORKTREE>\research\agent)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<WORKTREE>\target\debug\incremental\stratide_research-3mnwn5c8fg717\s-hnt1wx0h83-025gwch-working`
+
+warning: `stratide-research` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.41s
+     Running unittests src\lib.rs (target\debug\deps\stratide_research-f40faafca20d7995.exe)
+error: test failed, to rerun pass `-p stratide-research --lib`

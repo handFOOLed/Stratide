@@ -1,0 +1,13 @@
+
+running 2 tests
+test structured_tests::recorded_status_after_settlement_is_not_cloud ... ok
+test structured_tests::recorded_status_before_dispatch_is_not_cloud ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 13 filtered out; finished in 0.55s
+
+   Compiling stratide-research v0.0.1 (<WORKTREE>\research\agent)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<WORKTREE>\target\debug\incremental\stratide_research-3mnwn5c8fg717\s-hnt2o04l4e-1q2qbb2-working`
+
+warning: `stratide-research` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.17s
+     Running unittests src\lib.rs (target\debug\deps\stratide_research-f40faafca20d7995.exe)

@@ -177,6 +177,7 @@ impl Settings {
                 "MODEL_CONFIG_INVALID",
             )?;
             match m.kind.as_str() {
+                "structured_research_v1" => crate::structured::validate_model(m)?,
                 "bigquery_forecast_v1" | "deepseek_portfolio_v1" => {
                     crate::risk_cloud::validate_model(m)?;
                 }
@@ -282,6 +283,13 @@ impl Model {
         hash(&serde_json::to_vec(self).expect("model JSON"))
     }
     pub fn authorize(&self, scopes: &[String], budget: Option<&Budget>) -> Result<()> {
+        if crate::structured::is_model(self) {
+            return crate::structured::authorize(self, scopes, budget);
+        }
+        ensure(
+            !scopes.iter().any(|s| s == crate::structured::SCOPE),
+            "STRUCTURED_EXPLICIT_PROTOCOL_REQUIRED",
+        )?;
         if crate::risk_cloud::is_model(self) {
             return crate::risk_cloud::authorize(self, scopes, budget);
         }

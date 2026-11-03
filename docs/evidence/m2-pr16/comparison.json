@@ -1,0 +1,33 @@
+{
+  "old_reference": "PR64 frozen seed63 / 2 rounds / 8 ASTs; aggregate evidence only",
+  "new_ast_count": 4,
+  "old_ast_count": 8,
+  "ast_intersection": [],
+  "frozen_code_matches_current": true,
+  "baseline_base_return": {
+    "cash": {
+      "old": "0",
+      "new": "0",
+      "identical": true
+    },
+    "matched_equal_weight": {
+      "old": "0.0160637158068345819623984549039769762948198776580",
+      "new": "0.0160637158068345819623984549039769762948198776580",
+      "identical": true
+    },
+    "simple_positive_return": {
+      "old": "-0.55065696008047040204560326890275491706814644419835",
+      "new": "-0.55065696008047040204560326890275491706814644419835",
+      "identical": true
+    }
+  },
+  "new_base_return": {
+    "candidate_01/base": "-0.58249263388839166231110700787821676918270606283198",
+    "candidate_02/base": "-0.62499959017443342946448336474818249063092385830635",
+    "candidate_03/base": "-0.87309010778662540999212273355502323613185058625322",
+    "candidate_04/base": "-0.05772957652264911814342390531105790622979461075070",
+    "cash/base": "0",
+    "matched_equal_weight/base": "0.0160637158068345819623984549039769762948198776580",
+    "simple_positive_return/base": "-0.55065696008047040204560326890275491706814644419835"
+  }
+}

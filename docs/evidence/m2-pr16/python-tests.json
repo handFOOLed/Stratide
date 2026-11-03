@@ -1,0 +1,29 @@
+[
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/test-cloud-structured.py"
+    ],
+    "exit": 0
+  },
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/test-autonomous-research.py"
+    ],
+    "exit": 0
+  },
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/test-multistock-research.py"
+    ],
+    "exit": 0
+  }
+]

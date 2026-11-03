@@ -10,6 +10,9 @@ pub mod risk_portfolio;
 mod risk_portfolio_tests;
 mod service;
 mod store;
+pub mod structured;
+#[cfg(test)]
+mod structured_tests;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 pub use service::Agent;
@@ -67,9 +70,14 @@ pub struct Research {
     pub fusion: Option<Box<multimodal::Fusion>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub risk_portfolio: Option<Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub structured_research: Option<structured::Receipt>,
 }
 impl Research {
     pub fn validate(&self) -> Result<()> {
+        if let Some(receipt) = &self.structured_research {
+            receipt.validate()?;
+        }
         if let Some(v) = &self.risk_portfolio {
             risk_portfolio::validate_output(v)?;
         }
@@ -88,7 +96,7 @@ impl Research {
                     })
                 && serde_json::to_vec(self).is_ok_and(|s| {
                     s.len()
-                        <= if self.risk_portfolio.is_some() {
+                        <= if self.risk_portfolio.is_some() || self.structured_research.is_some() {
                             65536
                         } else {
                             16384

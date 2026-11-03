@@ -231,7 +231,10 @@ impl Agent {
                     _ => "not_verified",
                 });
                 view["last_reason"] = json!(last.and_then(|v| v.1));
-                if model.kind != "fake" && !crate::risk_cloud::recorded(model) {
+                if model.kind != "fake"
+                    && !crate::risk_cloud::recorded(model)
+                    && !crate::structured::recorded(model)
+                {
                     let successes:i64=c.query_row("SELECT COUNT(*) FROM tasks WHERE provider_id=?1 AND provider_hash=?2 AND result IS NOT NULL",params![model.id,model.fingerprint()],|r|r.get(0))?;
                     if successes > 0 {
                         view["verification"] = json!("REAL_PROVIDER_CALL_OBSERVED");
@@ -336,6 +339,9 @@ impl Agent {
             if crate::multimodal::is_input(&input) {
                 crate::multimodal::validate_input(&input, now)?;
             }
+            if crate::structured::is_input(&input) {
+                crate::structured::gate(&self.store().connect()?, trigger.as_deref(), &input, &s)?;
+            }
             if crate::risk_portfolio::is_input(&input) {
                 crate::risk_portfolio::gate(
                     &self.store().connect()?,
@@ -411,10 +417,42 @@ impl Agent {
                 },
             )?;
             #[cfg(test)]
+            if crate::structured::is_input(&input) {
+                crate::structured_tests::fault("after_reserve", &input);
+            }
+            #[cfg(test)]
             if crate::risk_portfolio::is_input(&input) {
                 crate::risk_portfolio_tests::fault("after_reserve");
             }
             let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
+            if crate::structured::is_input(&input) {
+                let checked = self.settings().and_then(|settings| {
+                    budget::check_dispatch(
+                        &tx,
+                        settings.budget.as_ref().ok_or("BUDGET_UNCONFIGURED")?,
+                        Utc::now(),
+                    )?;
+                    crate::structured::gate(&tx, trigger.as_deref(), &input, &settings)
+                });
+                if let Err(error) = checked {
+                    tx.execute(
+                        "UPDATE calls SET state='no_charge',reason=?1 WHERE id=?2",
+                        params![error.0, call_id],
+                    )?;
+                    tx.commit()?;
+                    return self.store().finish(
+                        id,
+                        if error.0 == "STRUCTURED_OWNER_PAUSED" {
+                            "failed"
+                        } else {
+                            "cancelled"
+                        },
+                        &error.0,
+                        None,
+                        Utc::now(),
+                    );
+                }
+            }
             if crate::risk_portfolio::is_input(&input) {
                 // Re-read grant/caps at the final dispatch boundary as well as reserve.
                 let checked = self.settings().and_then(|settings| {
@@ -487,6 +525,10 @@ impl Agent {
             )?;
             tx.commit()?;
             #[cfg(test)]
+            if crate::structured::is_input(&input) {
+                crate::structured_tests::fault("after_dispatch", &input);
+            }
+            #[cfg(test)]
             if crate::risk_portfolio::is_input(&input) {
                 crate::risk_portfolio_tests::fault("after_dispatch");
             }
@@ -553,11 +595,18 @@ impl Agent {
                             || research.risk_portfolio.is_some(),
                         "RISK_PORTFOLIO_OUTPUT_REQUIRED",
                     )?;
+                    ensure(
+                        !crate::structured::is_input(&input)
+                            || research.structured_research.is_some(),
+                        "STRUCTURED_RECEIPT_REQUIRED",
+                    )?;
                     let usage = m.cost(input_tokens, output_tokens)?;
                     let valid = input_tokens <= m.max_input_tokens
                         && output_tokens <= m.max_output_tokens
                         && usage <= maximum;
-                    let fake = m.kind == "fake" || crate::risk_cloud::recorded(m);
+                    let fake = m.kind == "fake"
+                        || crate::risk_cloud::recorded(m)
+                        || crate::structured::recorded(m);
                     c.execute("UPDATE calls SET state=?1,usage_micro=?2,settled_micro=?3,input_tokens=?4,output_tokens=?5,finished_at=?6,violation=?7 WHERE id=?8",
                         params![if !valid{"outcome_uncertain"}else if fake{"settled"}else{"usage_received"},usage,if fake && valid {usage}else{0},input_tokens,output_tokens,finished.to_rfc3339(),!valid,call_id])?;
                     #[cfg(test)]

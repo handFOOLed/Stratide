@@ -1,0 +1,24 @@
+{
+  "version": "research-ast-v1",
+  "features": {"returns":"ratio","volatility":"ratio","amount":"thousand_CNY","pb":"ratio","pe":"ratio"},
+  "operators": ["feature","negate","rank","blend","threshold","and","or","true"],
+  "limits": {"depth":8,"nodes":48,"window":60,"candidates":8},
+  "lag": 1,
+  "missing": "reject_security",
+  "ast_shape": {
+    "version":"research-ast-v1", "score":"numeric_node", "filter":"boolean_node",
+    "top_k":"integer 1..research_boundary.max_positions", "exposure":"decimal string in [0,1]",
+    "rebalance_sessions":"integer 1..20", "min_hold_sessions":"integer 1..rebalance_sessions"
+  },
+  "node_shapes": {
+    "feature":{"op":"feature","name":"one of features","window":"integer 1..60; volatility>=2; pb/pe=1","lag":1,"unit":"features[name]","missing":"reject_security"},
+    "negate":{"op":"negate","arg":"numeric_node; keeps unit"},
+    "rank":{"op":"rank","arg":"numeric_node; returns rank_ratio"},
+    "blend":{"op":"blend","terms":"2..4 items {weight:decimal_string in [0,1],arg:numeric_node}; same units and sum weights=1"},
+    "threshold":{"op":"threshold","arg":"numeric_node","direction":"ge or le","value":"finite decimal string","unit":"same as arg; returns boolean"},
+    "and":{"op":"and","args":"2..4 boolean_node items"},
+    "or":{"op":"or","args":"2..4 boolean_node items"},
+    "true":{"op":"true"}
+  },
+  "node_fields":"Exactly the fields for that node; unknown fields/operators/units denied. No ticker, date, future label, arbitrary code or execution authority. The PR15 validator is authoritative."
+}

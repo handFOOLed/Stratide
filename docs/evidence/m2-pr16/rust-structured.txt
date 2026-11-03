@@ -1,0 +1,20 @@
+
+running 9 tests
+test structured_tests::cancel_or_revoke_after_reserve_has_no_send_or_charge ... ok
+test structured_tests::crash_after_dispatch_holds_original_reservation_across_month ... ok
+test structured_tests::insufficient_original_budget_and_revoked_grant_never_dispatch ... ok
+test structured_tests::loopback_production_dispatch_and_unknown_no_retry ... ok
+test structured_tests::old_grants_cannot_authorize_new_scope ... ok
+test structured_tests::paused_after_reserve_can_explicitly_resume_without_second_dispatch ... ok
+test structured_tests::process_driver ... ok
+test structured_tests::recorded_exact_task_shared_budget_and_no_repeat ... ok
+test structured_tests::usage_overrun_and_duplicate_wire_keys_keep_unknown_reservation ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 5.16s
+
+   Compiling stratide-research v0.0.1 (<WORKTREE>\research\agent)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\<WORKTREE>\target\debug\incremental\stratide_research-3mnwn5c8fg717\s-hnt1x3thx0-0m60kfj-working`
+
+warning: `stratide-research` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.29s
+     Running unittests src\lib.rs (target\debug\deps\stratide_research-f40faafca20d7995.exe)

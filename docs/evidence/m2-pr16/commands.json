@@ -1,0 +1,251 @@
+[
+  {
+    "argv": [
+      "target/debug/stratided",
+      "--agent-init-fake",
+      "<DISPOSABLE_TST_OWNER>"
+    ],
+    "exit": 0,
+    "label": "explicit-original-synthetic-owner"
+  },
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/autonomous-research.py",
+      "init",
+      "--source",
+      "recorded_cloud",
+      "--agent-dir",
+      "<WORKTREE>\\state\\cloud-structured-evidence\\issue65-20261103-v1\\owner",
+      "--configure-recorded",
+      "--v1-root",
+      "<WORKTREE>\\state\\cloud-structured-evidence\\issue65-20261103-v1\\synthetic\\v1",
+      "--v2-root",
+      "<WORKTREE>\\state\\cloud-structured-evidence\\issue65-20261103-v1\\synthetic\\v2",
+      "--v1-version",
+      "90",
+      "--v2-version",
+      "360",
+      "--start",
+      "20211101",
+      "--end",
+      "20220304",
+      "--config",
+      "<WORKTREE>\\state\\cloud-structured-evidence\\issue65-20261103-v1\\synthetic-config.json",
+      "--out",
+      "<WORKTREE>\\state\\autonomous-research\\issue65-20261103-v1-synthetic",
+      "--authorize-local"
+    ],
+    "exit": 0,
+    "label": "synthetic-init",
+    "seconds": 0.893
+  },
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/autonomous-research.py",
+      "once",
+      "--out",
+      "<WORKTREE>\\state\\autonomous-research\\issue65-20261103-v1-synthetic",
+      "--recording",
+      "<WORKTREE>\\state\\cloud-structured-evidence\\issue65-20261103-v1\\synthetic-wire.json"
+    ],
+    "exit": 0,
+    "label": "synthetic-once",
+    "seconds": 0.788
+  },
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/autonomous-research.py",
+      "verify",
+      "--out",
+      "<WORKTREE>\\state\\autonomous-research\\issue65-20261103-v1-synthetic"
+    ],
+    "exit": 0,
+    "label": "synthetic-verify",
+    "seconds": 0.204
+  },
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/autonomous-research.py",
+      "status",
+      "--out",
+      "<WORKTREE>\\state\\autonomous-research\\issue65-20261103-v1-synthetic"
+    ],
+    "exit": 0,
+    "label": "synthetic-status",
+    "seconds": 0.15
+  },
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/autonomous-research.py",
+      "history",
+      "--out",
+      "<WORKTREE>\\state\\autonomous-research\\issue65-20261103-v1-synthetic"
+    ],
+    "exit": 0,
+    "label": "synthetic-history",
+    "seconds": 0.154
+  },
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/autonomous-research.py",
+      "report",
+      "--out",
+      "<WORKTREE>\\state\\autonomous-research\\issue65-20261103-v1-synthetic"
+    ],
+    "exit": 0,
+    "label": "synthetic-report",
+    "seconds": 0.169
+  },
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/autonomous-research.py",
+      "once",
+      "--out",
+      "<WORKTREE>\\state\\autonomous-research\\issue65-20261103-v1-synthetic"
+    ],
+    "exit": 0,
+    "label": "synthetic-repeat-once",
+    "seconds": 0.187
+  },
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/autonomous-research.py",
+      "init",
+      "--source",
+      "recorded_cloud",
+      "--agent-dir",
+      "<WORKTREE>\\state\\cloud-structured-evidence\\issue65-20261103-v1\\owner",
+      "--configure-recorded",
+      "--v1-root",
+      "<V1_ROOT>",
+      "--v2-root",
+      "<V2_ROOT>",
+      "--v1-version",
+      "1212",
+      "--v2-version",
+      "4848",
+      "--start",
+      "20211101",
+      "--end",
+      "20261030",
+      "--config",
+      "<WORKTREE>\\state\\cloud-structured-evidence\\issue65-20261103-v1\\real-config.json",
+      "--out",
+      "<WORKTREE>\\state\\autonomous-research\\issue65-20261103-v1-real",
+      "--authorize-local"
+    ],
+    "exit": 0,
+    "label": "real-init",
+    "seconds": 0.918
+  },
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/autonomous-research.py",
+      "once",
+      "--out",
+      "<WORKTREE>\\state\\autonomous-research\\issue65-20261103-v1-real",
+      "--recording",
+      "<WORKTREE>\\state\\cloud-structured-evidence\\issue65-20261103-v1\\real-wire.json"
+    ],
+    "exit": 0,
+    "label": "real-once",
+    "seconds": 294.421
+  },
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/autonomous-research.py",
+      "verify",
+      "--out",
+      "<WORKTREE>\\state\\autonomous-research\\issue65-20261103-v1-real"
+    ],
+    "exit": 0,
+    "label": "real-verify",
+    "seconds": 0.84
+  },
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/autonomous-research.py",
+      "status",
+      "--out",
+      "<WORKTREE>\\state\\autonomous-research\\issue65-20261103-v1-real"
+    ],
+    "exit": 0,
+    "label": "real-status",
+    "seconds": 0.15
+  },
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/autonomous-research.py",
+      "history",
+      "--out",
+      "<WORKTREE>\\state\\autonomous-research\\issue65-20261103-v1-real"
+    ],
+    "exit": 0,
+    "label": "real-history",
+    "seconds": 0.152
+  },
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/autonomous-research.py",
+      "report",
+      "--out",
+      "<WORKTREE>\\state\\autonomous-research\\issue65-20261103-v1-real"
+    ],
+    "exit": 0,
+    "label": "real-report",
+    "seconds": 0.211
+  },
+  {
+    "argv": [
+      "python",
+      "-I",
+      "-B",
+      "scripts/autonomous-research.py",
+      "once",
+      "--out",
+      "<WORKTREE>\\state\\autonomous-research\\issue65-20261103-v1-real"
+    ],
+    "exit": 0,
+    "label": "real-repeat-once",
+    "seconds": 0.274
+  }
+]
