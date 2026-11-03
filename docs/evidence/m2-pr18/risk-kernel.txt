@@ -1,0 +1,52 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling syn v3.0.9
+   Compiling serde_derive v1.0.229
+   Compiling serde v1.0.229
+   Compiling stratide-contracts v0.0.1 (<CHECKOUT>\crates\contracts)
+   Compiling stratide-risk v0.0.1 (<CHECKOUT>\crates\risk)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.68s
+     Running unittests src\lib.rs (target\debug\deps\stratide_risk-489c103a4feeeadb.exe)
+
+running 33 tests
+test tests::both_risk_layers_enforce_order_and_exposure_caps ... ok
+test tests::buys_include_fees_and_cash_boundary_is_exact ... ok
+test tests::cost_is_bound_to_every_proposal_and_rule_field_and_expiry ... ok
+test tests::deposits_and_withdrawals_are_not_trading_profit_or_loss ... ok
+test tests::deposits_cannot_hide_losses_and_observed_peak_cannot_be_lowered ... ok
+test tests::explicit_initial_capital_and_authorization_are_required ... ok
+test tests::fee_evidence_must_be_present_and_bound_to_proposal ... ok
+test tests::financial_freezes_deny_buys_but_allow_verified_settled_reduction ... ok
+test tests::future_data_expiry_and_invalid_snapshot_are_rejected ... ok
+test tests::identity_changes_cannot_reuse_account_or_risk_state ... ok
+test tests::invalid_lots_ticks_price_bands_suspensions_and_evidence_are_rejected ... ok
+test tests::invalid_positions_and_overreservations_fail_closed ... ok
+test tests::invalid_quantity_id_symbol_price_and_overflows_fail_closed ... ok
+test tests::missing_stale_duplicate_and_future_marks_never_imply_zero_loss ... ok
+test tests::no_position_and_overselling_are_rejected ... ok
+test tests::normal_buy_is_bound_repeatable_and_does_not_fill_or_reserve ... ok
+test tests::observation::regression_bad_or_incomplete_marks_cannot_partially_update_state ... ok
+test tests::observation::regression_invalid_equity_basis_cannot_partially_commit_state ... ok
+test tests::observation::regression_invalid_proposals_cannot_skip_trusted_loss_observation ... ok
+test tests::observation::regression_missing_cost_evidence_still_records_trusted_peak ... ok
+test tests::observation::regression_missing_market_evidence_still_latches_trusted_loss ... ok
+test tests::observation::regression_observation_without_proposal_records_loss_and_peak ... ok
+test tests::observation::regression_restore_repeat_and_next_day_observation_preserve_locks_and_peak ... ok
+test tests::observation::regression_wrong_identity_or_expired_snapshot_cannot_pollute_state ... ok
+test tests::overflowing_nav_and_invalid_flow_adjustment_fail_closed ... ok
+test tests::pending_buys_reserve_shared_cash_and_exposure ... ok
+test tests::pending_sells_and_duplicate_ids_cannot_be_reused ... ok
+test tests::sell_fees_cannot_create_an_unreserved_cash_debit ... ok
+test tests::settlement_is_instrument_specific_and_unknown_rules_fail_closed ... ok
+test tests::strategy_loss_and_account_drawdown_are_separate_checks ... ok
+test tests::t_plus_one_only_releases_earlier_day_lots ... ok
+test tests::uncertainty_and_manual_freezes_deny_both_sides ... ok
+test tests::unrealized_nav_loss_latches_at_threshold_and_memory_restore_retains_it ... ok
+
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests stratide_risk
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

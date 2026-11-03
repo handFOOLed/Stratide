@@ -1,0 +1,1787 @@
+{
+  "label": "WSL2_LINUX_CPU_PRODUCTION_ENGINEERING_E2E",
+  "N100_ACCEPTANCE": "NOT_VERIFIED",
+  "data_mode": "synthetic_test",
+  "tasks": [
+    [
+      1,
+      "completed",
+      "LOCAL_NO_BILLING"
+    ]
+  ],
+  "calls": 0,
+  "billing": "LOCAL_NO_BILLING",
+  "enabled_after_stop": "false",
+  "verified": true,
+  "paper_allowed": false,
+  "live_allowed": false,
+  "metrics": {
+    "batch_timings": [
+      {
+        "seconds": 0.10115097300000286,
+        "series": 1
+      },
+      {
+        "seconds": 0.057179374000000394,
+        "series": 1
+      },
+      {
+        "seconds": 0.0565879490000043,
+        "series": 1
+      },
+      {
+        "seconds": 0.058428794999997535,
+        "series": 1
+      }
+    ],
+    "cgroup_cpu_seconds": 2.95381,
+    "cgroup_memory_peak_bytes": 1411121152,
+    "cpu_seconds": 2.91664579,
+    "failures": 0,
+    "load_seconds": 1.0315752540000034,
+    "peak_rss_bytes": 2076774400,
+    "resource_scope": "WHOLE_WORKER_CGROUP",
+    "wall_seconds": 2.9884698329999964
+  },
+  "baseline_comparison": [
+    {
+      "action_handling": "SYNTHETIC_NONE_VERIFIED",
+      "annualization": null,
+      "ewma": 0.0020146745651857625,
+      "ewma_lambda": 0.94,
+      "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+      "instrument": "600000.SH",
+      "missing": 0,
+      "naive": 0.00198287717715106,
+      "observed_history_rms": 0.0019915685475384247,
+      "observed_last_return": 0.0022428083861532055,
+      "target": "rolling20_rms_daily_return_ratio",
+      "unit": "daily_return_ratio",
+      "window": 20
+    },
+    {
+      "action_handling": "SYNTHETIC_NONE_VERIFIED",
+      "annualization": null,
+      "ewma": 0.0019460587158277335,
+      "ewma_lambda": 0.94,
+      "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+      "instrument": "600001.SH",
+      "missing": 0,
+      "naive": 0.0019092029341587942,
+      "observed_history_rms": 0.0019690191619224713,
+      "observed_last_return": -0.00048661800486615725,
+      "target": "rolling20_rms_daily_return_ratio",
+      "unit": "daily_return_ratio",
+      "window": 20
+    },
+    {
+      "action_handling": "SYNTHETIC_NONE_VERIFIED",
+      "annualization": null,
+      "ewma": 0.001971055509468887,
+      "ewma_lambda": 0.94,
+      "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+      "instrument": "600002.SH",
+      "missing": 0,
+      "naive": 0.0019743656067288786,
+      "observed_history_rms": 0.0019841372110331263,
+      "observed_last_return": -0.0022401870069153063,
+      "target": "rolling20_rms_daily_return_ratio",
+      "unit": "daily_return_ratio",
+      "window": 20
+    },
+    {
+      "action_handling": "SYNTHETIC_NONE_VERIFIED",
+      "annualization": null,
+      "ewma": 0.001966801573814683,
+      "ewma_lambda": 0.94,
+      "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+      "instrument": "600003.SH",
+      "missing": 0,
+      "naive": 0.001964940657974201,
+      "observed_history_rms": 0.0019830896422450696,
+      "observed_last_return": -0.0018552875695733162,
+      "target": "rolling20_rms_daily_return_ratio",
+      "unit": "daily_return_ratio",
+      "window": 20
+    }
+  ],
+  "original_settings_unchanged": true,
+  "host_sample_count": 60,
+  "host_peak_memory_bytes": 1411121152,
+  "host_worker_peak_rss_bytes": 1471303680,
+  "observed_pids": [
+    424,
+    426,
+    427
+  ],
+  "orphan_pids_after_stop": [],
+  "unit_after_stop": {
+    "LoadState": "not-found",
+    "ActiveState": "inactive"
+  },
+  "host_network_namespace_isolated": true,
+  "host_model_mount_readonly": true,
+  "host_observations": [
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "778240",
+        "memory.peak": "782336"
+      },
+      "workers": []
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "20766720",
+        "memory.peak": "20766720"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 29995008,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "20500480",
+        "memory.peak": "20766720"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 29995008,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "20500480",
+        "memory.peak": "20766720"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 29995008,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "20500480",
+        "memory.peak": "20766720"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 29995008,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "20500480",
+        "memory.peak": "20766720"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 29995008,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "20500480",
+        "memory.peak": "20766720"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 29995008,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "20500480",
+        "memory.peak": "20766720"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 29995008,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "14958592",
+        "memory.peak": "20766720"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 22695936,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "53981184",
+        "memory.peak": "53981184"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 30941184,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "69472256",
+        "memory.peak": "69472256"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 37539840,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "110272512",
+        "memory.peak": "110272512"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 55496704,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "154771456",
+        "memory.peak": "154771456"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 63016960,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "200359936",
+        "memory.peak": "200359936"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 79536128,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "235483136",
+        "memory.peak": "235483136"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 102449152,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "264040448",
+        "memory.peak": "264040448"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 112476160,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "294699008",
+        "memory.peak": "294699008"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 131407872,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "328740864",
+        "memory.peak": "328740864"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 149434368,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "341168128",
+        "memory.peak": "341221376"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 161165312,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "347230208",
+        "memory.peak": "347230208"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 165326848,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "355565568",
+        "memory.peak": "355565568"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 171036672,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "360808448",
+        "memory.peak": "360808448"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 174432256,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "368926720",
+        "memory.peak": "368926720"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 180293632,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "372846592",
+        "memory.peak": "372846592"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 182431744,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "378404864",
+        "memory.peak": "378437632"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 186396672,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "383406080",
+        "memory.peak": "383406080"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 189755392,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "388911104",
+        "memory.peak": "388911104"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 193597440,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "393367552",
+        "memory.peak": "393367552"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 198107136,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "398086144",
+        "memory.peak": "398086144"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 202481664,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "406212608",
+        "memory.peak": "406212608"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 210055168,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "411410432",
+        "memory.peak": "411410432"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 213962752,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "418070528",
+        "memory.peak": "418070528"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 217153536,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "443998208",
+        "memory.peak": "443998208"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 233820160,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "494854144",
+        "memory.peak": "494854144"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 284700672,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "546234368",
+        "memory.peak": "546234368"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 335855616,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "597352448",
+        "memory.peak": "597352448"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 386924544,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "648470528",
+        "memory.peak": "648470528"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 437899264,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "706572288",
+        "memory.peak": "706572288"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 495882240,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "755855360",
+        "memory.peak": "756117504"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 545165312,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "806711296",
+        "memory.peak": "806711296"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 595779584,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "858353664",
+        "memory.peak": "858353664"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 647180288,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "909471744",
+        "memory.peak": "909471744"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 698396672,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "960851968",
+        "memory.peak": "960851968"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 749580288,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "1012232192",
+        "memory.peak": "1012232192"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 800800768,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "1062563840",
+        "memory.peak": "1062563840"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 851226624,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "1113944064",
+        "memory.peak": "1113944064"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 902414336,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "1165062144",
+        "memory.peak": "1165062144"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 953364480,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "1216442368",
+        "memory.peak": "1216442368"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 1004789760,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "1267822592",
+        "memory.peak": "1267822592"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 1055842304,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "1318940672",
+        "memory.peak": "1318940672"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 1106886656,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "1361932288",
+        "memory.peak": "1361932288"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 1471303680,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "1377890304",
+        "memory.peak": "1377898496"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 1154080768,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "1400635392",
+        "memory.peak": "1400635392"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 1171030016,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "1411121152",
+        "memory.peak": "1411121152"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 1181655040,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "1411121152",
+        "memory.peak": "1411121152"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 1181667328,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "1411121152",
+        "memory.peak": "1411121152"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 1181667328,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "1411121152",
+        "memory.peak": "1411121152"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 1182253056,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "523898880",
+        "memory.peak": "1411121152"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 270630912,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "484884480",
+        "memory.peak": "1411121152"
+      },
+      "workers": [
+        {
+          "pid": 427,
+          "rss_bytes": 257839104,
+          "net_namespace_distinct": true,
+          "interfaces": [
+            "lo"
+          ],
+          "model_mount_readonly": true
+        }
+      ]
+    },
+    {
+      "unit": {
+        "OOMPolicy": "kill",
+        "CPUQuotaPerSecUSec": "2s",
+        "MemoryMax": "6442450944",
+        "MemorySwapMax": "0",
+        "KillMode": "control-group",
+        "ActiveState": "active"
+      },
+      "kernel": {
+        "memory.max": "6442450944",
+        "memory.swap.max": "0",
+        "memory.oom.group": "1",
+        "memory.current": "370950144",
+        "memory.peak": "1411121152"
+      },
+      "workers": []
+    }
+  ],
+  "source_code_sha256": "26c92639fd78b143c4bd400988f447f29fcb52294319734555bae14efe669f2a"
+}

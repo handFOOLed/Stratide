@@ -1,0 +1,72 @@
+{
+  "tests": 4,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "facts": [
+    {
+      "test": "network_filesystem_environment",
+      "result": {
+        "network_denied": true,
+        "model_readonly": true,
+        "home_hidden": true,
+        "secrets_absent": true,
+        "isolation": {
+          "mechanism": "systemd-cgroup-v2+bubblewrap",
+          "memory_max_bytes": 6442450944,
+          "memory_swap_max_bytes": 0,
+          "memory_oom_group": true
+        }
+      }
+    },
+    {
+      "test": "production_probe_normal_exit",
+      "result": {
+        "isolation": {
+          "mechanism": "systemd-cgroup-v2+bubblewrap",
+          "memory_max_bytes": 6442450944,
+          "memory_swap_max_bytes": 0,
+          "memory_oom_group": true
+        },
+        "metrics": {
+          "peak_rss_bytes": 21520384,
+          "cgroup_memory_peak_bytes": 12521472,
+          "cgroup_cpu_seconds": 0.042956,
+          "resource_scope": "WHOLE_WORKER_CGROUP"
+        }
+      }
+    },
+    {
+      "test": "oom",
+      "host_unit": {
+        "Result": "oom-kill",
+        "OOMPolicy": "kill",
+        "ExecMainCode": "2",
+        "ExecMainStatus": "9",
+        "MemoryPeak": "134217728",
+        "MemoryMax": "134217728",
+        "MemorySwapMax": "0"
+      }
+    },
+    {
+      "test": "controller_death_before_kill",
+      "host": {
+        "worker_pid": 461,
+        "worker_rss_bytes": 1475964928,
+        "cgroup": {
+          "memory.max": "6442450944",
+          "memory.swap.max": "0",
+          "memory.oom.group": "1",
+          "memory.current": "2289782784",
+          "memory.peak": "2289782784"
+        }
+      }
+    },
+    {
+      "test": "controller_death_after_kill",
+      "unit_active": false,
+      "worker_pid_exists": false,
+      "cleanup_seconds": 0.042832807000024786
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "exit": 134,
+  "stderr": "Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads\nPython runtime state: finalizing (tstate=0x0000000000ba6748)\n\nCurrent thread 0x0000734d5fa56080 (most recent call first):\n  <no Python frame>\n",
+  "stdout": "{\"isolation\":{\"mechanism\":\"systemd-cgroup-v2+bubblewrap\",\"memory_max_bytes\":6442450944,\"memory_swap_max_bytes\":0,\"memory_oom_group\":true},\"metrics\":{\"peak_rss_bytes\":21389312,\"cgroup_memory_peak_bytes\":13103104,\"cgroup_cpu_seconds\":0.043564,\"resource_scope\":\"WHOLE_WORKER_CGROUP\"}}\n"
+}

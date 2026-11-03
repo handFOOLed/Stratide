@@ -1,0 +1,10 @@
+test_blank_truncation_refusal_partial_and_invalid_source_keep_cost_and_audit (__main__.Suite.test_blank_truncation_refusal_partial_and_invalid_source_keep_cost_and_audit) ... ok
+test_default_off_preflight_no_key_read_no_network_and_explicit_once (__main__.Suite.test_default_off_preflight_no_key_read_no_network_and_explicit_once) ... ok
+test_https_request_loopback_ast_freeze_pr62_evaluate_and_readonly_audit (__main__.Suite.test_https_request_loopback_ast_freeze_pr62_evaluate_and_readonly_audit) ... ok
+test_missing_usage_unknown_and_recording_cannot_replace_https (__main__.Suite.test_missing_usage_unknown_and_recording_cannot_replace_https) ... ok
+test_original_invoice_settlement_does_not_resign_frozen_research (__main__.Suite.test_original_invoice_settlement_does_not_resign_frozen_research) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 16.512s
+
+OK

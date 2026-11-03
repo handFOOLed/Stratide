@@ -1,0 +1,15 @@
+test_02_future_observation_rejected (__main__.Tests.test_02_future_observation_rejected) ... FAIL
+
+======================================================================
+FAIL: test_02_future_observation_rejected (__main__.Tests.test_02_future_observation_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>\state\test-tree\scripts\test-timesfm-cpu.py", line 102, in test_02_future_observation_rejected
+    with self.assertRaisesRegex(model.Rejected,"BAD_OR_FUTURE_OBSERVATION"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Rejected not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.220s
+
+FAILED (failures=1)

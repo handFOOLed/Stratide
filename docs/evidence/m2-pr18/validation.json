@@ -1,0 +1,108 @@
+{
+  "base_sha": "b62c1171d8503e1f21e4b470847944c6fbe8dbf4",
+  "validation_type": "DEVELOPER_SELF_TEST_NOT_INDEPENDENT_ACCEPTANCE",
+  "code_files": "source-sha256.json",
+  "legacy_source_unchanged": {
+    "research/agent/src/risk_portfolio.rs": true,
+    "research/agent/src/risk_cloud.rs": true,
+    "research/agent/src/risk_binding.rs": true,
+    "research/agent/src/service.rs": true,
+    "research/agent/src/store.rs": true,
+    "research/agent/src/config.rs": true,
+    "research/agent/src/budget.rs": true,
+    "research/agent/src/deepseek.rs": true
+  },
+  "commands": [
+    {
+      "command": "with-msvc.ps1 build --workspace --locked --offline",
+      "exit": 0
+    },
+    {
+      "command": "with-msvc.ps1 fmt --all -- --check",
+      "exit": 0
+    },
+    {
+      "command": "python -X utf8 -B scripts/test-timesfm-cpu.py (isolated checkout)",
+      "exit": 0,
+      "tests": 12
+    },
+    {
+      "command": "python -X utf8 -B scripts/test-timesfm-cpu-real.py",
+      "exit": 0,
+      "real_model": true,
+      "production_series": [
+        1,
+        4,
+        8
+      ],
+      "production_task_created": false
+    },
+    {
+      "command": "python -X utf8 -B scripts/timesfm-cpu.py bench --development-cpu-diagnostic",
+      "exit": 0,
+      "real_model": true,
+      "cases": 16,
+      "failures": 0
+    },
+    {
+      "command": "test-risk-portfolio.py --driver <libtest>",
+      "exit": 0,
+      "tests": 13
+    },
+    {
+      "command": "test-deepseek-structured.py",
+      "exit": 0,
+      "tests": 5
+    },
+    {
+      "command": "with-msvc.ps1 test --workspace --locked --offline",
+      "exit": 1,
+      "passed_before_stop": 147,
+      "failed": 1,
+      "baseline_reproduced": true
+    },
+    {
+      "command": "with-msvc.ps1 test -p stratide-risk --locked --offline",
+      "exit": 0,
+      "tests": 33
+    },
+    {
+      "command": "<shared_budget libtest> --test-threads=1 (fixed writable TEMP)",
+      "exit": 0,
+      "tests": 6,
+      "note": "A targeted passing run does not erase workspace/baseline failures"
+    },
+    {
+      "command": "with-msvc.ps1 clippy --workspace --all-targets --locked --offline",
+      "exit": 0,
+      "warnings": 4
+    },
+    {
+      "command": "clippy with RUSTFLAGS=-Dwarnings",
+      "exit": 1,
+      "existing_lints": 4
+    },
+    {
+      "command": "python scripts/test-timesfm-linux.py",
+      "exit": 0,
+      "skipped": 4,
+      "status": "NOT_RUN_NO_LINUX_OR_WSL"
+    },
+    {
+      "command": "python scripts/timesfm-cpu.py preflight",
+      "exit": 2,
+      "error_code": "LINUX_ISOLATION_UNAVAILABLE"
+    },
+    {
+      "command": "pip check (pinned venv)",
+      "exit": 0
+    }
+  ],
+  "real_market_requests": 0,
+  "real_paid_provider_requests": 0,
+  "trading_permissions_changed": false,
+  "raw_history_reparsed": false,
+  "full_history_revalidated": false,
+  "linux_isolation_acceptance": "NOT_VERIFIED",
+  "N100_ACCEPTANCE": "NOT_VERIFIED"
+}

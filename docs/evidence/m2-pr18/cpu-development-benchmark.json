@@ -1,0 +1,882 @@
+{
+  "label": "DEVELOPMENT_CPU_BENCHMARK",
+  "N100_ACCEPTANCE": "NOT_VERIFIED",
+  "machine": {
+    "cpu": "AMD Ryzen 7 9700X 8-Core Processor",
+    "logical_threads": 16,
+    "physical_cores": 8,
+    "physical_cores_status": "MEASURED",
+    "memory_bytes": 33997303808,
+    "system": "Windows",
+    "release": "11",
+    "architecture": "AMD64",
+    "python": "3.12.10"
+  },
+  "manifest": {
+    "schema_version": 1,
+    "model": "google/timesfm-2.5-200m-pytorch",
+    "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+    "license": "Apache-2.0",
+    "versions": {
+      "timesfm": "2.0.2",
+      "torch": "2.8.0+cpu",
+      "numpy": "2.2.6",
+      "huggingface-hub": "0.34.4",
+      "safetensors": "0.6.2"
+    },
+    "files": {
+      "model.safetensors": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+      "config.json": "cd3315b760d5cc7e278d7afdf41b897031ced888fc6c115bd9b3ac0ea2c47408",
+      "README.md": "4c3f16633a3d8b9324904bf004429aced2ee009b84e64effb59a902520cc7f2e",
+      "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    }
+  },
+  "model_manifest_sha256": "d5e54a409cc4aa4e1aa7a2b308bab3500124e90644071a210aab4fbce23f2597",
+  "memory_budget_bytes": 6442450944,
+  "isolation_acceptance": "NOT_VERIFIED",
+  "matrix": [
+    {
+      "series": 10,
+      "context": 64,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 3.9812250999966636,
+      "load_seconds": 0.7495854999870062,
+      "first_batch_seconds": 0.034218499989947304,
+      "worker_wall_seconds": 3.6029627000098117,
+      "cpu_seconds": 4.59375,
+      "hot_per_series_p50_seconds": 0.03311129999929108,
+      "hot_per_series_p95_seconds": 0.03344160001142882,
+      "hot_per_series_mean_seconds": 0.03314566500193905,
+      "peak_rss_bytes": 2051588096,
+      "process_resources": {
+        "job_memory_peak_bytes": 3446853632,
+        "job_cpu_seconds": 5.109375,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "output_sha256": "2026dfa2169796986c6a0ceb5f2191369a4545700850ce2fc80a13216960c333",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+        "memory_max_bytes": null
+      }
+    },
+    {
+      "series": 30,
+      "context": 64,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 5.918462700006785,
+      "load_seconds": 0.7300799999793526,
+      "first_batch_seconds": 0.03152230000705458,
+      "worker_wall_seconds": 5.544592100020964,
+      "cpu_seconds": 8.46875,
+      "hot_per_series_p50_seconds": 0.03271659999154508,
+      "hot_per_series_p95_seconds": 0.033307300007436424,
+      "hot_per_series_mean_seconds": 0.0325351749988234,
+      "peak_rss_bytes": 2051317760,
+      "process_resources": {
+        "job_memory_peak_bytes": 3446603776,
+        "job_cpu_seconds": 8.96875,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "output_sha256": "017863443e64421ffd766a7822e37e9b961063176ec8829cdc1ed1b5fcd05867",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+        "memory_max_bytes": null
+      }
+    },
+    {
+      "series": 50,
+      "context": 64,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 8.946065700001782,
+      "load_seconds": 0.815066500013927,
+      "first_batch_seconds": 0.03354530001524836,
+      "worker_wall_seconds": 8.372975100006443,
+      "cpu_seconds": 13.265625,
+      "hot_per_series_p50_seconds": 0.034054900010232814,
+      "hot_per_series_p95_seconds": 0.05349439999554306,
+      "hot_per_series_mean_seconds": 0.037470361999003214,
+      "peak_rss_bytes": 2051268608,
+      "process_resources": {
+        "job_memory_peak_bytes": 3446599680,
+        "job_cpu_seconds": 13.890625,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "output_sha256": "6c6c5ee4325beb0380514975753f9b73beecf76be24a7c079a86aea1409726c6",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+        "memory_max_bytes": null
+      }
+    },
+    {
+      "series": 100,
+      "context": 64,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 13.299424500000896,
+      "load_seconds": 0.7334873999934644,
+      "first_batch_seconds": 0.03467709998949431,
+      "worker_wall_seconds": 12.914759599982062,
+      "cpu_seconds": 22.796875,
+      "hot_per_series_p50_seconds": 0.03294750000350177,
+      "hot_per_series_p95_seconds": 0.033581099996808916,
+      "hot_per_series_mean_seconds": 0.03294832149884314,
+      "peak_rss_bytes": 2051825664,
+      "process_resources": {
+        "job_memory_peak_bytes": 3447185408,
+        "job_cpu_seconds": 23.25,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "output_sha256": "df9e9860cf725186573f9db4ea8866c922c8a44e5d44ee702ff6b7dd622f339b",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+        "memory_max_bytes": null
+      }
+    },
+    {
+      "series": 10,
+      "context": 128,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 4.703878300002543,
+      "load_seconds": 0.73628959999769,
+      "first_batch_seconds": 0.05714099999750033,
+      "worker_wall_seconds": 4.386202800000319,
+      "cpu_seconds": 6.09375,
+      "hot_per_series_p50_seconds": 0.05924095000955276,
+      "hot_per_series_p95_seconds": 0.06066379998810589,
+      "hot_per_series_mean_seconds": 0.05943783500406426,
+      "peak_rss_bytes": 2051031040,
+      "process_resources": {
+        "job_memory_peak_bytes": 3446427648,
+        "job_cpu_seconds": 6.515625,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "output_sha256": "6ef82ba6cfd3e67fd45ace355552553a718c428b7065dcb165112e8b61e3ca19",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+        "memory_max_bytes": null
+      }
+    },
+    {
+      "series": 30,
+      "context": 128,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 7.712459400005173,
+      "load_seconds": 0.7102428000071086,
+      "first_batch_seconds": 0.05661540001165122,
+      "worker_wall_seconds": 7.398212100000819,
+      "cpu_seconds": 12.109375,
+      "hot_per_series_p50_seconds": 0.05371774997911416,
+      "hot_per_series_p95_seconds": 0.05635130000882782,
+      "hot_per_series_mean_seconds": 0.054094778333092106,
+      "peak_rss_bytes": 2051256320,
+      "process_resources": {
+        "job_memory_peak_bytes": 3446497280,
+        "job_cpu_seconds": 12.46875,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "output_sha256": "252806cd85d31a80eae39b1261b5d5bd5bb5ecba9d2194aab532ca434ba26186",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+        "memory_max_bytes": null
+      }
+    },
+    {
+      "series": 50,
+      "context": 128,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 11.677035500004422,
+      "load_seconds": 0.7340109999931883,
+      "first_batch_seconds": 0.05812830000650138,
+      "worker_wall_seconds": 11.342219600017415,
+      "cpu_seconds": 20.0,
+      "hot_per_series_p50_seconds": 0.058180999985779636,
+      "hot_per_series_p95_seconds": 0.05961719999322668,
+      "hot_per_series_mean_seconds": 0.0579326629996649,
+      "peak_rss_bytes": 2052431872,
+      "process_resources": {
+        "job_memory_peak_bytes": 3447582720,
+        "job_cpu_seconds": 20.453125,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "output_sha256": "2e9ff4734d3867080b6ce3c5b73209e7c2e3e5e373819070953601776f41c08a",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+        "memory_max_bytes": null
+      }
+    },
+    {
+      "series": 100,
+      "context": 128,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 23.093642100022407,
+      "load_seconds": 0.7298803000012413,
+      "first_batch_seconds": 0.05885639999178238,
+      "worker_wall_seconds": 22.764448400004767,
+      "cpu_seconds": 42.8125,
+      "hot_per_series_p50_seconds": 0.06800929999735672,
+      "hot_per_series_p95_seconds": 0.06987020000815392,
+      "hot_per_series_mean_seconds": 0.06779249750063172,
+      "peak_rss_bytes": 2052534272,
+      "process_resources": {
+        "job_memory_peak_bytes": 3447578624,
+        "job_cpu_seconds": 43.234375,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "output_sha256": "4ce1720891d1f5006aaae80197751ec85c4f3b714b09a0828d07ace6621f1c9c",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+        "memory_max_bytes": null
+      }
+    },
+    {
+      "series": 10,
+      "context": 256,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 5.209435299999313,
+      "load_seconds": 0.707845199998701,
+      "first_batch_seconds": 0.05559819997870363,
+      "worker_wall_seconds": 4.8704637000046205,
+      "cpu_seconds": 7.015625,
+      "hot_per_series_p50_seconds": 0.08155124998302199,
+      "hot_per_series_p95_seconds": 0.08268390002194792,
+      "hot_per_series_mean_seconds": 0.08021318999817595,
+      "peak_rss_bytes": 2051252224,
+      "process_resources": {
+        "job_memory_peak_bytes": 3446652928,
+        "job_cpu_seconds": 7.484375,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "output_sha256": "889c48c240ee11424de6373f8a9d0282236a84ea7ffaabc49d2936ed6a95a4e4",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+        "memory_max_bytes": null
+      }
+    },
+    {
+      "series": 30,
+      "context": 256,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 10.177482600003714,
+      "load_seconds": 0.7493982999876607,
+      "first_batch_seconds": 0.0600953999964986,
+      "worker_wall_seconds": 9.837827000010293,
+      "cpu_seconds": 16.984375,
+      "hot_per_series_p50_seconds": 0.08259030000772327,
+      "hot_per_series_p95_seconds": 0.08343590001459233,
+      "hot_per_series_mean_seconds": 0.08050839666684624,
+      "peak_rss_bytes": 2051928064,
+      "process_resources": {
+        "job_memory_peak_bytes": 3447029760,
+        "job_cpu_seconds": 17.453125,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "output_sha256": "24b63f9010e66917e6218a4e8b5dce59fad1a7e5b66c43aee2532df573be62bf",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+        "memory_max_bytes": null
+      }
+    },
+    {
+      "series": 50,
+      "context": 256,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 14.962706299993442,
+      "load_seconds": 0.7334389000025112,
+      "first_batch_seconds": 0.06346929998835549,
+      "worker_wall_seconds": 14.601603400020394,
+      "cpu_seconds": 26.5625,
+      "hot_per_series_p50_seconds": 0.08226070000091568,
+      "hot_per_series_p95_seconds": 0.08328030002303421,
+      "hot_per_series_mean_seconds": 0.0815178609994473,
+      "peak_rss_bytes": 2052059136,
+      "process_resources": {
+        "job_memory_peak_bytes": 3447074816,
+        "job_cpu_seconds": 27.046875,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "output_sha256": "4b0a10bd639dcf993202a2a3a284e3685c5f64e75f1b2c6a37b3f86f764f15a0",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+        "memory_max_bytes": null
+      }
+    },
+    {
+      "series": 100,
+      "context": 256,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 27.18374439998297,
+      "load_seconds": 0.711726900015492,
+      "first_batch_seconds": 0.055220200010808185,
+      "worker_wall_seconds": 26.839231700025266,
+      "cpu_seconds": 50.96875,
+      "hot_per_series_p50_seconds": 0.08215919998474419,
+      "hot_per_series_p95_seconds": 0.08325709999189712,
+      "hot_per_series_mean_seconds": 0.08129913200085866,
+      "peak_rss_bytes": 2052976640,
+      "process_resources": {
+        "job_memory_peak_bytes": 3448508416,
+        "job_cpu_seconds": 51.390625,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "output_sha256": "b44d34551648f8a61b6ed008fbcc073a8a4e77086699f603b578aab7d337377a",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+        "memory_max_bytes": null
+      }
+    },
+    {
+      "series": 10,
+      "context": 512,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 5.936318100022618,
+      "load_seconds": 0.7177400999935344,
+      "first_batch_seconds": 0.0751866000064183,
+      "worker_wall_seconds": 5.593593300000066,
+      "cpu_seconds": 8.609375,
+      "hot_per_series_p50_seconds": 0.10705145000247285,
+      "hot_per_series_p95_seconds": 0.10805860001710244,
+      "hot_per_series_mean_seconds": 0.10697411000001011,
+      "peak_rss_bytes": 2051571712,
+      "process_resources": {
+        "job_memory_peak_bytes": 3446816768,
+        "job_cpu_seconds": 9.0625,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "output_sha256": "3657c3fe2e711180eb4e5f1727d5ffbb197854c80f78509c2b23a965c1aaaa10",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+        "memory_max_bytes": null
+      }
+    },
+    {
+      "series": 30,
+      "context": 512,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 12.374109500000486,
+      "load_seconds": 0.716352800023742,
+      "first_batch_seconds": 0.07510499999625608,
+      "worker_wall_seconds": 12.0497628999874,
+      "cpu_seconds": 21.46875,
+      "hot_per_series_p50_seconds": 0.10765380000520963,
+      "hot_per_series_p95_seconds": 0.10968300001695752,
+      "hot_per_series_mean_seconds": 0.1068034850017284,
+      "peak_rss_bytes": 2051919872,
+      "process_resources": {
+        "job_memory_peak_bytes": 3447898112,
+        "job_cpu_seconds": 21.890625,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "output_sha256": "144739d29d946f8a37adb6c3be1a082e24503be5e0d235e4e0f0d1007d9ea8fc",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+        "memory_max_bytes": null
+      }
+    },
+    {
+      "series": 50,
+      "context": 512,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 18.63401999999769,
+      "load_seconds": 0.7121018999896478,
+      "first_batch_seconds": 0.07210850002593361,
+      "worker_wall_seconds": 18.278599400015082,
+      "cpu_seconds": 33.921875,
+      "hot_per_series_p50_seconds": 0.10827974999847356,
+      "hot_per_series_p95_seconds": 0.10987860002205707,
+      "hot_per_series_mean_seconds": 0.10555022600106895,
+      "peak_rss_bytes": 2052825088,
+      "process_resources": {
+        "job_memory_peak_bytes": 3448451072,
+        "job_cpu_seconds": 34.390625,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "output_sha256": "c6ad7ac0cefb03bbed611ab2758b5097a302b071e303cb88042d579d15c2fb1a",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+        "memory_max_bytes": null
+      }
+    },
+    {
+      "series": 100,
+      "context": 512,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 35.16268589999527,
+      "load_seconds": 0.7252623999956995,
+      "first_batch_seconds": 0.07842750000418164,
+      "worker_wall_seconds": 34.79302280000411,
+      "cpu_seconds": 66.875,
+      "hot_per_series_p50_seconds": 0.10757335000380408,
+      "hot_per_series_p95_seconds": 0.10981910000555217,
+      "hot_per_series_mean_seconds": 0.10717602850083495,
+      "peak_rss_bytes": 2054328320,
+      "process_resources": {
+        "job_memory_peak_bytes": 3450064896,
+        "job_cpu_seconds": 67.34375,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "output_sha256": "42b72c70e8585d9d8969939dca0709a0dfba4f98f7ecee469ef333970570e34d",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+        "memory_max_bytes": null
+      }
+    }
+  ],
+  "walk_forward": {
+    "mode": "SYNTHETIC_SEQUENTIAL_AS_OF_WALK_FORWARD",
+    "folds": [
+      {
+        "prefix_closes": 84,
+        "context": 64,
+        "as_of": "2025-04-29T16:00:00Z",
+        "request_sha256": "75bd14f9f29b7a606c03f3071d1531abc0d0eb716b7caefbd15ec255aafe5ef5",
+        "target_sent_to_worker": false,
+        "risk_experts": [
+          {
+            "annualization": null,
+            "as_of": "2025-04-29T16:00:00Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.0018193919339521132,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600000.SH",
+              "missing": 0,
+              "naive": 0.0016853265699953454,
+              "observed_history_rms": 0.0016412982689369443,
+              "observed_last_return": 0.0012594458438286438,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2025-04-30",
+              "2025-05-01",
+              "2025-05-02",
+              "2025-05-05",
+              "2025-05-06",
+              "2025-05-07",
+              "2025-05-08",
+              "2025-05-09",
+              "2025-05-12",
+              "2025-05-13",
+              "2025-05-14",
+              "2025-05-15",
+              "2025-05-16",
+              "2025-05-19",
+              "2025-05-20",
+              "2025-05-21",
+              "2025-05-22",
+              "2025-05-23",
+              "2025-05-26",
+              "2025-05-27"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600000.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY",
+              "DEVELOPMENT_ISOLATION_NOT_VERIFIED"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "7841ead6c871d775a3b5dbc00c32d2f56587e2f51e959334e78721c17bb86048",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.001643023919314146
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.0015542597859166563
+              }
+            ]
+          }
+        ],
+        "development_only": true,
+        "horizon_mean_absolute_errors": {
+          "timesfm": {
+            "5": 4.744026623109093e-05,
+            "20": 8.826748740935913e-05
+          },
+          "naive": {
+            "5": 5.137615549891551e-06,
+            "20": 4.279929666932999e-05
+          },
+          "ewma": {
+            "5": 0.00012892774840687622,
+            "20": 0.00017686466062609776
+          }
+        },
+        "status": "PASS"
+      },
+      {
+        "prefix_closes": 104,
+        "context": 84,
+        "as_of": "2025-05-27T16:00:00Z",
+        "request_sha256": "2aeae189c37d53f9ec0ac9ca58a809a43c61a123c3cfa1696489b2b8b51fc13d",
+        "target_sent_to_worker": false,
+        "risk_experts": [
+          {
+            "annualization": null,
+            "as_of": "2025-05-27T16:00:00Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.0016338452164540679,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600000.SH",
+              "missing": 0,
+              "naive": 0.0014558634665264149,
+              "observed_history_rms": 0.001606966476095627,
+              "observed_last_return": 0.0005758710048948679,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2025-05-28",
+              "2025-05-29",
+              "2025-05-30",
+              "2025-06-02",
+              "2025-06-03",
+              "2025-06-04",
+              "2025-06-05",
+              "2025-06-06",
+              "2025-06-09",
+              "2025-06-10",
+              "2025-06-11",
+              "2025-06-12",
+              "2025-06-13",
+              "2025-06-16",
+              "2025-06-17",
+              "2025-06-18",
+              "2025-06-19",
+              "2025-06-20",
+              "2025-06-23",
+              "2025-06-24"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600000.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY",
+              "DEVELOPMENT_ISOLATION_NOT_VERIFIED"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "de067529c96241516296b5552f7829fd5199fd7e26e4cd4ec4a34ae397ab7bae",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.001486069615930319
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.0015371649351436645
+              }
+            ]
+          }
+        ],
+        "development_only": true,
+        "horizon_mean_absolute_errors": {
+          "timesfm": {
+            "5": 6.929471617595807e-06,
+            "20": 7.55958814327635e-06
+          },
+          "naive": {
+            "5": 3.713562102149984e-05,
+            "20": 8.886105676052594e-05
+          },
+          "ewma": {
+            "5": 0.00014084612890615314,
+            "20": 8.912069316712704e-05
+          }
+        },
+        "status": "PASS"
+      },
+      {
+        "prefix_closes": 124,
+        "context": 104,
+        "as_of": "2025-06-24T16:00:00Z",
+        "request_sha256": "02d58785b5c73204884602ce5432e4c16804ce8d443a6efb7398245e18f55418",
+        "target_sent_to_worker": false,
+        "risk_experts": [
+          {
+            "annualization": null,
+            "as_of": "2025-06-24T16:00:00Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.001490355713913974,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600000.SH",
+              "missing": 0,
+              "naive": 0.0014470429736041933,
+              "observed_history_rms": 0.0015820636329091132,
+              "observed_last_return": 9.5996928098252e-05,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2025-06-25",
+              "2025-06-26",
+              "2025-06-27",
+              "2025-06-30",
+              "2025-07-01",
+              "2025-07-02",
+              "2025-07-03",
+              "2025-07-04",
+              "2025-07-07",
+              "2025-07-08",
+              "2025-07-09",
+              "2025-07-10",
+              "2025-07-11",
+              "2025-07-14",
+              "2025-07-15",
+              "2025-07-16",
+              "2025-07-17",
+              "2025-07-18",
+              "2025-07-21",
+              "2025-07-22"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600000.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY",
+              "DEVELOPMENT_ISOLATION_NOT_VERIFIED"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "7892e909c2eeb2e6cd07c87b177541550526857ff47f37a8888e1560a97b5bd4",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.0014972645789384843
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.0015986402810085564
+              }
+            ]
+          }
+        ],
+        "development_only": true,
+        "horizon_mean_absolute_errors": {
+          "timesfm": {
+            "5": 2.369585394242763e-05,
+            "20": 8.199892914708047e-05
+          },
+          "naive": {
+            "5": 2.6525751391863342e-05,
+            "20": 6.959837825728263e-05
+          },
+          "ewma": {
+            "5": 1.678698891791736e-05,
+            "20": 2.6285637947501923e-05
+          }
+        },
+        "status": "PASS"
+      }
+    ],
+    "metrics": {
+      "timesfm": {
+        "mae": 7.555035601088292e-05,
+        "rmse": 8.978130171100136e-05,
+        "points": 60
+      },
+      "naive": {
+        "mae": 6.94901548372455e-05,
+        "rmse": 9.810020783792832e-05,
+        "points": 60
+      },
+      "ewma": {
+        "mae": 0.00010598534648525524,
+        "rmse": 0.00013442902931136164,
+        "points": 60
+      }
+    },
+    "missing": 0,
+    "failures": 0,
+    "authority": "RESEARCH_ONLY",
+    "eligibility": "ELIGIBILITY_DENIED"
+  },
+  "paper_allowed": false,
+  "live_allowed": false,
+  "billing": "LOCAL_NO_BILLING"
+}

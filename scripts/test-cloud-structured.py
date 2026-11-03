@@ -76,7 +76,7 @@ def loopback_task(root,recording):
             self.send_response(200);self.send_header("Content-Length",str(len(payload)));self.end_headers();self.wfile.write(payload)
     server=HTTPServer(("127.0.0.1",0),Handler)
     thread=threading.Thread(target=server.handle_request,daemon=True);thread.start()
-    binaries=sorted((ROOT/"target/debug/deps").glob("stratide_research-*.exe"),key=lambda p:p.stat().st_mtime_ns)
+    binaries=sorted((p for p in (ROOT/"target/debug/deps").glob("stratide_research-*.exe" if os.name=="nt" else "stratide_research-*") if p.is_file() and os.access(p,os.X_OK)),key=lambda p:p.stat().st_mtime_ns)
     if not binaries:raise RuntimeError("Build Rust --lib tests first")
     env=os.environ.copy();env["STRATIDE_STRUCTURED_TEST"]=json.dumps(dict(experiment=str(root),port=server.server_port))
     try:

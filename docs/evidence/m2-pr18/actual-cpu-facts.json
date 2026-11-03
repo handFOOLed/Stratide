@@ -1,0 +1,8 @@
+{
+  "torch": "2.8.0+cpu",
+  "runtime_torch": "2.8.0+cpu",
+  "cuda_build": null,
+  "cuda_available": false,
+  "timesfm": "2.0.2",
+  "device": "cpu"
+}

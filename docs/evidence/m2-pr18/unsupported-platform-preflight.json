@@ -1,0 +1,6 @@
+{
+  "error_code": "LINUX_ISOLATION_UNAVAILABLE",
+  "billing": "LOCAL_NO_BILLING",
+  "paper_allowed": false,
+  "live_allowed": false
+}

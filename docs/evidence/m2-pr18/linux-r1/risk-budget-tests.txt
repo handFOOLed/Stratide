@@ -1,0 +1,42 @@
+   Compiling serde v1.0.229
+   Compiling hyper-rustls v0.27.10
+   Compiling serde_urlencoded v0.7.1
+   Compiling reqwest v0.12.28
+   Compiling stratide-research v0.0.1 ($PR_WORKTREE/research/agent)
+warning: variable does not need to be mutable
+  --> research/agent/src/eod_snapshot.rs:39:17
+   |
+39 |             let mut linked = meta.file_type().is_symlink();
+   |                 ----^^^^^^
+   |                 |
+   |                 help: remove this `mut`
+   |
+   = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: `stratide-research` (lib) generated 1 warning (run `cargo fix --lib -p stratide-research` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.03s
+     Running tests/risk_portfolio.rs (target/debug/deps/risk_portfolio-f903bfcfacf84241)
+
+running 8 tests
+test copied_old_grant_cannot_authorize_new_cloud_scope ... ok
+test bigquery_https_fails_closed_without_a_verified_all_dimension_bound ... ok
+test cloud_grants_prices_fields_endpoints_and_legacy_scopes_are_closed ... ok
+test production_adapter_config_is_supported_offline ... ok
+test portfolio_entire_artifact_is_rejected_for_weights_tools_unknown_holdings_or_authority ... ok
+test production_request_templates_are_bounded_and_do_not_leak_raw_bars_to_fusion ... ok
+test bigquery_response_status_context_axis_and_finite_ratio_are_checked ... ok
+test forecast_context_units_calendar_availability_and_readiness_are_independent ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/shared_budget.rs (target/debug/deps/shared_budget-f6620b80878b78e5)
+
+running 6 tests
+test cross_entry_process ... ok
+test two_processes_from_legacy_and_cloud_share_one_atomic_reservation ... ok
+test selecting_cloud_task_preserves_existing_default_and_shared_call_table ... ok
+test legacy_unknown_survives_restart_and_month_change_in_cloud_budget ... ok
+test existing_authority_rejects_a_second_settings_file_or_database ... ok
+test original_spend_and_cloud_quotes_share_both_period_caps ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s

@@ -1,0 +1,7 @@
+{
+  "kind": "DELIBERATE_MUTATION_COUNTEREXAMPLE_NOT_BASELINE_BUG",
+  "mutation": "omit Frozen.validate",
+  "test": "Tests.test_02_future_observation_rejected",
+  "red_exit": 1,
+  "green_exit": 0
+}

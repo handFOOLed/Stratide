@@ -1,0 +1,1748 @@
+[
+  {
+    "argv": [
+      "$SYNTHETIC_CHECKOUT/target/debug/stratided",
+      "--agent-init-fake",
+      "$SYNTHETIC_CHECKOUT/state/disposable-synthetic-owner"
+    ],
+    "exit": 0,
+    "wall_seconds": 0.04555212799999708,
+    "stdout": "\u5df2\u521b\u5efa\u672c\u5730 fake / synthetic_test \u914d\u7f6e\u4e0e owner-token\uff1b\u6ca1\u6709\u4e91\u7aef\u8c03\u7528\u3002\u4f7f\u7528 --agent-dir \u6307\u5b9a\u6b64\u76ee\u5f55\u542f\u52a8\u3002"
+  },
+  {
+    "argv": [
+      "python3.12",
+      "-B",
+      "scripts/risk-portfolio.py",
+      "init",
+      "--agent-dir",
+      "$SYNTHETIC_CHECKOUT/state/disposable-synthetic-owner"
+    ],
+    "exit": 0,
+    "wall_seconds": 0.10359095799999807,
+    "output": {
+      "authority_id": "7357ef9d079c6bd7749d04609fd7803256e2ab542feffdff73813b7aeda5ac0d",
+      "billing": "NOT_BILLED",
+      "cloud": "CLOUD_NOT_AUTHORIZED",
+      "enabled": false,
+      "scope": "risk_portfolio_v1",
+      "state": "INITIALIZED"
+    }
+  },
+  {
+    "argv": [
+      "python3.12",
+      "-B",
+      "scripts/timesfm-cpu.py",
+      "preflight"
+    ],
+    "exit": 0,
+    "wall_seconds": 1.29305497,
+    "output": {
+      "model_manifest_sha256": "d5e54a409cc4aa4e1aa7a2b308bab3500124e90644071a210aab4fbce23f2597",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      },
+      "metrics": {
+        "peak_rss_bytes": 21520384,
+        "cgroup_memory_peak_bytes": 12713984,
+        "cgroup_cpu_seconds": 0.048381,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      }
+    }
+  },
+  {
+    "argv": [
+      "python3.12",
+      "-B",
+      "scripts/timesfm-cpu.py",
+      "enable"
+    ],
+    "exit": 0,
+    "wall_seconds": 0.06774301099999036,
+    "output": {
+      "billing": "LOCAL_NO_BILLING",
+      "enabled": true
+    }
+  },
+  {
+    "argv": [
+      "python3.12",
+      "-B",
+      "scripts/timesfm-cpu.py",
+      "synthetic-freeze",
+      "--name",
+      "linux-real-risk",
+      "--series",
+      "4"
+    ],
+    "exit": 0,
+    "wall_seconds": 0.44637524999998845,
+    "output": {
+      "state": "FROZEN_NOT_RUN",
+      "billing": "LOCAL_NO_BILLING"
+    }
+  },
+  {
+    "argv": [
+      "python3.12",
+      "-B",
+      "scripts/timesfm-cpu.py",
+      "once",
+      "--name",
+      "linux-real-risk"
+    ],
+    "exit": 0,
+    "wall_seconds": 4.379568644999992,
+    "output": {
+      "id": "1",
+      "state": "completed",
+      "reason": "LOCAL_NO_BILLING",
+      "provider_hash": "42fb2034e1d4ebf0230899051b9944ae2c20d913d3228a1a5357c91a1af28538",
+      "result": {
+        "backend": "TimesFM 2.5 CPU",
+        "billing": "LOCAL_NO_BILLING",
+        "research": {
+          "risk_portfolio": {
+            "authority": "RESEARCH_ONLY",
+            "can_execute_forward_paper": false,
+            "eligibility": "ELIGIBILITY_DENIED",
+            "live_allowed": false,
+            "paper_allowed": false,
+            "receipt": {
+              "billing": "LOCAL_NO_BILLING",
+              "clamp_count": 0,
+              "clamp_policy": "REJECT_NEGATIVE_NO_CLAMP",
+              "code_sha256": "26c92639fd78b143c4bd400988f447f29fcb52294319734555bae14efe669f2a",
+              "development_only": false,
+              "frozen_input_sha256": "c1e92eb8179c02e694041b87ae3ab3e222d9782d3986987a865c5383cfba46be",
+              "isolation": {
+                "mechanism": "systemd-cgroup-v2+bubblewrap",
+                "memory_max_bytes": 6442450944,
+                "memory_oom_group": true,
+                "memory_swap_max_bytes": 0
+              },
+              "manifest_sha256": "d5e54a409cc4aa4e1aa7a2b308bab3500124e90644071a210aab4fbce23f2597",
+              "metrics": {
+                "batch_timings": [
+                  {
+                    "seconds": 0.10115097300000286,
+                    "series": 1
+                  },
+                  {
+                    "seconds": 0.057179374000000394,
+                    "series": 1
+                  },
+                  {
+                    "seconds": 0.0565879490000043,
+                    "series": 1
+                  },
+                  {
+                    "seconds": 0.058428794999997535,
+                    "series": 1
+                  }
+                ],
+                "cgroup_cpu_seconds": 2.95381,
+                "cgroup_memory_peak_bytes": 1411121152,
+                "cpu_seconds": 2.91664579,
+                "failures": 0,
+                "load_seconds": 1.0315752540000034,
+                "peak_rss_bytes": 2076774400,
+                "resource_scope": "WHOLE_WORKER_CGROUP",
+                "wall_seconds": 2.9884698329999964
+              },
+              "model_revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+              "request_sha256": "587b945cbbaba5e9d408005963f33612d129a1e590c9616780be5b5c67e593e2",
+              "transport": "local_cpu",
+              "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8"
+            },
+            "risk_experts": [
+              {
+                "annualization": null,
+                "as_of": "2026-11-03T10:53:53.085313Z",
+                "authority": "RESEARCH_ONLY",
+                "baseline_comparison": {
+                  "action_handling": "SYNTHETIC_NONE_VERIFIED",
+                  "annualization": null,
+                  "ewma": 0.0020146745651857625,
+                  "ewma_lambda": 0.94,
+                  "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+                  "instrument": "600000.SH",
+                  "missing": 0,
+                  "naive": 0.00198287717715106,
+                  "observed_history_rms": 0.0019915685475384247,
+                  "observed_last_return": 0.0022428083861532055,
+                  "target": "rolling20_rms_daily_return_ratio",
+                  "unit": "daily_return_ratio",
+                  "window": 20
+                },
+                "calibration_status": "UNKNOWN_UNCALIBRATED",
+                "cost": {
+                  "actual_bill": "LOCAL_NO_BILLING",
+                  "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+                  "receipt": "parent_bundle.receipt"
+                },
+                "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+                "downside_metric": "UNKNOWN_UNCALIBRATED",
+                "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+                "forecast_horizons": [
+                  5,
+                  20
+                ],
+                "forecast_sessions": [
+                  "2026-11-04",
+                  "2026-11-05",
+                  "2026-11-06",
+                  "2026-11-09",
+                  "2026-11-10",
+                  "2026-11-11",
+                  "2026-11-12",
+                  "2026-11-13",
+                  "2026-11-16",
+                  "2026-11-17",
+                  "2026-11-18",
+                  "2026-11-19",
+                  "2026-11-20",
+                  "2026-11-23",
+                  "2026-11-24",
+                  "2026-11-25",
+                  "2026-11-26",
+                  "2026-11-27",
+                  "2026-11-30",
+                  "2026-12-01"
+                ],
+                "input_mode": "synthetic_test",
+                "instrument": "600000.SH",
+                "job_ref": null,
+                "market_regime": "NORMAL_VOLATILITY",
+                "quality_blockers": [
+                  "SYNTHETIC_ENGINEERING_ONLY"
+                ],
+                "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+                "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+                "schema_version": 1,
+                "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+                "snapshot_ref": "485d02c4730e402759745f5d99d6bcb25555255ef469db026e411f07a1c56ec6",
+                "target": "rolling20_rms_daily_return_ratio",
+                "uncertainty": "UNKNOWN_UNCALIBRATED",
+                "unit": "daily_return_ratio",
+                "volatility_forecast": [
+                  {
+                    "sessions": 5,
+                    "value_ratio": 0.001961427740752697
+                  },
+                  {
+                    "sessions": 20,
+                    "value_ratio": 0.001970303669804707
+                  }
+                ]
+              },
+              {
+                "annualization": null,
+                "as_of": "2026-11-03T10:53:53.085313Z",
+                "authority": "RESEARCH_ONLY",
+                "baseline_comparison": {
+                  "action_handling": "SYNTHETIC_NONE_VERIFIED",
+                  "annualization": null,
+                  "ewma": 0.0019460587158277335,
+                  "ewma_lambda": 0.94,
+                  "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+                  "instrument": "600001.SH",
+                  "missing": 0,
+                  "naive": 0.0019092029341587942,
+                  "observed_history_rms": 0.0019690191619224713,
+                  "observed_last_return": -0.00048661800486615725,
+                  "target": "rolling20_rms_daily_return_ratio",
+                  "unit": "daily_return_ratio",
+                  "window": 20
+                },
+                "calibration_status": "UNKNOWN_UNCALIBRATED",
+                "cost": {
+                  "actual_bill": "LOCAL_NO_BILLING",
+                  "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+                  "receipt": "parent_bundle.receipt"
+                },
+                "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+                "downside_metric": "UNKNOWN_UNCALIBRATED",
+                "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+                "forecast_horizons": [
+                  5,
+                  20
+                ],
+                "forecast_sessions": [
+                  "2026-11-04",
+                  "2026-11-05",
+                  "2026-11-06",
+                  "2026-11-09",
+                  "2026-11-10",
+                  "2026-11-11",
+                  "2026-11-12",
+                  "2026-11-13",
+                  "2026-11-16",
+                  "2026-11-17",
+                  "2026-11-18",
+                  "2026-11-19",
+                  "2026-11-20",
+                  "2026-11-23",
+                  "2026-11-24",
+                  "2026-11-25",
+                  "2026-11-26",
+                  "2026-11-27",
+                  "2026-11-30",
+                  "2026-12-01"
+                ],
+                "input_mode": "synthetic_test",
+                "instrument": "600001.SH",
+                "job_ref": null,
+                "market_regime": "NORMAL_VOLATILITY",
+                "quality_blockers": [
+                  "SYNTHETIC_ENGINEERING_ONLY"
+                ],
+                "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+                "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+                "schema_version": 1,
+                "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+                "snapshot_ref": "485d02c4730e402759745f5d99d6bcb25555255ef469db026e411f07a1c56ec6",
+                "target": "rolling20_rms_daily_return_ratio",
+                "uncertainty": "UNKNOWN_UNCALIBRATED",
+                "unit": "daily_return_ratio",
+                "volatility_forecast": [
+                  {
+                    "sessions": 5,
+                    "value_ratio": 0.001977492496371269
+                  },
+                  {
+                    "sessions": 20,
+                    "value_ratio": 0.0019686961313709617
+                  }
+                ]
+              },
+              {
+                "annualization": null,
+                "as_of": "2026-11-03T10:53:53.085313Z",
+                "authority": "RESEARCH_ONLY",
+                "baseline_comparison": {
+                  "action_handling": "SYNTHETIC_NONE_VERIFIED",
+                  "annualization": null,
+                  "ewma": 0.001971055509468887,
+                  "ewma_lambda": 0.94,
+                  "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+                  "instrument": "600002.SH",
+                  "missing": 0,
+                  "naive": 0.0019743656067288786,
+                  "observed_history_rms": 0.0019841372110331263,
+                  "observed_last_return": -0.0022401870069153063,
+                  "target": "rolling20_rms_daily_return_ratio",
+                  "unit": "daily_return_ratio",
+                  "window": 20
+                },
+                "calibration_status": "UNKNOWN_UNCALIBRATED",
+                "cost": {
+                  "actual_bill": "LOCAL_NO_BILLING",
+                  "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+                  "receipt": "parent_bundle.receipt"
+                },
+                "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+                "downside_metric": "UNKNOWN_UNCALIBRATED",
+                "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+                "forecast_horizons": [
+                  5,
+                  20
+                ],
+                "forecast_sessions": [
+                  "2026-11-04",
+                  "2026-11-05",
+                  "2026-11-06",
+                  "2026-11-09",
+                  "2026-11-10",
+                  "2026-11-11",
+                  "2026-11-12",
+                  "2026-11-13",
+                  "2026-11-16",
+                  "2026-11-17",
+                  "2026-11-18",
+                  "2026-11-19",
+                  "2026-11-20",
+                  "2026-11-23",
+                  "2026-11-24",
+                  "2026-11-25",
+                  "2026-11-26",
+                  "2026-11-27",
+                  "2026-11-30",
+                  "2026-12-01"
+                ],
+                "input_mode": "synthetic_test",
+                "instrument": "600002.SH",
+                "job_ref": null,
+                "market_regime": "NORMAL_VOLATILITY",
+                "quality_blockers": [
+                  "SYNTHETIC_ENGINEERING_ONLY"
+                ],
+                "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+                "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+                "schema_version": 1,
+                "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+                "snapshot_ref": "485d02c4730e402759745f5d99d6bcb25555255ef469db026e411f07a1c56ec6",
+                "target": "rolling20_rms_daily_return_ratio",
+                "uncertainty": "UNKNOWN_UNCALIBRATED",
+                "unit": "daily_return_ratio",
+                "volatility_forecast": [
+                  {
+                    "sessions": 5,
+                    "value_ratio": 0.0019655875861644746
+                  },
+                  {
+                    "sessions": 20,
+                    "value_ratio": 0.001968817750457674
+                  }
+                ]
+              },
+              {
+                "annualization": null,
+                "as_of": "2026-11-03T10:53:53.085313Z",
+                "authority": "RESEARCH_ONLY",
+                "baseline_comparison": {
+                  "action_handling": "SYNTHETIC_NONE_VERIFIED",
+                  "annualization": null,
+                  "ewma": 0.001966801573814683,
+                  "ewma_lambda": 0.94,
+                  "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+                  "instrument": "600003.SH",
+                  "missing": 0,
+                  "naive": 0.001964940657974201,
+                  "observed_history_rms": 0.0019830896422450696,
+                  "observed_last_return": -0.0018552875695733162,
+                  "target": "rolling20_rms_daily_return_ratio",
+                  "unit": "daily_return_ratio",
+                  "window": 20
+                },
+                "calibration_status": "UNKNOWN_UNCALIBRATED",
+                "cost": {
+                  "actual_bill": "LOCAL_NO_BILLING",
+                  "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+                  "receipt": "parent_bundle.receipt"
+                },
+                "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+                "downside_metric": "UNKNOWN_UNCALIBRATED",
+                "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+                "forecast_horizons": [
+                  5,
+                  20
+                ],
+                "forecast_sessions": [
+                  "2026-11-04",
+                  "2026-11-05",
+                  "2026-11-06",
+                  "2026-11-09",
+                  "2026-11-10",
+                  "2026-11-11",
+                  "2026-11-12",
+                  "2026-11-13",
+                  "2026-11-16",
+                  "2026-11-17",
+                  "2026-11-18",
+                  "2026-11-19",
+                  "2026-11-20",
+                  "2026-11-23",
+                  "2026-11-24",
+                  "2026-11-25",
+                  "2026-11-26",
+                  "2026-11-27",
+                  "2026-11-30",
+                  "2026-12-01"
+                ],
+                "input_mode": "synthetic_test",
+                "instrument": "600003.SH",
+                "job_ref": null,
+                "market_regime": "NORMAL_VOLATILITY",
+                "quality_blockers": [
+                  "SYNTHETIC_ENGINEERING_ONLY"
+                ],
+                "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+                "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+                "schema_version": 1,
+                "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+                "snapshot_ref": "485d02c4730e402759745f5d99d6bcb25555255ef469db026e411f07a1c56ec6",
+                "target": "rolling20_rms_daily_return_ratio",
+                "uncertainty": "UNKNOWN_UNCALIBRATED",
+                "unit": "daily_return_ratio",
+                "volatility_forecast": [
+                  {
+                    "sessions": 5,
+                    "value_ratio": 0.001961161382496357
+                  },
+                  {
+                    "sessions": 20,
+                    "value_ratio": 0.0019679985125549138
+                  }
+                ]
+              }
+            ],
+            "schema_version": 1
+          }
+        },
+        "worker_response": {
+          "clamp_count": 0,
+          "clamp_policy": "REJECT_NEGATIVE_NO_CLAMP",
+          "forecasts": [
+            {
+              "instrument": "600000.SH",
+              "values": [
+                0.0019206232391297817,
+                0.0020111820194870234,
+                0.001957332482561469,
+                0.0019093400333076715,
+                0.0020086609292775393,
+                0.0019928733818233013,
+                0.0019505838863551617,
+                0.0019839215092360973,
+                0.001978184562176466,
+                0.0019509514095261693,
+                0.001977891195565462,
+                0.0019851108081638813,
+                0.0019680492114275694,
+                0.001976844621822238,
+                0.0019760122522711754,
+                0.0019603711552917957,
+                0.001969203818589449,
+                0.001978962915018201,
+                0.001975341932848096,
+                0.0019746320322155952
+              ]
+            },
+            {
+              "instrument": "600001.SH",
+              "values": [
+                0.002006181748583913,
+                0.0019676468800753355,
+                0.0019251848571002483,
+                0.002001277869567275,
+                0.0019871711265295744,
+                0.00194587092846632,
+                0.0019761393778026104,
+                0.0019723272416740656,
+                0.0019457717426121235,
+                0.001975143561139703,
+                0.001977928215637803,
+                0.0019593762699514627,
+                0.0019574749749153852,
+                0.001974480925127864,
+                0.00196721195243299,
+                0.0019651332404464483,
+                0.0019671821501106024,
+                0.001971583813428879,
+                0.001967436634004116,
+                0.0019633991178125143
+              ]
+            },
+            {
+              "instrument": "600002.SH",
+              "values": [
+                0.0019707700703293085,
+                0.0019293290097266436,
+                0.001997352112084627,
+                0.001989798154681921,
+                0.0019406885839998722,
+                0.001972537487745285,
+                0.001969228032976389,
+                0.0019500970374792814,
+                0.0019797340501099825,
+                0.0019718825351446867,
+                0.0019636729266494513,
+                0.00196671299636364,
+                0.0019717381801456213,
+                0.001971289049834013,
+                0.0019689856562763453,
+                0.0019729011692106724,
+                0.001972491852939129,
+                0.001972378231585026,
+                0.0019705554004758596,
+                0.001974212471395731
+              ]
+            },
+            {
+              "instrument": "600003.SH",
+              "values": [
+                0.0019047714304178953,
+                0.0020232212264090776,
+                0.001995573053136468,
+                0.0019078750628978014,
+                0.0019743661396205425,
+                0.0019776623230427504,
+                0.0019434455316513777,
+                0.0019780676811933517,
+                0.0019976228941231966,
+                0.001953686820343137,
+                0.0019655595533549786,
+                0.001967086223885417,
+                0.001961958594620228,
+                0.0019708822946995497,
+                0.0019791314844042063,
+                0.0019652843475341797,
+                0.0019717554096132517,
+                0.001975666731595993,
+                0.0019741463474929333,
+                0.00197220710106194
+              ]
+            }
+          ],
+          "isolation": {
+            "mechanism": "systemd-cgroup-v2+bubblewrap",
+            "memory_max_bytes": 6442450944,
+            "memory_oom_group": true,
+            "memory_swap_max_bytes": 0
+          },
+          "metrics": {
+            "batch_timings": [
+              {
+                "seconds": 0.10115097300000286,
+                "series": 1
+              },
+              {
+                "seconds": 0.057179374000000394,
+                "series": 1
+              },
+              {
+                "seconds": 0.0565879490000043,
+                "series": 1
+              },
+              {
+                "seconds": 0.058428794999997535,
+                "series": 1
+              }
+            ],
+            "cgroup_cpu_seconds": 2.95381,
+            "cgroup_memory_peak_bytes": 1411121152,
+            "cpu_seconds": 2.91664579,
+            "failures": 0,
+            "load_seconds": 1.0315752540000034,
+            "peak_rss_bytes": 2076774400,
+            "resource_scope": "WHOLE_WORKER_CGROUP",
+            "wall_seconds": 2.9884698329999964
+          },
+          "model_revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+          "request_sha256": "587b945cbbaba5e9d408005963f33612d129a1e590c9616780be5b5c67e593e2",
+          "schema_version": 1,
+          "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8"
+        }
+      },
+      "billing": "LOCAL_NO_BILLING",
+      "paper_allowed": false,
+      "live_allowed": false
+    }
+  },
+  {
+    "argv": [
+      "python3.12",
+      "-B",
+      "scripts/timesfm-cpu.py",
+      "status",
+      "--name",
+      "linux-real-risk"
+    ],
+    "exit": 0,
+    "wall_seconds": 0.044124447999990934,
+    "output": {
+      "id": "1",
+      "state": "completed",
+      "reason": "LOCAL_NO_BILLING",
+      "provider_hash": "42fb2034e1d4ebf0230899051b9944ae2c20d913d3228a1a5357c91a1af28538",
+      "result": {
+        "backend": "TimesFM 2.5 CPU",
+        "billing": "LOCAL_NO_BILLING",
+        "research": {
+          "risk_portfolio": {
+            "authority": "RESEARCH_ONLY",
+            "can_execute_forward_paper": false,
+            "eligibility": "ELIGIBILITY_DENIED",
+            "live_allowed": false,
+            "paper_allowed": false,
+            "receipt": {
+              "billing": "LOCAL_NO_BILLING",
+              "clamp_count": 0,
+              "clamp_policy": "REJECT_NEGATIVE_NO_CLAMP",
+              "code_sha256": "26c92639fd78b143c4bd400988f447f29fcb52294319734555bae14efe669f2a",
+              "development_only": false,
+              "frozen_input_sha256": "c1e92eb8179c02e694041b87ae3ab3e222d9782d3986987a865c5383cfba46be",
+              "isolation": {
+                "mechanism": "systemd-cgroup-v2+bubblewrap",
+                "memory_max_bytes": 6442450944,
+                "memory_oom_group": true,
+                "memory_swap_max_bytes": 0
+              },
+              "manifest_sha256": "d5e54a409cc4aa4e1aa7a2b308bab3500124e90644071a210aab4fbce23f2597",
+              "metrics": {
+                "batch_timings": [
+                  {
+                    "seconds": 0.10115097300000286,
+                    "series": 1
+                  },
+                  {
+                    "seconds": 0.057179374000000394,
+                    "series": 1
+                  },
+                  {
+                    "seconds": 0.0565879490000043,
+                    "series": 1
+                  },
+                  {
+                    "seconds": 0.058428794999997535,
+                    "series": 1
+                  }
+                ],
+                "cgroup_cpu_seconds": 2.95381,
+                "cgroup_memory_peak_bytes": 1411121152,
+                "cpu_seconds": 2.91664579,
+                "failures": 0,
+                "load_seconds": 1.0315752540000034,
+                "peak_rss_bytes": 2076774400,
+                "resource_scope": "WHOLE_WORKER_CGROUP",
+                "wall_seconds": 2.9884698329999964
+              },
+              "model_revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+              "request_sha256": "587b945cbbaba5e9d408005963f33612d129a1e590c9616780be5b5c67e593e2",
+              "transport": "local_cpu",
+              "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8"
+            },
+            "risk_experts": [
+              {
+                "annualization": null,
+                "as_of": "2026-11-03T10:53:53.085313Z",
+                "authority": "RESEARCH_ONLY",
+                "baseline_comparison": {
+                  "action_handling": "SYNTHETIC_NONE_VERIFIED",
+                  "annualization": null,
+                  "ewma": 0.0020146745651857625,
+                  "ewma_lambda": 0.94,
+                  "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+                  "instrument": "600000.SH",
+                  "missing": 0,
+                  "naive": 0.00198287717715106,
+                  "observed_history_rms": 0.0019915685475384247,
+                  "observed_last_return": 0.0022428083861532055,
+                  "target": "rolling20_rms_daily_return_ratio",
+                  "unit": "daily_return_ratio",
+                  "window": 20
+                },
+                "calibration_status": "UNKNOWN_UNCALIBRATED",
+                "cost": {
+                  "actual_bill": "LOCAL_NO_BILLING",
+                  "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+                  "receipt": "parent_bundle.receipt"
+                },
+                "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+                "downside_metric": "UNKNOWN_UNCALIBRATED",
+                "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+                "forecast_horizons": [
+                  5,
+                  20
+                ],
+                "forecast_sessions": [
+                  "2026-11-04",
+                  "2026-11-05",
+                  "2026-11-06",
+                  "2026-11-09",
+                  "2026-11-10",
+                  "2026-11-11",
+                  "2026-11-12",
+                  "2026-11-13",
+                  "2026-11-16",
+                  "2026-11-17",
+                  "2026-11-18",
+                  "2026-11-19",
+                  "2026-11-20",
+                  "2026-11-23",
+                  "2026-11-24",
+                  "2026-11-25",
+                  "2026-11-26",
+                  "2026-11-27",
+                  "2026-11-30",
+                  "2026-12-01"
+                ],
+                "input_mode": "synthetic_test",
+                "instrument": "600000.SH",
+                "job_ref": null,
+                "market_regime": "NORMAL_VOLATILITY",
+                "quality_blockers": [
+                  "SYNTHETIC_ENGINEERING_ONLY"
+                ],
+                "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+                "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+                "schema_version": 1,
+                "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+                "snapshot_ref": "485d02c4730e402759745f5d99d6bcb25555255ef469db026e411f07a1c56ec6",
+                "target": "rolling20_rms_daily_return_ratio",
+                "uncertainty": "UNKNOWN_UNCALIBRATED",
+                "unit": "daily_return_ratio",
+                "volatility_forecast": [
+                  {
+                    "sessions": 5,
+                    "value_ratio": 0.001961427740752697
+                  },
+                  {
+                    "sessions": 20,
+                    "value_ratio": 0.001970303669804707
+                  }
+                ]
+              },
+              {
+                "annualization": null,
+                "as_of": "2026-11-03T10:53:53.085313Z",
+                "authority": "RESEARCH_ONLY",
+                "baseline_comparison": {
+                  "action_handling": "SYNTHETIC_NONE_VERIFIED",
+                  "annualization": null,
+                  "ewma": 0.0019460587158277335,
+                  "ewma_lambda": 0.94,
+                  "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+                  "instrument": "600001.SH",
+                  "missing": 0,
+                  "naive": 0.0019092029341587942,
+                  "observed_history_rms": 0.0019690191619224713,
+                  "observed_last_return": -0.00048661800486615725,
+                  "target": "rolling20_rms_daily_return_ratio",
+                  "unit": "daily_return_ratio",
+                  "window": 20
+                },
+                "calibration_status": "UNKNOWN_UNCALIBRATED",
+                "cost": {
+                  "actual_bill": "LOCAL_NO_BILLING",
+                  "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+                  "receipt": "parent_bundle.receipt"
+                },
+                "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+                "downside_metric": "UNKNOWN_UNCALIBRATED",
+                "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+                "forecast_horizons": [
+                  5,
+                  20
+                ],
+                "forecast_sessions": [
+                  "2026-11-04",
+                  "2026-11-05",
+                  "2026-11-06",
+                  "2026-11-09",
+                  "2026-11-10",
+                  "2026-11-11",
+                  "2026-11-12",
+                  "2026-11-13",
+                  "2026-11-16",
+                  "2026-11-17",
+                  "2026-11-18",
+                  "2026-11-19",
+                  "2026-11-20",
+                  "2026-11-23",
+                  "2026-11-24",
+                  "2026-11-25",
+                  "2026-11-26",
+                  "2026-11-27",
+                  "2026-11-30",
+                  "2026-12-01"
+                ],
+                "input_mode": "synthetic_test",
+                "instrument": "600001.SH",
+                "job_ref": null,
+                "market_regime": "NORMAL_VOLATILITY",
+                "quality_blockers": [
+                  "SYNTHETIC_ENGINEERING_ONLY"
+                ],
+                "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+                "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+                "schema_version": 1,
+                "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+                "snapshot_ref": "485d02c4730e402759745f5d99d6bcb25555255ef469db026e411f07a1c56ec6",
+                "target": "rolling20_rms_daily_return_ratio",
+                "uncertainty": "UNKNOWN_UNCALIBRATED",
+                "unit": "daily_return_ratio",
+                "volatility_forecast": [
+                  {
+                    "sessions": 5,
+                    "value_ratio": 0.001977492496371269
+                  },
+                  {
+                    "sessions": 20,
+                    "value_ratio": 0.0019686961313709617
+                  }
+                ]
+              },
+              {
+                "annualization": null,
+                "as_of": "2026-11-03T10:53:53.085313Z",
+                "authority": "RESEARCH_ONLY",
+                "baseline_comparison": {
+                  "action_handling": "SYNTHETIC_NONE_VERIFIED",
+                  "annualization": null,
+                  "ewma": 0.001971055509468887,
+                  "ewma_lambda": 0.94,
+                  "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+                  "instrument": "600002.SH",
+                  "missing": 0,
+                  "naive": 0.0019743656067288786,
+                  "observed_history_rms": 0.0019841372110331263,
+                  "observed_last_return": -0.0022401870069153063,
+                  "target": "rolling20_rms_daily_return_ratio",
+                  "unit": "daily_return_ratio",
+                  "window": 20
+                },
+                "calibration_status": "UNKNOWN_UNCALIBRATED",
+                "cost": {
+                  "actual_bill": "LOCAL_NO_BILLING",
+                  "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+                  "receipt": "parent_bundle.receipt"
+                },
+                "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+                "downside_metric": "UNKNOWN_UNCALIBRATED",
+                "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+                "forecast_horizons": [
+                  5,
+                  20
+                ],
+                "forecast_sessions": [
+                  "2026-11-04",
+                  "2026-11-05",
+                  "2026-11-06",
+                  "2026-11-09",
+                  "2026-11-10",
+                  "2026-11-11",
+                  "2026-11-12",
+                  "2026-11-13",
+                  "2026-11-16",
+                  "2026-11-17",
+                  "2026-11-18",
+                  "2026-11-19",
+                  "2026-11-20",
+                  "2026-11-23",
+                  "2026-11-24",
+                  "2026-11-25",
+                  "2026-11-26",
+                  "2026-11-27",
+                  "2026-11-30",
+                  "2026-12-01"
+                ],
+                "input_mode": "synthetic_test",
+                "instrument": "600002.SH",
+                "job_ref": null,
+                "market_regime": "NORMAL_VOLATILITY",
+                "quality_blockers": [
+                  "SYNTHETIC_ENGINEERING_ONLY"
+                ],
+                "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+                "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+                "schema_version": 1,
+                "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+                "snapshot_ref": "485d02c4730e402759745f5d99d6bcb25555255ef469db026e411f07a1c56ec6",
+                "target": "rolling20_rms_daily_return_ratio",
+                "uncertainty": "UNKNOWN_UNCALIBRATED",
+                "unit": "daily_return_ratio",
+                "volatility_forecast": [
+                  {
+                    "sessions": 5,
+                    "value_ratio": 0.0019655875861644746
+                  },
+                  {
+                    "sessions": 20,
+                    "value_ratio": 0.001968817750457674
+                  }
+                ]
+              },
+              {
+                "annualization": null,
+                "as_of": "2026-11-03T10:53:53.085313Z",
+                "authority": "RESEARCH_ONLY",
+                "baseline_comparison": {
+                  "action_handling": "SYNTHETIC_NONE_VERIFIED",
+                  "annualization": null,
+                  "ewma": 0.001966801573814683,
+                  "ewma_lambda": 0.94,
+                  "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+                  "instrument": "600003.SH",
+                  "missing": 0,
+                  "naive": 0.001964940657974201,
+                  "observed_history_rms": 0.0019830896422450696,
+                  "observed_last_return": -0.0018552875695733162,
+                  "target": "rolling20_rms_daily_return_ratio",
+                  "unit": "daily_return_ratio",
+                  "window": 20
+                },
+                "calibration_status": "UNKNOWN_UNCALIBRATED",
+                "cost": {
+                  "actual_bill": "LOCAL_NO_BILLING",
+                  "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+                  "receipt": "parent_bundle.receipt"
+                },
+                "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+                "downside_metric": "UNKNOWN_UNCALIBRATED",
+                "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+                "forecast_horizons": [
+                  5,
+                  20
+                ],
+                "forecast_sessions": [
+                  "2026-11-04",
+                  "2026-11-05",
+                  "2026-11-06",
+                  "2026-11-09",
+                  "2026-11-10",
+                  "2026-11-11",
+                  "2026-11-12",
+                  "2026-11-13",
+                  "2026-11-16",
+                  "2026-11-17",
+                  "2026-11-18",
+                  "2026-11-19",
+                  "2026-11-20",
+                  "2026-11-23",
+                  "2026-11-24",
+                  "2026-11-25",
+                  "2026-11-26",
+                  "2026-11-27",
+                  "2026-11-30",
+                  "2026-12-01"
+                ],
+                "input_mode": "synthetic_test",
+                "instrument": "600003.SH",
+                "job_ref": null,
+                "market_regime": "NORMAL_VOLATILITY",
+                "quality_blockers": [
+                  "SYNTHETIC_ENGINEERING_ONLY"
+                ],
+                "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+                "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+                "schema_version": 1,
+                "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+                "snapshot_ref": "485d02c4730e402759745f5d99d6bcb25555255ef469db026e411f07a1c56ec6",
+                "target": "rolling20_rms_daily_return_ratio",
+                "uncertainty": "UNKNOWN_UNCALIBRATED",
+                "unit": "daily_return_ratio",
+                "volatility_forecast": [
+                  {
+                    "sessions": 5,
+                    "value_ratio": 0.001961161382496357
+                  },
+                  {
+                    "sessions": 20,
+                    "value_ratio": 0.0019679985125549138
+                  }
+                ]
+              }
+            ],
+            "schema_version": 1
+          }
+        },
+        "worker_response": {
+          "clamp_count": 0,
+          "clamp_policy": "REJECT_NEGATIVE_NO_CLAMP",
+          "forecasts": [
+            {
+              "instrument": "600000.SH",
+              "values": [
+                0.0019206232391297817,
+                0.0020111820194870234,
+                0.001957332482561469,
+                0.0019093400333076715,
+                0.0020086609292775393,
+                0.0019928733818233013,
+                0.0019505838863551617,
+                0.0019839215092360973,
+                0.001978184562176466,
+                0.0019509514095261693,
+                0.001977891195565462,
+                0.0019851108081638813,
+                0.0019680492114275694,
+                0.001976844621822238,
+                0.0019760122522711754,
+                0.0019603711552917957,
+                0.001969203818589449,
+                0.001978962915018201,
+                0.001975341932848096,
+                0.0019746320322155952
+              ]
+            },
+            {
+              "instrument": "600001.SH",
+              "values": [
+                0.002006181748583913,
+                0.0019676468800753355,
+                0.0019251848571002483,
+                0.002001277869567275,
+                0.0019871711265295744,
+                0.00194587092846632,
+                0.0019761393778026104,
+                0.0019723272416740656,
+                0.0019457717426121235,
+                0.001975143561139703,
+                0.001977928215637803,
+                0.0019593762699514627,
+                0.0019574749749153852,
+                0.001974480925127864,
+                0.00196721195243299,
+                0.0019651332404464483,
+                0.0019671821501106024,
+                0.001971583813428879,
+                0.001967436634004116,
+                0.0019633991178125143
+              ]
+            },
+            {
+              "instrument": "600002.SH",
+              "values": [
+                0.0019707700703293085,
+                0.0019293290097266436,
+                0.001997352112084627,
+                0.001989798154681921,
+                0.0019406885839998722,
+                0.001972537487745285,
+                0.001969228032976389,
+                0.0019500970374792814,
+                0.0019797340501099825,
+                0.0019718825351446867,
+                0.0019636729266494513,
+                0.00196671299636364,
+                0.0019717381801456213,
+                0.001971289049834013,
+                0.0019689856562763453,
+                0.0019729011692106724,
+                0.001972491852939129,
+                0.001972378231585026,
+                0.0019705554004758596,
+                0.001974212471395731
+              ]
+            },
+            {
+              "instrument": "600003.SH",
+              "values": [
+                0.0019047714304178953,
+                0.0020232212264090776,
+                0.001995573053136468,
+                0.0019078750628978014,
+                0.0019743661396205425,
+                0.0019776623230427504,
+                0.0019434455316513777,
+                0.0019780676811933517,
+                0.0019976228941231966,
+                0.001953686820343137,
+                0.0019655595533549786,
+                0.001967086223885417,
+                0.001961958594620228,
+                0.0019708822946995497,
+                0.0019791314844042063,
+                0.0019652843475341797,
+                0.0019717554096132517,
+                0.001975666731595993,
+                0.0019741463474929333,
+                0.00197220710106194
+              ]
+            }
+          ],
+          "isolation": {
+            "mechanism": "systemd-cgroup-v2+bubblewrap",
+            "memory_max_bytes": 6442450944,
+            "memory_oom_group": true,
+            "memory_swap_max_bytes": 0
+          },
+          "metrics": {
+            "batch_timings": [
+              {
+                "seconds": 0.10115097300000286,
+                "series": 1
+              },
+              {
+                "seconds": 0.057179374000000394,
+                "series": 1
+              },
+              {
+                "seconds": 0.0565879490000043,
+                "series": 1
+              },
+              {
+                "seconds": 0.058428794999997535,
+                "series": 1
+              }
+            ],
+            "cgroup_cpu_seconds": 2.95381,
+            "cgroup_memory_peak_bytes": 1411121152,
+            "cpu_seconds": 2.91664579,
+            "failures": 0,
+            "load_seconds": 1.0315752540000034,
+            "peak_rss_bytes": 2076774400,
+            "resource_scope": "WHOLE_WORKER_CGROUP",
+            "wall_seconds": 2.9884698329999964
+          },
+          "model_revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+          "request_sha256": "587b945cbbaba5e9d408005963f33612d129a1e590c9616780be5b5c67e593e2",
+          "schema_version": 1,
+          "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8"
+        }
+      },
+      "billing": "LOCAL_NO_BILLING",
+      "paper_allowed": false,
+      "live_allowed": false
+    }
+  },
+  {
+    "argv": [
+      "python3.12",
+      "-B",
+      "scripts/timesfm-cpu.py",
+      "verify",
+      "--name",
+      "linux-real-risk"
+    ],
+    "exit": 0,
+    "wall_seconds": 0.4345325680000087,
+    "output": {
+      "id": "1",
+      "state": "completed",
+      "reason": "LOCAL_NO_BILLING",
+      "provider_hash": "42fb2034e1d4ebf0230899051b9944ae2c20d913d3228a1a5357c91a1af28538",
+      "result": {
+        "backend": "TimesFM 2.5 CPU",
+        "billing": "LOCAL_NO_BILLING",
+        "research": {
+          "risk_portfolio": {
+            "authority": "RESEARCH_ONLY",
+            "can_execute_forward_paper": false,
+            "eligibility": "ELIGIBILITY_DENIED",
+            "live_allowed": false,
+            "paper_allowed": false,
+            "receipt": {
+              "billing": "LOCAL_NO_BILLING",
+              "clamp_count": 0,
+              "clamp_policy": "REJECT_NEGATIVE_NO_CLAMP",
+              "code_sha256": "26c92639fd78b143c4bd400988f447f29fcb52294319734555bae14efe669f2a",
+              "development_only": false,
+              "frozen_input_sha256": "c1e92eb8179c02e694041b87ae3ab3e222d9782d3986987a865c5383cfba46be",
+              "isolation": {
+                "mechanism": "systemd-cgroup-v2+bubblewrap",
+                "memory_max_bytes": 6442450944,
+                "memory_oom_group": true,
+                "memory_swap_max_bytes": 0
+              },
+              "manifest_sha256": "d5e54a409cc4aa4e1aa7a2b308bab3500124e90644071a210aab4fbce23f2597",
+              "metrics": {
+                "batch_timings": [
+                  {
+                    "seconds": 0.10115097300000286,
+                    "series": 1
+                  },
+                  {
+                    "seconds": 0.057179374000000394,
+                    "series": 1
+                  },
+                  {
+                    "seconds": 0.0565879490000043,
+                    "series": 1
+                  },
+                  {
+                    "seconds": 0.058428794999997535,
+                    "series": 1
+                  }
+                ],
+                "cgroup_cpu_seconds": 2.95381,
+                "cgroup_memory_peak_bytes": 1411121152,
+                "cpu_seconds": 2.91664579,
+                "failures": 0,
+                "load_seconds": 1.0315752540000034,
+                "peak_rss_bytes": 2076774400,
+                "resource_scope": "WHOLE_WORKER_CGROUP",
+                "wall_seconds": 2.9884698329999964
+              },
+              "model_revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+              "request_sha256": "587b945cbbaba5e9d408005963f33612d129a1e590c9616780be5b5c67e593e2",
+              "transport": "local_cpu",
+              "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8"
+            },
+            "risk_experts": [
+              {
+                "annualization": null,
+                "as_of": "2026-11-03T10:53:53.085313Z",
+                "authority": "RESEARCH_ONLY",
+                "baseline_comparison": {
+                  "action_handling": "SYNTHETIC_NONE_VERIFIED",
+                  "annualization": null,
+                  "ewma": 0.0020146745651857625,
+                  "ewma_lambda": 0.94,
+                  "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+                  "instrument": "600000.SH",
+                  "missing": 0,
+                  "naive": 0.00198287717715106,
+                  "observed_history_rms": 0.0019915685475384247,
+                  "observed_last_return": 0.0022428083861532055,
+                  "target": "rolling20_rms_daily_return_ratio",
+                  "unit": "daily_return_ratio",
+                  "window": 20
+                },
+                "calibration_status": "UNKNOWN_UNCALIBRATED",
+                "cost": {
+                  "actual_bill": "LOCAL_NO_BILLING",
+                  "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+                  "receipt": "parent_bundle.receipt"
+                },
+                "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+                "downside_metric": "UNKNOWN_UNCALIBRATED",
+                "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+                "forecast_horizons": [
+                  5,
+                  20
+                ],
+                "forecast_sessions": [
+                  "2026-11-04",
+                  "2026-11-05",
+                  "2026-11-06",
+                  "2026-11-09",
+                  "2026-11-10",
+                  "2026-11-11",
+                  "2026-11-12",
+                  "2026-11-13",
+                  "2026-11-16",
+                  "2026-11-17",
+                  "2026-11-18",
+                  "2026-11-19",
+                  "2026-11-20",
+                  "2026-11-23",
+                  "2026-11-24",
+                  "2026-11-25",
+                  "2026-11-26",
+                  "2026-11-27",
+                  "2026-11-30",
+                  "2026-12-01"
+                ],
+                "input_mode": "synthetic_test",
+                "instrument": "600000.SH",
+                "job_ref": null,
+                "market_regime": "NORMAL_VOLATILITY",
+                "quality_blockers": [
+                  "SYNTHETIC_ENGINEERING_ONLY"
+                ],
+                "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+                "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+                "schema_version": 1,
+                "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+                "snapshot_ref": "485d02c4730e402759745f5d99d6bcb25555255ef469db026e411f07a1c56ec6",
+                "target": "rolling20_rms_daily_return_ratio",
+                "uncertainty": "UNKNOWN_UNCALIBRATED",
+                "unit": "daily_return_ratio",
+                "volatility_forecast": [
+                  {
+                    "sessions": 5,
+                    "value_ratio": 0.001961427740752697
+                  },
+                  {
+                    "sessions": 20,
+                    "value_ratio": 0.001970303669804707
+                  }
+                ]
+              },
+              {
+                "annualization": null,
+                "as_of": "2026-11-03T10:53:53.085313Z",
+                "authority": "RESEARCH_ONLY",
+                "baseline_comparison": {
+                  "action_handling": "SYNTHETIC_NONE_VERIFIED",
+                  "annualization": null,
+                  "ewma": 0.0019460587158277335,
+                  "ewma_lambda": 0.94,
+                  "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+                  "instrument": "600001.SH",
+                  "missing": 0,
+                  "naive": 0.0019092029341587942,
+                  "observed_history_rms": 0.0019690191619224713,
+                  "observed_last_return": -0.00048661800486615725,
+                  "target": "rolling20_rms_daily_return_ratio",
+                  "unit": "daily_return_ratio",
+                  "window": 20
+                },
+                "calibration_status": "UNKNOWN_UNCALIBRATED",
+                "cost": {
+                  "actual_bill": "LOCAL_NO_BILLING",
+                  "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+                  "receipt": "parent_bundle.receipt"
+                },
+                "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+                "downside_metric": "UNKNOWN_UNCALIBRATED",
+                "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+                "forecast_horizons": [
+                  5,
+                  20
+                ],
+                "forecast_sessions": [
+                  "2026-11-04",
+                  "2026-11-05",
+                  "2026-11-06",
+                  "2026-11-09",
+                  "2026-11-10",
+                  "2026-11-11",
+                  "2026-11-12",
+                  "2026-11-13",
+                  "2026-11-16",
+                  "2026-11-17",
+                  "2026-11-18",
+                  "2026-11-19",
+                  "2026-11-20",
+                  "2026-11-23",
+                  "2026-11-24",
+                  "2026-11-25",
+                  "2026-11-26",
+                  "2026-11-27",
+                  "2026-11-30",
+                  "2026-12-01"
+                ],
+                "input_mode": "synthetic_test",
+                "instrument": "600001.SH",
+                "job_ref": null,
+                "market_regime": "NORMAL_VOLATILITY",
+                "quality_blockers": [
+                  "SYNTHETIC_ENGINEERING_ONLY"
+                ],
+                "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+                "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+                "schema_version": 1,
+                "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+                "snapshot_ref": "485d02c4730e402759745f5d99d6bcb25555255ef469db026e411f07a1c56ec6",
+                "target": "rolling20_rms_daily_return_ratio",
+                "uncertainty": "UNKNOWN_UNCALIBRATED",
+                "unit": "daily_return_ratio",
+                "volatility_forecast": [
+                  {
+                    "sessions": 5,
+                    "value_ratio": 0.001977492496371269
+                  },
+                  {
+                    "sessions": 20,
+                    "value_ratio": 0.0019686961313709617
+                  }
+                ]
+              },
+              {
+                "annualization": null,
+                "as_of": "2026-11-03T10:53:53.085313Z",
+                "authority": "RESEARCH_ONLY",
+                "baseline_comparison": {
+                  "action_handling": "SYNTHETIC_NONE_VERIFIED",
+                  "annualization": null,
+                  "ewma": 0.001971055509468887,
+                  "ewma_lambda": 0.94,
+                  "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+                  "instrument": "600002.SH",
+                  "missing": 0,
+                  "naive": 0.0019743656067288786,
+                  "observed_history_rms": 0.0019841372110331263,
+                  "observed_last_return": -0.0022401870069153063,
+                  "target": "rolling20_rms_daily_return_ratio",
+                  "unit": "daily_return_ratio",
+                  "window": 20
+                },
+                "calibration_status": "UNKNOWN_UNCALIBRATED",
+                "cost": {
+                  "actual_bill": "LOCAL_NO_BILLING",
+                  "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+                  "receipt": "parent_bundle.receipt"
+                },
+                "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+                "downside_metric": "UNKNOWN_UNCALIBRATED",
+                "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+                "forecast_horizons": [
+                  5,
+                  20
+                ],
+                "forecast_sessions": [
+                  "2026-11-04",
+                  "2026-11-05",
+                  "2026-11-06",
+                  "2026-11-09",
+                  "2026-11-10",
+                  "2026-11-11",
+                  "2026-11-12",
+                  "2026-11-13",
+                  "2026-11-16",
+                  "2026-11-17",
+                  "2026-11-18",
+                  "2026-11-19",
+                  "2026-11-20",
+                  "2026-11-23",
+                  "2026-11-24",
+                  "2026-11-25",
+                  "2026-11-26",
+                  "2026-11-27",
+                  "2026-11-30",
+                  "2026-12-01"
+                ],
+                "input_mode": "synthetic_test",
+                "instrument": "600002.SH",
+                "job_ref": null,
+                "market_regime": "NORMAL_VOLATILITY",
+                "quality_blockers": [
+                  "SYNTHETIC_ENGINEERING_ONLY"
+                ],
+                "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+                "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+                "schema_version": 1,
+                "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+                "snapshot_ref": "485d02c4730e402759745f5d99d6bcb25555255ef469db026e411f07a1c56ec6",
+                "target": "rolling20_rms_daily_return_ratio",
+                "uncertainty": "UNKNOWN_UNCALIBRATED",
+                "unit": "daily_return_ratio",
+                "volatility_forecast": [
+                  {
+                    "sessions": 5,
+                    "value_ratio": 0.0019655875861644746
+                  },
+                  {
+                    "sessions": 20,
+                    "value_ratio": 0.001968817750457674
+                  }
+                ]
+              },
+              {
+                "annualization": null,
+                "as_of": "2026-11-03T10:53:53.085313Z",
+                "authority": "RESEARCH_ONLY",
+                "baseline_comparison": {
+                  "action_handling": "SYNTHETIC_NONE_VERIFIED",
+                  "annualization": null,
+                  "ewma": 0.001966801573814683,
+                  "ewma_lambda": 0.94,
+                  "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+                  "instrument": "600003.SH",
+                  "missing": 0,
+                  "naive": 0.001964940657974201,
+                  "observed_history_rms": 0.0019830896422450696,
+                  "observed_last_return": -0.0018552875695733162,
+                  "target": "rolling20_rms_daily_return_ratio",
+                  "unit": "daily_return_ratio",
+                  "window": 20
+                },
+                "calibration_status": "UNKNOWN_UNCALIBRATED",
+                "cost": {
+                  "actual_bill": "LOCAL_NO_BILLING",
+                  "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+                  "receipt": "parent_bundle.receipt"
+                },
+                "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+                "downside_metric": "UNKNOWN_UNCALIBRATED",
+                "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+                "forecast_horizons": [
+                  5,
+                  20
+                ],
+                "forecast_sessions": [
+                  "2026-11-04",
+                  "2026-11-05",
+                  "2026-11-06",
+                  "2026-11-09",
+                  "2026-11-10",
+                  "2026-11-11",
+                  "2026-11-12",
+                  "2026-11-13",
+                  "2026-11-16",
+                  "2026-11-17",
+                  "2026-11-18",
+                  "2026-11-19",
+                  "2026-11-20",
+                  "2026-11-23",
+                  "2026-11-24",
+                  "2026-11-25",
+                  "2026-11-26",
+                  "2026-11-27",
+                  "2026-11-30",
+                  "2026-12-01"
+                ],
+                "input_mode": "synthetic_test",
+                "instrument": "600003.SH",
+                "job_ref": null,
+                "market_regime": "NORMAL_VOLATILITY",
+                "quality_blockers": [
+                  "SYNTHETIC_ENGINEERING_ONLY"
+                ],
+                "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+                "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+                "schema_version": 1,
+                "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+                "snapshot_ref": "485d02c4730e402759745f5d99d6bcb25555255ef469db026e411f07a1c56ec6",
+                "target": "rolling20_rms_daily_return_ratio",
+                "uncertainty": "UNKNOWN_UNCALIBRATED",
+                "unit": "daily_return_ratio",
+                "volatility_forecast": [
+                  {
+                    "sessions": 5,
+                    "value_ratio": 0.001961161382496357
+                  },
+                  {
+                    "sessions": 20,
+                    "value_ratio": 0.0019679985125549138
+                  }
+                ]
+              }
+            ],
+            "schema_version": 1
+          }
+        },
+        "worker_response": {
+          "clamp_count": 0,
+          "clamp_policy": "REJECT_NEGATIVE_NO_CLAMP",
+          "forecasts": [
+            {
+              "instrument": "600000.SH",
+              "values": [
+                0.0019206232391297817,
+                0.0020111820194870234,
+                0.001957332482561469,
+                0.0019093400333076715,
+                0.0020086609292775393,
+                0.0019928733818233013,
+                0.0019505838863551617,
+                0.0019839215092360973,
+                0.001978184562176466,
+                0.0019509514095261693,
+                0.001977891195565462,
+                0.0019851108081638813,
+                0.0019680492114275694,
+                0.001976844621822238,
+                0.0019760122522711754,
+                0.0019603711552917957,
+                0.001969203818589449,
+                0.001978962915018201,
+                0.001975341932848096,
+                0.0019746320322155952
+              ]
+            },
+            {
+              "instrument": "600001.SH",
+              "values": [
+                0.002006181748583913,
+                0.0019676468800753355,
+                0.0019251848571002483,
+                0.002001277869567275,
+                0.0019871711265295744,
+                0.00194587092846632,
+                0.0019761393778026104,
+                0.0019723272416740656,
+                0.0019457717426121235,
+                0.001975143561139703,
+                0.001977928215637803,
+                0.0019593762699514627,
+                0.0019574749749153852,
+                0.001974480925127864,
+                0.00196721195243299,
+                0.0019651332404464483,
+                0.0019671821501106024,
+                0.001971583813428879,
+                0.001967436634004116,
+                0.0019633991178125143
+              ]
+            },
+            {
+              "instrument": "600002.SH",
+              "values": [
+                0.0019707700703293085,
+                0.0019293290097266436,
+                0.001997352112084627,
+                0.001989798154681921,
+                0.0019406885839998722,
+                0.001972537487745285,
+                0.001969228032976389,
+                0.0019500970374792814,
+                0.0019797340501099825,
+                0.0019718825351446867,
+                0.0019636729266494513,
+                0.00196671299636364,
+                0.0019717381801456213,
+                0.001971289049834013,
+                0.0019689856562763453,
+                0.0019729011692106724,
+                0.001972491852939129,
+                0.001972378231585026,
+                0.0019705554004758596,
+                0.001974212471395731
+              ]
+            },
+            {
+              "instrument": "600003.SH",
+              "values": [
+                0.0019047714304178953,
+                0.0020232212264090776,
+                0.001995573053136468,
+                0.0019078750628978014,
+                0.0019743661396205425,
+                0.0019776623230427504,
+                0.0019434455316513777,
+                0.0019780676811933517,
+                0.0019976228941231966,
+                0.001953686820343137,
+                0.0019655595533549786,
+                0.001967086223885417,
+                0.001961958594620228,
+                0.0019708822946995497,
+                0.0019791314844042063,
+                0.0019652843475341797,
+                0.0019717554096132517,
+                0.001975666731595993,
+                0.0019741463474929333,
+                0.00197220710106194
+              ]
+            }
+          ],
+          "isolation": {
+            "mechanism": "systemd-cgroup-v2+bubblewrap",
+            "memory_max_bytes": 6442450944,
+            "memory_oom_group": true,
+            "memory_swap_max_bytes": 0
+          },
+          "metrics": {
+            "batch_timings": [
+              {
+                "seconds": 0.10115097300000286,
+                "series": 1
+              },
+              {
+                "seconds": 0.057179374000000394,
+                "series": 1
+              },
+              {
+                "seconds": 0.0565879490000043,
+                "series": 1
+              },
+              {
+                "seconds": 0.058428794999997535,
+                "series": 1
+              }
+            ],
+            "cgroup_cpu_seconds": 2.95381,
+            "cgroup_memory_peak_bytes": 1411121152,
+            "cpu_seconds": 2.91664579,
+            "failures": 0,
+            "load_seconds": 1.0315752540000034,
+            "peak_rss_bytes": 2076774400,
+            "resource_scope": "WHOLE_WORKER_CGROUP",
+            "wall_seconds": 2.9884698329999964
+          },
+          "model_revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+          "request_sha256": "587b945cbbaba5e9d408005963f33612d129a1e590c9616780be5b5c67e593e2",
+          "schema_version": 1,
+          "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8"
+        }
+      },
+      "billing": "LOCAL_NO_BILLING",
+      "paper_allowed": false,
+      "live_allowed": false,
+      "verified": true
+    }
+  },
+  {
+    "argv": [
+      "python3.12",
+      "-B",
+      "scripts/timesfm-cpu.py",
+      "stop"
+    ],
+    "exit": 0,
+    "wall_seconds": 0.059826193000006356,
+    "output": {
+      "state": "STOPPED",
+      "billing": "LOCAL_NO_BILLING"
+    }
+  }
+]

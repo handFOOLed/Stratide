@@ -6,6 +6,7 @@ pub mod multimodal;
 pub mod provider;
 pub mod risk_binding;
 pub mod risk_cloud;
+pub mod risk_cpu;
 pub mod risk_portfolio;
 #[cfg(test)]
 mod risk_portfolio_tests;

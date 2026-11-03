@@ -1,0 +1,98 @@
+{
+  "label": "WSL2_EXT4_LINUX_CPU_ENGINEERING_ACCEPTANCE",
+  "collected_at": "2026-11-03T11:16:15.732657+00:00",
+  "N100_ACCEPTANCE": "NOT_VERIFIED",
+  "os_release": {
+    "PRETTY_NAME": "Ubuntu 24.04.5 LTS",
+    "NAME": "Ubuntu",
+    "VERSION_ID": "24.04",
+    "VERSION": "24.04.5 LTS (Noble Numbat)"
+  },
+  "kernel": "6.18.54.1-microsoft-standard-WSL2",
+  "python": "3.12.3",
+  "uid": 1000,
+  "rust": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "systemd": "systemd 255 (255.4-1ubuntu8.17)",
+  "user_manager": "running",
+  "bubblewrap": "bubblewrap 0.9.0",
+  "filesystems": {
+    "worktree": "ext4",
+    "venv": "ext4",
+    "model": "ext4",
+    "cargo_target": "ext4"
+  },
+  "cgroup_type": "cgroup2fs",
+  "cgroup_controllers": [
+    "cpuset",
+    "cpu",
+    "io",
+    "memory",
+    "hugetlb",
+    "pids",
+    "rdma"
+  ],
+  "cpu_model": "AMD Ryzen 7 9700X 8-Core Processor",
+  "logical_cpus": 16,
+  "host_memtotal_bytes": 16590467072,
+  "dependency_versions": {
+    "timesfm": "2.0.2",
+    "torch": "2.8.0+cpu",
+    "numpy": "2.2.6",
+    "huggingface-hub": "0.34.4",
+    "safetensors": "0.6.2",
+    "filelock": "3.19.1",
+    "fsspec": "2025.9.0",
+    "Jinja2": "3.1.6",
+    "MarkupSafe": "3.0.2",
+    "networkx": "3.5",
+    "setuptools": "78.1.0",
+    "sympy": "1.14.0",
+    "mpmath": "1.3.0",
+    "typing-extensions": "4.15.0",
+    "hf-xet": "1.1.9",
+    "packaging": "25.0",
+    "PyYAML": "6.0.2",
+    "requests": "2.32.5",
+    "charset-normalizer": "3.4.3",
+    "idna": "3.10",
+    "urllib3": "2.5.0",
+    "certifi": "2025.8.3",
+    "tqdm": "4.67.1",
+    "InquirerPy": "0.3.4",
+    "pfzy": "0.3.4",
+    "prompt-toolkit": "3.0.52",
+    "wcwidth": "0.2.13"
+  },
+  "dependencies_excluded_by_platform_marker": [
+    "colorama==0.4.6; sys_platform == \"win32\""
+  ],
+  "torch_cuda_build": null,
+  "torch_cuda_available": false,
+  "model": {
+    "model": "google/timesfm-2.5-200m-pytorch",
+    "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+    "license": "Apache-2.0",
+    "files": {
+      "model.safetensors": {
+        "bytes": 925181104,
+        "sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8"
+      },
+      "config.json": {
+        "bytes": 475,
+        "sha256": "cd3315b760d5cc7e278d7afdf41b897031ced888fc6c115bd9b3ac0ea2c47408"
+      },
+      "README.md": {
+        "bytes": 2496,
+        "sha256": "4c3f16633a3d8b9324904bf004429aced2ee009b84e64effb59a902520cc7f2e"
+      },
+      "LICENSE": {
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      }
+    }
+  },
+  "main_sha": "b62c1171d8503e1f21e4b470847944c6fbe8dbf4",
+  "implementation_start_sha": "e8ef8b8d97488432872b4ac224cbd5780f3a11af",
+  "main_worktree_clean": true
+}

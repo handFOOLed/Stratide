@@ -4,6 +4,8 @@
 
 ## Domains and trust boundaries
 
+**Owner-settled exception (2026-11-03 / #69):** TimesFM 2.5 200M forecasting runs in an on-demand offline CPU Python Worker, outside the Rust core, with N100 x86_64 Linux as its deployment target. This specific authorization supersedes the generic no-local-inference wording for this forecasting Worker only; LLM/cloud, budget and trading authority are unchanged. See [M2-PR18](M2_PR18.md) for fixed artifacts, lifecycle and OS isolation.
+
 ```text
 Cloud LLM API ---> Research Orchestrator ---> Isolated Research Worker
                          |                         |

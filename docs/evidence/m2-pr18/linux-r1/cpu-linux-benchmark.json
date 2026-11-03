@@ -1,0 +1,879 @@
+{
+  "label": "DEVELOPMENT_CPU_BENCHMARK",
+  "N100_ACCEPTANCE": "NOT_VERIFIED",
+  "machine": {
+    "cpu": "AMD Ryzen 7 9700X 8-Core Processor",
+    "logical_threads": 16,
+    "physical_cores": 8,
+    "physical_cores_status": "MEASURED",
+    "memory_bytes": 16590467072,
+    "system": "Linux",
+    "release": "6.18.54.1-microsoft-standard-WSL2",
+    "architecture": "x86_64",
+    "python": "3.12.3"
+  },
+  "manifest": {
+    "schema_version": 1,
+    "model": "google/timesfm-2.5-200m-pytorch",
+    "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+    "license": "Apache-2.0",
+    "versions": {
+      "timesfm": "2.0.2",
+      "torch": "2.8.0+cpu",
+      "numpy": "2.2.6",
+      "huggingface-hub": "0.34.4",
+      "safetensors": "0.6.2"
+    },
+    "files": {
+      "model.safetensors": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+      "config.json": "cd3315b760d5cc7e278d7afdf41b897031ced888fc6c115bd9b3ac0ea2c47408",
+      "README.md": "4c3f16633a3d8b9324904bf004429aced2ee009b84e64effb59a902520cc7f2e",
+      "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    }
+  },
+  "model_manifest_sha256": "d5e54a409cc4aa4e1aa7a2b308bab3500124e90644071a210aab4fbce23f2597",
+  "memory_budget_bytes": 6442450944,
+  "isolation_acceptance": "MEASURED_BY_WORKER",
+  "matrix": [
+    {
+      "series": 10,
+      "context": 64,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 4.507105913999965,
+      "load_seconds": 1.0443815820000282,
+      "first_batch_seconds": 0.07347357899999452,
+      "worker_wall_seconds": 4.158230474999982,
+      "cpu_seconds": 5.340961194,
+      "hot_per_series_p50_seconds": 0.048701331000017944,
+      "hot_per_series_p95_seconds": 0.05165417000000616,
+      "hot_per_series_mean_seconds": 0.04948063415000377,
+      "peak_rss_bytes": 2076917760,
+      "process_resources": {
+        "cgroup_memory_peak_bytes": 1389416448,
+        "cgroup_cpu_seconds": 5.392565,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      },
+      "output_sha256": "2355b12970633e357ec079d1548a396e6b5adfabfe3060c1cb55c395431c474f",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      }
+    },
+    {
+      "series": 30,
+      "context": 64,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 7.00766942599995,
+      "load_seconds": 0.9416339270000549,
+      "first_batch_seconds": 0.04858955200000992,
+      "worker_wall_seconds": 6.426796992999982,
+      "cpu_seconds": 10.969186506,
+      "hot_per_series_p50_seconds": 0.050223334999998315,
+      "hot_per_series_p95_seconds": 0.05287444299995059,
+      "hot_per_series_mean_seconds": 0.050061194816665495,
+      "peak_rss_bytes": 2077585408,
+      "process_resources": {
+        "cgroup_memory_peak_bytes": 1078874112,
+        "cgroup_cpu_seconds": 11.005587,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      },
+      "output_sha256": "10a848fa21674f430d14489c8580410a92087812cb3b90494d812e47e3b8dd34",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      }
+    },
+    {
+      "series": 50,
+      "context": 64,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 10.06342701699998,
+      "load_seconds": 1.0430434680000076,
+      "first_batch_seconds": 0.05208768099998906,
+      "worker_wall_seconds": 9.540876403000027,
+      "cpu_seconds": 17.152417841000002,
+      "hot_per_series_p50_seconds": 0.050325176499995905,
+      "hot_per_series_p95_seconds": 0.054037311000001864,
+      "hot_per_series_mean_seconds": 0.050290979769998786,
+      "peak_rss_bytes": 2077741056,
+      "process_resources": {
+        "cgroup_memory_peak_bytes": 1079402496,
+        "cgroup_cpu_seconds": 17.188412,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      },
+      "output_sha256": "045b546844447e87140db2227b594edb2a3b775319f8dd9ec85a2de6abc1048a",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      }
+    },
+    {
+      "series": 100,
+      "context": 64,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 17.07053115100001,
+      "load_seconds": 0.7645759640000165,
+      "first_batch_seconds": 0.05156217699999388,
+      "worker_wall_seconds": 16.655222412,
+      "cpu_seconds": 31.670290732,
+      "hot_per_series_p50_seconds": 0.04863868350000189,
+      "hot_per_series_p95_seconds": 0.05814869300002101,
+      "hot_per_series_mean_seconds": 0.050204789424998925,
+      "peak_rss_bytes": 2077990912,
+      "process_resources": {
+        "cgroup_memory_peak_bytes": 1079201792,
+        "cgroup_cpu_seconds": 31.711633,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      },
+      "output_sha256": "bd0a7ba3431881042612005382a22ff9770cc1b8a2340e8a229458eeb08ce8e4",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      }
+    },
+    {
+      "series": 10,
+      "context": 128,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 4.006276808999985,
+      "load_seconds": 1.0135303980000003,
+      "first_batch_seconds": 0.058952253000029486,
+      "worker_wall_seconds": 3.705628998000009,
+      "cpu_seconds": 5.527457536,
+      "hot_per_series_p50_seconds": 0.05623332499999378,
+      "hot_per_series_p95_seconds": 0.06466379799996957,
+      "hot_per_series_mean_seconds": 0.05822086509999167,
+      "peak_rss_bytes": 2077560832,
+      "process_resources": {
+        "cgroup_memory_peak_bytes": 1090703360,
+        "cgroup_cpu_seconds": 5.562658,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      },
+      "output_sha256": "4a3c4721a5dba75f6732dca8bc1c20d473f9d261d58b7e5b112a8b3e06718a9a",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      }
+    },
+    {
+      "series": 30,
+      "context": 128,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 7.071403361000023,
+      "load_seconds": 0.6892267079999783,
+      "first_batch_seconds": 0.059338913999965825,
+      "worker_wall_seconds": 6.59628277500002,
+      "cpu_seconds": 11.650842699,
+      "hot_per_series_p50_seconds": 0.05432112200000461,
+      "hot_per_series_p95_seconds": 0.057723224000028495,
+      "hot_per_series_mean_seconds": 0.05479171350000058,
+      "peak_rss_bytes": 2077831168,
+      "process_resources": {
+        "cgroup_memory_peak_bytes": 1088868352,
+        "cgroup_cpu_seconds": 11.686077,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      },
+      "output_sha256": "eae1270f89589cf6b2fe7ab250f88e090ea7bee7d9149532bae766baa8e232ee",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      }
+    },
+    {
+      "series": 50,
+      "context": 128,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 11.06297433200001,
+      "load_seconds": 0.9825761889999853,
+      "first_batch_seconds": 0.06265795599995272,
+      "worker_wall_seconds": 10.392134991999967,
+      "cpu_seconds": 18.973359387000002,
+      "hot_per_series_p50_seconds": 0.05485440999999014,
+      "hot_per_series_p95_seconds": 0.06291600200000858,
+      "hot_per_series_mean_seconds": 0.056237657799999854,
+      "peak_rss_bytes": 2078040064,
+      "process_resources": {
+        "cgroup_memory_peak_bytes": 1089925120,
+        "cgroup_cpu_seconds": 19.012259,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      },
+      "output_sha256": "c092b103d95464c3698d82df1cb5c6d80e8029823644635fb72cea96a788549b",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      }
+    },
+    {
+      "series": 100,
+      "context": 128,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 19.576257528999975,
+      "load_seconds": 1.0007080160000328,
+      "first_batch_seconds": 0.06220423499996741,
+      "worker_wall_seconds": 18.90338280499998,
+      "cpu_seconds": 35.886340728,
+      "hot_per_series_p50_seconds": 0.05578930800001558,
+      "hot_per_series_p95_seconds": 0.06307291800004577,
+      "hot_per_series_mean_seconds": 0.05679774885999933,
+      "peak_rss_bytes": 2078416896,
+      "process_resources": {
+        "cgroup_memory_peak_bytes": 1090105344,
+        "cgroup_cpu_seconds": 35.925511,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      },
+      "output_sha256": "7e6fccbf4e5fbf7585fed064efbea70595673a010bd860a9a0344a7de6596365",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      }
+    },
+    {
+      "series": 10,
+      "context": 256,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 4.007167017000029,
+      "load_seconds": 0.8551453120000474,
+      "first_batch_seconds": 0.06371748399999433,
+      "worker_wall_seconds": 3.6254110790000027,
+      "cpu_seconds": 5.542956396,
+      "hot_per_series_p50_seconds": 0.05932974800001034,
+      "hot_per_series_p95_seconds": 0.06804790099999991,
+      "hot_per_series_mean_seconds": 0.060713180850001436,
+      "peak_rss_bytes": 2077716480,
+      "process_resources": {
+        "cgroup_memory_peak_bytes": 1100419072,
+        "cgroup_cpu_seconds": 5.5794,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      },
+      "output_sha256": "102b8af8de16ff9d6d7d505746fd4d58207439929bfc90607b1b9c7996e5dc58",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      }
+    },
+    {
+      "series": 30,
+      "context": 256,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 7.561990309000009,
+      "load_seconds": 0.6925645430000031,
+      "first_batch_seconds": 0.06234661899998173,
+      "worker_wall_seconds": 6.885769618999973,
+      "cpu_seconds": 12.238665594,
+      "hot_per_series_p50_seconds": 0.05880466950000596,
+      "hot_per_series_p95_seconds": 0.06294915999995965,
+      "hot_per_series_mean_seconds": 0.0592634688999946,
+      "peak_rss_bytes": 2078019584,
+      "process_resources": {
+        "cgroup_memory_peak_bytes": 1100210176,
+        "cgroup_cpu_seconds": 12.27568,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      },
+      "output_sha256": "453e836aed837c274d590ee4ce5d4047b176005a2d8c5d2b24393d1f67e65c4e",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      }
+    },
+    {
+      "series": 50,
+      "context": 256,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 11.077409934000002,
+      "load_seconds": 1.0056565180000234,
+      "first_batch_seconds": 0.06623280600001635,
+      "worker_wall_seconds": 10.517937041999971,
+      "cpu_seconds": 19.212364331,
+      "hot_per_series_p50_seconds": 0.05723590049998961,
+      "hot_per_series_p95_seconds": 0.05990628699998979,
+      "hot_per_series_mean_seconds": 0.05738154493999957,
+      "peak_rss_bytes": 2078433280,
+      "process_resources": {
+        "cgroup_memory_peak_bytes": 1100587008,
+        "cgroup_cpu_seconds": 19.252388,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      },
+      "output_sha256": "a8e06f0dd46378b2a42d6de5e3bd2474cd43b8c97b621b145a88d2f40fb5bda1",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      }
+    },
+    {
+      "series": 100,
+      "context": 256,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 19.591143055000032,
+      "load_seconds": 0.9649637549999852,
+      "first_batch_seconds": 0.062067691000038394,
+      "worker_wall_seconds": 19.25571308900004,
+      "cpu_seconds": 36.64058106,
+      "hot_per_series_p50_seconds": 0.057616634499993324,
+      "hot_per_series_p95_seconds": 0.06202151899998398,
+      "hot_per_series_mean_seconds": 0.057885437459999876,
+      "peak_rss_bytes": 2079158272,
+      "process_resources": {
+        "cgroup_memory_peak_bytes": 1101426688,
+        "cgroup_cpu_seconds": 36.683296,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      },
+      "output_sha256": "377dbc355b4a7b2d5c6a5cf5a5f6befc6aab1cfaf827ea2497053384fe42bf7b",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      }
+    },
+    {
+      "series": 10,
+      "context": 512,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 4.088150755000015,
+      "load_seconds": 0.6880362590000004,
+      "first_batch_seconds": 0.07430125899998075,
+      "worker_wall_seconds": 3.7983011410000245,
+      "cpu_seconds": 6.095948729,
+      "hot_per_series_p50_seconds": 0.073207006500013,
+      "hot_per_series_p95_seconds": 0.07543446800002584,
+      "hot_per_series_mean_seconds": 0.07309157445000665,
+      "peak_rss_bytes": 2077847552,
+      "process_resources": {
+        "cgroup_memory_peak_bytes": 1103572992,
+        "cgroup_cpu_seconds": 6.131914,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      },
+      "output_sha256": "0fe70a8d0d48510820cdc2b21b237d33d2f5fbb35dcec0bc036f7d8e21797c0a",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      }
+    },
+    {
+      "series": 30,
+      "context": 512,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 8.582433730000048,
+      "load_seconds": 0.8753734630000736,
+      "first_batch_seconds": 0.08376921699994,
+      "worker_wall_seconds": 8.310749955999995,
+      "cpu_seconds": 14.913559982,
+      "hot_per_series_p50_seconds": 0.07171111949998021,
+      "hot_per_series_p95_seconds": 0.07345633799991447,
+      "hot_per_series_mean_seconds": 0.0716529648499981,
+      "peak_rss_bytes": 2078621696,
+      "process_resources": {
+        "cgroup_memory_peak_bytes": 1103949824,
+        "cgroup_cpu_seconds": 14.951986,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      },
+      "output_sha256": "66984daa91bb9eb780bab11912860c39edadae2a221c6a602be67db11d5e3568",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      }
+    },
+    {
+      "series": 50,
+      "context": 512,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 13.081614722999916,
+      "load_seconds": 0.8553198870000642,
+      "first_batch_seconds": 0.08157843300000422,
+      "worker_wall_seconds": 12.645523504999915,
+      "cpu_seconds": 23.583439581,
+      "hot_per_series_p50_seconds": 0.07256947100000843,
+      "hot_per_series_p95_seconds": 0.07577924600002461,
+      "hot_per_series_mean_seconds": 0.07251296833999618,
+      "peak_rss_bytes": 2079002624,
+      "process_resources": {
+        "cgroup_memory_peak_bytes": 1105211392,
+        "cgroup_cpu_seconds": 23.626182,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      },
+      "output_sha256": "0e919ea1d039f318ad4f6865963f91f76da5c1d602b8386978985b5b30868713",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      }
+    },
+    {
+      "series": 100,
+      "context": 512,
+      "batch_size": 1,
+      "threads": 2,
+      "repeats": 3,
+      "status": "PASS",
+      "failures": 0,
+      "process_wall_seconds": 24.095577949000017,
+      "load_seconds": 0.688702195000019,
+      "first_batch_seconds": 0.07801320200007922,
+      "worker_wall_seconds": 23.48172276599996,
+      "cpu_seconds": 45.380006645,
+      "hot_per_series_p50_seconds": 0.07251560899993592,
+      "hot_per_series_p95_seconds": 0.07668933900004049,
+      "hot_per_series_mean_seconds": 0.07275039626499563,
+      "peak_rss_bytes": 2080792576,
+      "process_resources": {
+        "cgroup_memory_peak_bytes": 1107431424,
+        "cgroup_cpu_seconds": 45.431066,
+        "resource_scope": "WHOLE_WORKER_CGROUP"
+      },
+      "output_sha256": "c8f3a42f6cfede3292e10bc3d605d4817cafae578f5bed27b6a453d9be3f3765",
+      "repeatability": "THREE_IDENTICAL_FORECASTS",
+      "isolation": {
+        "mechanism": "systemd-cgroup-v2+bubblewrap",
+        "memory_max_bytes": 6442450944,
+        "memory_swap_max_bytes": 0,
+        "memory_oom_group": true
+      }
+    }
+  ],
+  "walk_forward": {
+    "mode": "SYNTHETIC_SEQUENTIAL_AS_OF_WALK_FORWARD",
+    "folds": [
+      {
+        "prefix_closes": 84,
+        "context": 64,
+        "as_of": "2025-04-29T16:00:00Z",
+        "request_sha256": "75bd14f9f29b7a606c03f3071d1531abc0d0eb716b7caefbd15ec255aafe5ef5",
+        "target_sent_to_worker": false,
+        "risk_experts": [
+          {
+            "annualization": null,
+            "as_of": "2025-04-29T16:00:00Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.0018193919339521132,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600000.SH",
+              "missing": 0,
+              "naive": 0.0016853265699953454,
+              "observed_history_rms": 0.0016412982689369443,
+              "observed_last_return": 0.0012594458438286438,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2025-04-30",
+              "2025-05-01",
+              "2025-05-02",
+              "2025-05-05",
+              "2025-05-06",
+              "2025-05-07",
+              "2025-05-08",
+              "2025-05-09",
+              "2025-05-12",
+              "2025-05-13",
+              "2025-05-14",
+              "2025-05-15",
+              "2025-05-16",
+              "2025-05-19",
+              "2025-05-20",
+              "2025-05-21",
+              "2025-05-22",
+              "2025-05-23",
+              "2025-05-26",
+              "2025-05-27"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600000.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "7841ead6c871d775a3b5dbc00c32d2f56587e2f51e959334e78721c17bb86048",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.0016430238727480173
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.0015542597626335918
+              }
+            ]
+          }
+        ],
+        "development_only": false,
+        "horizon_mean_absolute_errors": {
+          "timesfm": {
+            "5": 4.7440312797219705e-05,
+            "20": 8.826751069242363e-05
+          },
+          "naive": {
+            "5": 5.137615549891551e-06,
+            "20": 4.279929666932999e-05
+          },
+          "ewma": {
+            "5": 0.00012892774840687622,
+            "20": 0.00017686466062609776
+          }
+        },
+        "status": "PASS"
+      },
+      {
+        "prefix_closes": 104,
+        "context": 84,
+        "as_of": "2025-05-27T16:00:00Z",
+        "request_sha256": "2aeae189c37d53f9ec0ac9ca58a809a43c61a123c3cfa1696489b2b8b51fc13d",
+        "target_sent_to_worker": false,
+        "risk_experts": [
+          {
+            "annualization": null,
+            "as_of": "2025-05-27T16:00:00Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.0016338452164540679,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600000.SH",
+              "missing": 0,
+              "naive": 0.0014558634665264149,
+              "observed_history_rms": 0.001606966476095627,
+              "observed_last_return": 0.0005758710048948679,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2025-05-28",
+              "2025-05-29",
+              "2025-05-30",
+              "2025-06-02",
+              "2025-06-03",
+              "2025-06-04",
+              "2025-06-05",
+              "2025-06-06",
+              "2025-06-09",
+              "2025-06-10",
+              "2025-06-11",
+              "2025-06-12",
+              "2025-06-13",
+              "2025-06-16",
+              "2025-06-17",
+              "2025-06-18",
+              "2025-06-19",
+              "2025-06-20",
+              "2025-06-23",
+              "2025-06-24"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600000.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "de067529c96241516296b5552f7829fd5199fd7e26e4cd4ec4a34ae397ab7bae",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.001486069615930319
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.0015371649235021323
+              }
+            ]
+          }
+        ],
+        "development_only": false,
+        "horizon_mean_absolute_errors": {
+          "timesfm": {
+            "5": 6.929471617595807e-06,
+            "20": 7.559599784808489e-06
+          },
+          "naive": {
+            "5": 3.713562102149984e-05,
+            "20": 8.886105676052594e-05
+          },
+          "ewma": {
+            "5": 0.00014084612890615314,
+            "20": 8.912069316712704e-05
+          }
+        },
+        "status": "PASS"
+      },
+      {
+        "prefix_closes": 124,
+        "context": 104,
+        "as_of": "2025-06-24T16:00:00Z",
+        "request_sha256": "02d58785b5c73204884602ce5432e4c16804ce8d443a6efb7398245e18f55418",
+        "target_sent_to_worker": false,
+        "risk_experts": [
+          {
+            "annualization": null,
+            "as_of": "2025-06-24T16:00:00Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.001490355713913974,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600000.SH",
+              "missing": 0,
+              "naive": 0.0014470429736041933,
+              "observed_history_rms": 0.0015820636329091132,
+              "observed_last_return": 9.5996928098252e-05,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2025-06-25",
+              "2025-06-26",
+              "2025-06-27",
+              "2025-06-30",
+              "2025-07-01",
+              "2025-07-02",
+              "2025-07-03",
+              "2025-07-04",
+              "2025-07-07",
+              "2025-07-08",
+              "2025-07-09",
+              "2025-07-10",
+              "2025-07-11",
+              "2025-07-14",
+              "2025-07-15",
+              "2025-07-16",
+              "2025-07-17",
+              "2025-07-18",
+              "2025-07-21",
+              "2025-07-22"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600000.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "7892e909c2eeb2e6cd07c87b177541550526857ff47f37a8888e1560a97b5bd4",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.0014972645789384843
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.001598640304291621
+              }
+            ]
+          }
+        ],
+        "development_only": false,
+        "horizon_mean_absolute_errors": {
+          "timesfm": {
+            "5": 2.369585394242763e-05,
+            "20": 8.199895243014496e-05
+          },
+          "naive": {
+            "5": 2.6525751391863342e-05,
+            "20": 6.959837825728263e-05
+          },
+          "ewma": {
+            "5": 1.678698891791736e-05,
+            "20": 2.6285637947501923e-05
+          }
+        },
+        "status": "PASS"
+      }
+    ],
+    "metrics": {
+      "timesfm": {
+        "mae": 7.555035989139364e-05,
+        "rmse": 8.978130879887104e-05,
+        "points": 60
+      },
+      "naive": {
+        "mae": 6.94901548372455e-05,
+        "rmse": 9.810020783792832e-05,
+        "points": 60
+      },
+      "ewma": {
+        "mae": 0.00010598534648525524,
+        "rmse": 0.00013442902931136164,
+        "points": 60
+      }
+    },
+    "missing": 0,
+    "failures": 0,
+    "authority": "RESEARCH_ONLY",
+    "eligibility": "ELIGIBILITY_DENIED"
+  },
+  "paper_allowed": false,
+  "live_allowed": false,
+  "billing": "LOCAL_NO_BILLING"
+}

@@ -1,0 +1,22 @@
+{
+  "research/agent/src/bin/timesfm-risk-agent.rs": "0fd6b3e738c93820b8c0da663e609257ad474aaf60328ef99916c171723f4c5a",
+  "research/agent/src/risk_cpu.rs": "e0c7d67a0642aa02ab7189f0923f64da1bc1e355089c24976adf03c10e9ccc60",
+  "research/timesfm_cpu/LICENSE.timesfm": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+  "research/timesfm_cpu/THIRD_PARTY_NOTICES.md": "d07d3ed4fba8eba5fcfe56d15b4a192ed22c76cd8da346b57e6339a5d76d14c0",
+  "research/timesfm_cpu/benchmark.py": "e25a4ccb9638647c9d64804b6e0df7cb2143129f00be460ed38ee15c919a3b80",
+  "research/timesfm_cpu/cli.py": "58f64e78a151a8bd1b268a590d99b2095b7879a498ddbde84b466235d725358f",
+  "research/timesfm_cpu/isolation_probe.py": "bb36d2a03cfe07b9b178076f3e4d7e3180b8550cf17d57689c5f90da0b98dd3e",
+  "research/timesfm_cpu/model.py": "efa0d191672561f0faa9af0b3ad5864701b102e548217c0621193d2da1061b95",
+  "research/timesfm_cpu/provision.py": "fe432f35219c6d70b757211dcce9247dbc05a610336ae43aec459c1263a076d0",
+  "research/timesfm_cpu/requirements.lock": "a072cedefb2a67ce3a499f0077d8f7ee8c7567c49db7ba3e65746ea241a93020",
+  "research/timesfm_cpu/runtime.py": "ca972470470258975eb0c77d6b3a1a3938a6f73f2e9172b73189a9c12c871f2e",
+  "research/timesfm_cpu/windows.py": "c73277c462e33604a84357efcf07768f4be74f1756a277bb49b97b5fe443de90",
+  "research/timesfm_cpu/worker.py": "a8a98593f18e8643e85f82e3d7db2433da3e23a112d7f2897d06f95eeb323457",
+  "scripts/install-timesfm-cpu.sh": "2a5954ae305d4faa0f17b7ce77eabc8bb99680c5cbae1001be7726fa3202b05a",
+  "scripts/test-timesfm-cpu-real.py": "607648b2fe440cf96af7c4dbe392eb26b6f901c78150cac9e681f316731b3e32",
+  "scripts/test-timesfm-cpu.py": "89cabafcca0898e5386b98cd90231a434999a4a9c33d40d9c6c3bcbae8251f71",
+  "scripts/test-timesfm-linux.py": "5e3d419e7aa3b5dcbaac2adedc6f71f7abe18567e8875ac154745b24968aa4fc",
+  "scripts/timesfm-cpu.py": "1b857c268686708025cbb4cee85fc7129dd1d62043bc9bc65dfe4320e2d65d9f",
+  ".gitignore": "951580c68070fa795501ca8b197094236364c59edfabc07d8205b804266a0bf2",
+  "research/agent/src/lib.rs": "bb12bb29647b113f5d42421829b9cd418f678ce2a368a67ee2323a8792e938f7"
+}

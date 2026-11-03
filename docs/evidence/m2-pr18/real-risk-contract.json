@@ -1,0 +1,1355 @@
+{
+  "label": "DEVELOPMENT_CPU_DIAGNOSTIC",
+  "N100_ACCEPTANCE": "NOT_VERIFIED",
+  "runs": [
+    {
+      "series": 1,
+      "input_mode": "synthetic_test",
+      "backend": "REAL_TIMESFM_2_5_CPU",
+      "production_task_created": false,
+      "production_decode_denied": true,
+      "request_sha256": "3d60859b348de35ac3fe1b24a6f254ae641f809d4c572f8417d7bd92a4d05ca5",
+      "result_sha256": "a9632519205af05d36b357868d0467436ec2651e11c899a73dd1e4e290d33b47",
+      "metrics": {
+        "load_seconds": 0.7399131999991369,
+        "wall_seconds": 2.7811870999867097,
+        "cpu_seconds": 2.8125,
+        "batch_timings": [
+          {
+            "seconds": 0.0712766999786254,
+            "series": 1
+          }
+        ],
+        "failures": 0,
+        "peak_rss_bytes": 2051256320,
+        "job_memory_peak_bytes": 3446788096,
+        "job_cpu_seconds": 3.21875,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "risk_result": {
+        "authority": "RESEARCH_ONLY",
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "live_allowed": false,
+        "paper_allowed": false,
+        "receipt": {
+          "billing": "LOCAL_NO_BILLING",
+          "clamp_count": 0,
+          "clamp_policy": "REJECT_NEGATIVE_NO_CLAMP",
+          "code_sha256": "aa0eaeb67b15fdfd461070a1716841ede58033bae02c85218fed2e1b8cd46396",
+          "development_only": true,
+          "frozen_input_sha256": "eeedb367fddf8f1e668f0106d61329691b6a9c359547099179c8b45408e992e3",
+          "isolation": {
+            "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+            "memory_max_bytes": null
+          },
+          "manifest_sha256": "d5e54a409cc4aa4e1aa7a2b308bab3500124e90644071a210aab4fbce23f2597",
+          "metrics": {
+            "batch_timings": [
+              {
+                "seconds": 0.0712766999786254,
+                "series": 1
+              }
+            ],
+            "cpu_seconds": 2.8125,
+            "failures": 0,
+            "job_cpu_seconds": 3.21875,
+            "job_memory_max_bytes": 6442450944,
+            "job_memory_peak_bytes": 3446788096,
+            "job_total_processes": 3,
+            "load_seconds": 0.7399131999991369,
+            "peak_rss_bytes": 2051256320,
+            "resource_scope": "WHOLE_WINDOWS_JOB",
+            "wall_seconds": 2.7811870999867097
+          },
+          "model_revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+          "request_sha256": "3d60859b348de35ac3fe1b24a6f254ae641f809d4c572f8417d7bd92a4d05ca5",
+          "transport": "local_cpu",
+          "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8"
+        },
+        "risk_experts": [
+          {
+            "annualization": null,
+            "as_of": "2026-11-03T09:30:04.929209Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.0020146745651857625,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600000.SH",
+              "missing": 0,
+              "naive": 0.00198287717715106,
+              "observed_history_rms": 0.0019915685475384247,
+              "observed_last_return": 0.0022428083861532055,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2026-11-04",
+              "2026-11-05",
+              "2026-11-06",
+              "2026-11-09",
+              "2026-11-10",
+              "2026-11-11",
+              "2026-11-12",
+              "2026-11-13",
+              "2026-11-16",
+              "2026-11-17",
+              "2026-11-18",
+              "2026-11-19",
+              "2026-11-20",
+              "2026-11-23",
+              "2026-11-24",
+              "2026-11-25",
+              "2026-11-26",
+              "2026-11-27",
+              "2026-11-30",
+              "2026-12-01"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600000.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY",
+              "DEVELOPMENT_ISOLATION_NOT_VERIFIED"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "b6fd07a6c2deda2033c956f81986eacd20fee07f8a8f76c54698baca301cb8fc",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.001961427740752697
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.0019703036872670055
+              }
+            ]
+          }
+        ],
+        "schema_version": 1
+      }
+    },
+    {
+      "series": 4,
+      "input_mode": "synthetic_test",
+      "backend": "REAL_TIMESFM_2_5_CPU",
+      "production_task_created": false,
+      "production_decode_denied": true,
+      "request_sha256": "587b945cbbaba5e9d408005963f33612d129a1e590c9616780be5b5c67e593e2",
+      "result_sha256": "6f49ada5fdb99327e65108b682d09e01818e6cf662cb16e67bfd2c53ab9ca43b",
+      "metrics": {
+        "load_seconds": 0.7297582000028342,
+        "wall_seconds": 2.9630755000107456,
+        "cpu_seconds": 3.265625,
+        "batch_timings": [
+          {
+            "seconds": 0.0762910999765154,
+            "series": 1
+          },
+          {
+            "seconds": 0.07828230000450276,
+            "series": 1
+          },
+          {
+            "seconds": 0.07830659998580813,
+            "series": 1
+          },
+          {
+            "seconds": 0.08411130000604317,
+            "series": 1
+          }
+        ],
+        "failures": 0,
+        "peak_rss_bytes": 2051047424,
+        "job_memory_peak_bytes": 3446394880,
+        "job_cpu_seconds": 3.703125,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "risk_result": {
+        "authority": "RESEARCH_ONLY",
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "live_allowed": false,
+        "paper_allowed": false,
+        "receipt": {
+          "billing": "LOCAL_NO_BILLING",
+          "clamp_count": 0,
+          "clamp_policy": "REJECT_NEGATIVE_NO_CLAMP",
+          "code_sha256": "aa0eaeb67b15fdfd461070a1716841ede58033bae02c85218fed2e1b8cd46396",
+          "development_only": true,
+          "frozen_input_sha256": "71408bcdabb0b804236072d78730184a986e5da9555ee3863c865502de1bc727",
+          "isolation": {
+            "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+            "memory_max_bytes": null
+          },
+          "manifest_sha256": "d5e54a409cc4aa4e1aa7a2b308bab3500124e90644071a210aab4fbce23f2597",
+          "metrics": {
+            "batch_timings": [
+              {
+                "seconds": 0.0762910999765154,
+                "series": 1
+              },
+              {
+                "seconds": 0.07828230000450276,
+                "series": 1
+              },
+              {
+                "seconds": 0.07830659998580813,
+                "series": 1
+              },
+              {
+                "seconds": 0.08411130000604317,
+                "series": 1
+              }
+            ],
+            "cpu_seconds": 3.265625,
+            "failures": 0,
+            "job_cpu_seconds": 3.703125,
+            "job_memory_max_bytes": 6442450944,
+            "job_memory_peak_bytes": 3446394880,
+            "job_total_processes": 3,
+            "load_seconds": 0.7297582000028342,
+            "peak_rss_bytes": 2051047424,
+            "resource_scope": "WHOLE_WINDOWS_JOB",
+            "wall_seconds": 2.9630755000107456
+          },
+          "model_revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+          "request_sha256": "587b945cbbaba5e9d408005963f33612d129a1e590c9616780be5b5c67e593e2",
+          "transport": "local_cpu",
+          "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8"
+        },
+        "risk_experts": [
+          {
+            "annualization": null,
+            "as_of": "2026-11-03T09:30:08.047294Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.0020146745651857625,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600000.SH",
+              "missing": 0,
+              "naive": 0.00198287717715106,
+              "observed_history_rms": 0.0019915685475384247,
+              "observed_last_return": 0.0022428083861532055,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2026-11-04",
+              "2026-11-05",
+              "2026-11-06",
+              "2026-11-09",
+              "2026-11-10",
+              "2026-11-11",
+              "2026-11-12",
+              "2026-11-13",
+              "2026-11-16",
+              "2026-11-17",
+              "2026-11-18",
+              "2026-11-19",
+              "2026-11-20",
+              "2026-11-23",
+              "2026-11-24",
+              "2026-11-25",
+              "2026-11-26",
+              "2026-11-27",
+              "2026-11-30",
+              "2026-12-01"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600000.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY",
+              "DEVELOPMENT_ISOLATION_NOT_VERIFIED"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "485d02c4730e402759745f5d99d6bcb25555255ef469db026e411f07a1c56ec6",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.001961427740752697
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.0019703036872670055
+              }
+            ]
+          },
+          {
+            "annualization": null,
+            "as_of": "2026-11-03T09:30:08.047294Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.0019460587158277335,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600001.SH",
+              "missing": 0,
+              "naive": 0.0019092029341587942,
+              "observed_history_rms": 0.0019690191619224713,
+              "observed_last_return": -0.00048661800486615725,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2026-11-04",
+              "2026-11-05",
+              "2026-11-06",
+              "2026-11-09",
+              "2026-11-10",
+              "2026-11-11",
+              "2026-11-12",
+              "2026-11-13",
+              "2026-11-16",
+              "2026-11-17",
+              "2026-11-18",
+              "2026-11-19",
+              "2026-11-20",
+              "2026-11-23",
+              "2026-11-24",
+              "2026-11-25",
+              "2026-11-26",
+              "2026-11-27",
+              "2026-11-30",
+              "2026-12-01"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600001.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY",
+              "DEVELOPMENT_ISOLATION_NOT_VERIFIED"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "485d02c4730e402759745f5d99d6bcb25555255ef469db026e411f07a1c56ec6",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.001977492496371269
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.0019686961313709617
+              }
+            ]
+          },
+          {
+            "annualization": null,
+            "as_of": "2026-11-03T09:30:08.047294Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.001971055509468887,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600002.SH",
+              "missing": 0,
+              "naive": 0.0019743656067288786,
+              "observed_history_rms": 0.0019841372110331263,
+              "observed_last_return": -0.0022401870069153063,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2026-11-04",
+              "2026-11-05",
+              "2026-11-06",
+              "2026-11-09",
+              "2026-11-10",
+              "2026-11-11",
+              "2026-11-12",
+              "2026-11-13",
+              "2026-11-16",
+              "2026-11-17",
+              "2026-11-18",
+              "2026-11-19",
+              "2026-11-20",
+              "2026-11-23",
+              "2026-11-24",
+              "2026-11-25",
+              "2026-11-26",
+              "2026-11-27",
+              "2026-11-30",
+              "2026-12-01"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600002.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY",
+              "DEVELOPMENT_ISOLATION_NOT_VERIFIED"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "485d02c4730e402759745f5d99d6bcb25555255ef469db026e411f07a1c56ec6",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.0019655875861644746
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.001968817750457674
+              }
+            ]
+          },
+          {
+            "annualization": null,
+            "as_of": "2026-11-03T09:30:08.047294Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.001966801573814683,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600003.SH",
+              "missing": 0,
+              "naive": 0.001964940657974201,
+              "observed_history_rms": 0.0019830896422450696,
+              "observed_last_return": -0.0018552875695733162,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2026-11-04",
+              "2026-11-05",
+              "2026-11-06",
+              "2026-11-09",
+              "2026-11-10",
+              "2026-11-11",
+              "2026-11-12",
+              "2026-11-13",
+              "2026-11-16",
+              "2026-11-17",
+              "2026-11-18",
+              "2026-11-19",
+              "2026-11-20",
+              "2026-11-23",
+              "2026-11-24",
+              "2026-11-25",
+              "2026-11-26",
+              "2026-11-27",
+              "2026-11-30",
+              "2026-12-01"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600003.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY",
+              "DEVELOPMENT_ISOLATION_NOT_VERIFIED"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "485d02c4730e402759745f5d99d6bcb25555255ef469db026e411f07a1c56ec6",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.001961161382496357
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.0019679985125549138
+              }
+            ]
+          }
+        ],
+        "schema_version": 1
+      }
+    },
+    {
+      "series": 8,
+      "input_mode": "synthetic_test",
+      "backend": "REAL_TIMESFM_2_5_CPU",
+      "production_task_created": false,
+      "production_decode_denied": true,
+      "request_sha256": "86e26032a601de9182cad2ef872d9be3ff223c2b75ee433285341bd8bdf8d7fb",
+      "result_sha256": "3578e161743c5d60ef142240dbbf4859b150b782b1c7ea4b4860cc0732f4dd9c",
+      "metrics": {
+        "load_seconds": 0.7493840999959502,
+        "wall_seconds": 3.3743071999924723,
+        "cpu_seconds": 4.015625,
+        "batch_timings": [
+          {
+            "seconds": 0.07661950000328943,
+            "series": 1
+          },
+          {
+            "seconds": 0.07029180001700297,
+            "series": 1
+          },
+          {
+            "seconds": 0.07870859999093227,
+            "series": 1
+          },
+          {
+            "seconds": 0.07431130000622943,
+            "series": 1
+          },
+          {
+            "seconds": 0.08760890000849031,
+            "series": 1
+          },
+          {
+            "seconds": 0.09083020000252873,
+            "series": 1
+          },
+          {
+            "seconds": 0.09229659999255091,
+            "series": 1
+          },
+          {
+            "seconds": 0.09560830000555143,
+            "series": 1
+          }
+        ],
+        "failures": 0,
+        "peak_rss_bytes": 2051399680,
+        "job_memory_peak_bytes": 3446620160,
+        "job_cpu_seconds": 4.5625,
+        "job_total_processes": 3,
+        "job_memory_max_bytes": 6442450944,
+        "resource_scope": "WHOLE_WINDOWS_JOB"
+      },
+      "risk_result": {
+        "authority": "RESEARCH_ONLY",
+        "can_execute_forward_paper": false,
+        "eligibility": "ELIGIBILITY_DENIED",
+        "live_allowed": false,
+        "paper_allowed": false,
+        "receipt": {
+          "billing": "LOCAL_NO_BILLING",
+          "clamp_count": 0,
+          "clamp_policy": "REJECT_NEGATIVE_NO_CLAMP",
+          "code_sha256": "aa0eaeb67b15fdfd461070a1716841ede58033bae02c85218fed2e1b8cd46396",
+          "development_only": true,
+          "frozen_input_sha256": "f497fe46c40983ab08ca044387b01fa0c652a70530f1e45510fd7ac03daf434e",
+          "isolation": {
+            "mechanism": "UNISOLATED_DEVELOPMENT_DIAGNOSTIC",
+            "memory_max_bytes": null
+          },
+          "manifest_sha256": "d5e54a409cc4aa4e1aa7a2b308bab3500124e90644071a210aab4fbce23f2597",
+          "metrics": {
+            "batch_timings": [
+              {
+                "seconds": 0.07661950000328943,
+                "series": 1
+              },
+              {
+                "seconds": 0.07029180001700297,
+                "series": 1
+              },
+              {
+                "seconds": 0.07870859999093227,
+                "series": 1
+              },
+              {
+                "seconds": 0.07431130000622943,
+                "series": 1
+              },
+              {
+                "seconds": 0.08760890000849031,
+                "series": 1
+              },
+              {
+                "seconds": 0.09083020000252871,
+                "series": 1
+              },
+              {
+                "seconds": 0.09229659999255092,
+                "series": 1
+              },
+              {
+                "seconds": 0.09560830000555144,
+                "series": 1
+              }
+            ],
+            "cpu_seconds": 4.015625,
+            "failures": 0,
+            "job_cpu_seconds": 4.5625,
+            "job_memory_max_bytes": 6442450944,
+            "job_memory_peak_bytes": 3446620160,
+            "job_total_processes": 3,
+            "load_seconds": 0.7493840999959502,
+            "peak_rss_bytes": 2051399680,
+            "resource_scope": "WHOLE_WINDOWS_JOB",
+            "wall_seconds": 3.3743071999924723
+          },
+          "model_revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+          "request_sha256": "86e26032a601de9182cad2ef872d9be3ff223c2b75ee433285341bd8bdf8d7fb",
+          "transport": "local_cpu",
+          "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8"
+        },
+        "risk_experts": [
+          {
+            "annualization": null,
+            "as_of": "2026-11-03T09:30:11.392591Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.0020146745651857625,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600000.SH",
+              "missing": 0,
+              "naive": 0.00198287717715106,
+              "observed_history_rms": 0.0019915685475384247,
+              "observed_last_return": 0.0022428083861532055,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2026-11-04",
+              "2026-11-05",
+              "2026-11-06",
+              "2026-11-09",
+              "2026-11-10",
+              "2026-11-11",
+              "2026-11-12",
+              "2026-11-13",
+              "2026-11-16",
+              "2026-11-17",
+              "2026-11-18",
+              "2026-11-19",
+              "2026-11-20",
+              "2026-11-23",
+              "2026-11-24",
+              "2026-11-25",
+              "2026-11-26",
+              "2026-11-27",
+              "2026-11-30",
+              "2026-12-01"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600000.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY",
+              "DEVELOPMENT_ISOLATION_NOT_VERIFIED"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "7c2882ce870ccde202ac679cd73a74898b3f479d5bbb2b7d551ee291ba20da16",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.001961427740752697
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.0019703036872670055
+              }
+            ]
+          },
+          {
+            "annualization": null,
+            "as_of": "2026-11-03T09:30:11.392591Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.0019460587158277335,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600001.SH",
+              "missing": 0,
+              "naive": 0.0019092029341587942,
+              "observed_history_rms": 0.0019690191619224713,
+              "observed_last_return": -0.00048661800486615725,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2026-11-04",
+              "2026-11-05",
+              "2026-11-06",
+              "2026-11-09",
+              "2026-11-10",
+              "2026-11-11",
+              "2026-11-12",
+              "2026-11-13",
+              "2026-11-16",
+              "2026-11-17",
+              "2026-11-18",
+              "2026-11-19",
+              "2026-11-20",
+              "2026-11-23",
+              "2026-11-24",
+              "2026-11-25",
+              "2026-11-26",
+              "2026-11-27",
+              "2026-11-30",
+              "2026-12-01"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600001.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY",
+              "DEVELOPMENT_ISOLATION_NOT_VERIFIED"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "7c2882ce870ccde202ac679cd73a74898b3f479d5bbb2b7d551ee291ba20da16",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.001977492496371269
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.0019686961313709617
+              }
+            ]
+          },
+          {
+            "annualization": null,
+            "as_of": "2026-11-03T09:30:11.392591Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.001971055509468887,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600002.SH",
+              "missing": 0,
+              "naive": 0.0019743656067288786,
+              "observed_history_rms": 0.0019841372110331263,
+              "observed_last_return": -0.0022401870069153063,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2026-11-04",
+              "2026-11-05",
+              "2026-11-06",
+              "2026-11-09",
+              "2026-11-10",
+              "2026-11-11",
+              "2026-11-12",
+              "2026-11-13",
+              "2026-11-16",
+              "2026-11-17",
+              "2026-11-18",
+              "2026-11-19",
+              "2026-11-20",
+              "2026-11-23",
+              "2026-11-24",
+              "2026-11-25",
+              "2026-11-26",
+              "2026-11-27",
+              "2026-11-30",
+              "2026-12-01"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600002.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY",
+              "DEVELOPMENT_ISOLATION_NOT_VERIFIED"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "7c2882ce870ccde202ac679cd73a74898b3f479d5bbb2b7d551ee291ba20da16",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.0019655875861644746
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.001968817750457674
+              }
+            ]
+          },
+          {
+            "annualization": null,
+            "as_of": "2026-11-03T09:30:11.392591Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.001966801573814683,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600003.SH",
+              "missing": 0,
+              "naive": 0.001964940657974201,
+              "observed_history_rms": 0.0019830896422450696,
+              "observed_last_return": -0.0018552875695733162,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2026-11-04",
+              "2026-11-05",
+              "2026-11-06",
+              "2026-11-09",
+              "2026-11-10",
+              "2026-11-11",
+              "2026-11-12",
+              "2026-11-13",
+              "2026-11-16",
+              "2026-11-17",
+              "2026-11-18",
+              "2026-11-19",
+              "2026-11-20",
+              "2026-11-23",
+              "2026-11-24",
+              "2026-11-25",
+              "2026-11-26",
+              "2026-11-27",
+              "2026-11-30",
+              "2026-12-01"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600003.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY",
+              "DEVELOPMENT_ISOLATION_NOT_VERIFIED"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "7c2882ce870ccde202ac679cd73a74898b3f479d5bbb2b7d551ee291ba20da16",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.001961161382496357
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.0019679985125549138
+              }
+            ]
+          },
+          {
+            "annualization": null,
+            "as_of": "2026-11-03T09:30:11.392591Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.0019048492716395612,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600004.SH",
+              "missing": 0,
+              "naive": 0.001909778734616045,
+              "observed_history_rms": 0.0019686057964376775,
+              "observed_last_return": 0.0005871415989822104,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2026-11-04",
+              "2026-11-05",
+              "2026-11-06",
+              "2026-11-09",
+              "2026-11-10",
+              "2026-11-11",
+              "2026-11-12",
+              "2026-11-13",
+              "2026-11-16",
+              "2026-11-17",
+              "2026-11-18",
+              "2026-11-19",
+              "2026-11-20",
+              "2026-11-23",
+              "2026-11-24",
+              "2026-11-25",
+              "2026-11-26",
+              "2026-11-27",
+              "2026-11-30",
+              "2026-12-01"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600004.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY",
+              "DEVELOPMENT_ISOLATION_NOT_VERIFIED"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "7c2882ce870ccde202ac679cd73a74898b3f479d5bbb2b7d551ee291ba20da16",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.0019811436999589206
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.001971336593851447
+              }
+            ]
+          },
+          {
+            "annualization": null,
+            "as_of": "2026-11-03T09:30:11.392591Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.001973247691186118,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600005.SH",
+              "missing": 0,
+              "naive": 0.002005646877677987,
+              "observed_history_rms": 0.0019917373877744726,
+              "observed_last_return": 0.002739189982390977,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2026-11-04",
+              "2026-11-05",
+              "2026-11-06",
+              "2026-11-09",
+              "2026-11-10",
+              "2026-11-11",
+              "2026-11-12",
+              "2026-11-13",
+              "2026-11-16",
+              "2026-11-17",
+              "2026-11-18",
+              "2026-11-19",
+              "2026-11-20",
+              "2026-11-23",
+              "2026-11-24",
+              "2026-11-25",
+              "2026-11-26",
+              "2026-11-27",
+              "2026-11-30",
+              "2026-12-01"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600005.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY",
+              "DEVELOPMENT_ISOLATION_NOT_VERIFIED"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "7c2882ce870ccde202ac679cd73a74898b3f479d5bbb2b7d551ee291ba20da16",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.0019624359207227825
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.0019660979916807262
+              }
+            ]
+          },
+          {
+            "annualization": null,
+            "as_of": "2026-11-03T09:30:11.392591Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.00202497513285074,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600006.SH",
+              "missing": 0,
+              "naive": 0.0020111403309894115,
+              "observed_history_rms": 0.001997219996476175,
+              "observed_last_return": 0.0026349175368400868,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2026-11-04",
+              "2026-11-05",
+              "2026-11-06",
+              "2026-11-09",
+              "2026-11-10",
+              "2026-11-11",
+              "2026-11-12",
+              "2026-11-13",
+              "2026-11-16",
+              "2026-11-17",
+              "2026-11-18",
+              "2026-11-19",
+              "2026-11-20",
+              "2026-11-23",
+              "2026-11-24",
+              "2026-11-25",
+              "2026-11-26",
+              "2026-11-27",
+              "2026-11-30",
+              "2026-12-01"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600006.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY",
+              "DEVELOPMENT_ISOLATION_NOT_VERIFIED"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "7c2882ce870ccde202ac679cd73a74898b3f479d5bbb2b7d551ee291ba20da16",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.001954353880137205
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.001965767063666135
+              }
+            ]
+          },
+          {
+            "annualization": null,
+            "as_of": "2026-11-03T09:30:11.392591Z",
+            "authority": "RESEARCH_ONLY",
+            "baseline_comparison": {
+              "action_handling": "SYNTHETIC_NONE_VERIFIED",
+              "annualization": null,
+              "ewma": 0.0019551731088416403,
+              "ewma_lambda": 0.94,
+              "gap_detection": "VALIDATED_SESSION_SEQUENCE",
+              "instrument": "600007.SH",
+              "missing": 0,
+              "naive": 0.001910267888139263,
+              "observed_history_rms": 0.001970890305188389,
+              "observed_last_return": 0.0003894460130464683,
+              "target": "rolling20_rms_daily_return_ratio",
+              "unit": "daily_return_ratio",
+              "window": 20
+            },
+            "calibration_status": "UNKNOWN_UNCALIBRATED",
+            "cost": {
+              "actual_bill": "LOCAL_NO_BILLING",
+              "allocation": "SHARED_BATCH_COST_NOT_PER_INSTRUMENT",
+              "receipt": "parent_bundle.receipt"
+            },
+            "covariance": "UNKNOWN_INSUFFICIENT_EVIDENCE",
+            "downside_metric": "UNKNOWN_UNCALIBRATED",
+            "error_comparison": "UNKNOWN_NO_FORWARD_OUTCOMES",
+            "forecast_horizons": [
+              5,
+              20
+            ],
+            "forecast_sessions": [
+              "2026-11-04",
+              "2026-11-05",
+              "2026-11-06",
+              "2026-11-09",
+              "2026-11-10",
+              "2026-11-11",
+              "2026-11-12",
+              "2026-11-13",
+              "2026-11-16",
+              "2026-11-17",
+              "2026-11-18",
+              "2026-11-19",
+              "2026-11-20",
+              "2026-11-23",
+              "2026-11-24",
+              "2026-11-25",
+              "2026-11-26",
+              "2026-11-27",
+              "2026-11-30",
+              "2026-12-01"
+            ],
+            "input_mode": "synthetic_test",
+            "instrument": "600007.SH",
+            "job_ref": null,
+            "market_regime": "NORMAL_VOLATILITY",
+            "quality_blockers": [
+              "SYNTHETIC_ENGINEERING_ONLY",
+              "DEVELOPMENT_ISOLATION_NOT_VERIFIED"
+            ],
+            "readiness_ref": "SYNTHETIC_ENGINEERING_ONLY",
+            "regime_rule": "rms_daily_ratio_ge_0.025_v1_exploratory_not_risk_policy",
+            "schema_version": 1,
+            "session_mapping": "ordinal_daily_model_axis_to_frozen_exchange_calendar_v1",
+            "snapshot_ref": "7c2882ce870ccde202ac679cd73a74898b3f479d5bbb2b7d551ee291ba20da16",
+            "target": "rolling20_rms_daily_return_ratio",
+            "uncertainty": "UNKNOWN_UNCALIBRATED",
+            "unit": "daily_return_ratio",
+            "volatility_forecast": [
+              {
+                "sessions": 5,
+                "value_ratio": 0.0019796882756054402
+              },
+              {
+                "sessions": 20,
+                "value_ratio": 0.0019688148342538623
+              }
+            ]
+          }
+        ],
+        "schema_version": 1
+      }
+    }
+  ]
+}

@@ -21,6 +21,9 @@ config/local.toml
 
 # Runtime money/data artifacts (repo root only; apps/dashboard/src/state is tracked source)
 /state/
+/models/
+*.safetensors
+*.whl
 logs/
 data/
 *.db
