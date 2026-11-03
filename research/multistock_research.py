@@ -255,8 +255,10 @@ class Portfolio:
                     if delta <= D("1e-28"):
                         continue
                     block=execution_block(rows.get(code),side)
-                    if not block and side=="sell" and h.bought_index>=index:
-                        block="T_PLUS_1_ASSUMPTION"
+                    if not block and side=="sell" and index-h.bought_index < self.config.get("min_hold_sessions", 1):
+                        block="T_PLUS_1_ASSUMPTION" if self.config.get("min_hold_sessions", 1) == 1 else "MIN_HOLDING_SESSIONS"
+                    if not block and side=="buy" and h is None and len(self.holdings) >= self.config.get("hard_position_cap", 20000):
+                        block="POSITION_CAP"
                     if remaining <= D("1e-28"):
                         block="TURNOVER_CAP"
                     if block:

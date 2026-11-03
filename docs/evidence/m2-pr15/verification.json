@@ -1,0 +1,27 @@
+{
+  "classification": "EXPLORATORY",
+  "cumulative_trials": 8,
+  "data_mode": "historical_backfill_ex_post",
+  "eligibility": "ELIGIBILITY_DENIED",
+  "forward_research_readiness": "BLOCKED",
+  "historical_pit_status": "NOT_VERIFIED",
+  "historical_received_at": null,
+  "live_allowed": false,
+  "paper_allowed": false,
+  "plan_sha": "41e5b2cde6792fdf8ab9787283584067f910b273450b6ae1b63734745c3e1c80",
+  "provider_published_at": null,
+  "rounds": [
+    {
+      "output_sha": "e0aa0b2f2237172382df153238f647ecc3e08c1af7b043b9fbb880f1de0e6d1e",
+      "round": 1,
+      "state": "SEALED"
+    },
+    {
+      "output_sha": "a1c55cb421cf0bc379506c808ec4106aa994bb41d0ad44d17fb71f5feeffe3bf",
+      "round": 2,
+      "state": "SEALED"
+    }
+  ],
+  "scope": "NEW_ARTIFACT_HASHES_AND_JOURNAL_METRICS_NOT_OLD_SOURCE_REVERIFY_NOT_INDEPENDENT_ACCEPTANCE",
+  "verified": true
+}

@@ -1,0 +1,16 @@
+test_independent_decimal_cash_units_fees_and_normalized_index (new_tests.Suite.test_independent_decimal_cash_units_fees_and_normalized_index) ... FAIL
+
+======================================================================
+FAIL: test_independent_decimal_cash_units_fees_and_normalized_index (new_tests.Suite.test_independent_decimal_cash_units_fees_and_normalized_index)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>\scripts\test-autonomous-research.py", line 178, in test_independent_decimal_cash_units_fees_and_normalized_index
+    self.assertLess(abs(book.cash-cash), D("1e-45"))
+AssertionError: Decimal('0.0010000000000000000000000000000000000000000000000') not less than Decimal('1E-45')
+
+----------------------------------------------------------------------
+Ran 1 test in 2.167s
+
+FAILED (failures=1)
+expected_failure_detected=True
+exit_code=1 (expected 1)

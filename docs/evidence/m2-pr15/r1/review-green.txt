@@ -1,0 +1,8 @@
+test_post_seal_failure_audit_tamper_delete_extra_and_recovery (__main__.Suite.test_post_seal_failure_audit_tamper_delete_extra_and_recovery) ... ok
+test_seed3_without_contraction_has_bounded_novel_second_round (__main__.Suite.test_seed3_without_contraction_has_bounded_novel_second_round) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.761s
+
+OK
+exit_code=0

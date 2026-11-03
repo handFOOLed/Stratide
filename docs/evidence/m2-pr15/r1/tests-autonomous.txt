@@ -1,0 +1,20 @@
+test_archive_status_gap_failure_audit_and_seed_reproduction (__main__.Suite.test_archive_status_gap_failure_audit_and_seed_reproduction) ... ok
+test_corrupt_sources_outputs_candidate_explosion_and_empty_candidates (__main__.Suite.test_corrupt_sources_outputs_candidate_explosion_and_empty_candidates) ... ok
+test_feedback_cannot_see_validation_or_exposed_outcomes (__main__.Suite.test_feedback_cannot_see_validation_or_exposed_outcomes) ... ok
+test_freeze_pause_cancel_resources_concurrency (__main__.Suite.test_freeze_pause_cancel_resources_concurrency) ... ok
+test_generator_structure_seed_units_and_rejections (__main__.Suite.test_generator_structure_seed_units_and_rejections) ... ok
+test_independent_decimal_cash_units_fees_and_normalized_index (__main__.Suite.test_independent_decimal_cash_units_fees_and_normalized_index) ... ok
+test_optional_valuation_nulls_and_feature_time_prefix (__main__.Suite.test_optional_valuation_nulls_and_feature_time_prefix) ... ok
+test_post_seal_failure_audit_tamper_delete_extra_and_recovery (__main__.Suite.test_post_seal_failure_audit_tamper_delete_extra_and_recovery) ... ok
+test_readonly_commands_no_source_http_dispatch_or_mutations (__main__.Suite.test_readonly_commands_no_source_http_dispatch_or_mutations) ... ok
+test_recovery_evaluate_publish_archive_and_no_duplicate_reads (__main__.Suite.test_recovery_evaluate_publish_archive_and_no_duplicate_reads) ... ok
+test_seed3_without_contraction_has_bounded_novel_second_round (__main__.Suite.test_seed3_without_contraction_has_bounded_novel_second_round) ... ok
+test_text_agent_and_forged_sources_are_rejected (__main__.Suite.test_text_agent_and_forged_sources_are_rejected) ... ok
+test_timing_cost_direction_and_benchmark_cap (__main__.Suite.test_timing_cost_direction_and_benchmark_cap) ... ok
+test_two_round_e2e_negative_results_dedup_and_immutable (__main__.Suite.test_two_round_e2e_negative_results_dedup_and_immutable) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 9.863s
+
+OK
+exit_code=0
