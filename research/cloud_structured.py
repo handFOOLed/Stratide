@@ -13,6 +13,7 @@ import multistock_research as m
 ROOT = Path(__file__).resolve().parents[1]
 require, Error, canonical, sha = m.require, m.Error, m.canonical, m.sha
 RUST_FILES = ("research/agent/src/structured.rs", "research/agent/src/service.rs", "research/agent/src/provider.rs",
+              "research/agent/src/deepseek.rs",
               "research/agent/src/config.rs", "research/agent/src/lib.rs", "research/agent/src/risk_binding.rs",
               "research/agent/src/budget.rs", "research/agent/src/store.rs", "research/agent/src/bin/structured-research-agent.rs")
 FILES = ("research/cloud_structured.py", "research/structured-grammar-v1.json", *RUST_FILES)
@@ -38,15 +39,25 @@ def rust(command, root, *args):
     return value
 
 
-def configuration(root, agent_dir, mode, model_id="structured-recorded", configure_recorded=False):
-    require(mode == "recorded_cloud", "AUTHORIZED_CLOUD_BLOCKED_OWNER_PROVIDER_DATA_PERMISSION_REQUIRED")
+def configuration(root, agent_dir, mode, model_id=None, configure_recorded=False, deepseek_config=None):
+    require(mode in ("recorded_cloud", "authorized_cloud"), "CLOUD_SOURCE_REQUIRED")
     require(agent_dir is not None, "EXISTING_OWNER_AGENT_REQUIRED")
+    real=mode=="authorized_cloud"
+    model_id=model_id or ("ds4.1flash" if real else "structured-recorded")
+    require(not real or not configure_recorded,"RECORDING_IS_NOT_CLOUD_AUTHORIZATION")
     root = Path(root).absolute()
     rust("bind", root, Path(agent_dir).absolute())
     if configure_recorded:
         rust("configure-recorded", root)
-    model = rust("descriptor", root, model_id)
-    require(model["currency"] == "TST" and model["transport"] == "recorded", "RECORDING_IS_NOT_CLOUD_AUTHORIZATION")
+    if deepseek_config is not None:
+        require(real,"DEEPSEEK_CONFIG_REQUIRES_AUTHORIZED_SOURCE")
+        rust("configure-deepseek",root,Path(deepseek_config).absolute())
+    try:
+        model = rust("descriptor", root, model_id)
+    except Error:
+        if real: raise Error("AUTHORIZED_CLOUD_BLOCKED_OWNER_PROVIDER_DATA_PERMISSION_REQUIRED") from None
+        raise
+    require((model["currency"],model["transport"]) == (("CNY","https") if real else ("TST","recorded")), "RECORDING_IS_NOT_CLOUD_AUTHORIZATION")
     return dict(mode=mode, model=model, authority_id=model["authority_id"], parser_sha=m.hash_file(ROOT/"research/cloud_structured.py"),
                 binary_sha=m.hash_file(binary()), summary_mode="synthetic_test", real_provider_enabled=False)
 
@@ -71,6 +82,12 @@ def output_contract():
 
 
 def request(frozen,n,feedback=None):
+    if frozen["cloud"]["mode"]=="authorized_cloud":
+        require(n==1 and feedback is None,"DEEPSEEK_ONE_SYNTHETIC_ROUND_ONLY")
+        return dict(response_source=expected_source(frozen,n),
+            research_boundary=dict(mode="SYNTHETIC_ONLY_NO_MARKET_DATA",max_positions=50,candidate_limit=4),
+            development_summary=dict(mode="synthetic_test",observed_sessions=0,feedback=None),
+            grammar=grammar(),output_contract=output_contract())
     config=frozen["config"]
     dev=next(w for w in config["windows"] if w["role"]=="development")
     # This issue sends no real research/data summary. Counts are explicitly synthetic;
@@ -157,17 +174,24 @@ def freeze_transport(root,frozen,n,feedback=None,recording=None):
     folder=root/f"cloud/round-{n:02}"
     prepare_request(root,frozen,n,feedback)
     if not (folder/"context.json").exists():
-        require(recording is not None,"RECORDED_RESPONSE_REQUIRED_NO_DEFAULT_MODEL_CALL")
-        path=Path(recording)
-        m.data.v1.no_links(path)
-        require(path.is_file() and path.stat().st_size<=65536,"RECORDING_SIZE")
-        wire=path.read_bytes()
-        a.put(folder/"recording.json",wire,raw=True)
+        real=frozen["cloud"]["mode"]=="authorized_cloud"
+        if real:
+            require(recording is None,"DEEPSEEK_RECORDING_NOT_ALLOWED")
+            recording_sha="0"*64
+        else:
+            require(recording is not None,"RECORDED_RESPONSE_REQUIRED_NO_DEFAULT_MODEL_CALL")
+            path=Path(recording)
+            m.data.v1.no_links(path)
+            require(path.is_file() and path.stat().st_size<=65536,"RECORDING_SIZE")
+            wire=path.read_bytes()
+            a.put(folder/"recording.json",wire,raw=True)
+            recording_sha=sha(wire)
         a.put(folder/"context.json",dict(experiment=str(root),round=n,plan_sha=frozen["plan_sha"],
-            request_sha=m.hash_file(folder/"request.json"),recording_sha=sha(wire),model_id=frozen["cloud"]["model"]["id"],
+            request_sha=m.hash_file(folder/"request.json"),recording_sha=recording_sha,model_id=frozen["cloud"]["model"]["id"],
             boundary_sha=m.hash_file(root/"cloud/boundary.json"),
             model_sha=frozen["cloud"]["model"]["fingerprint"],authority_id=frozen["cloud"]["authority_id"]))
     elif recording is not None:
+        require(frozen["cloud"]["mode"]=="recorded_cloud","DEEPSEEK_RECORDING_NOT_ALLOWED")
         require(m.hash_file(Path(recording))==a.read(folder/"context.json")["recording_sha"],"RECORDING_CHANGED_NEW_EXPERIMENT_REQUIRED")
     require(m.hash_file(binary())==frozen["cloud"]["binary_sha"],"AGENT_BINARY_CHANGED_NEW_EXPERIMENT_REQUIRED")
     return folder
@@ -197,12 +221,15 @@ def obtain(root,frozen,n,feedback,seen,recording=None):
     except (Error,ValueError,TypeError,KeyError) as exc:
         proposals={}
         rejected=[dict(proposal_sha=receipt["response_sha"],state="REJECTED",reason=str(exc) if isinstance(exc,Error) else "INVALID_CLOUD_JSON")]
+    metadata=receipt.get("provider_metadata")
+    observed=bool(metadata and metadata.get("verification")=="REAL_PROVIDER_CALL_OBSERVED")
     audit=dict(task_id=task["id"],task_input_sha=task["input_sha"],task_result_sha=task["result_sha"],
         request_sha=receipt["request_sha"],wire_sha=receipt["wire_sha"],response_sha=receipt["response_sha"],
         model_sha=receipt["provider_sha"],prompt_sha=receipt["prompt_sha"],adapter_sha=receipt["adapter_sha"],
         calls=task["calls"],accepted=len(proposals),rejected=len(rejected),
         outcome="ALL_REJECTED" if not proposals else "PARTIAL" if len(proposals)<frozen["limits"]["candidates"] else "ACCEPTED",
-        real_provider_calls=0,paid_calls=0,currency="TST")
+        real_provider_calls=int(observed),paid_calls=int(observed),currency=frozen["cloud"]["model"]["currency"])
+    if metadata is not None: audit["provider_metadata"]=metadata
     a.put(folder/"receipt.json",audit)
     return (proposals,rejected),audit
 
@@ -211,16 +238,21 @@ def verify_round(root,frozen,n,record):
     import autonomous_research as a
     folder=root/f"cloud/round-{n:02}"
     ctx=a.read(folder/"context.json")
-    require(m.hash_file(folder/"request.json")==ctx["request_sha"] and m.hash_file(folder/"recording.json")==ctx["recording_sha"],"CLOUD_FROZEN_INPUT_CHANGED")
+    require(m.hash_file(folder/"request.json")==ctx["request_sha"],"CLOUD_FROZEN_INPUT_CHANGED")
+    verify_transport(folder,ctx,frozen)
     require(a.read(folder/"request.json")==request(frozen,n,record["feedback"]),"CLOUD_REQUEST_CHANGED")
     audit=a.read(folder/"receipt.json")
     require(record["cloud_receipt"]==audit,"CLOUD_RECEIPT_CHANGED")
     task=read_task(root,n)
     require(task and task["status"]=="completed" and task["id"]==audit["task_id"]
         and task["input_sha"]==audit["task_input_sha"] and task["result_sha"]==audit["task_result_sha"]
-        and task["calls"]==audit["calls"],"ORIGINAL_AGENT_RESULT_CHANGED")
+        and calls_match(task["calls"],audit["calls"],frozen["cloud"]["mode"]),"ORIGINAL_AGENT_RESULT_CHANGED")
     receipt=task["result"]["research"]["structured_research"]
-    require(receipt["response_sha"]==audit["response_sha"] and receipt["wire_sha"]==ctx["recording_sha"],"CLOUD_OUTPUT_SHA_MISMATCH")
+    require(receipt["response_sha"]==audit["response_sha"] and receipt["wire_sha"]==audit["wire_sha"],"CLOUD_OUTPUT_SHA_MISMATCH")
+    if frozen["cloud"]["mode"]=="recorded_cloud":
+        require(receipt["wire_sha"]==ctx["recording_sha"],"CLOUD_OUTPUT_SHA_MISMATCH")
+    else:
+        require(receipt["provider_metadata"]==audit["provider_metadata"],"CLOUD_PROVIDER_RECEIPT_CHANGED")
     proposals,rejected={},[]
     try:
         previous={p["ast_sha"] for i in range(1,n) for p in a.read(root/f"round-{i:02}/proposals.json")["proposals"].values()}
@@ -229,6 +261,25 @@ def verify_round(root,frozen,n,record):
     except (Error,ValueError,TypeError,KeyError) as exc:
         rejected=[dict(proposal_sha=receipt["response_sha"],state="REJECTED",reason=str(exc) if isinstance(exc,Error) else "INVALID_CLOUD_JSON")]
     require(proposals==record["proposals"] and rejected==record["rejected"],"CLOUD_AST_ADMISSION_CHANGED")
+
+
+def verify_transport(folder,ctx,frozen):
+    if frozen["cloud"]["mode"]=="recorded_cloud":
+        require(m.hash_file(folder/"recording.json")==ctx["recording_sha"],"CLOUD_FROZEN_INPUT_CHANGED")
+    else:
+        require(ctx["recording_sha"]=="0"*64 and not (folder/"recording.json").exists(),"DEEPSEEK_RECORDING_NOT_ALLOWED")
+
+
+def calls_match(current,frozen,mode):
+    if current==frozen:return True
+    if mode!="authorized_cloud" or len(current)!=len(frozen):return False
+    # Original invoice reconciliation may settle a usage estimate after archival.
+    # The frozen estimate stays immutable; all other call facts must still match.
+    for now,old in zip(current,frozen):
+        if not (old["state"]=="usage_received" and now["state"]=="settled" and
+                str(now["reason"]).startswith("OWNER_INVOICE:") and int(now["settled_micro"])>=0):return False
+        if {k:v for k,v in now.items() if k not in ("state","settled_micro","reason")}!={k:v for k,v in old.items() if k not in ("state","settled_micro","reason")}:return False
+    return True
 
 
 def verify_pending(root,frozen):
@@ -244,10 +295,10 @@ def verify_pending(root,frozen):
         ctx=a.read(folder/"context.json")
         require(ctx["experiment"]==str(root) and ctx["plan_sha"]==frozen["plan_sha"] and ctx["round"]==n
             and ctx["request_sha"]==m.hash_file(folder/"request.json")
-            and ctx["recording_sha"]==m.hash_file(folder/"recording.json")
             and ctx["boundary_sha"]==m.hash_file(root/"cloud/boundary.json")
             and ctx["model_sha"]==frozen["cloud"]["model"]["fingerprint"]
             and ctx["authority_id"]==frozen["cloud"]["authority_id"],"CLOUD_FROZEN_INPUT_CHANGED")
+        verify_transport(folder,ctx,frozen)
         task=read_task(root,n)
         if not (root/f"round-{n:02}/proposals.json").exists():
             pending.append(dict(round=n,state="NOT_DISPATCHED" if task is None else task["status"],
@@ -257,12 +308,24 @@ def verify_pending(root,frozen):
 
 def report(root):
     import autonomous_research as a
-    rounds=[]
+    mode=a.read(root/"plan.json")["cloud"]["mode"]
+    rounds=[];observed=possible=loopback=invoice=0
     for n in (1,2):
         folder=root/f"cloud/round-{n:02}"
         if not folder.exists(): continue
         task=read_task(root,n)
+        if task and mode=="authorized_cloud":
+            result=task["result"] or {}
+            metadata=(result.get("research",{}).get("structured_research") or {}).get("provider_metadata") or {}
+            sent=sum(c["state"] in ("dispatched","usage_received","outcome_uncertain","charged_failure","settled") for c in task["calls"])
+            if metadata.get("verification")=="REAL_PROVIDER_CALL_OBSERVED":
+                observed+=sent
+                invoice+=sum(int(c["settled_micro"]) for c in task["calls"] if c["state"]=="settled")
+            elif metadata.get("verification")=="LOOPBACK_NOT_REAL_PROVIDER":loopback+=sent
+            else:possible+=sent
         rounds.append(dict(round=n,task=None if task is None else {k:v for k,v in task.items() if k!="result"},
             receipt=a.read(folder/"receipt.json") if (folder/"receipt.json").exists() else None,
             blocked=a.read(folder/"blocked.json") if (folder/"blocked.json").exists() else None))
-    return dict(mode="recorded_cloud",real_provider_calls=0,paid_calls=0,external_data_sends=0,rounds=rounds)
+    return dict(mode=mode,real_provider_calls=observed,possible_real_provider_calls=possible,loopback_calls=loopback,
+                paid_calls=observed,paid_calls_meaning="billable_requests_not_final_invoice",owner_invoice_settled_micro=invoice,
+                external_data_sends=None if possible else observed,rounds=rounds)

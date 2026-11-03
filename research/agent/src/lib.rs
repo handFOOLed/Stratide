@@ -1,5 +1,6 @@
 pub mod budget;
 pub mod config;
+pub mod deepseek;
 pub mod eod_snapshot;
 pub mod multimodal;
 pub mod provider;

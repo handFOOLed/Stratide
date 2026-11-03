@@ -235,7 +235,7 @@ impl Agent {
                     && !crate::risk_cloud::recorded(model)
                     && !crate::structured::recorded(model)
                 {
-                    let successes:i64=c.query_row("SELECT COUNT(*) FROM tasks WHERE provider_id=?1 AND provider_hash=?2 AND result IS NOT NULL",params![model.id,model.fingerprint()],|r|r.get(0))?;
+                    let successes:i64=c.query_row("SELECT COUNT(*) FROM tasks WHERE provider_id=?1 AND provider_hash=?2 AND result IS NOT NULL AND (?3=0 OR json_extract(result,'$.research.structured_research.provider_metadata.verification')='REAL_PROVIDER_CALL_OBSERVED')",params![model.id,model.fingerprint(),crate::deepseek::is_model(model)],|r|r.get(0))?;
                     if successes > 0 {
                         view["verification"] = json!("REAL_PROVIDER_CALL_OBSERVED");
                     }
@@ -523,6 +523,10 @@ impl Agent {
                 "UPDATE calls SET state='dispatched' WHERE id=?1 AND state='reserved'",
                 [call_id],
             )?;
+            if crate::deepseek::is_model(m) {
+                // The one-shot switch and the durable dispatch marker commit together.
+                crate::deepseek::consume(&tx)?;
+            }
             tx.commit()?;
             #[cfg(test)]
             if crate::structured::is_input(&input) {

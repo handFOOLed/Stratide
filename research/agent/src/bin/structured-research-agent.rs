@@ -7,6 +7,14 @@ fn run(args: &[String]) -> Result<Value> {
     ensure(args.len() >= 2, "STRUCTURED_ARGUMENTS")?;
     let root = Path::new(&args[1]);
     match args[0].as_str() {
+        "configure-deepseek" if args.len() == 3 => {
+            stratide_research::deepseek::configure(root, Path::new(&args[2]))
+        }
+        "preflight" | "status-deepseek" if args.len() == 2 => {
+            stratide_research::deepseek::preflight(root)
+        }
+        "enable-deepseek" if args.len() == 3 => stratide_research::deepseek::enable(root, &args[2]),
+        "disable-deepseek" if args.len() == 2 => stratide_research::deepseek::disable(root),
         "bind" if args.len() == 3 => {
             let b = binding::bind_at(root, Path::new(&args[2]), None)?;
             Ok(json!({"authority_id":b.authority_id,"state":"EXISTING_OWNER_BOUND"}))

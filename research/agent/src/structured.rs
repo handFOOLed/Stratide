@@ -30,8 +30,9 @@ pub fn adapter_sha() -> String {
     hash(include_str!("structured.rs").as_bytes())
 }
 pub fn prompt_sha() -> String {
-    hash(SYSTEM.as_bytes())
+    hash(format!("{SYSTEM}{JSON_EXAMPLE}").as_bytes())
 }
+const JSON_EXAMPLE: &str = r#" JSON example: {"contract":"cloud-structured-response-v1","source":{"kind":"rust_agent_structured_v1","task_ref":"copy response_source.task_ref","plan_sha":"copy response_source.plan_sha","round":1,"producer_sha":"copy response_source.producer_sha","model_sha":"copy response_source.model_sha","prompt_sha":"copy response_source.prompt_sha","parser_sha":"copy response_source.parser_sha"},"candidates":[],"refusal":"No supported hypothesis"}. Copy the supplied response_source exactly into source and every candidate source; do not copy these example strings."#;
 pub fn is_model(m: &Model) -> bool {
     m.kind == "structured_research_v1"
 }
@@ -59,11 +60,15 @@ pub fn validate_model(m: &Model) -> Result<()> {
             && !c.billing_bound_source.is_empty()
             && !c.billing_bound_version.is_empty()
             && (1..=1_000_000_000_000).contains(&c.max_call_micro)
-            && m.fake_scenario.is_none()
-            && m.api_key_env.is_none(),
+            && m.fake_scenario.is_none(),
         "STRUCTURED_CONFIG_INVALID",
     )?;
     provider::endpoint(m.endpoint.as_deref().ok_or("ENDPOINT_REQUIRED")?)?;
+    if c.transport == "https" {
+        crate::deepseek::validate_model(m)?;
+    } else {
+        ensure(m.api_key_env.is_none(), "RECORDED_KEY_NOT_ALLOWED")?;
+    }
     Ok(())
 }
 pub fn authorize(m: &Model, scopes: &[String], budget: Option<&Budget>) -> Result<()> {
@@ -94,11 +99,9 @@ pub fn authorize(m: &Model, scopes: &[String], budget: Option<&Budget>) -> Resul
             && m.cost(m.max_input_tokens, m.max_output_tokens)? <= c.max_call_micro,
         "PRICE_UNBOUNDED",
     )?;
-    // No production live enable switch in this issue, even with a hand-edited grant.
-    ensure(
-        c.transport == "recorded",
-        "AUTHORIZED_CLOUD_BLOCKED_OWNER_PROVIDER_DATA_PERMISSION_REQUIRED",
-    )?;
+    if c.transport == "https" {
+        return crate::deepseek::authorize(m, b);
+    }
     ensure(
         b.currency == "TST"
             && p.source == "synthetic_test"
@@ -214,7 +217,12 @@ pub fn validate_request(ctx: &Context, m: &Model) -> Result<Value> {
             && plan["cloud"]["model"]["fingerprint"] == m.fingerprint()
             && ctx.model_sha == m.fingerprint()
             && ctx.model_id == m.id
-            && plan["cloud"]["mode"] == "recorded_cloud"
+            && plan["cloud"]["mode"]
+                == if recorded(m) {
+                    "recorded_cloud"
+                } else {
+                    "authorized_cloud"
+                }
             && plan["cloud"]["authority_id"] == ctx.authority_id,
         "STRUCTURED_PLAN_MODEL_MISMATCH",
     )?;
@@ -226,6 +234,10 @@ pub fn validate_request(ctx: &Context, m: &Model) -> Result<Value> {
             && v["output_contract"] == output_contract(),
         "STRUCTURED_SOURCE_OR_GRAMMAR_MISMATCH",
     )?;
+    if crate::deepseek::is_model(m) {
+        crate::deepseek::validate_request(ctx, &plan, &v)?;
+        return Ok(v);
+    }
     let b = &v["research_boundary"];
     fields(
         b,
@@ -330,6 +342,10 @@ pub fn gate(c: &Connection, trigger: Option<&str>, i: &InputSummary, s: &Setting
     let control = rp::read(&ctx.experiment.join("control/state.json"), 4096)?;
     ensure(control["cancelled"] == false, "STRUCTURED_OWNER_CANCELLED")?;
     ensure(control["paused"] == false, "STRUCTURED_OWNER_PAUSED")?;
+    let paused: String = c.query_row("SELECT value FROM meta WHERE key='paused'", [], |r| {
+        r.get(0)
+    })?;
+    ensure(paused != "true", "STRUCTURED_OWNER_PAUSED")?;
     let m = s
         .models
         .iter()
@@ -337,18 +353,32 @@ pub fn gate(c: &Connection, trigger: Option<&str>, i: &InputSummary, s: &Setting
         .ok_or("PINNED_MODEL_UNAVAILABLE")?;
     m.authorize(&i.scopes, s.budget.as_ref())?;
     validate_request(&ctx, m)?;
+    if crate::deepseek::is_model(m) {
+        crate::deepseek::gate(c, s, &ctx)?;
+    }
     Ok(())
 }
 pub fn build_body(m: &Model, request: &Value) -> Value {
-    json!({"model":m.model,"messages":[{"role":"system","content":SYSTEM},
+    let mut body = json!({"model":m.model,"messages":[{"role":"system","content":format!("{SYSTEM}{JSON_EXAMPLE}")},
         {"role":"user","content":request.to_string()}], "max_completion_tokens":m.max_output_tokens,
-        "response_format":{"type":"json_object"},"stream":false,"n":1})
+        "response_format":{"type":"json_object"},"stream":false,"n":1});
+    if crate::deepseek::is_model(m) {
+        // The frozen completion cap uses DeepSeek's documented wire spelling.
+        body.as_object_mut()
+            .unwrap()
+            .remove("max_completion_tokens");
+        body["max_tokens"] = json!(m.max_output_tokens);
+        body["thinking"] = json!({"type":"disabled"});
+    }
+    body
 }
 pub struct Prepared {
     pub model: Model,
     pub ctx: Context,
     pub body: Value,
     pub bytes: Vec<u8>,
+    pub(crate) secret: Option<zeroize::Zeroizing<String>>,
+    https: Option<(reqwest::blocking::Client, reqwest::Url)>,
 }
 pub fn prepare(m: &Model, input: &Value) -> Result<Prepared> {
     let i: InputSummary = serde_json::from_value(input["published_summary"].clone())
@@ -360,16 +390,50 @@ pub fn prepare(m: &Model, input: &Value) -> Result<Prepared> {
         body.to_string().len() + 1024 <= m.max_input_tokens as usize,
         "INPUT_TOKEN_BOUND_EXCEEDED",
     )?;
-    let bytes = read_bytes(&ctx.folder().join("recording.json"), 65536)?;
-    ensure(
-        hash(&bytes) == ctx.recording_sha,
-        "STRUCTURED_RECORDING_CHANGED_NEW_EXPERIMENT_REQUIRED",
-    )?;
+    let (bytes, secret, https) = if recorded(m) {
+        let bytes = read_bytes(&ctx.folder().join("recording.json"), 65536)?;
+        ensure(
+            hash(&bytes) == ctx.recording_sha,
+            "STRUCTURED_RECORDING_CHANGED_NEW_EXPERIMENT_REQUIRED",
+        )?;
+        (bytes, None, None)
+    } else {
+        ensure(
+            ctx.recording_sha == "0".repeat(64) && !ctx.folder().join("recording.json").exists(),
+            "DEEPSEEK_RECORDING_NOT_ALLOWED",
+        )?;
+        let b = binding::read_at(&ctx.experiment)?;
+        let settings = Settings::load(&b.settings_path)?;
+        let c = rusqlite::Connection::open_with_flags(
+            b.agent_dir.join("agent.sqlite"),
+            rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+        )?;
+        // No key content or DNS before both model and exact-request authorization.
+        gate(&c, Some(&ctx.trigger()), &i, &settings)?;
+        let cfg = crate::deepseek::gate(&c, &settings, &ctx)?;
+        let key = crate::deepseek::read_key(&cfg)?;
+        ensure(
+            !body.to_string().contains(key.as_str()),
+            "DEEPSEEK_SECRET_IN_REQUEST_DENIED",
+        )?;
+        #[cfg(test)]
+        let override_transport = crate::structured_tests::has_transport(&ctx);
+        #[cfg(not(test))]
+        let override_transport = false;
+        let https = if override_transport {
+            None
+        } else {
+            Some(provider::https_client(m)?)
+        };
+        (Vec::new(), Some(key), https)
+    };
     Ok(Prepared {
         model: m.clone(),
         ctx,
         body,
         bytes,
+        secret,
+        https,
     })
 }
 #[derive(Clone, Serialize, Deserialize)]
@@ -384,6 +448,8 @@ pub struct Receipt {
     pub provider_sha: String,
     pub prompt_sha: String,
     pub adapter_sha: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub provider_metadata: Option<Value>,
 }
 impl Receipt {
     pub fn validate(&self) -> Result<()> {
@@ -427,6 +493,8 @@ struct Choice {
     index: u32,
     message: Message,
     finish_reason: String,
+    #[serde(default)]
+    logprobs: Option<Value>,
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -435,6 +503,8 @@ struct Message {
     content: Option<String>,
     #[serde(default)]
     refusal: Option<String>,
+    #[serde(default)]
+    reasoning_content: Option<String>,
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -443,16 +513,45 @@ struct Usage {
     completion_tokens: u32,
     #[serde(default)]
     total_tokens: Option<u64>,
+    #[serde(default)]
+    prompt_cache_hit_tokens: Option<u32>,
+    #[serde(default)]
+    prompt_cache_miss_tokens: Option<u32>,
+    #[serde(default)]
+    prompt_tokens_details: Option<PromptDetails>,
+    #[serde(default)]
+    completion_tokens_details: Option<CompletionDetails>,
+}
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct PromptDetails {
+    cached_tokens: Option<u32>,
+}
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct CompletionDetails {
+    reasoning_tokens: Option<u32>,
 }
 pub fn call(p: Prepared) -> Outcome {
-    #[cfg(test)]
-    let wire = crate::structured_tests::transport(&p);
-    #[cfg(not(test))]
-    let wire: std::result::Result<Vec<u8>, &'static str> = Ok(p.bytes.clone());
+    let wire = if let Some((client, url)) = &p.https {
+        provider::send(client, url.as_str(), p.secret.as_ref().unwrap(), &p.body)
+    } else {
+        #[cfg(test)]
+        let wire = crate::structured_tests::transport(&p);
+        #[cfg(not(test))]
+        let wire = Ok(p.bytes.clone());
+        wire
+    };
     let bytes = match wire {
         Ok(b) => b,
         Err(reason) => return Outcome::Uncertain(reason),
     };
+    if p.secret
+        .as_ref()
+        .is_some_and(|s| bytes.windows(s.len()).any(|w| w == s.as_bytes()))
+    {
+        return Outcome::Uncertain("DEEPSEEK_SECRET_REFLECTION_REDACTED");
+    }
     decode(&p, &bytes)
 }
 pub fn decode(p: &Prepared, bytes: &[u8]) -> Outcome {
@@ -471,6 +570,43 @@ pub fn decode(p: &Prepared, bytes: &[u8]) -> Outcome {
         return fail();
     }
     let choice = &w.choices[0];
+    let real = crate::deepseek::is_model(&p.model);
+    if real
+        && (w.model.as_deref() != Some(crate::deepseek::MODEL)
+            || w.usage.prompt_tokens == 0
+            || w.system_fingerprint.as_ref().is_none_or(|s| {
+                s.is_empty()
+                    || s.len() > 128
+                    || !s
+                        .bytes()
+                        .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'-' | b'_'))
+            })
+            || w.usage.total_tokens.is_none()
+            || w.usage
+                .prompt_cache_hit_tokens
+                .zip(w.usage.prompt_cache_miss_tokens)
+                .is_none_or(|(hit, miss)| {
+                    u64::from(hit) + u64::from(miss) != u64::from(w.usage.prompt_tokens)
+                })
+            || w.usage
+                .prompt_tokens_details
+                .as_ref()
+                .and_then(|d| d.cached_tokens)
+                .is_some_and(|n| Some(n) != w.usage.prompt_cache_hit_tokens)
+            || w.usage
+                .completion_tokens_details
+                .as_ref()
+                .and_then(|d| d.reasoning_tokens)
+                .is_some_and(|n| n > w.usage.completion_tokens)
+            || choice.logprobs.is_some()
+            || choice
+                .message
+                .reasoning_content
+                .as_ref()
+                .is_some_and(|s| !s.trim().is_empty()))
+    {
+        return fail();
+    }
     if choice.index != 0
         || choice.message.role != "assistant"
         || !matches!(
@@ -484,6 +620,14 @@ pub fn decode(p: &Prepared, bytes: &[u8]) -> Outcome {
         return fail();
     }
     let content = choice.message.content.clone().unwrap_or_default();
+    if p.secret.as_ref().is_some_and(|s| {
+        content.contains(s.as_str())
+            || w.system_fingerprint
+                .as_ref()
+                .is_some_and(|fp| fp.contains(s.as_str()))
+    }) {
+        return Outcome::Uncertain("DEEPSEEK_SECRET_REFLECTION_REDACTED");
+    }
     if content.len() > 49152 {
         return fail();
     }
@@ -498,6 +642,20 @@ pub fn decode(p: &Prepared, bytes: &[u8]) -> Outcome {
         provider_sha: p.model.fingerprint(),
         prompt_sha: prompt_sha(),
         adapter_sha: adapter_sha(),
+        provider_metadata: if real {
+            Some(
+                json!({"model":w.model,"system_fingerprint":w.system_fingerprint,
+            "received_at":Utc::now().to_rfc3339(),"finish_reason":choice.finish_reason,
+            "prompt_tokens":w.usage.prompt_tokens,"completion_tokens":w.usage.completion_tokens,
+            "prompt_cache_hit_tokens":w.usage.prompt_cache_hit_tokens,"prompt_cache_miss_tokens":w.usage.prompt_cache_miss_tokens,
+            "reasoning_tokens":w.usage.completion_tokens_details.and_then(|d|d.reasoning_tokens),
+            "usage_estimate_basis":"peak_all_input_cache_miss_upper_estimate_not_invoice",
+            "transport":if p.https.is_some(){"https"}else{"libtest_loopback"},
+            "verification":if p.https.is_some(){"REAL_PROVIDER_CALL_OBSERVED"}else{"LOOPBACK_NOT_REAL_PROVIDER"}}),
+            )
+        } else {
+            None
+        },
     };
     Outcome::Success {
         research: Research {
@@ -522,13 +680,16 @@ pub fn descriptor(root: &Path, model_id: &str) -> Result<Value> {
         .find(|m| m.id == model_id)
         .ok_or("STRUCTURED_MODEL_NOT_CONFIGURED")?;
     m.authorize(&[SCOPE.into()], s.budget.as_ref())?;
+    if crate::deepseek::is_model(m) {
+        crate::deepseek::check_configuration(root)?;
+    }
     Ok(
         json!({"authority_id":b.authority_id,"id":m.id,"fingerprint":m.fingerprint(),"model":m.model,
         "model_version":m.cloud.as_ref().unwrap().model_version,"transport":m.cloud.as_ref().unwrap().transport,
         "receiver":m.endpoint,"purpose":SCOPE,"fields":FIELDS,"prompt_sha":prompt_sha(),"adapter_sha":adapter_sha(),
         "price_version":m.price.as_ref().unwrap().version,"maximum_micro":m.cost(m.max_input_tokens,m.max_output_tokens)?,
         "price":m.price,"grant":m.grant,"budget":s.budget,
-        "max_input_tokens":m.max_input_tokens,"max_output_tokens":m.max_output_tokens,"currency":s.budget.as_ref().unwrap().currency}),
+        "max_input_tokens":m.max_input_tokens,"max_output_tokens":m.max_output_tokens,"max_completion_tokens":m.max_output_tokens,"currency":s.budget.as_ref().unwrap().currency}),
     )
 }
 pub fn execute(root: &Path, round: u32, queue_only: bool) -> Result<Value> {

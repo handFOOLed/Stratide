@@ -1,12 +1,13 @@
 # Stratide 当前状态
 
-> 截至 2026-11-03，基于开始时最新 `main 7f12f12b321cdd7c24c90458f4ae4859f59ec3bd`，PR #64 已合并；附本分支 #65 结构化云提案接线开发状态。这是**当前实现快照**，不是实盘承诺。Owner 已决定 **Core-first、UI-later**：后续核心功能先用 CLI/持久报告验收，最后按 PR #28 设计体系统一集成 UI。
+> 截至 2026-11-03，基于开始时最新 `main e24f30f69b12fa303221ccd4fc6b8ea9084dc989`，PR #66 已合并；附本分支 #67 DeepSeek HTTPS 开发状态。这是**当前实现快照**，不是实盘承诺。Owner 已决定 **Core-first、UI-later**：后续核心功能先用 CLI/持久报告验收，最后按 PR #28 设计体系统一集成 UI。
 
 ## 已实现
 
 | 领域 | 实际状态 | 证据 |
 | --- | --- | --- |
-| M2-PR16 云端结构化提案接线（本分支 Draft） | #65：显式 recorded source → 原 Owner Rust 任务/统一预算 → PR15 强类型 AST/冻结/归档 → PR62 多候选三成本；loopback、预算/撤销/取消/崩溃/未知和篡改反证。真实 Provider 默认 BLOCKED，0 外发/付费/新行情/Token，不解锁交易 | [契约/操作](M2_PR16.md) / [本期开发证据](evidence/m2-pr16/README.md) |
+| M2-PR17 DeepSeek HTTPS（本分支 Draft） | #67：`ds4.1flash` → 官方 `deepseek-flash`；原 CNY Agent/Budget、受控密钥、纯合成输入、显式一次开关、PR15/PR62 研究闭环。默认 OFF；本次真实请求 `REAL_PROVIDER_NOT_RUN_OWNER_AUTHORIZATION_MISSING`，0 实际费用/真实密钥正文读取/新行情，不解锁 Paper/Live | [操作](M2_PR17.md) / [开发证据](evidence/m2-pr17/README.md) |
+| M2-PR16 云端结构化提案接线（PR #66 已合并） | #65：显式 recorded source → 原 Owner Rust 任务/统一预算 → PR15 强类型 AST/冻结/归档 → PR62 多候选三成本；loopback、预算/撤销/取消/崩溃/未知和篡改反证。该期真实 Provider BLOCKED，0 外发/付费/新行情/Token，不解锁交易 | [契约/操作](M2_PR16.md) / [原开发证据](evidence/m2-pr16/README.md) |
 | M2-PR15 自主策略研究闭环（PR #64 已合并） | #63：受限 AST、本地确定性四类提案、冻结实验与开发段反馈、PR62 同源多候选评测和匹配基准、持久失败/恢复及只读研究 Inbox 契约。原真实五年运行与开发证据保留；0 新行情/Token/云模型/付费，不解锁交易 | [契约/操作](M2_PR15.md) / [原开发证据](evidence/m2-pr15/README.md) |
 | M2-PR14 多股票历史研究 V1（PR #62 已合并） | #61：只读处理 1212 会话 / 25569182 规范行，实测 5774 代码、5387 代码曾入研究子集；三策略/三基准、三成本情景及重置 Walk-forward，541 秒 / 267.5 MiB，12 项定向自测。三规则未建立相对等权优势；历史 PIT、可成交性仍未验证，研究指数不是账户 NAV 或 Paper/Live 准入 | [契约/操作](M2_PR14.md) / [原开发证据](evidence/m2-pr14/README.md) |
 | M2-PR13 历史 sidecar V2（PR #60 已合并） | #59：2000 积分现有账号，四接口各 1212 日期已落地，6068 次原请求；因子 1212 日旧 PARTIAL 标签保留且不再推断数字 cap，限价 33 日 PARTIAL。历史市场覆盖仍未验证；持久预算/断点续传、只读版本查询和冻结锚点复权 | [契约/操作](M2_PR13.md) / [实际证据](evidence/m2-pr13/README.md) / [增量修复](evidence/m2-pr13/r1/README.md) |

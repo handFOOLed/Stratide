@@ -1,0 +1,142 @@
+{
+  "accepted": 4,
+  "actual_key_content_reads": 0,
+  "actual_paid_calls": 0,
+  "actual_paid_micro": 0,
+  "after_once_enabled": false,
+  "archive_sha": "06221cecedca38e0a7a5a184340b88de60f5f4aa790b18b7cc8d475ebd6eaaad",
+  "ast_sha": [
+    "9af4b5ebb2b7eeb6b53190c3aa66a9efc588ad99dec73453aa7081ffd445fa16",
+    "6778aa06ff343cac48347ffbc845861c3b26dc05a0e0ca008e3ab641c271370d",
+    "3b1fb3afe726fa7b4d3e0905bbcf44ed23980e0ce170c9cafdcb33bbc51b43c2",
+    "643c440254c3c30b7f9652f294e07c2ffd9f8a975a2eee412b391b6234e36813"
+  ],
+  "base_sha": "e24f30f69b12fa303221ccd4fc6b8ea9084dc989",
+  "binary_sha": "77a26e70c23ddfbdb49e99af95f9c1846729e24151cfc37288b49f0d2c66a3bb",
+  "call_count_after_duplicate_once": 1,
+  "classification": "EXPLORATORY",
+  "contract": "m2-pr17-synthetic-evidence-v1",
+  "data_mode": "historical_backfill_ex_post",
+  "eligibility": "ELIGIBILITY_DENIED",
+  "fixture": "synthetic_90_sessions_original_CNY_test_Store_not_real_money",
+  "forward_research_readiness": "BLOCKED",
+  "historical_pit_status": "NOT_VERIFIED",
+  "historical_received_at": null,
+  "live_allowed": false,
+  "model": {
+    "adapter_sha": "adbb97a7b8df201cfd68dbe41d90b338f3551d1764b50546feb9789f8c4cd6c0",
+    "authority_id": "cb27ed87ecaee94d263668a6c2d8c0832b8331bd69d5d58bb1c8d76358c019e0",
+    "budget": {
+      "currency": "CNY",
+      "daily_limit_micro": 1000000,
+      "monthly_limit_micro": 10000000,
+      "timezone": "Asia/Shanghai"
+    },
+    "currency": "CNY",
+    "fields": [
+      "response_source",
+      "research_boundary",
+      "development_summary",
+      "grammar",
+      "output_contract"
+    ],
+    "fingerprint": "47294e0046b1e9b2dbfdb786f743df4b10ebfb20b6b66068faceef0f4e623337",
+    "grant": {
+      "authorized_at": "2026-11-03T06:55:32.471634+00:00",
+      "purpose": "cloud_structured_research_v1",
+      "receiver": "https://api.deepseek.com/chat/completions",
+      "revoked": false,
+      "scopes": [
+        "cloud_structured_research_v1"
+      ]
+    },
+    "id": "ds4.1flash",
+    "max_completion_tokens": 4096,
+    "max_input_tokens": 32768,
+    "max_output_tokens": 4096,
+    "maximum_micro": 98304,
+    "model": "deepseek-flash",
+    "model_version": "DeepSeek-V4.1-Flash-1017_ALIAS_MUTABLE",
+    "price": {
+      "bounded_text_billing_verified": true,
+      "currency": "CNY",
+      "input_micro_per_million": 2000000,
+      "output_micro_per_million": 8000000,
+      "source": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+      "version": "deepseek-cny-20261103-peak-v1"
+    },
+    "price_version": "deepseek-cny-20261103-peak-v1",
+    "prompt_sha": "350b8632f5463aa2c2460f767122e647461e4e458d63c4e9d0041396e7f26457",
+    "purpose": "cloud_structured_research_v1",
+    "receiver": "https://api.deepseek.com/chat/completions",
+    "transport": "https"
+  },
+  "new_tushare_calls": 0,
+  "old_full_data_verifications": 0,
+  "paper_allowed": false,
+  "parser_sha": "999d87c8376a74fbba0ca2b76a1273d3b976f36a1800cda9e2a2e94a0afbf26a",
+  "plan_sha": "543fb52aed62aa36c900f1be18feaf8ec37d83380aa26efb025db3042c59aee5",
+  "preflight_enabled": false,
+  "provider_published_at": null,
+  "real_provider_status": "REAL_PROVIDER_NOT_RUN_OWNER_AUTHORIZATION_MISSING",
+  "receipt": {
+    "accepted": 4,
+    "adapter_sha": "adbb97a7b8df201cfd68dbe41d90b338f3551d1764b50546feb9789f8c4cd6c0",
+    "calls": [
+      {
+        "day": "2026-11-03",
+        "id": 1,
+        "input_tokens": 4096,
+        "maximum_micro": 98304,
+        "month": "2026-11",
+        "output_tokens": 4096,
+        "price_version": "deepseek-cny-20261103-peak-v1",
+        "reason": null,
+        "settled_micro": 0,
+        "state": "usage_received",
+        "usage_micro": 40960
+      }
+    ],
+    "currency": "CNY",
+    "model_sha": "47294e0046b1e9b2dbfdb786f743df4b10ebfb20b6b66068faceef0f4e623337",
+    "outcome": "ACCEPTED",
+    "paid_calls": 0,
+    "prompt_sha": "350b8632f5463aa2c2460f767122e647461e4e458d63c4e9d0041396e7f26457",
+    "provider_metadata": {
+      "completion_tokens": 4096,
+      "finish_reason": "stop",
+      "model": "deepseek-flash",
+      "prompt_cache_hit_tokens": 1000,
+      "prompt_cache_miss_tokens": 3096,
+      "prompt_tokens": 4096,
+      "reasoning_tokens": 0,
+      "received_at": "2026-11-03T06:55:34.592902700+00:00",
+      "system_fingerprint": "synthetic-fp-1",
+      "transport": "libtest_loopback",
+      "usage_estimate_basis": "peak_all_input_cache_miss_upper_estimate_not_invoice",
+      "verification": "LOOPBACK_NOT_REAL_PROVIDER"
+    },
+    "real_provider_calls": 0,
+    "rejected": 0,
+    "request_sha": "9c0fee7860c80aa5a238a92ce689877f55605de1d055789d25a9a0722a9a46cf",
+    "response_sha": "46eb93654c21b5b2d0da96dd25545e456d8de5aabb904e9bb062ff937f8867a3",
+    "task_id": 1,
+    "task_input_sha": "206dd369d26bb6be3e46e8780237b6ceade8ae40f6d0fbfd7030e21197d45626",
+    "task_result_sha": "eed6be6f7cd4f9341bea14562b54a5e008c0053ae12b54c7c43f5e9415d46bc0",
+    "wire_sha": "b2c2f5bd094b1ea2aeabd9c835da6b75b6cdac8febad30cc953a05d97bbde84f"
+  },
+  "rejected": 0,
+  "request_sha": "9c0fee7860c80aa5a238a92ce689877f55605de1d055789d25a9a0722a9a46cf",
+  "result_sha": "937bd8879acfe5fe873ebcdcc80b4fa6578a4e234ff6f5ca744a07cc8bf53415",
+  "source_sha": "9134e0ed97fa3898b221fdaff3125a122c442db1a881460b01f36e8d37ae60f7",
+  "task_id": 1,
+  "task_input_sha": "206dd369d26bb6be3e46e8780237b6ceade8ae40f6d0fbfd7030e21197d45626",
+  "task_result_sha": "eed6be6f7cd4f9341bea14562b54a5e008c0053ae12b54c7c43f5e9415d46bc0",
+  "transport": {
+    "loopback_http_calls": 1,
+    "real_provider_calls": 0,
+    "request_body_sha": "91a8e944887c45dba4ff5255ba39143b7cbeaf462ba2081ed10917f338c81172"
+  },
+  "tushare_token_reads": 0,
+  "verified": true
+}

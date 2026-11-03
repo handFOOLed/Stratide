@@ -66,6 +66,9 @@ def source_files(frozen=None):
 
 def plan(ds, config, seed=63, limits=None, cloud=None):
     limits = dict(DEFAULT_LIMITS, **(limits or {}))
+    if cloud and cloud["mode"]=="authorized_cloud":
+        limits["rounds"]=1
+        require(limits["candidates"]==4,"DEEPSEEK_AT_MOST_FOUR_CANDIDATES")
     require(set(limits) == set(DEFAULT_LIMITS), "RESOURCE_FIELDS")
     for key,hi in dict(candidates=8, rounds=2, workers=1, wall_seconds=3600, memory_mib=512,
                        disk_mib=256, checkpoint_sessions=100, max_attempts_per_round=3).items():
@@ -92,7 +95,7 @@ def plan(ds, config, seed=63, limits=None, cloud=None):
         sealed_results=True, provider_integration="NONE_NO_AGENT_DISPATCH_OR_NEW_BUDGET_LEDGER")
     if cloud is not None:
         base.update(version="autonomous-cloud-plan-v1",cloud=cloud,proposer="rust_agent_structured_v1",
-            provider_integration="ORIGINAL_RUST_AGENT_EXACT_TASK_SHARED_BUDGET_RECORDED_ONLY")
+            provider_integration="ORIGINAL_RUST_AGENT_EXACT_TASK_SHARED_BUDGET_"+("AUTHORIZED_SYNTHETIC_ONCE" if cloud["mode"]=="authorized_cloud" else "RECORDED_ONLY"))
         base["code_sha"]={p:m.hash_file(ROOT/p) for p in source_files(base)}
     return dict(base, plan_sha=sha(canonical(base)))
 
@@ -123,7 +126,7 @@ def initialize(ds, config, out, seed=63, limits=None, authorized=False, cloud=No
         for relative in source_files(frozen):
             put(root/"frozen-source"/relative, (ROOT/relative).read_bytes(), raw=True)
         put(root/"authorization.json", dict(plan_sha=frozen["plan_sha"], authority="OWNER_LOCAL_START",
-            scope="CLOUD_RECORDED_LOCAL_RESEARCH_ONLY" if cloud else "LOCAL_DETERMINISTIC_RESEARCH_ONLY",
+            scope=local_scope(frozen),
             paid_limit_micro=0, providers=[cloud["model"]["id"]] if cloud else [], trading=False))
         if not (root/"control"/"state.json").exists():
             put(root/"control"/"state.json", dict(paused=False, cancelled=False))
@@ -135,7 +138,13 @@ def initialize(ds, config, out, seed=63, limits=None, authorized=False, cloud=No
             import cloud_structured as source
             source.freeze_boundary(root,frozen)
             source.prepare_request(root,frozen,1)
+            if cloud["mode"]=="authorized_cloud": source.freeze_transport(root,frozen,1)
     return status(root)
+
+
+def local_scope(frozen):
+    if "cloud" not in frozen:return "LOCAL_DETERMINISTIC_RESEARCH_ONLY"
+    return "CLOUD_SYNTHETIC_ONCE_LOCAL_EVALUATION_ONLY" if frozen["cloud"]["mode"]=="authorized_cloud" else "CLOUD_RECORDED_LOCAL_RESEARCH_ONLY"
 
 
 def check_plan(root, current_code=False):
@@ -363,7 +372,7 @@ def once(out, progress=None, fault=None, recording=None):
     with m.data.v1.writer_lock(root):
         frozen = check_plan(root, current_code=True)
         auth = read(root/"authorization.json")
-        require(auth["plan_sha"] == frozen["plan_sha"] and auth["scope"] == ("CLOUD_RECORDED_LOCAL_RESEARCH_ONLY" if "cloud" in frozen else "LOCAL_DETERMINISTIC_RESEARCH_ONLY")
+        require(auth["plan_sha"] == frozen["plan_sha"] and auth["scope"] == local_scope(frozen)
                 and auth["paid_limit_micro"] == 0 and auth["providers"] == ([frozen["cloud"]["model"]["id"]] if "cloud" in frozen else [])
                 and not auth["trading"], "LOCAL_AUTHORIZATION_INVALID")
         s = status(root)
@@ -540,7 +549,7 @@ def verify(out):
 
 def cli():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("plan", "init", "once", "status", "history", "report", "verify", "pause", "resume", "cancel"))
+    parser.add_argument("command", choices=("plan", "init", "once", "status", "history", "report", "verify", "pause", "resume", "cancel", "configure", "preflight", "enable", "disable"))
     parser.add_argument("--v1-root", type=Path)
     parser.add_argument("--v2-root", type=Path)
     parser.add_argument("--v1-version", type=int)
@@ -554,11 +563,23 @@ def cli():
     parser.add_argument("--full", action="store_true")
     parser.add_argument("--source",choices=("deterministic","recorded_cloud","authorized_cloud"),default="deterministic")
     parser.add_argument("--agent-dir",type=Path)
-    parser.add_argument("--model-id",default="structured-recorded")
+    parser.add_argument("--model-id")
     parser.add_argument("--configure-recorded",action="store_true")
     parser.add_argument("--recording",type=Path)
+    parser.add_argument("--deepseek-config",type=Path)
+    parser.add_argument("--opt-in")
     args = parser.parse_args()
-    require(args.source!="authorized_cloud","AUTHORIZED_CLOUD_BLOCKED_OWNER_PROVIDER_DATA_PERMISSION_REQUIRED")
+    if args.command in ("configure","preflight","enable","disable"):
+        import cloud_structured as cloud
+        require(args.out is not None,"OUTPUT_REQUIRED")
+        root=output(args.out,existing=args.command not in ("configure","disable"))
+        if args.command=="configure":
+            require(args.agent_dir is not None and args.deepseek_config is not None,"EXISTING_OWNER_AND_LOCAL_CONFIG_REQUIRED")
+            cloud.rust("bind",root,Path(args.agent_dir).absolute())
+            return cloud.rust("configure-deepseek",root,Path(args.deepseek_config).absolute())
+        if args.command=="disable":return cloud.rust("disable-deepseek",root)
+        check_plan(root,current_code=True)
+        return cloud.rust("enable-deepseek",root,args.opt_in or "") if args.command=="enable" else cloud.rust("preflight",root)
     with localcontext() as ctx:
         ctx.prec = 50
         if args.command in ("plan", "init"):
@@ -575,9 +596,9 @@ def cli():
                 return p if args.full else dict(**m.SAFE, plan_sha=p["plan_sha"], source_sha=p["source_sha"], limits=p["limits"], seed=p["seed"])
             require(args.out is not None, "OUTPUT_REQUIRED")
             cloud=None
-            if args.source=="recorded_cloud":
+            if args.source in ("recorded_cloud","authorized_cloud"):
                 import cloud_structured as source
-                cloud=source.configuration(output(args.out,existing=False),args.agent_dir,args.source,args.model_id,args.configure_recorded)
+                cloud=source.configuration(output(args.out,existing=False),args.agent_dir,args.source,args.model_id,args.configure_recorded,args.deepseek_config)
             return initialize(ds, config, args.out, args.seed, options.get("limits"), args.authorize_local,cloud)
         require(args.out is not None, "OUTPUT_REQUIRED")
         if args.command in ("pause", "resume", "cancel"):

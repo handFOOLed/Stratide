@@ -6,6 +6,10 @@
 
 ## 当前状态
 
+- **M2-PR17 DeepSeek HTTPS（#67 / 默认 OFF）：** 真实 API model 固定为 `deepseek-flash`，本模块内部默认 ID 为 `ds4.1flash`。复用原 Agent/CNY Budget 与 PR15 AST/PR62 离线评价；开发验证使用 recorded/loopback，真实请求为 `REAL_PROVIDER_NOT_RUN_OWNER_AUTHORIZATION_MISSING`，Paper/Live 仍 BLOCKED。见[操作与边界](docs/M2_PR17.md)和[测试证据](docs/evidence/m2-pr17/README.md)。
+
+Owner 首次使用：在既有真实 CNY Agent 的 `settings.json` 手动填日/月 hard cap，复制[空配置](research/agent/deepseek-owner-config.example.json)到本机 ignored 目录，明确单次上限、DeepSeek 接收方、纯合成字段许可、密钥来源与已复核的价格期限；不要把 TST 账本换币种。依次运行 `scripts/autonomous-research.py configure`、`init --source authorized_cloud`、只读 `preflight`，核对字段说明/请求 SHA/最大预留；然后 `enable --opt-in APPROVE_ONE_SYNTHETIC_DEEPSEEK_REQUEST` 和 `once` 最多发一个真实请求。`disable` 停止后续外发，`status/history/report/verify` 只读审计；未知费用必须沿用原 Owner 发票核销，不能自动释放。[完整可复制命令](docs/M2_PR17.md#owner-操作)。本次未提供具体费用和外发批准，因此没有读取真实密钥正文或请求 Provider。
+
 - **历史 sidecar V2（本分支 Draft / #59）：** [M2-PR13](docs/M2_PR13.md) 使用现有 2000 积分 Tushare 账号执行四 API 五年历史回填；每 API 1212 日期已落地、共 6068 次请求，支持持久有界续传、版本查询与冻结锚点复权。[真实证据](docs/evidence/m2-pr13/README.md)；数据仅在本机、ex-post / coverage PARTIAL，不增加 PIT 或交易资格。
 - **历史仓库 V1（PR #58 已合并）：** [M2-PR12](docs/M2_PR12.md) 提供独立 SQLite 证券目录、交易日历、未复权日线的预检/试采/有界回填、断点续传与只读查询。真实取得范围与缺口见[证据](docs/evidence/m2-pr12/README.md)；`historical_backfill_ex_post / PIT NOT_VERIFIED`，不增加前向或交易资格。
 - **已实现：** Paper Risk Kernel、持久账本、六报告、真实历史 EOD 探索性回测、只观察的前向 EOD journal、[Web Dashboard V1](apps/dashboard/README.md)。
