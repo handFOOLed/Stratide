@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "key_file": "",
+  "grant_version": "deepseek-synthetic-grant-v1",
+  "synthetic_only": false,
+  "provider_terms_reviewed": false,
+  "authorized_at": "",
+  "price_reviewed_at": "",
+  "price_valid_until": "",
+  "max_call_micro": 0
+}

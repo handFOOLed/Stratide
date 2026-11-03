@@ -17,6 +17,7 @@ __pycache__/
 secrets/
 config/local.toml
 /STRATIDE_TUSHARE_TOKEN.md
+/STRATIDE_DEEPSEEK_APIKEY.md
 
 # Runtime money/data artifacts (repo root only; apps/dashboard/src/state is tracked source)
 /state/

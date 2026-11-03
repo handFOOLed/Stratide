@@ -130,6 +130,27 @@ pub fn prepare(m: &Model, input: &Value) -> Result<Prepared> {
             },
         });
     }
+    let (client, url) = https_client(m)?;
+    let key = std::env::var(m.api_key_env.as_ref().ok_or("KEY_ENV_REQUIRED")?)
+        .map_err(|_| "PROVIDER_KEY_MISSING")?;
+    ensure(
+        reqwest::header::HeaderValue::from_str(&format!("Bearer {key}")).is_ok(),
+        "PROVIDER_KEY_INVALID",
+    )?;
+    Ok(Prepared::Cloud {
+        client,
+        url,
+        key,
+        body,
+    })
+}
+
+/// The same pinned, proxy-free TLS boundary for the structured DeepSeek route.
+pub(crate) fn https_client(m: &Model) -> Result<(Client, Url)> {
+    #[cfg(test)]
+    if crate::deepseek::is_model(m) {
+        return Err("LIBTEST_REQUIRES_LOOPBACK_NO_EXTERNAL_DNS".into());
+    }
     let url = endpoint(m.endpoint.as_deref().ok_or("ENDPOINT_REQUIRED")?)?;
     let host = url.host_str().ok_or("ENDPOINT_INVALID")?;
     let addresses: Vec<SocketAddr> = (host, 443)
@@ -139,12 +160,6 @@ pub fn prepare(m: &Model, input: &Value) -> Result<Prepared> {
     ensure(
         !addresses.is_empty() && addresses.iter().all(|a| public_ip(a.ip())),
         "PROVIDER_NETWORK_TARGET_REJECTED",
-    )?;
-    let key = std::env::var(m.api_key_env.as_ref().ok_or("KEY_ENV_REQUIRED")?)
-        .map_err(|_| "PROVIDER_KEY_MISSING")?;
-    ensure(
-        reqwest::header::HeaderValue::from_str(&format!("Bearer {key}")).is_ok(),
-        "PROVIDER_KEY_INVALID",
     )?;
     // Pin the inspected addresses to avoid DNS rebinding; no system proxies,
     // redirects, transparent retries, cookies, or insecure TLS overrides.
@@ -158,12 +173,7 @@ pub fn prepare(m: &Model, input: &Value) -> Result<Prepared> {
         .connect_timeout(Duration::from_secs(10))
         .build()
         .map_err(|_| "PROVIDER_CLIENT_UNAVAILABLE")?;
-    Ok(Prepared::Cloud {
-        client,
-        url,
-        key,
-        body,
-    })
+    Ok((client, url))
 }
 
 pub fn call(prepared: Prepared, attempt: usize) -> Outcome {
@@ -238,7 +248,12 @@ pub(crate) fn send(
         .send()
         .map_err(|_| "PROVIDER_TRANSPORT_OUTCOME_UNKNOWN")?;
     if !response.status().is_success() {
-        return Err("PROVIDER_HTTP_ERROR_BILLING_UNKNOWN");
+        return Err(match response.status().as_u16() {
+            429 => "PROVIDER_HTTP_429_BILLING_UNKNOWN",
+            500..=599 => "PROVIDER_HTTP_5XX_BILLING_UNKNOWN",
+            300..=399 => "PROVIDER_HTTP_REDIRECT_REJECTED_BILLING_UNKNOWN",
+            _ => "PROVIDER_HTTP_ERROR_BILLING_UNKNOWN",
+        });
     }
     let mut bytes = Vec::new();
     response

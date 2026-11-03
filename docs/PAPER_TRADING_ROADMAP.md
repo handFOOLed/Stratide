@@ -40,11 +40,13 @@ PR #42 的[历史公司行为桥接 V1](M1_PR09.md)、PR #44 的[EOD 自动研�
 
 **M2-PR15 已合并（PR #64）：** [自主策略研究闭环 V1](M2_PR15.md)：可信本地确定性提案 → 强类型受限 AST → 评价前冻结 → PR62 同源多候选/匹配基准 → 成功与失败封存 → 仅开发段反馈的下一轮有界研究。原真实五年结果与资源见 [原证据](evidence/m2-pr15/README.md)，不以正收益作为工程 PASS 条件。旧 seed63/两轮/8 AST 和 post-seal 证据保留。
 
-**当前 M2-PR16 Draft（#65）：** [云端结构化提案接线 V1](M2_PR16.md)：原 Owner Agent/共享 Budget → 受控 recorded/loopback → PR15 AST/冻结/持久控制器 → PR62 同源评测/失败审计。真实 Provider 在本 Issue 始终 BLOCKED；0 付费/外发/新行情/Token/旧 raw 或全库复验，不解锁 Paper/Live。运行与反证见 [开发证据](evidence/m2-pr16/README.md)。
+**M2-PR16 已合并（PR #66）：** [云端结构化提案接线 V1](M2_PR16.md)：原 Owner Agent/共享 Budget → 受控 recorded/loopback → PR15 AST/冻结/持久控制器 → PR62 同源评测/失败审计。该期真实 Provider BLOCKED；0 付费/外发/新行情/Token/旧 raw 或全库复验，不解锁 Paper/Live。原运行与反证见 [开发证据](evidence/m2-pr16/README.md)。
+
+**当前 M2-PR17 Draft（#67）：** [DeepSeek 受控 HTTPS](M2_PR17.md)：内部 `ds4.1flash` / API `deepseek-flash`，默认 OFF；原 CNY Agent/Budget、受控密钥、纯合成输入的一次请求许可、PR15 AST/PR62 离线闭环。开发采用 recorded/loopback，未获 Owner 具体费用与外发授权，真实请求 `REAL_PROVIDER_NOT_RUN_OWNER_AUTHORIZATION_MISSING`。不重复旧五年研究或全库验收，Paper/Live 保持 BLOCKED；[本期证据](evidence/m2-pr17/README.md)。
 
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |
-| **当前 #65** | **Sol** | M2-PR16 受控结构化云提案完整闭环，原任务/预算与 AST/评测复用、recorded/loopback 定向验证；唯一 Draft，固定 HEAD 审查及 Owner 明确批准后才可合并。 |
+| **当前 #67** | **Sol** | M2-PR17 DeepSeek 真实 HTTPS 功能与原预算/外发双门禁，合成及 loopback 验证；唯一 Draft，固定 HEAD 审查及 Owner 明确批准后才可合并。 |
 | **后续核心** | Owner 再定范围 | #10 真实开盘、PIT、账户税/到账仍受阻；#36 完整多模态消融及真实供应商未验证。 |
 | **核心全部完成后** | **Sol** | 按 PR #28 的设计体系统一集成 UI；本期不改 UI。 |
 

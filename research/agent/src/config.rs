@@ -163,9 +163,11 @@ impl Settings {
             ensure(
                 !m.id.is_empty()
                     && m.id.len() <= 48
-                    && m.id
+                    && (m
+                        .id
                         .bytes()
                         .all(|c| c.is_ascii_alphanumeric() || c == b'-' || c == b'_')
+                        || m.id == crate::deepseek::ID)
                     && ids.insert(m.id.as_str())
                     && m.label.len() <= 120
                     && !m.label.is_empty()
