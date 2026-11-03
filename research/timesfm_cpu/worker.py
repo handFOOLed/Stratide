@@ -19,10 +19,11 @@ def linux_limits():
     cg = Path("/sys/fs/cgroup") / entry[3:].lstrip("/")
     cap = (cg / "memory.max").read_text().strip()
     swap = (cg / "memory.swap.max").read_text().strip()
-    require(cap.isdigit() and int(cap) <= MEMORY_MAX and swap == "0", "MEMORY_CGROUP_REQUIRED")
+    oom_group = (cg / "memory.oom.group").read_text().strip()
+    require(cap.isdigit() and int(cap) <= MEMORY_MAX and swap == "0" and oom_group == "1", "MEMORY_CGROUP_REQUIRED")
     interfaces = {line.split(":")[0].strip() for line in Path("/proc/net/dev").read_text().splitlines() if ":" in line}
     require(interfaces <= {"lo"}, "PRIVATE_NETWORK_REQUIRED")
-    return dict(mechanism="systemd-cgroup-v2+bubblewrap", memory_max_bytes=int(cap), memory_swap_max_bytes=0)
+    return dict(mechanism="systemd-cgroup-v2+bubblewrap", memory_max_bytes=int(cap), memory_swap_max_bytes=0, memory_oom_group=True)
 
 
 def cgroup_metrics():
@@ -52,19 +53,42 @@ def execute(v, directory, engine_factory=Engine):
                              cpu_seconds=time.process_time() - cpu, batch_timings=timings, failures=0))
 
 
+
+def read_request_line(fd):
+    # Use raw FD reads: a daemon must never hold Python's buffered-stdin lock
+    # during interpreter shutdown. Preserve any already-read heartbeat bytes.
+    data=bytearray()
+    while True:
+        newline=data.find(b"\n")
+        if newline >= 0:
+            return bytes(data[:newline]),bytes(data[newline+1:])
+        require(len(data) <= MAX_INPUT,"WORKER_INPUT_LIMIT")
+        block=os.read(fd,min(65536,MAX_INPUT+1-len(data)))
+        if not block:return bytes(data),b""
+        data.extend(block)
+
+
 def main():
     try:
         diagnostic = sys.argv[1:] == ["--development-cpu-diagnostic"]
         require(not sys.argv[1:] or diagnostic, "WORKER_ARGUMENTS")
         limits = dict(mechanism="UNISOLATED_DEVELOPMENT_DIAGNOSTIC", memory_max_bytes=None) if diagnostic else linux_limits()
-        raw = sys.stdin.buffer.readline(MAX_INPUT + 1).rstrip(b"\n")
+        input_fd=sys.stdin.fileno()
+        raw,pending=read_request_line(input_fd)
         require(len(raw) <= MAX_INPUT, "WORKER_INPUT_LIMIT")
         if not diagnostic:
             last = [time.monotonic()]
             def heartbeat():
-                while sys.stdin.buffer.readline(3) == b".\n":
-                    last[0] = time.monotonic()
-                os._exit(3)
+                buffered=pending
+                while True:
+                    while b"\n" in buffered:
+                        line,buffered=buffered.split(b"\n",1)
+                        if line != b".":os._exit(3)
+                        last[0] = time.monotonic()
+                    if len(buffered)>1:os._exit(3)
+                    block=os.read(input_fd,4096)
+                    if not block:os._exit(3)
+                    buffered+=block
             def watchdog():
                 while time.monotonic() - last[0] < 5:
                     time.sleep(.5)

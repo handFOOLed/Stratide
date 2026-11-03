@@ -6,7 +6,7 @@
 
 ## 当前状态
 
-- **M2-PR18 本地 TimesFM CPU（#69 / Draft / 默认 OFF）：** 固定官方 TimesFM 2.5 200M 权重与 CPU 依赖，按需 Python Worker 接原风险结果/Naive/EWMA；生产目标 N100 Linux，N100 验收仍 `NOT_VERIFIED`。不改变旧云路径或 Paper/Live 权限。见[运行与隔离边界](docs/M2_PR18.md)、[实际证据与阻断项](docs/evidence/m2-pr18/README.md)。
+- **M2-PR18 本地 TimesFM CPU（#69 / Draft / 默认 OFF）：** 固定官方 TimesFM 2.5 200M 权重与 CPU 依赖，按需 Python Worker 接原风险结果/Naive/EWMA；WSL2 Linux 隔离 4/4、真实 CPU 生产闭环及 16 点压力矩阵已实测；生产目标 N100 Linux，N100 验收仍 `NOT_VERIFIED`。不改变旧云路径或 Paper/Live 权限。见[运行与隔离边界](docs/M2_PR18.md)、[Linux 证据与回归限制](docs/evidence/m2-pr18/linux-r1/README.md)。
 
 - **M2-PR17 DeepSeek HTTPS（#67 / 默认 OFF）：** 真实 API model 固定为 `deepseek-flash`，本模块内部默认 ID 为 `ds4.1flash`。复用原 Agent/CNY Budget 与 PR15 AST/PR62 离线评价；开发验证使用 recorded/loopback，真实请求为 `REAL_PROVIDER_NOT_RUN_OWNER_AUTHORIZATION_MISSING`，Paper/Live 仍 BLOCKED。见[操作与边界](docs/M2_PR17.md)和[测试证据](docs/evidence/m2-pr17/README.md)。
 

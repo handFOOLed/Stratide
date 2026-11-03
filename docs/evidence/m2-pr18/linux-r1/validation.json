@@ -1,0 +1,154 @@
+{
+  "label": "DEVELOPER_WSL2_LINUX_ACCEPTANCE",
+  "N100_ACCEPTANCE": "NOT_VERIFIED",
+  "independent_fixed_head_review": "PENDING",
+  "commands": [
+    {
+      "command": "bash scripts/install-timesfm-cpu.sh",
+      "exit_code": 0,
+      "phase": "EXPLICIT_PUBLIC_DEPENDENCY_INSTALL",
+      "evidence": "environment.json"
+    },
+    {
+      "command": ".venv/bin/python -m pip check",
+      "exit_code": 0,
+      "output": "No broken requirements found."
+    },
+    {
+      "command": "cargo build --workspace --locked --offline",
+      "exit_code": 0
+    },
+    {
+      "command": "STRATIDE_TIMESFM_TEST_EVIDENCE=state/linux-r1/isolation-facts.json python3.12 -B scripts/test-timesfm-linux.py",
+      "exit_code": 0,
+      "tests": 4,
+      "passed": 4,
+      "skipped": 0,
+      "evidence": "linux-isolation.txt"
+    },
+    {
+      "command": "python3.12 -B state/linux-r1/run-production.py",
+      "exit_code": 0,
+      "steps": "production-steps.json",
+      "host_proof": "production-proof.json"
+    },
+    {
+      "command": "python3.12 -B scripts/test-timesfm-cpu.py",
+      "cwd": "disposable-regression-checkout",
+      "exit_code": 0,
+      "tests": 12,
+      "passed": 11,
+      "skipped": 1,
+      "skip_reason": "Windows Job Object test; Linux equivalent covered by 4/4",
+      "evidence": "synthetic-tests.txt"
+    },
+    {
+      "command": "python3.12 -B scripts/test-risk-portfolio.py --driver \"$LIBTEST\"",
+      "cwd": "disposable-regression-checkout",
+      "exit_code": 1,
+      "tests": 13,
+      "passed": 12,
+      "failures": 1,
+      "reason": "unknown_position expected PORTFOLIO_SOURCE_OR_INSTRUMENT_UNVERIFIED; got FUTURE_OR_STALE_SNAPSHOT",
+      "evidence": "risk-portfolio-tests.txt"
+    },
+    {
+      "command": "python3.12 -B scripts/test-deepseek-structured.py",
+      "cwd": "disposable-regression-checkout",
+      "exit_code": 0,
+      "tests": 5,
+      "passed": 5,
+      "evidence": "deepseek-tests.txt",
+      "earlier_intermittent_failure": "deepseek-intermittent-failure.txt"
+    },
+    {
+      "command": "cargo test -p stratide-research --test risk_portfolio --test shared_budget --locked --offline",
+      "exit_code": 0,
+      "passed": 14,
+      "evidence": "risk-budget-tests.txt"
+    },
+    {
+      "command": "cargo test -p stratide-risk --locked --offline",
+      "exit_code": 0,
+      "passed": 33,
+      "evidence": "risk-kernel-tests.txt"
+    },
+    {
+      "command": "cargo test --workspace --locked --offline -- --test-threads=1",
+      "cwd": "disposable-regression-checkout",
+      "exit_code": 0,
+      "passed": 200,
+      "evidence": "rust-workspace-serial.txt",
+      "earlier_failures": [
+        "rust-workspace-parallel-failure.txt",
+        "rust-workspace-earlier-serial-failure.txt"
+      ]
+    },
+    {
+      "command": "cargo test --workspace --locked --offline",
+      "cwd": "disposable-regression-checkout",
+      "exit_code": 101,
+      "reason": "Ledger local writer lock, Resource temporarily unavailable (os error 11)",
+      "evidence": "rust-workspace-parallel-failure.txt"
+    },
+    {
+      "command": "cargo test -p stratide-research --test shared_budget --locked --offline",
+      "cwd": "unmodified-main",
+      "exit_code": 0,
+      "passed": 6,
+      "evidence": "main-shared-budget.txt"
+    },
+    {
+      "command": "cargo test -p stratide-ledger --locked --offline full_day_evidence_requires_exclusive_expiry_after_close_for_buys_and_sells -- --test-threads=1",
+      "cwd": "unmodified-main",
+      "exit_code": 0,
+      "passed": 1,
+      "evidence": "main-ledger-targeted.txt"
+    },
+    {
+      "command": "cargo test -p stratide-research --lib --locked --offline structured_tests::deepseek_blank_truncated_missing_usage_forgery_http_and_disconnect_no_retry -- --exact --test-threads=1",
+      "cwd": "unmodified-main",
+      "exit_code": 0,
+      "passed": 1,
+      "evidence": "main-deepseek-targeted.txt"
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "exit_code": 0,
+      "evidence": "fmt.txt"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets --locked --offline",
+      "exit_code": 0,
+      "evidence": "clippy.txt"
+    },
+    {
+      "command": "python3.12 -B scripts/timesfm-cpu.py bench",
+      "exit_code": 0,
+      "matrix_points": 16,
+      "passed": 16,
+      "failures": 0,
+      "evidence": "cpu-linux-benchmark.json"
+    }
+  ],
+  "scope": {
+    "real_market_data_requests": 0,
+    "real_provider_requests": 0,
+    "old_historical_raw_reparsed": 0,
+    "old_full_history_reverified": 0,
+    "owner_real_database_bound": false,
+    "paper_allowed": false,
+    "live_allowed": false
+  },
+  "limitations": [
+    "N100 not tested",
+    "Existing Python risk timestamp failure unresolved; clock comparison did not reproduce clock drift",
+    "Existing parallel Ledger lock failure and earlier DeepSeek authorization flake preserved; serial Rust suite passed",
+    "No independent fixed-HEAD acceptance or merge"
+  ],
+  "after_benchmark": {
+    "unit_load_state": "not-found",
+    "unit_active_state": "inactive",
+    "worker_pids": []
+  }
+}

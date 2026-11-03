@@ -142,7 +142,7 @@ class PortfolioTests(unittest.TestCase):
         cls.owner = ROOT / "state/original-owner-agent"
         fresh = not cls.owner.exists()
         if fresh:
-            original = subprocess.run([str(ROOT / "target/debug/stratided.exe"), "--agent-init-fake", str(cls.owner)], cwd=ROOT, capture_output=True)
+            original = subprocess.run([str(ROOT / "target/debug" / ("stratided.exe" if os.name == "nt" else "stratided")), "--agent-init-fake", str(cls.owner)], cwd=ROOT, capture_output=True)
             assert original.returncode == 0
         else:
             assert Path(p.binding()["agent_dir"]).resolve() == cls.owner.resolve()
@@ -452,7 +452,7 @@ class PortfolioTests(unittest.TestCase):
 
     def test_13_binding_does_not_create_or_switch_cost_authority(self):
         other = ROOT / ("state/other-original-agent-" + os.urandom(3).hex())
-        init = subprocess.run([str(ROOT / "target/debug/stratided.exe"), "--agent-init-fake", str(other)], cwd=ROOT, capture_output=True)
+        init = subprocess.run([str(ROOT / "target/debug" / ("stratided.exe" if os.name == "nt" else "stratided")), "--agent-init-fake", str(other)], cwd=ROOT, capture_output=True)
         assert init.returncode == 0
         before = p.status()
         denied = cli("init", "--agent-dir", other, code=2)

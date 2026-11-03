@@ -1,0 +1,29 @@
+test_01_network_filesystem_environment_and_6gib (__main__.LinuxIsolation.test_01_network_filesystem_environment_and_6gib) ... ERROR
+
+======================================================================
+ERROR: test_01_network_filesystem_environment_and_6gib (__main__.LinuxIsolation.test_01_network_filesystem_environment_and_6gib)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$PR_WORKTREE/research/timesfm_cpu/runtime.py", line 142, in communicate_bounded
+    require(process.returncode == 0, value.get("error_code", "WORKER_EXIT_FAILED"))
+  File "$PR_WORKTREE/research/timesfm_cpu/model.py", line 25, in require
+    raise Rejected(code)
+model.Rejected: WORKER_EXIT_FAILED
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "$PR_WORKTREE/scripts/test-timesfm-linux.py", line 55, in test_01_network_filesystem_environment_and_6gib
+    normal=runtime.run(b"probe")
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "$PR_WORKTREE/research/timesfm_cpu/runtime.py", line 172, in run
+    return communicate_bounded(args, raw, cleanup=lambda:stop_owned(tag), heartbeat=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$PR_WORKTREE/research/timesfm_cpu/runtime.py", line 162, in communicate_bounded
+    stream.close()
+BrokenPipeError: [Errno 32] Broken pipe
+
+----------------------------------------------------------------------
+Ran 1 test in 1.638s
+
+FAILED (errors=1)

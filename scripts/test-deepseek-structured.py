@@ -26,7 +26,7 @@ pr16=importlib.util.module_from_spec(spec);spec.loader.exec_module(pr16)
 
 
 def libtest():
-    binaries=sorted((ROOT/"target/debug/deps").glob("stratide_research-*.exe"),key=lambda p:p.stat().st_mtime_ns)
+    binaries=sorted((p for p in (ROOT/"target/debug/deps").glob("stratide_research-*.exe" if os.name=="nt" else "stratide_research-*") if p.is_file() and os.access(p,os.X_OK)),key=lambda p:p.stat().st_mtime_ns)
     if not binaries:raise RuntimeError("Build stratide-research --lib tests first")
     return binaries[-1]
 
@@ -178,7 +178,7 @@ class Suite(unittest.TestCase):
     def test_original_invoice_settlement_does_not_resign_frozen_research(self):
         root,owner,_=self.experiment();self.enable(root);loopback(root,self.wire(root));self.once(root)
         archive=(root/"round-01/archive.json").read_bytes()
-        daemon=ROOT/"target/debug/stratided.exe"
+        daemon=ROOT/"target/debug"/("stratided.exe" if os.name=="nt" else "stratided")
         run=subprocess.run([str(daemon),"--agent-settle",str(owner),"1","12345","SYNTHETIC-INVOICE-ONLY"],capture_output=True,cwd=ROOT)
         self.assertEqual(run.returncode,0)
         self.assertTrue(a.verify(root)["verified"])

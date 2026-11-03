@@ -1,0 +1,7 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s
+     Running unittests src/lib.rs (target/debug/deps/stratide_ledger-11aaef2aa54f2a84)
+
+running 1 test
+test store::tests::r2::full_day_evidence_requires_exclusive_expiry_after_close_for_buys_and_sells ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 44 filtered out; finished in 0.31s

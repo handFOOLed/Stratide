@@ -1,4 +1,6 @@
-# M2-PR18 开发证据
+# M2-PR18 初版 Windows 开发证据
+
+**当前 Linux 状态（2026-11-03 R1）：4/4 PASS、0 skipped，真实 TimesFM CPU 生产闭环与 Linux 16 点压力矩阵完成。见 [Linux R1 证据 / 回归限制 / 复跑命令](linux-r1/README.md)。N100 仍 NOT_VERIFIED，PR 保持 Draft。** 本页其余内容保留初版 Windows 的历史记录，其中 Linux NOT_RUN 是初次交付时的状态。
 
 Base：最新 main `b62c1171d8503e1f21e4b470847944c6fbe8dbf4`，提交前再次只读核对远端未变。实现位于独立 `issue69-worktree` / `codex/issue69-timesfm-cpu`。这些是开发者自测，**不是独立验收**。源码精确字节见 [source-sha256](source-sha256.json)，最终 Git HEAD 见该 Draft PR；不将未提交工作树的 base SHA 冒充测试实现的 HEAD。
 
@@ -79,4 +81,4 @@ python3.12 -B scripts/timesfm-cpu.py bench
 
 [validation.json](validation.json) 逐项记录命令/退出码、基线失败和未运行项。[模型 manifest](model-manifest.json) 固定 revision/四文件 SHA，[Windows wheel SHA](dependency-wheel-sha256.json) 固定本次实际安装字节，未冒充 Linux wheel 验收。证据不含模型/wheels、凭据、主机绝对路径或真实行情。
 
-本期新增真实行情请求 0、真实付费 Provider 请求 0、旧 RAW 重解析 0、旧全库复验 0、真实前向观察新增 0。原 Risk/Ledger/旧云路径及预算/交易权限未改，`RESEARCH_ONLY / ELIGIBILITY_DENIED / paper_allowed=false / live_allowed=false`。Linux 隔离、N100 与独立固定 HEAD 审查尚未完成，保持唯一 Draft，不 Ready/合并。
+本期新增真实行情请求 0、真实付费 Provider 请求 0、旧 RAW 重解析 0、旧全库复验 0、真实前向观察新增 0。原 Risk/Ledger/旧云路径及预算/交易权限未改，`RESEARCH_ONLY / ELIGIBILITY_DENIED / paper_allowed=false / live_allowed=false`。初版时 Linux 未运行；R1 已补 Linux 实测，N100 与独立固定 HEAD 审查仍未完成，保持唯一 Draft，不 Ready/合并。

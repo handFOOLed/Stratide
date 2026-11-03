@@ -1,0 +1,7 @@
+{
+  "samples": 500,
+  "outside": 0,
+  "worst_before_delta_ns": 485228,
+  "worst_after_delta_ns": -131523,
+  "anomalies": []
+}

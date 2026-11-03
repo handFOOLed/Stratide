@@ -33,4 +33,6 @@ else:
     except OSError:
         readonly=True
     print(json.dumps(dict(network_denied=network,model_readonly=readonly,home_hidden=not Path("/home").exists(),
-                          secrets_absent=not any("KEY" in k or "TOKEN" in k for k in os.environ),isolation=limits)))
+                          secrets_absent=(os.environ.get("HF_HUB_DISABLE_IMPLICIT_TOKEN") == "1" and not any(
+                              any(marker in k for marker in ("KEY", "TOKEN", "SECRET"))
+                              and k != "HF_HUB_DISABLE_IMPLICIT_TOKEN" for k in os.environ)),isolation=limits)))

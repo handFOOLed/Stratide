@@ -1,0 +1,33 @@
+{
+  "implementation_start_sha": "e8ef8b8d97488432872b4ac224cbd5780f3a11af",
+  "base_sha": "b62c1171d8503e1f21e4b470847944c6fbe8dbf4",
+  "production_code_sha256": "26c92639fd78b143c4bd400988f447f29fcb52294319734555bae14efe669f2a",
+  "production_snapshot_matches_worktree": true,
+  "source_sha256": {
+    "research/agent/src/bin/timesfm-risk-agent.rs": "0fd6b3e738c93820b8c0da663e609257ad474aaf60328ef99916c171723f4c5a",
+    "research/agent/src/risk_cpu.rs": "e0c7d67a0642aa02ab7189f0923f64da1bc1e355089c24976adf03c10e9ccc60",
+    "research/timesfm_cpu/benchmark.py": "e25a4ccb9638647c9d64804b6e0df7cb2143129f00be460ed38ee15c919a3b80",
+    "research/timesfm_cpu/cli.py": "58f64e78a151a8bd1b268a590d99b2095b7879a498ddbde84b466235d725358f",
+    "research/timesfm_cpu/isolation_probe.py": "ea3301846372548b504bd98b185d2d1697bcdcac5e72275bad04c4cf0b4dc040",
+    "research/timesfm_cpu/model.py": "efa0d191672561f0faa9af0b3ad5864701b102e548217c0621193d2da1061b95",
+    "research/timesfm_cpu/provision.py": "fe432f35219c6d70b757211dcce9247dbc05a610336ae43aec459c1263a076d0",
+    "research/timesfm_cpu/requirements.lock": "a072cedefb2a67ce3a499f0077d8f7ee8c7567c49db7ba3e65746ea241a93020",
+    "research/timesfm_cpu/runtime.py": "68c49c40e50d6ca0af9cf90cbd46c266ba5216425b1d237a6bb5180519eeca1b",
+    "research/timesfm_cpu/windows.py": "c73277c462e33604a84357efcf07768f4be74f1756a277bb49b97b5fe443de90",
+    "research/timesfm_cpu/worker.py": "b29c5a198bc3f73af6004523f986e004ab5a4bcaa07f21211a16ec2ba4a28670",
+    "scripts/test-cloud-structured.py": "1fc91e50fc07d6a0dde9416aa3db340474a2e46e184a5b1baa289acaed7f9b4b",
+    "scripts/test-deepseek-structured.py": "04a4109b3f4d6993a8bdf8f2ee6f1bde6d78d2ddbbc89febd37a4a57a272dae2",
+    "scripts/test-risk-portfolio.py": "d805a4e170aa2efa809e233ba1bd456643ae22984d6acd08c3b26de07e3297ab",
+    "scripts/test-timesfm-cpu.py": "4e3b79f30726d4b497d6cc7684e70c68e8b29621b32a181e82c0de0d9af337f6",
+    "scripts/test-timesfm-linux.py": "3b7107747fafc8ec18af10bc94538891ff3d8f49653907705513a3f0002ef703"
+  },
+  "legacy_source_unchanged_since_main": {
+    "research/agent/src/risk_binding.rs": "a932415e5e33c828084aabe20a97c8e8ae6dfd67814c59b94d5708aabfa156f0",
+    "research/agent/src/risk_portfolio.rs": "40654b2ffb349cb5c0055054b329c8ed364faff5d9b6d60060ab4a49be462547",
+    "research/agent/src/risk_cloud.rs": "9fb120393b1acc758460d8b77ed8c5d20d61cb5c1e860511f7cc2045663269a8",
+    "research/agent/src/deepseek.rs": "d748c5e7b68c003924b596eb153906e6f585180a8382cb6ea0be00e29fde31ef",
+    "research/agent/src/budget.rs": "f5bf1997b26cdb992cdb64aa27fa32854513d961796e9bb2682d872a23c22da8",
+    "research/agent/src/structured.rs": "adbb97a7b8df201cfd68dbe41d90b338f3551d1764b50546feb9789f8c4cd6c0"
+  },
+  "risk_kernel_and_ledger_unchanged": true
+}

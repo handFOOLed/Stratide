@@ -61,7 +61,7 @@ def command(threads):
     require((ROOT / ".venv/bin/python").is_file(), "PINNED_RUNTIME_NOT_INSTALLED")
     args = ["systemd-run", "--user", "--pipe", "--wait", "--collect", "--quiet", "--unit=" + UNIT,
             "--property=MemoryMax=" + str(MEMORY_MAX), "--property=MemorySwapMax=0",
-            "--property=MemoryOOMGroup=yes", "--property=OOMPolicy=kill", "--property=TasksMax=64",
+            "--property=OOMPolicy=kill", "--property=TasksMax=64",
             "--property=CPUQuota=200%", "--property=RuntimeMaxSec=" + str(TIMEOUT),
             "--property=TimeoutStopSec=5", "--property=KillMode=control-group", "--property=NoNewPrivileges=yes",
             shutil.which("bwrap"), "--unshare-user", "--unshare-pid", "--unshare-net", "--unshare-ipc", "--unshare-uts",
@@ -82,7 +82,12 @@ def command(threads):
 def stop():
     require(sys.platform == "linux" and shutil.which("systemctl"), "LINUX_ISOLATION_UNAVAILABLE")
     result = subprocess.run(["systemctl", "--user", "stop", UNIT], env=clean_env(), capture_output=True, timeout=15)
-    require(result.returncode == 0, "WORKER_STOP_FAILED")
+    if result.returncode != 0:
+        status=subprocess.run(["systemctl","--user","show",UNIT,"--property=LoadState,ActiveState"],
+                              env=clean_env(),capture_output=True,timeout=15)
+        fields=dict(line.split("=",1) for line in status.stdout.decode(errors="replace").splitlines() if "=" in line)
+        require(status.returncode == 0 and fields.get("LoadState")=="not-found"
+                and fields.get("ActiveState")=="inactive","WORKER_STOP_FAILED")
     return dict(state="STOPPED", billing="LOCAL_NO_BILLING")
 
 
@@ -159,7 +164,9 @@ def communicate_bounded(argv, raw, *, timeout=TIMEOUT + 15, env=None, cleanup=No
                     process.kill()
             process.wait(timeout=10)
             for stream in (process.stdin, process.stdout, process.stderr):
-                stream.close()
+                # A dead peer can leave a heartbeat buffered on stdin. Preserve
+                # the original Worker failure while still closing every pipe.
+                with contextlib.suppress(BrokenPipeError):stream.close()
             for thread in threads:
                 thread.join(timeout=2)
 

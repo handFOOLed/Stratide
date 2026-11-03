@@ -189,7 +189,22 @@ class Tests(unittest.TestCase):
             runtime.stop_owned("STRATIDE_TIMESFM_RUN=ours")
             self.assertEqual(run.call_count,2)
 
+        with patch.object(runtime.sys,"platform","linux"),patch.object(runtime.shutil,"which",return_value="/usr/bin/systemctl"):
+            for fields,ok in ((b"LoadState=not-found\nActiveState=inactive\n",True),(b"LoadState=loaded\nActiveState=active\n",False)):
+                results=[subprocess.CompletedProcess([],5,b"",b""),subprocess.CompletedProcess([],0,fields,b"")]
+                with patch.object(runtime.subprocess,"run",side_effect=results):
+                    if ok:self.assertEqual(runtime.stop()["state"],"STOPPED")
+                    else:
+                        with self.assertRaisesRegex(model.Rejected,"WORKER_STOP_FAILED"):runtime.stop()
+
     def test_09_timeout_crash_output_and_input_limits(self):
+        read_fd,write_fd=os.pipe()
+        try:
+            os.write(write_fd,b'{"x":1}\n.\n');os.close(write_fd);write_fd=None
+            self.assertEqual(worker.read_request_line(read_fd),(b'{"x":1}',b'.\n'))
+        finally:
+            os.close(read_fd)
+            if write_fd is not None:os.close(write_fd)
         with self.assertRaisesRegex(model.Rejected,"WORKER_TIMEOUT"):
             runtime.communicate_bounded([sys.executable,"-c","import time;time.sleep(10)"],b"{}",timeout=.15)
         with self.assertRaisesRegex(model.Rejected,"WORKER_EXIT_FAILED"):
