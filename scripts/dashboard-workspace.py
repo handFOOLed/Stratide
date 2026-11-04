@@ -123,11 +123,29 @@ def snapshot(config):
         except (ValueError, OSError) as e:
             evidence.append(dict(id=str(index),name=Path(path).name,state="BLOCKED",reason=str(e)))
     from evidence_audit import blockers
+    import market_eod
+    market = market_eod.Market(market_eod.default_root())
+    if market.path.is_file():
+        try:
+            market_status = market.report()
+            # Dashboard receives counts/state only; security names, prices and
+            # raw provider responses stay in the local source/CLI.
+            latest = market_status["latest"]
+            market_status["latest"] = None if latest is None else {k: latest[k] for k in (
+                "source_day", "state", "expected_market", "actual_quoted", "market_explained", "market_coverage_bps",
+                "research_denominator", "eligible_symbols", "categories", "available_at", "source_states",
+                "blockers", "snapshot_sha256")}
+            if market_status["latest"] is not None:
+                market_status["latest"]["eligible_count"] = len(market_status["latest"].pop("eligible_symbols"))
+        except (market_eod.Error, OSError) as error:
+            market_status = dict(state="BLOCKED", reason=str(error), latest=None, last_successful_date=None, gaps=[])
+    else:
+        market_status = dict(state="NOT_CONFIGURED", latest=None, last_successful_date=None, gaps=[])
     backup=dict(state="not_configured")
     if config.get("backup_manifest"):
         try:backup=command("local-backup.py","verify","--bundle",str(Path(config["backup_manifest"]).parent))
         except (ValueError,OSError) as e:backup=dict(state="BLOCKED",reason=str(e))
-    return dict(schema_version=1,state="ready",studies=studies,evaluations=evaluations,candidates=candidates,evidence=evidence,admission=blockers(),backup=backup,
+    return dict(schema_version=1,state="ready",studies=studies,evaluations=evaluations,candidates=candidates,evidence=evidence,admission=blockers(),backup=backup,market=market_status,
         historical_pit_status="NOT_VERIFIED",opening_observed="NOT_VERIFIED",trading_eligibility="BLOCKED",
         paper_allowed=False,live_allowed=False,real_market_cloud_egress=False,
         refresh="READ_ONLY_NO_INFERENCE",deployment="WINDOWS_LOCAL_WSL2_OPTIONAL",n100="DEFERRED_NOT_V1_GATE")

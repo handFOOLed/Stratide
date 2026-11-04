@@ -1,5 +1,7 @@
 **简体中文** | [English](README.en.md)
 
+**M3-PR01 / #82（Draft 交付）**：[全市场 A 股 EOD 与可信覆盖快照](docs/M3_PR01.md) 复用原 Operator、V1/V2 仓库与 source gate，提供日期证券池、按日批量增量、质量/覆盖双分母和只读报告。BSE 保留为不支持；真实全市场覆盖与当前接口权限尚未实测，不增加交易资格。
+
 **V1 收尾 B / #77（Draft 交付）**：[Windows 本地产品操作与恢复](docs/V1_COMPLETION.md) 集成当前 Paper/历史报告分离、原 TimesFM/Fusion/OOS/Registry、持久审批通知及 UI 精修。Paper 成交仅 `EX_POST_OPEN_ASSUMPTION`，PIT/开盘实收与交易资格仍未验证；N100 暂缓，不是 V1 门槛。
 
 **V1 收尾 A / #76（已由 PR #78 合并）**：[冻结风险评价、前向只读审计与 FusionResearcherV1](docs/V1_EVALUATION.md) 提供本地 CPU / Naive / EWMA 同目标比较和合成 Prompt 安全闭环。真实指标只留本机，PIT、前向 Paper 与真实数据外发不解锁。

@@ -175,6 +175,19 @@ def read(*args, **kwargs):
     except (v1.WarehouseError, v2.Error) as e:
         raise Blocked(str(e)) from None
 
+
+def market_day(root, date, symbols, as_of):
+    """Read the qualified current EOD source only; does not run a Worker/model.
+
+    Historical `_read` retains its frozen V1/V2 semantics and PIT restrictions.
+    This gate is the source boundary for subsequent market-wide research.
+    """
+    import market_eod
+    try:
+        return market_eod.Market(root).research_source(date, symbols, as_of)
+    except market_eod.Error as error:
+        raise Blocked(str(error)) from None
+
 def provenance(value, store_name):
     import cli
     check(store_name is None, "HISTORY_LOCAL_SOURCE_ONLY")

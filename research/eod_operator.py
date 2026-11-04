@@ -499,6 +499,10 @@ class Operator:
 
 def main(argv=None, *, clock=s.clock_ms, spawn=spawn,
          fault=lambda point: None, wait=time.sleep):
+    arguments = sys.argv[1:] if argv is None else argv
+    if arguments and arguments[0] == "market":
+        import market_eod
+        return market_eod.cli(arguments[1:])
     parser = argparse.ArgumentParser(description="EOD Operator：一次启用，前台每日自动；NO_ORDERS/NO_FILLS/NO_NAV")
     parser.add_argument("--snapshot-store", required=True, help="已有 PR33 store 名称")
     commands = parser.add_subparsers(dest="command", required=True)

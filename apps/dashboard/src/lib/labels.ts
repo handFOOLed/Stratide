@@ -1,6 +1,7 @@
 import type { BadgeTone } from '../components/ui/Badge';
 
 export const MODE_LABELS: Record<string, { label: string; tone: BadgeTone; description: string }> = {
+  tushare_incremental_eod: {label:'本机盘后采集',tone:'neutral',description:'已有 Tushare 授权下的盘后数据；按实际接收时点记录，不代表历史 PIT 或交易资格。'},
   ex_post_paper_assumption: {label:'Paper 假设成交',tone:'warning',description:'前一日冻结意图，次日盘后事后确认；不是开盘实收或真实交易。'},
   historical_research_only: {label:'事后历史研究',tone:'neutral',description:'事后取得的历史输入，仅本地研究。'},
   forward_observed_eod: {label:'前向盘后观察',tone:'neutral',description:'实际时间戳记录的盘后观察，不等于已成交。'},
