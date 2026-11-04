@@ -123,10 +123,31 @@ impl State {
     }
 
     pub(crate) fn apply(&mut self, cmd: &Command) -> Result<()> {
+        // A no-price terminal event does not advance valuation time, but its
+        // business time still fences all later commands against backdating.
+        if let Some(receipt) = self.paper_eod.as_ref().and_then(|b| b.no_fills.last()) {
+            let at = match cmd {
+                Command::SubmitPaperIntentV1 { intent } => Some(intent.now),
+                Command::ExpirePaperIntentsV1 { now }
+                | Command::FreezePaperIntentsV1 { now, .. }
+                | Command::ExPostOpenAssumptionV1 { now, .. }
+                | Command::CashDividendV1 { now, .. }
+                | Command::HistoricalNextOpenV1 { now, .. }
+                | Command::Observe { now, .. }
+                | Command::Submit { now, .. }
+                | Command::Match { now, .. } => Some(*now),
+                Command::Freeze { .. } => None,
+            };
+            if at.is_some_and(|at| at < receipt.finalized_at) {
+                return Err("PAPER_TERMINAL_EVENT_CLOCK_REGRESSION".into());
+            }
+        }
         if self.paper_eod.as_ref().is_some_and(|b| b.pending.is_some())
             && !matches!(
                 cmd,
-                Command::ExPostOpenAssumptionV1 { .. } | Command::Freeze { .. }
+                Command::ExPostOpenAssumptionV1 { .. }
+                    | Command::ExpirePaperIntentsV1 { .. }
+                    | Command::Freeze { .. }
             )
         {
             return Err("PAPER_INTENTS_FROZEN：不得看过后续数据后改选或撤销意图".into());
@@ -172,6 +193,8 @@ impl State {
             }
         }
         match cmd {
+            Command::SubmitPaperIntentV1 { intent } => self.submit_paper_intent(intent)?,
+            Command::ExpirePaperIntentsV1 { now } => self.expire_paper_intents(*now)?,
             Command::FreezePaperIntentsV1 {
                 now,
                 target_day,
@@ -519,7 +542,7 @@ impl State {
         self.observe()
     }
 
-    fn expire(&mut self, index: usize) {
+    pub(crate) fn expire(&mut self, index: usize) {
         self.orders[index].status = OrderStatus::Expired;
         self.orders[index].reserved_fee = Cny::ZERO;
         self.orders[index].reason = "到期，释放剩余预留；不是超时未知成交".into();

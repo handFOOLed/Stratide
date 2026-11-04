@@ -56,18 +56,23 @@ Dashboard 停止与独立 Worker 停止是两件事。需要停止 CPU 时使用
 
 ## EOD Paper 假设成交
 
-该能力复用原单证券 A 股 next-open v1、Risk Kernel 和 SQLite Ledger。它是事后 Paper 假设，不是开盘实时接收或真实可成交证据；没有券商接口。当前模型固定为 `next-open-adverse-tick-100-v1`：最多 100 股、开盘价向不利方向一分、适用限价/整手/T+1/费用/资金检查、剩余 IOC 释放。模型版本随前日意图冻结，不能事后更换。
+该能力是 **Owner CLI 提交 JSON、单证券 A 股 next-open v1**，复用原 Risk Kernel 和 SQLite Ledger；不是研究候选自动转单或多证券无人值守 Paper。它是事后 Paper 假设，不是开盘实时接收或真实可成交证据；没有券商接口。当前模型固定为 `next-open-adverse-tick-100-v1`：最多 100 股、开盘价向不利方向一分、适用限价/整手/T+1/费用/资金检查、剩余 IOC 释放。模型版本随前日意图冻结，不能事后更换。
 
 ```text
 paper-eod-init    <新账本目录> <Owner PaperAccountConfig JSON> <来源版本ID>
 paper-eod-intent  <原账本目录> <唯一事件ID> <前日意图JSON>
 paper-eod-confirm <原账本目录> <唯一事件ID> <次日盘后来源JSON>
+paper-eod-expire  <原账本目录> <唯一事件ID>
 ```
 
 用 `target/debug/stratide-cli[.exe]` 调用。`init` 配置是原 `PaperAccountConfig`，必须包含 Owner 明确的本金、账户/策略风险限额、身份及估值时效，没有暗设 ¥100,000。不会修改或迁移旧账本。来源版本自动加 `paper-eod-assumption-v1:`。
 
-- `intent` 输入为 `{proposal, rules, fees, marks, target_day}`，均为原契约类型；`proposal` 包含原 account/deployment/instrument、整数股数、限价和时间字段。CLI 以真实本机时钟覆盖 `decision_at`，在上海当天 16:00 后按原 Observe → Submit → Freeze 写入。`data_available_at` 及估值来源必须是当时已取得的数据。`target_day` 必须由可信交易日历给出**下一开市日**，不能由普通周一至周五猜测；本切片不新增日历下载器。
-- `confirm` 输入为 `{bar, rules, source_received_at, corporate_actions_verified}`。`bar` 是原未复权 `DailyBar`，provenance 须与该账本一致；来源文件实际字节 SHA256、实际取得时刻以及服务端记账时刻都会保留。当天 16:00 前、缺价格/状态/公司行为证据、错日期/来源、资金或费用不适用均不能生成相关成交。次日实际交易规则仍须独立核验，不能把前日规则当作次日事实。
+- `intent` 输入仍为 `{proposal, rules, fees, marks, target_day}`；CLI 以真实本机时钟覆盖 `decision_at`。上海当天 16:00 后，原 Observe → Submit → Freeze 在**一个 `SubmitPaperIntentV1` 事件和一个 SQLite 事务**内完成；错误日期、过期窗口、写入前校验失败或 commit 前崩溃不会留下半笔订单/预留。commit 后重启及跨日同 ID/同输入重试返回原记录，改内容复用 ID 拒绝。风控拒绝是一个持久终态订单、没有冻结/预留；已观察到的损失锁照常保留。
+- `target_day` 必须由 Owner 依据可信交易日历给出**下一开市日**。核心拒绝无效/非未来日期及不在提案执行/到期窗口内的目标；不能由普通周一至周五猜测，也不声称已独立校验下一开市日。本切片不新增日历下载器。错填休市日期、停牌、缺行或供应商延迟，都有下述确定性整批到期路径，不需要重建账户。
+- 新意图冻结时写入目标日**上海 17:15** 的 `confirmation_deadline`，沿用既有 EOD 采集窗口的截止时点。这是 Paper 固定接收截止，不是供应商交付保证。`confirm` 仍输入 `{bar, rules, source_received_at, corporate_actions_verified}`，仅在目标日 16:00 后、截止前接受；`bar` 是原未复权 `DailyBar`，provenance 须与该账本一致。缺价格/状态/公司行为证据、错日期/来源、资金或费用不适用均不能生成相关成交。
+- `expire` 不接收行情、价格或选择的订单 ID。到固定截止后，对尚未确认的**整个批次**写 `NO_FILL / DATA_UNAVAILABLE`、目标/原意图/订单 ID、截止及终结时间，释放预留并清除 pending；它表示未取得合格确认，不据此断言停牌原因。现金、持仓、旧估值时点、成交数和风险锁保持；不补价格、不增加 NAV 点、不重发旧信号。截止前不能用它撤销不利订单，截止后不能再用后来价格确认旧订单；同事件重试不重复终结。源恢复后，只有新的显式意图和原 Risk 检查才能继续。
+- 对 R1 前遗留的 `:submit` 成功、`:freeze` 未写入订单，先保留原文件，过原决策日后执行 `paper-eod-expire <原账本> <新事件ID>`，记录 `NO_FILL / UNSEALED_LEGACY_INTENT` 并整批释放。旧冻结批次按目标日 17:15 进行无成交终结；旧已完成事件保留原序列化与哈希可重放，不迁移/改写旧历史。无成交终结后禁止回填早于其时间的新命令，重新提交使用新事件/提案 ID，禁止自动重放旧输入。
+- SHA256 证明本机输入字节完整性；`source_received_at`、`corporate_actions_verified` 及日历/行情来源目前是 **Owner JSON 声明，非独立供应商收数或 PIT 证明**。API/CLI 保留 `OWNER_DECLARED_NOT_PROVIDER_VERIFIED`，无成交收据进入只读数据缺口/技术详情。次日实际交易规则仍须独立核验，不能把前日规则当作次日事实。
 - 前日冻结原订单、数量、撮合版本和输入 SHA；冻结后不能新增/撤销/替换订单或先导入次日价格。账户风险冻结仍可写入，且继续阻止成交。`confirm` 用唯一事件 ID 幂等记账，变更输入不能复用 ID。没有有效前日冻结就拒绝。
 - 成交写 `EX_POST_OPEN_ASSUMPTION`、来源 SHA 和实际取得时间，不创建 `OpeningEvidence`。历史、合成及假设成交不会升级为 `forward_observed_eod`。当前账户收益/成本来自账本和可信估值；资金流不算利润。缺估值显示 `—`，有外部资金流时简单累计收益率不可用。最大日回撤仅覆盖账本记录的日期。
 

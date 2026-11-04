@@ -116,12 +116,29 @@ pub fn load(path: &Path) -> Result<(Value, Value), String> {
         "remaining":o.remaining,"limit_fen":o.proposal.limit_price.fen(),"status":o.status,"reason":o.reason,"deployment":o.proposal.deployment})).collect::<Vec<_>>();
     let day = s.snapshot.trading_day.0.to_string();
     let synthetic = s.provenance.source_version.contains("synthetic_test");
+    let gaps = s
+        .paper_eod
+        .as_ref()
+        .map(|b| {
+            b.no_fills
+                .iter()
+                .map(|r| {
+                    json!({
+                        "day":r.intents.as_ref().map(|i|i.target_day.0.to_string()),
+                        "reason":"Paper 意图已无成交终结；没有补价格或新增估值，详见技术收据",
+                        "finalized_at":r.finalized_at,
+                    })
+                })
+                .collect::<Vec<_>>()
+        })
+        .unwrap_or_default();
     let meta = json!({"mode":if synthetic {"synthetic_test"}else{"ex_post_paper_assumption"},"source":"Owner selected Paper Ledger","source_version":s.provenance.source_version,"as_of":day,
         "first_day":history[0].state.snapshot.trading_day.0.to_string(),"last_day":day,"last_valid_valuation_at":s.equity.map(|_|s.snapshot.as_of.0.to_string()),
         "timezone":"Asia/Shanghai","evidence_class":if synthetic {"engine_test_only"}else{"EX_POST_OPEN_ASSUMPTION"},"snapshot_id":ledger.head(),"report_sha256":ledger.head(),
         "input_sha256":s.provenance.dataset_hash,"ledger_head":ledger.head(),"publication":"authoritative_paper_ledger","refresh_policy":"read_only_latest_transaction",
         "validation":"ledger_replay_and_digest_verified","forward_account":"not_verified","market_freshness":"eod_assumption_not_live",
-        "execution_model":"EX_POST_OPEN_ASSUMPTION","gaps":[],"paper_receipts":s.paper_eod});
+        "source_attestation":"OWNER_DECLARED_NOT_PROVIDER_VERIFIED",
+        "execution_model":"EX_POST_OPEN_ASSUMPTION","gaps":gaps,"paper_receipts":s.paper_eod});
     Ok((
         meta,
         safe_json(

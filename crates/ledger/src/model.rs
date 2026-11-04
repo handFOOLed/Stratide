@@ -204,6 +204,12 @@ pub struct State {
 /// Trusted-core commands. No Worker/control-network API is exposed by this crate.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Command {
+    SubmitPaperIntentV1 {
+        intent: crate::paper_eod::PaperIntent,
+    },
+    ExpirePaperIntentsV1 {
+        now: Timestamp,
+    },
     FreezePaperIntentsV1 {
         now: Timestamp,
         target_day: TradingDay,

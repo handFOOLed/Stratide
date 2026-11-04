@@ -638,6 +638,17 @@ fn crash_child() {
     }
     let mut l = Ledger::open(path).unwrap();
     match action.as_str() {
+        "paper-intent" => {
+            let cmd = paper_eod::atomic(&l);
+            apply(&mut l, "paper-intent", cmd);
+        }
+        "paper-no-fill" => apply(
+            &mut l,
+            "paper-no-fill",
+            Command::ExpirePaperIntentsV1 {
+                now: crate::paper_eod::confirmation_deadline(TradingDay(20261029)).unwrap(),
+            },
+        ),
         "submit" => {
             let p = proposal(&l.state.config, 1);
             apply(&mut l, "s", submit(p, TradingDay(20261028), Timestamp(T0)));
