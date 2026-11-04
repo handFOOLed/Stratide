@@ -1,5 +1,7 @@
 # Stratide 当前状态
 
+**2026-11-04 / PR #75 R2：** 修复 Rust historical 当日收盘的盘后时点门禁；上海 16:00 边界和日期/时区一致性反证通过。历史 13/13、research Rust 71/71、旧 CPU 11 pass + 1 skip；真实 task 9 / Registry / report/verify 通过，0 新云/行情调用。[R2 证据](evidence/m2-pr20/r2/README.md)。保持 Draft，待固定 HEAD 复审。
+
 **2026-11-04 / PR #75 R1：** 历史模型 pin、完整纯 UNKNOWN opportunities、版本/未用字段已严格校验；来源索引改为证券+日期引用原 SHA，真实三证券 252 条来源绑定与 task 8 复核通过。57 个重算 SHA 反例先红后绿，历史套件 12/12、Rust 204/204，预算/授权/真实外发边界保持。[修复证据](evidence/m2-pr20/r1/README.md)。仍为 Draft，待新固定 HEAD 复审，未 Ready/merge。
 
 **2026-11-03 / #74 / M2-PR20（本分支 Draft）：** 基于最新 main `971eb4ba90507142b1d32ca80af2d15859790933`（含已合并 PR #60/#70/#72），[真实历史 → 本地 TimesFM](M2_PR20.md) 已实际跑通三证券 84 会话 → CPU → 原 Agent task 6 / Registry / report/verify。真实因子变化与缺口样本 BLOCKED；原 calls/预算/授权未变，新市场请求/云调用/计费为 0，真实风险外发 `REAL_MARKET_DATA_EGRESS_DENIED`。数据仍 PARTIAL、PIT 未验证，Paper/Live 禁止，N100 未验收。[本期开发证据](evidence/m2-pr20/README.md)。以下旧条目保留其发生时的状态，本段是当前增量。

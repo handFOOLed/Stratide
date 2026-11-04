@@ -1,6 +1,6 @@
 //! Local-only ex-post input contract. Does not change Frozen/cloud/Paper eligibility.
 use crate::{ensure, risk_portfolio as rp, Result};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Timelike, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::collections::BTreeSet;
@@ -61,7 +61,9 @@ impl History {
         )?;
         let at = f.as_of.parse::<DateTime<Utc>>().map_err(|_| "RISK_AS_OF")?;
         ensure(at <= Utc::now(), "HISTORY_AS_OF")?;
-        let day = at.with_timezone(&chrono_tz::Asia::Shanghai).date_naive();
+        let shanghai = at.with_timezone(&chrono_tz::Asia::Shanghai);
+        ensure(shanghai.hour() >= 16, "HISTORY_CLOSE_NOT_AVAILABLE")?;
+        let day = shanghai.date_naive();
         ensure((1..=8).contains(&f.series.len()), "HISTORY_SYMBOL_COUNT")?;
         let raw = p["series"].as_array().ok_or("HISTORY_RAW_SCHEMA")?;
         let quality = p["quality"].as_array().ok_or("HISTORY_QUALITY")?;

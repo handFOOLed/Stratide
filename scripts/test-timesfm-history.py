@@ -360,6 +360,49 @@ class Tests(unittest.TestCase):
             with self.subTest(decimal=decimal):
                 self.assertTrue(cli.bridge("verify-result",result)["verified"])
 
+    def test_13_rehashed_same_day_close_requires_shanghai_post_close(self):
+        cli.bridge("enable")
+        p=self.plan(CODES[:1])
+        f,hist=h.read(self.desc,self.w.root,self.s.root,CODES[:1],"2022-03-31T08:00:00Z")
+        p.update(frozen=f,history=hist)
+        def at(stamp,suffix):
+            value=copy.deepcopy(p);value["batch"]+="-"+suffix
+            value["frozen"]["as_of"]=stamp
+            value["history"]["payload"]["as_of"]=stamp
+            self.rehash(value)
+            return value
+        # Keep the very same March 31 closes, including the last close.
+        # Only the decision instant and all self-described SHA fields change.
+        early=("2022-03-31T00:00:00Z",
+               "2022-03-31T07:59:59Z",
+               "2022-03-31T15:59:59+08:00")
+        for i,stamp in enumerate(early):
+            bad=at(stamp,f"early-{i}")
+            for action in ("project","begin"):
+                with self.subTest(as_of=stamp,entry=action):
+                    with self.assertRaisesRegex(model.Rejected,"HISTORY_CLOSE_NOT_AVAILABLE"):
+                        cli.bridge(action,bad)
+        # Equivalent instants may carry different UTC offsets/calendar dates.
+        valid=("2022-03-31T08:00:00Z",
+               "2022-03-31T16:00:00+08:00",
+               "2022-03-30T23:00:00-09:00")
+        for i,stamp in enumerate(valid):
+            good=at(stamp,f"valid-{i}")
+            with self.subTest(as_of=stamp,entry="post_close_archive_verify"):
+                cli.bridge("project",good)
+                self.save(good)
+                with patch.object(cli,"verify_model",return_value=self.manifest),patch.object(runtime,"command",return_value=[]):
+                    self.assertEqual(cli.once(good["batch"],fixture.fixture_response)["state"],"completed")
+                    record=h.archive(good["batch"])
+                    self.assertEqual(h.archived(good["batch"]),record)
+                    self.assertTrue(cli.verify(good["batch"])["verified"])
+        # Post-close alone cannot move March 31 closes onto another decision day.
+        bad=at("2022-04-01T08:00:00Z","wrong-day")
+        for action in ("project","begin"):
+            with self.subTest(entry=action,as_of="wrong Shanghai day"):
+                with self.assertRaisesRegex(model.Rejected,"HISTORY_CUTOFF_OR_ACTION_GAP"):
+                    cli.bridge(action,bad)
+
     def test_06_old_synthetic_mode_still_works(self):
         p=dict(batch="legacy-fixture",frozen=cli.frozen(self.desc),manifest_sha256="1"*64,
                code_sha256=self.desc["code_sha256"],max_context=256,batch_size=1,threads=2)

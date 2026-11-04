@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-04",
+  "reviewed_head": "7db63a069a8e06522e82e0a3bc6352cb6bcad925",
+  "review": "https://github.com/handFOOLed/Stratide/pull/75#issuecomment-6621187959",
+  "real_run": "VERIFIED_DEVELOPER_EVIDENCE",
+  "task_id": "9",
+  "state": "completed",
+  "verified": true,
+  "as_of": "2022-03-31T08:00:00Z",
+  "shanghai_decision_time": "2022-03-31T16:00:00+08:00",
+  "series": 3,
+  "observations_per_series": 84,
+  "input_sha256": "aac86ebdc63b89ff08f4eea72dbe65b2346947e236fb992ad54dce09e66e2fcc",
+  "code_sha256": "29abc359c2ec458a12bebbaca211ef0d6a45c1d637ffacb33a2de408398a17e0",
+  "result_sha256": "9b76658a65ddb5fb3a1d51de92a81289b2786d59e53743fa2624ca1955f6ec04",
+  "registration_sha256": "d2d8779a9bc7e83fcef69fa2d1c5a0b1e15b94b08af1f2ee163d0802df114432",
+  "model_manifest_sha256": "d5e54a409cc4aa4e1aa7a2b308bab3500124e90644071a210aab4fbce23f2597",
+  "model_revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+  "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+  "real_prefix_rehashed_time_counterexamples": [
+    {
+      "as_of": "2022-03-31T00:00:00Z",
+      "entry": "project",
+      "exit_code": 2,
+      "reason": "HISTORY_CLOSE_NOT_AVAILABLE"
+    },
+    {
+      "as_of": "2022-03-31T00:00:00Z",
+      "entry": "begin",
+      "exit_code": 2,
+      "reason": "HISTORY_CLOSE_NOT_AVAILABLE"
+    },
+    {
+      "as_of": "2022-03-31T07:59:59Z",
+      "entry": "project",
+      "exit_code": 2,
+      "reason": "HISTORY_CLOSE_NOT_AVAILABLE"
+    },
+    {
+      "as_of": "2022-03-31T07:59:59Z",
+      "entry": "begin",
+      "exit_code": 2,
+      "reason": "HISTORY_CLOSE_NOT_AVAILABLE"
+    },
+    {
+      "as_of": "2022-03-31T15:59:59+08:00",
+      "entry": "project",
+      "exit_code": 2,
+      "reason": "HISTORY_CLOSE_NOT_AVAILABLE"
+    },
+    {
+      "as_of": "2022-03-31T15:59:59+08:00",
+      "entry": "begin",
+      "exit_code": 2,
+      "reason": "HISTORY_CLOSE_NOT_AVAILABLE"
+    }
+  ],
+  "negative_begin_target": "DISPOSABLE_FAKE_AGENT_ONLY",
+  "report_verify_repeat_passed": true,
+  "original_tasks_preserved": 8,
+  "original_calls": 2,
+  "original_calls_meta_settings_hashes_unchanged": true,
+  "old_pr19_task_4_readonly_verified": true,
+  "egress": "REAL_MARKET_DATA_EGRESS_DENIED",
+  "new_cloud_calls": 0,
+  "new_cloud_billing_micro": 0,
+  "new_market_requests": 0,
+  "real_key_content_reads": 0,
+  "coverage": "PARTIAL",
+  "historical_pit_status": "NOT_VERIFIED",
+  "paper_allowed": false,
+  "live_allowed": false,
+  "N100_ACCEPTANCE": "NOT_VERIFIED"
+}
