@@ -1,0 +1,316 @@
+{
+  "admission": {
+    "engineering": "SEPARATE_FROM_QUALIFICATION",
+    "fills": 0,
+    "forward_paper": "BLOCKED",
+    "historical_ex_post": "RESEARCH_ONLY",
+    "historical_pit": "BLOCKED",
+    "independent_acceptance": "NOT_PERFORMED_BY_THIS_DEVELOPER",
+    "live": "BLOCKED",
+    "matrix": [
+      {
+        "dependency": "historical_pit",
+        "issue": "#17",
+        "reason": "HISTORICAL_PIT_NOT_VERIFIED",
+        "required_evidence": "历史首次发布、修订与当时实收证据",
+        "source": "docs/M1_PR07_AUDIT.md",
+        "source_sha256": "3ae864a2b026c67b28735bb2514b3cc2a4312e539a2cd307c805923040649649",
+        "status": "BLOCKED"
+      },
+      {
+        "dependency": "historical_fees",
+        "issue": "#17",
+        "reason": "HISTORICAL_FEE_EFFECTIVE_DATES_MISSING",
+        "required_evidence": "2026-07-06 以前适用费用与取整的版本化来源",
+        "source": "docs/M1_PR07_AUDIT.md",
+        "source_sha256": "3ae864a2b026c67b28735bb2514b3cc2a4312e539a2cd307c805923040649649",
+        "status": "BLOCKED"
+      },
+      {
+        "dependency": "corporate_actions_2024_2025",
+        "issue": "#17",
+        "reason": "CORPORATE_ACTION_FACTS_MISSING",
+        "required_evidence": "2024/2025 事件公告、登记、除权与到账事实",
+        "source": "docs/M1_PR07_AUDIT.md",
+        "source_sha256": "3ae864a2b026c67b28735bb2514b3cc2a4312e539a2cd307c805923040649649",
+        "status": "BLOCKED"
+      },
+      {
+        "dependency": "corporate_action_2026",
+        "issue": "#17",
+        "reason": "FACTS_PARTIAL_PIT_TAX_SETTLEMENT_UNVERIFIED",
+        "required_evidence": "2026 事件历史 PIT、实际账户税务、到账与权益",
+        "source": "docs/M1_PR09.md",
+        "source_sha256": "3c113a908b37ce831f69ead04df210266891ae0ac67a1499b97cbadd04895401",
+        "status": "BLOCKED"
+      },
+      {
+        "dependency": "opening",
+        "issue": "#10",
+        "reason": "OPENING_SOURCE_NOT_VERIFIED",
+        "required_evidence": "独立开盘权限、窗口内实收、单位/延迟与费用",
+        "source": "docs/M1_PR04B_OPENING_EVIDENCE.md",
+        "source_sha256": "351381f58b832b410d9614d8010b92dcef39e305d169f1b18f932108f49b7041",
+        "status": "BLOCKED"
+      },
+      {
+        "dependency": "action_feed",
+        "issue": "#10/#17",
+        "reason": "COVERAGE_NOT_ATTESTED",
+        "required_evidence": "逐日当时取得的完整公司行为覆盖证据",
+        "source": "docs/M1_PR11.md",
+        "source_sha256": "7cf3061c1bf5753851e261cd3fc30be4fb307fdecf2d9f5f9ad73cedcffc22aa",
+        "status": "BLOCKED"
+      },
+      {
+        "dependency": "forward_paper",
+        "issue": "#10",
+        "reason": "FORWARD_OBSERVATION_NOT_PAPER_FILLS",
+        "required_evidence": "前向研究就绪、开盘/费用与实际模拟成交证据",
+        "source": "docs/M1_PR11.md",
+        "source_sha256": "7cf3061c1bf5753851e261cd3fc30be4fb307fdecf2d9f5f9ad73cedcffc22aa",
+        "status": "BLOCKED"
+      },
+      {
+        "dependency": "real_fusion",
+        "issue": "#76",
+        "reason": "REAL_MARKET_DATA_EGRESS_DENIED",
+        "required_evidence": "Owner 对指定真实数据类别/接收方的另行显式授权",
+        "source": "docs/M2_PR20.md",
+        "source_sha256": "a52e63c864d810b3a55e75fa965f19b86a8f1982881f052c9f56c5a5b16d36d6",
+        "status": "BLOCKED"
+      }
+    ],
+    "nav": null,
+    "observation": {
+      "cumulative_continuity": "EOD_CONTINUITY_VERIFIED",
+      "current_continuity": "GAPS_OR_UNVERIFIED",
+      "data_mode": "forward_observed_eod",
+      "days": [
+        {
+          "acquired_at": [
+            1793192840090
+          ],
+          "attempts": 1,
+          "late_backfill": 0,
+          "reason": null,
+          "source_day": "20261028",
+          "state": "ON_TIME"
+        },
+        {
+          "acquired_at": [
+            1793281197419
+          ],
+          "attempts": 1,
+          "late_backfill": 0,
+          "reason": null,
+          "source_day": "20261029",
+          "state": "ON_TIME"
+        },
+        {
+          "acquired_at": [],
+          "attempts": 0,
+          "late_backfill": 0,
+          "reason": "KNOWN_OPEN_DAY_WITHOUT_ON_DAY_COLLECTION",
+          "source_day": "20261030",
+          "state": "MISSED"
+        },
+        {
+          "acquired_at": [],
+          "attempts": 0,
+          "late_backfill": 0,
+          "reason": "CALENDAR_UNKNOWN",
+          "source_day": "20261031",
+          "state": "NOT_VERIFIED"
+        },
+        {
+          "acquired_at": [],
+          "attempts": 0,
+          "late_backfill": 0,
+          "reason": "CALENDAR_UNKNOWN",
+          "source_day": "20261101",
+          "state": "NOT_VERIFIED"
+        },
+        {
+          "acquired_at": [],
+          "attempts": 0,
+          "late_backfill": 0,
+          "reason": "CALENDAR_UNKNOWN",
+          "source_day": "20261102",
+          "state": "NOT_VERIFIED"
+        },
+        {
+          "acquired_at": [],
+          "attempts": 0,
+          "late_backfill": 0,
+          "reason": "CALENDAR_UNKNOWN",
+          "source_day": "20261103",
+          "state": "NOT_VERIFIED"
+        }
+      ],
+      "events": 5,
+      "fills": 0,
+      "journal_head": "28a8f562c7df902ced5fe03a38ceb22f8f44190da3df67944771e075effa8b66",
+      "longest_consecutive_known_open_days": 2,
+      "nav": null,
+      "new_observed_days_created": 0,
+      "on_time_days": 2,
+      "opening_source": "BLOCKED",
+      "orders": 0,
+      "physical_restart": "NOT_VERIFIED",
+      "raw_sha256": [
+        {
+          "api": "trade_cal",
+          "received_at": 1793192837756,
+          "sequence": 2,
+          "sha256": "c58a3f22477fcba061ab45ddb3bded36af9d318bc7b959e2e75505512348a6e1"
+        },
+        {
+          "api": "daily",
+          "received_at": 1793192840090,
+          "sequence": 2,
+          "sha256": "04994bab8f4b4e2140c75cb3d66e66de45dbc233c01268eb54214e09ef42306e"
+        },
+        {
+          "api": "trade_cal",
+          "received_at": 1793281197167,
+          "sequence": 4,
+          "sha256": "3fc20abcd3bd9159512b9da8b7d9ea5db53f82f7d188e7d82184937fc2d83526"
+        },
+        {
+          "api": "daily",
+          "received_at": 1793281197419,
+          "sequence": 4,
+          "sha256": "238afb58e7737b6c7c2c4cbd4665ad83031a1ec0f8bb65b4f8a9751eba117eab"
+        }
+      ],
+      "through": "20261103"
+    },
+    "orders": 0,
+    "schema_version": 1
+  },
+  "authority": "RESEARCH_ONLY",
+  "base_sha": "d557aa1cd721df66accdddbe7b22afb184736ecc",
+  "can_execute_forward_paper": false,
+  "cloud_egress": "REAL_MARKET_DATA_EGRESS_DENIED",
+  "eligibility": "ELIGIBILITY_DENIED",
+  "historical_pit_status": "NOT_VERIFIED",
+  "key_content_read": false,
+  "live_allowed": false,
+  "new_http_calls": 0,
+  "note": "Developer read-only recheck; original independent two-day evidence retained, no new observations; no verified original-observer Operator journal.",
+  "observation": {
+    "cumulative_continuity": "EOD_CONTINUITY_VERIFIED",
+    "current_continuity": "GAPS_OR_UNVERIFIED",
+    "data_mode": "forward_observed_eod",
+    "days": [
+      {
+        "acquired_at": [
+          1793192840090
+        ],
+        "attempts": 1,
+        "late_backfill": 0,
+        "reason": null,
+        "source_day": "20261028",
+        "state": "ON_TIME"
+      },
+      {
+        "acquired_at": [
+          1793281197419
+        ],
+        "attempts": 1,
+        "late_backfill": 0,
+        "reason": null,
+        "source_day": "20261029",
+        "state": "ON_TIME"
+      },
+      {
+        "acquired_at": [],
+        "attempts": 0,
+        "late_backfill": 0,
+        "reason": "KNOWN_OPEN_DAY_WITHOUT_ON_DAY_COLLECTION",
+        "source_day": "20261030",
+        "state": "MISSED"
+      },
+      {
+        "acquired_at": [],
+        "attempts": 0,
+        "late_backfill": 0,
+        "reason": "CALENDAR_UNKNOWN",
+        "source_day": "20261031",
+        "state": "NOT_VERIFIED"
+      },
+      {
+        "acquired_at": [],
+        "attempts": 0,
+        "late_backfill": 0,
+        "reason": "CALENDAR_UNKNOWN",
+        "source_day": "20261101",
+        "state": "NOT_VERIFIED"
+      },
+      {
+        "acquired_at": [],
+        "attempts": 0,
+        "late_backfill": 0,
+        "reason": "CALENDAR_UNKNOWN",
+        "source_day": "20261102",
+        "state": "NOT_VERIFIED"
+      },
+      {
+        "acquired_at": [],
+        "attempts": 0,
+        "late_backfill": 0,
+        "reason": "CALENDAR_UNKNOWN",
+        "source_day": "20261103",
+        "state": "NOT_VERIFIED"
+      }
+    ],
+    "events": 5,
+    "fills": 0,
+    "journal_head": "28a8f562c7df902ced5fe03a38ceb22f8f44190da3df67944771e075effa8b66",
+    "longest_consecutive_known_open_days": 2,
+    "nav": null,
+    "new_observed_days_created": 0,
+    "on_time_days": 2,
+    "opening_source": "BLOCKED",
+    "orders": 0,
+    "physical_restart": "NOT_VERIFIED",
+    "raw_sha256": [
+      {
+        "api": "trade_cal",
+        "received_at": 1793192837756,
+        "sequence": 2,
+        "sha256": "c58a3f22477fcba061ab45ddb3bded36af9d318bc7b959e2e75505512348a6e1"
+      },
+      {
+        "api": "daily",
+        "received_at": 1793192840090,
+        "sequence": 2,
+        "sha256": "04994bab8f4b4e2140c75cb3d66e66de45dbc233c01268eb54214e09ef42306e"
+      },
+      {
+        "api": "trade_cal",
+        "received_at": 1793281197167,
+        "sequence": 4,
+        "sha256": "3fc20abcd3bd9159512b9da8b7d9ea5db53f82f7d188e7d82184937fc2d83526"
+      },
+      {
+        "api": "daily",
+        "received_at": 1793281197419,
+        "sequence": 4,
+        "sha256": "238afb58e7737b6c7c2c4cbd4665ad83031a1ec0f8bb65b4f8a9751eba117eab"
+      }
+    ],
+    "through": "20261103"
+  },
+  "observer_bytes_unchanged": true,
+  "observer_database_sha256": "d4020489f0485554ec092e9e8e84026998aa54248ac3268df46aeb040ee0585e",
+  "operator": {
+    "reason": "OPERATOR_NOT_PROVIDED",
+    "state": "NOT_VERIFIED"
+  },
+  "paper_allowed": false,
+  "report_sha256": "80db07ef038c7f606f95daadccd6a7e85c8ba9a93a10b63187909c3fdbc21ca7",
+  "schema_version": 1,
+  "source_head": "e9fd6878816f10e0be22b869322242340349edb1"
+}

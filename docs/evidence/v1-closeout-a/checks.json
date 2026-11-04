@@ -1,0 +1,135 @@
+{
+  "agents_spawned": 0,
+  "base_sha": "d557aa1cd721df66accdddbe7b22afb184736ecc",
+  "checks": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "exit_code": 0,
+      "label": "fmt"
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--workspace",
+        "--locked",
+        "--offline"
+      ],
+      "exit_code": 0,
+      "label": "build"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--locked",
+        "--offline",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "label": "rust"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--locked",
+        "--offline"
+      ],
+      "exit_code": 0,
+      "label": "clippy"
+    },
+    {
+      "command": "python3 -B scripts/test-risk-evaluation.py",
+      "exit_code": 0,
+      "label": "evaluation-and-audit",
+      "passed": 11,
+      "skipped": 0,
+      "source": "tests-evaluation-final2"
+    },
+    {
+      "command": "python3 -B scripts/test-local-timesfm-fusion.py",
+      "exit_code": 0,
+      "label": "fusion-loopback",
+      "passed": 11,
+      "skipped": 0,
+      "source": "tests-fusion-final"
+    },
+    {
+      "command": "python3 -B scripts/test-timesfm-history.py",
+      "exit_code": 0,
+      "label": "history-registry-egress",
+      "passed": 13,
+      "skipped": 0,
+      "source": "tests-history-final"
+    },
+    {
+      "command": "python3 -B scripts/test-timesfm-cpu.py",
+      "exit_code": 0,
+      "label": "cpu",
+      "passed": 11,
+      "skipped": 1,
+      "source": "tests-cpu-final"
+    },
+    {
+      "command": "python3 -B scripts/test-timesfm-linux.py",
+      "exit_code": 0,
+      "label": "linux-isolation",
+      "passed": 4,
+      "skipped": 0,
+      "source": "WSL ext4"
+    },
+    {
+      "command": "python3 -B scripts/verify-risk-evaluation.py <sealed-local-directory>",
+      "exit_code": 0,
+      "label": "real-independent-recomputation"
+    },
+    {
+      "command": "risk-evaluate run on sealed directory; runner forbidden",
+      "exit_code": 0,
+      "label": "sealed-repeat"
+    },
+    {
+      "command": "local-fusion-agent verify <original-synthetic-batch>",
+      "exit_code": 0,
+      "label": "old-recorded-fusion-readonly"
+    },
+    {
+      "command": "original cli.verify and history.archived at original worktree Registry",
+      "exit_code": 0,
+      "label": "old-cpu-registry-readonly"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "label": "git-diff-check"
+    }
+  ],
+  "classification": "DEVELOPER_SELF_TEST_NOT_INDEPENDENT_ACCEPTANCE",
+  "clippy_warnings": "5 pre-existing warnings in eod_snapshot, provider, risk_binding and structured; not -D warnings",
+  "not_run": [
+    "N100 physical host",
+    "Windows-specific Job test",
+    "paid DeepSeek API",
+    "new market API",
+    "independent human acceptance",
+    "physical power-loss or OS restart"
+  ],
+  "rust_tests_passed": 205,
+  "skills": [
+    "stop-that-shit",
+    "tushare 1.1.12",
+    "tushare-data 1.1.16",
+    "pr"
+  ],
+  "source_head": "e9fd6878816f10e0be22b869322242340349edb1"
+}

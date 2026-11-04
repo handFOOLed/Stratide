@@ -1,0 +1,28 @@
+{
+  "base_sha": "d557aa1cd721df66accdddbe7b22afb184736ecc",
+  "files": {
+    "README.en.md": "a5442e389fa7e521751fc673eb8961ecf6fd137c154b82dca6bcb54a90e2a4b5",
+    "README.md": "3b2da2bb65a0edc0473f73f78ee1fc9bd0ab9026a3833c637e3e0c16a7461bdb",
+    "config/risk-evaluation-v1.json": "fab03053a63963c06c904f2f421886cadd9f541edb2f698e2d1caed6c94fc8a1",
+    "docs/PAPER_TRADING_ROADMAP.md": "8699f6d5ad48310a33c7bfe1e146feeb86e886e65399c6be575561192df9f6c2",
+    "docs/STATUS.md": "510aee66f21f249d4e4d14e420c027ad987dc0127e21b56b699f5a1fc192c949",
+    "docs/V1_EVALUATION.md": "f531fc2ecd300c53a566fce11f7eeb0914bfc1b1cde1adc909f10c8c67965a3c",
+    "docs/V1_EVALUATION_PROTOCOL.md": "0a4b313fe33d37b8704aa6507a29571d4e5982ccc705916930afbba8fb68a275",
+    "research/agent/prompts/fusion-researcher-v1-developer.txt": "31024678153dc20048136701127008decd954ed6f36f79840a39a8aba3660210",
+    "research/agent/prompts/fusion-researcher-v1-system.txt": "4f5e567eaa9188989a3da189a92627845dc73b7b0d6f84468ed590c5c2f1b9c2",
+    "research/agent/src/bin/fusion-researcher-contract.rs": "cb9b0137985c60ef114ba59f11611cdc73ed7b4349eb940d49aadfa74a0cbd46",
+    "research/agent/src/fusion_researcher.rs": "d52784cec11e3129e94799498b0c3b2438eaa4189dabddb3dd327978d7e6e4c1",
+    "research/agent/src/lib.rs": "62833bd55121c22461b525fdd521652bb8d6836308236ba6bbf027d5c1e43be6",
+    "research/agent/src/local_fusion.rs": "207d51508434f2fdf8830bf8a7a717b68a55381b4fb6a809851dd21c54d36315",
+    "research/evidence_audit.py": "9cd92416f4734c159ed5cb4c3d20642e9ae125ce29395ef9e4bb9cf1015c19ec",
+    "research/risk_evaluation.py": "d71d9fd3b7d3202e7f7af1dd5b846a095d24ca38822e5296d564aa9c81e65a88",
+    "scripts/risk-evaluate.py": "4ae1c13d41eafc9414bed64a54461daec3cfc3cbf4e173d1b9b83a30ce0126a0",
+    "scripts/test-local-timesfm-fusion.py": "0a4edbf275c34411a5d09bb395d9c51229a27a8a18bdd9ad0ac1d237590d1251",
+    "scripts/test-risk-evaluation.py": "adfa9ab29a6bbc685a3907d4c99968f28c569792644468cbed6e547fa549406b",
+    "scripts/verify-risk-evaluation.py": "be91698ba9a9310f2e29432da30db749f8683434a8fd8ed9e3d4c63b8a74aaf1"
+  },
+  "final_evidence_commit_changes_source": false,
+  "implementation_sha256": "4db1736e6e40cd7abcd1534e15465c12dd9359e5cce1be599e87c4bb79d0f6f6",
+  "protocol_canonical_sha256": "471d7e7136ec2645ce7210025f47fddcb18b372bacbc6ee2bdeb904435689cec",
+  "source_head": "e9fd6878816f10e0be22b869322242340349edb1"
+}
