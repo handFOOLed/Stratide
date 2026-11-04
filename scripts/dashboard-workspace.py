@@ -134,7 +134,7 @@ def snapshot(config):
             market_status["latest"] = None if latest is None else {k: latest[k] for k in (
                 "source_day", "state", "expected_market", "actual_quoted", "market_explained", "market_coverage_bps",
                 "research_denominator", "eligible_symbols", "categories", "available_at", "source_states",
-                "blockers", "snapshot_sha256")}
+                "blockers", "snapshot_sha256", "catalog_state", "catalog_scopes", "market_denominator_verified")}
             if market_status["latest"] is not None:
                 market_status["latest"]["eligible_count"] = len(market_status["latest"].pop("eligible_symbols"))
         except (market_eod.Error, OSError) as error:

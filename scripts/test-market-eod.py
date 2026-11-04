@@ -38,6 +38,8 @@ class HTTP:
     def __init__(self):
         self.calls = []
         self.catalog = catalog()
+        self.catalog_omissions = set()
+        self.resumed = set()
         self.failures = {}
         self.missing = set()
         self.missing_dates = {}
@@ -48,13 +50,15 @@ class HTTP:
 
     def __call__(self, api, params, fields):
         self.calls.append((api, dict(params)))
-        if api in self.failures:
-            value = self.failures.pop(api)
+        failure = (api, params.get("suspend_type")) if (api, params.get("suspend_type")) in self.failures else api
+        if failure in self.failures:
+            value = self.failures.pop(failure)
             if isinstance(value, Exception):
                 raise value
             return value
         if api == "stock_basic":
-            rows = [r for r in self.catalog if r["exchange"] == params["exchange"] and r["list_status"] == params["list_status"]]
+            rows = [r for r in self.catalog if r["exchange"] == params["exchange"] and r["list_status"] == params["list_status"]
+                    and (params["exchange"], params["list_status"]) not in self.catalog_omissions]
         elif api == "trade_cal":
             rows = [dict(exchange=params["exchange"], cal_date=d, is_open=int(d not in self.closed),
                          pretrade_date=(m.h.day(d)-dt.timedelta(days=1)).strftime("%Y%m%d"))
@@ -79,6 +83,11 @@ class HTTP:
                 rows = [dict(ts_code=c, trade_date=date, close="10.10", turnover_rate="1", total_mv="100") for c in active]
             elif api == "suspend_d":
                 rows = [dict(ts_code=S, trade_date=date, suspend_type="S", suspend_timing=None)] if S in {r["ts_code"] for r in self.catalog} else []
+                rows += [dict(ts_code=c, trade_date=date, suspend_type="R", suspend_timing=None) for c in sorted(self.resumed)]
+                if params.get("suspend_type"):
+                    rows = [r for r in rows if r["suspend_type"] == params["suspend_type"]]
+                if params.get("ts_code"):
+                    rows = [r for r in rows if r["ts_code"] in params["ts_code"].split(",")]
         if self.duplicates and rows:
             rows = list(reversed(rows)) + [rows[0]]
         names = fields.split(",")
@@ -151,6 +160,79 @@ class MarketTests(unittest.TestCase):
             frozen = db.execute("SELECT content,sha FROM market_snapshots ORDER BY id LIMIT 1").fetchone()
             self.assertEqual(frozen[1], old["snapshot_sha256"])
             self.assertEqual(m.sha(frozen[0].encode()), old["snapshot_sha256"])
+
+    def test_missing_exchange_catalog_cannot_claim_full_market_ready(self):
+        for exchange, omissions, absent_quotes in (
+            ("BSE", {("BSE", s) for s in m.h.STATUSES}, {BJ}),
+            ("SSE", {("SSE", "L")}, {A, N, U}),
+        ):
+            with self.subTest(exchange=exchange):
+                self.market = m.Market(self.market.root / exchange)
+                self.market.initialize(DAY, data_mode="synthetic_test")
+                self.market.control(True)
+                self.http = HTTP()
+                self.http.catalog_omissions = omissions
+                self.http.missing = absent_quotes
+                self.assertEqual(self.once()["state"], "BLOCKED")
+                report = self.market.report()
+                snapshot = report["latest"]
+                self.assertEqual(snapshot["market_coverage_bps"], 10000)
+                self.assertEqual(snapshot["catalog_state"], "NOT_VERIFIED")
+                self.assertEqual(snapshot["catalog_scopes"][exchange]["listed_rows"], 0)
+                self.assertFalse(snapshot["market_denominator_verified"])
+                self.assertEqual(snapshot["eligible_symbols"], [])
+                self.assertIsNone(report["last_successful_date"])
+                with self.assertRaisesRegex(m.Error, "MARKET_DAY_NOT_QUALIFIED"):
+                    self.market.research_source(DAY, [B], self.at)
+
+    def test_catalog_shrink_preserves_missing_prior_securities_and_blocks(self):
+        self.assertEqual(self.once()["state"], "READY")
+        previous = self.market.report()["latest"]["snapshot_sha256"]
+        self.http.catalog = [r for r in self.http.catalog if r["ts_code"] not in (N, U)]
+        self.at = "2026-11-05T08:10:00+00:00"
+        self.assertEqual(self.once()["state"], "BLOCKED")
+        snapshot = self.market.report()["latest"]
+        self.assertEqual(snapshot["catalog_missing_symbols"], sorted([N, U]))
+        self.assertEqual(snapshot["catalog_scopes"]["SSE"]["listed_rows"], 1)
+        self.assertEqual(snapshot["expected_market"], 6)
+        self.assertEqual(snapshot["categories"]["CATALOG_MISSING"], 2)
+        self.assertEqual(snapshot["eligible_symbols"], [])
+        with self.market.read() as db:
+            self.assertEqual(self.market.load_snapshot(db, DAY)["snapshot_sha256"], previous)
+
+    def test_new_listing_and_explicit_delisting_keep_catalog_verified(self):
+        self.assertEqual(self.once()["state"], "READY")
+        new_code = "600003.SH"
+        self.http.catalog = [dict(r, list_status="D", delist_date="20261105") if r["ts_code"] == A else r
+                             for r in self.http.catalog]
+        self.http.catalog.append(dict(self.http.catalog[0], ts_code=new_code, symbol=new_code[:6],
+                                      list_status="L", list_date="20261105", delist_date=None))
+        self.at = "2026-11-05T08:10:00+00:00"
+        self.assertEqual(self.once()["state"], "READY")
+        snapshot = self.market.report()["latest"]
+        self.assertEqual(snapshot["catalog_state"], "VERIFIED")
+        self.assertTrue(snapshot["market_denominator_verified"])
+        self.assertEqual(snapshot["catalog_missing_symbols"], [])
+        self.assertEqual(snapshot["categories"]["DELISTED"], 2)
+        self.assertEqual(snapshot["categories"]["NEW_LISTING"], 2)
+        self.assertEqual(snapshot["categories"]["UNSUPPORTED"], 1)
+        self.assertEqual(snapshot["catalog_scopes"]["BSE"]["listed_rows"], 1)
+
+    def test_suspension_requires_explicit_s_and_r_and_keeps_resume_separate(self):
+        self.http.resumed = {B}
+        self.assertEqual(self.once()["state"], "READY")
+        queries = [p for a, p in self.http.calls if a == "suspend_d"]
+        self.assertEqual({p["suspend_type"] for p in queries}, {"S", "R"})
+        snapshot = self.market.report()["latest"]
+        self.assertEqual(snapshot["suspend_query_types"], ["R", "S"])
+        source = self.market.research_source(DAY, [B], self.at)
+        self.assertEqual([r["suspend_type"] for r in source["sources"]["suspend_d"]], ["R"])
+        self.at = "2026-11-05T08:10:00+00:00"
+        self.http.failures[("suspend_d", "R")] = (200, m.canonical(dict(code=2002, msg="无接口权限")), "")
+        self.assertEqual(self.once()["state"], "BLOCKED")
+        snapshot = self.market.report()["latest"]
+        self.assertEqual(snapshot["source_states"]["suspend_d"], "PERMISSION_DENIED")
+        self.assertEqual(snapshot["eligible_symbols"], [])
 
     def test_anomalies_are_counted_and_not_admitted_to_native_daily(self):
         self.http.bad.add(A)
@@ -264,7 +346,7 @@ class MarketTests(unittest.TestCase):
     def test_six_thousand_boundary_is_partitioned_not_silently_complete(self):
         self.http.catalog = [dict(ts_code=f"{600000+i}.SH", symbol=str(600000+i), name="合成",
             exchange="SSE", market="主板", list_status="L" if i < 4000 else "P",
-            list_date="20000101", delist_date=None) for i in range(6001)]
+            list_date="20000101", delist_date=None) for i in range(5999)] + [r for r in catalog() if r["ts_code"] in (B, BJ)]
         self.http.cap = True
         self.assertEqual(self.once()["state"], "READY")
         snapshot = self.market.report()["latest"]

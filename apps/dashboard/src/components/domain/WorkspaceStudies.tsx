@@ -21,7 +21,8 @@ export function WorkspaceStudies({workspace}: {workspace: WorkspaceState}) {
         {data.market.data_mode === undefined ? null : <ModeBadge mode={data.market.data_mode}/>}
         <p>采集状态：{data.market.state === 'READY' ? '数据覆盖合格' : data.market.state === 'NOT_CONFIGURED' ? '未配置' : data.market.state === 'MARKET_CLOSED' ? '交易所休市' : '等待或受阻（见详情）'} · 最后成功日期：{data.market.last_successful_date === null ? '尚无' : data.market.last_successful_date}</p>
         {data.market.latest === null ? null : <>
-          <p>源日 {data.market.latest.source_day} · 全市场有行情 {data.market.latest.actual_quoted}/{data.market.latest.expected_market}；行情与已确认全天停牌合计 {data.market.latest.market_explained}/{data.market.latest.expected_market}（{(data.market.latest.market_coverage_bps / 100).toFixed(2)}%）</p>
+          <p>证券目录范围：{data.market.latest.market_denominator_verified ? '已核验' : '未核验，研究准入受阻'}；行情覆盖率按已知目录计算。</p>
+          <p>源日 {data.market.latest.source_day} · 目录内有行情 {data.market.latest.actual_quoted}/{data.market.latest.expected_market}；行情与已确认全天停牌合计 {data.market.latest.market_explained}/{data.market.latest.expected_market}（{(data.market.latest.market_coverage_bps / 100).toFixed(2)}%）</p>
           <p>研究选样合格 {data.market.latest.eligible_count}/{data.market.latest.research_denominator} · 实际可用时间 {formatDateTime(data.market.latest.available_at)}</p>
         </>}
         <p className="muted">缺口日期 {data.market.gaps.length}；BSE 保留覆盖记录，尚不支持研究准入。读取资料只查询本地数据。</p>

@@ -27,6 +27,7 @@ export interface Workspace {
   backup?:{state:string;files?:number;manifest_sha256?:string};
   market?: {state:string;reason?:string;data_mode?:string;last_successful_date:string|null;gaps:unknown[];
     latest:null|{source_day:string;state:string;expected_market:number;actual_quoted:number;market_explained:number;
+      catalog_state:string;catalog_scopes:Record<string,unknown>;market_denominator_verified:boolean;
       market_coverage_bps:number;research_denominator:number;eligible_count:number;categories:Record<string,number>;
       available_at:string;source_states:Record<string,string>;blockers:string[];snapshot_sha256:string}};
 }

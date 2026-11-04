@@ -211,7 +211,9 @@ class Market(h.Warehouse):
         old = db.execute("SELECT content,sha FROM market_catalogs WHERE source_day=?", (today,)).fetchone()
         if old:
             require(sha(old[0].encode()) == old[1], "CATALOG_SHA")
-            return json.loads(old[0])
+            value = json.loads(old[0])
+            require("scopes" in value, "CATALOG_SCOPE_NOT_VERIFIED")
+            return value
         sources, rows, blockers = [], {}, []
         for exchange in h.EXCHANGES:
             for status in h.STATUSES:
@@ -225,15 +227,58 @@ class Market(h.Warehouse):
                     rows[code] = row
         # B shares are outside the A-share denominator; retain their count and raw.
         excluded = [c for c in rows if re.fullmatch(r"(?:900\d{3}\.SH|200\d{3}\.SZ)", c)]
+        rows = {c: r for c, r in rows.items() if c not in excluded}
+        prior = db.execute("SELECT source_day,content,sha FROM market_catalogs WHERE source_day<? ORDER BY source_day DESC LIMIT 1",
+                           (today,)).fetchone()
+        missing, comparison = {}, None
+        if prior:
+            require(sha(prior[1].encode()) == prior[2], "CATALOG_SHA")
+            previous = json.loads(prior[1])
+            comparison = dict(source_day=prior[0], sha256=prior[2])
+            # An absent code is not evidence of delisting. A returned D/P row
+            # or another explicit status transition retains the code identity.
+            missing = {r["ts_code"]: r for r in previous["rows"]
+                       if r["list_status"] in ("L", "P") and r["ts_code"] not in rows
+                       and (not r["delist_date"] or today < r["delist_date"])}
+        scopes = {}
+        for exchange in h.EXCHANGES:
+            listed = sum(r["exchange"] == exchange and r["list_status"] == "L" for r in rows.values())
+            lost = sum(r["exchange"] == exchange for r in missing.values())
+            reasons = []
+            if listed == 0:
+                reasons.append("LISTED_SCOPE_EMPTY")
+            if lost:
+                reasons.append("PRIOR_SECURITIES_DISAPPEARED")
+            if any(b.startswith("CATALOG_TRUNCATED:" + exchange + ":") for b in blockers):
+                reasons.append("TRUNCATED_SCOPE")
+            scopes[exchange] = dict(state="NOT_VERIFIED" if reasons else "VERIFIED", listed_rows=listed,
+                                    current_rows=sum(r["exchange"] == exchange for r in rows.values()),
+                                    missing_prior_rows=lost, reasons=reasons)
+            blockers.extend("CATALOG_" + reason + ":" + exchange for reason in reasons)
+        # Retain previously known identities as an explicit gap, never shrink
+        # the market denominator merely because the provider omitted a block.
+        rows.update(missing)
         value = dict(version=VERSION, source_day=today, sources=sources, blockers=sorted(blockers),
-                     rows=[rows[c] for c in sorted(rows) if c not in excluded], excluded_b_shares=len(excluded),
+                     state="NOT_VERIFIED" if blockers else "VERIFIED", scopes=scopes,
+                     missing_symbols=sorted(missing), comparison=comparison,
+                     rows=[rows[c] for c in sorted(rows)], excluded_b_shares=len(excluded),
                      membership="CURRENT_DATED_CATALOG_NOT_HISTORICAL_PIT")
         with db:
             db.execute("INSERT INTO market_catalogs VALUES(?,?,?)", (today, canonical(value).decode(), sha(canonical(value))))
         return value
 
     def batch(self, db, download, api, date, catalog, retry):
-        result = download.fetch(api, dict(trade_date=date), retry=retry)
+        results = [self.batch_scope(db, download, api, dict(trade_date=date, suspend_type=kind), catalog, retry)
+                   for kind in ("S", "R")] if api == "suspend_d" else [
+                   self.batch_scope(db, download, api, dict(trade_date=date), catalog, retry)]
+        rows = sorted((r for part, _, _ in results for r in part), key=canonical)
+        sources = [a for _, ids, _ in results for a in ids]
+        state = ("PARTITIONED_CURRENT_CATALOG" if any(s == "PARTITIONED_CURRENT_CATALOG" for _, _, s in results)
+                 else results[0][2] if api != "suspend_d" else "OK" if rows else "EMPTY")
+        return rows, sources, state
+
+    def batch_scope(self, db, download, api, params, catalog, retry):
+        result = download.fetch(api, params, retry=retry)
         sources = [result["id"]]
         if result["status"] != "TRUNCATION_SUSPECTED" or api not in ("daily", "suspend_d"):
             return result["rows"], sources, result["status"]
@@ -244,7 +289,7 @@ class Market(h.Warehouse):
                        {r["ts_code"] for r in result["rows"]})
         merged = {}
         for offset in range(0, len(codes), 200):
-            part = download.fetch(api, dict(trade_date=date, ts_code=",".join(codes[offset:offset+200])))
+            part = download.fetch(api, dict(params, ts_code=",".join(codes[offset:offset+200])))
             require(part["status"] != "TRUNCATION_SUSPECTED", "PARTITION_TRUNCATED")
             sources.append(part["id"])
             for row in part["rows"]:
@@ -262,6 +307,9 @@ class Market(h.Warehouse):
             return None
         require(sha(row[0].encode()) == row[1], "SNAPSHOT_SHA")
         value = json.loads(row[0])
+        # R1 scope evidence cannot be reconstructed by relabelling a frozen
+        # pre-R1 snapshot. Keep its bytes, but reject it as current admission.
+        require("catalog_scopes" in value, "CATALOG_SCOPE_NOT_VERIFIED")
         for ref in value["sources"]:
             require(self.reference(db, ref["id"]) == ref, "SNAPSHOT_SOURCE_CHANGED")
         return dict(snapshot_sha256=row[1], **value)
@@ -279,7 +327,12 @@ class Market(h.Warehouse):
             code = row["ts_code"]
             capable = supported(row)
             reasons = []
-            if row["delist_date"] and date >= row["delist_date"]:
+            if code in catalog["missing_symbols"]:
+                category, reasons = "CATALOG_MISSING", ["ABSENT_FROM_CURRENT_CATALOG"]
+                if row["list_date"] and row["list_date"] <= date and (not row["delist_date"] or date < row["delist_date"]):
+                    expected.add(code)
+                    gaps.append(code)
+            elif row["delist_date"] and date >= row["delist_date"]:
                 category = "DELISTED"
             elif row["list_status"] in ("UN", "G"):
                 category = "NOT_LISTED"
@@ -357,6 +410,9 @@ class Market(h.Warehouse):
                      late_backfill=instant(available).astimezone(TZ).strftime("%Y%m%d") > date,
                      availability="ACTUAL_RECEIPT_ONLY_DAILY_OPEN_IS_NOT_T_PLUS_1_OBSERVED_PRICE",
                      catalog_source_day=catalog["source_day"], catalog_sha256=sha(canonical(catalog)),
+                     catalog_state=catalog["state"], catalog_scopes=catalog["scopes"],
+                     catalog_missing_symbols=catalog["missing_symbols"],
+                     market_denominator_verified=catalog["state"] == "VERIFIED",
                      catalog_membership=catalog["membership"], native_day_version=native["version_id"],
                      rule_sources=[dict(path=p, sha256=sha((h.ROOT / p).read_bytes())) for p in
                                    ("crates/contracts/src/paper.rs", "research/timesfm_cpu/history.py")],
@@ -370,6 +426,8 @@ class Market(h.Warehouse):
                      categories=dict(sorted(Counter(r["category"] for r in classes).items())), securities=classes,
                      missing_symbols=sorted(gaps), anomalous_symbols=sorted(set(anomalies) | set(invalid)),
                      unknown_symbols=unknown, source_states=states,
+                     suspend_query_types=sorted({r["params"]["suspend_type"] for r in sources
+                         if r["api"] == "suspend_d" and r["status"] in GOOD}),
                      source_coverage={api: dict(rows=len(data[api]),
                          missing_quoted=sorted(set(prices) - {r["ts_code"] for r in data[api]}))
                          for api in ("adj_factor", "daily_basic")},
