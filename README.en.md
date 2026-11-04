@@ -1,5 +1,7 @@
 [简体中文](README.md) | **English**
 
+**V1 closeout A / #76 (Draft branch)**: [Frozen risk evaluation, read-only forward audit and FusionResearcherV1](docs/V1_EVALUATION.md) compare local CPU / Naive / EWMA on the same RMS target and test the prompt using synthetic evidence. Real metrics remain local; PIT, forward-paper eligibility and real-data cloud egress stay blocked.
+
 # Stratide
 
 A local-first, **paper-only** personal quantitative research system: Rust risk/ledger and replay, genuine EOD observation, a local read-only Paper Dashboard and controlled research Agent. **Not authorized for real-money trading; no proven trading edge.**

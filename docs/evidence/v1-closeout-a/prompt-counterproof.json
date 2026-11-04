@@ -1,0 +1,33 @@
+{
+  "after": {
+    "command": "test-local-timesfm-fusion.py",
+    "exit_code": 0,
+    "forged_PIT_provenance": "outcome_uncertain / FUSION_PROVENANCE_LABELS_REQUIRED",
+    "maximum_reservation_held": true,
+    "passed": 11,
+    "repeat_does_not_send": true,
+    "tool_calls": "outcome_uncertain / DEEPSEEK_RESPONSE_PROTOCOL",
+    "unsupported_profit_claim": "outcome_uncertain / FUSION_UNSUPPORTED_CLAIM_OR_CAPABILITY"
+  },
+  "base_sha": "d557aa1cd721df66accdddbe7b22afb184736ecc",
+  "before": {
+    "command": "same synthetic test_10 against exact base production",
+    "exit_code": 1,
+    "forged_PIT_provenance": "completed (undesired)",
+    "tool_calls": "already rejected; role-version assertion failed",
+    "unsupported_profit_claim": "completed (undesired)"
+  },
+  "input_injection": [
+    "quality instruction text denied",
+    "uncertainty tool request denied",
+    "real source label denied",
+    "wrong target unit denied"
+  ],
+  "legacy_adapter_sha256": "e979cf6ba7894239493c1a72daac7dbff3e4357a1ddf342aab14d1052c1772e7",
+  "legacy_history_verify": true,
+  "new_paid_calls": 0,
+  "prompt_sha256": "65ef4796d8da3a7c000bb94e34a5f339e7515c121b8261352b1b2e78fea484fd",
+  "prompt_version": "FusionResearcherV1",
+  "source_head": "e9fd6878816f10e0be22b869322242340349edb1",
+  "synthetic_or_recorded_only": true
+}

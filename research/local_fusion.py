@@ -120,6 +120,9 @@ class Run(rp.ReviewSource):
                     local_parent_result_sha256=view["context"]["parent_result_sha256"],
                     result_storage_sha256=view["result_storage_sha256"], verified=True,
                     input_mode="synthetic_test", portfolio=bundle["portfolio"], fusion_receipt=bundle["receipt"],
+                    conclusion_contract=view["conclusion_contract"],
+                    conclusions=bundle.get("conclusions"),
+                    untrusted_hypothesis=bundle.get("untrusted_hypothesis"),
                     local_risk_receipt=view["local_risk"]["receipt"], registration_sha256=registration,
                     calls=value["calls"], paper_allowed=False, **rp.SAFE)
 

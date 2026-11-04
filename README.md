@@ -1,5 +1,7 @@
 **简体中文** | [English](README.en.md)
 
+**V1 收尾 A / #76（本分支 Draft）**：[冻结风险评价、前向只读审计与 FusionResearcherV1](docs/V1_EVALUATION.md) 提供本地 CPU / Naive / EWMA 同目标比较和合成 Prompt 安全闭环。真实指标只留本机，PIT、前向 Paper 与真实数据外发不解锁。
+
 # Stratide
 
 本地优先、**仅模拟交易（Paper-only）** 的个人量化研究系统：Rust 风控/账本与历史回放、真实盘后数据观察、本地只读 Paper Dashboard 与受控研究 Agent。**不能用于真实资金交易，也不代表已验证盈利能力。**
