@@ -16,6 +16,18 @@ export function WorkspaceStudies({workspace}: {workspace: WorkspaceState}) {
     <p className="muted">研究保留原任务与来源；历史和合成结果均不计入当前 Paper 账户。</p>
     {workspace.error ? <div role="alert">{workspace.error.message}<TechnicalDetails value={{code:workspace.error.code}}/></div> : null}
     {data === null ? <p>正在读取本地资料。</p> : <>
+      {data.market === undefined ? null : <section className="study-row" aria-label="全市场 EOD 采集">
+        <h3 className="card__title">全市场 EOD 采集</h3>
+        {data.market.data_mode === undefined ? null : <ModeBadge mode={data.market.data_mode}/>}
+        <p>采集状态：{data.market.state === 'READY' ? '数据覆盖合格' : data.market.state === 'NOT_CONFIGURED' ? '未配置' : data.market.state === 'MARKET_CLOSED' ? '交易所休市' : '等待或受阻（见详情）'} · 最后成功日期：{data.market.last_successful_date === null ? '尚无' : data.market.last_successful_date}</p>
+        {data.market.latest === null ? null : <>
+          <p>证券目录范围：{data.market.latest.market_denominator_verified ? '已核验' : '未核验，研究准入受阻'}；行情覆盖率按已知目录计算。</p>
+          <p>源日 {data.market.latest.source_day} · 目录内有行情 {data.market.latest.actual_quoted}/{data.market.latest.expected_market}；行情与已确认全天停牌合计 {data.market.latest.market_explained}/{data.market.latest.expected_market}（{(data.market.latest.market_coverage_bps / 100).toFixed(2)}%）</p>
+          <p>研究选样合格 {data.market.latest.eligible_count}/{data.market.latest.research_denominator} · 实际可用时间 {formatDateTime(data.market.latest.available_at)}</p>
+        </>}
+        <p className="muted">缺口日期 {data.market.gaps.length}；BSE 保留覆盖记录，尚不支持研究准入。读取资料只查询本地数据。</p>
+        <TechnicalDetails value={data.market}/>
+      </section>}
       {data.studies.length === 0 && data.evaluations.length === 0 ? <p className="compact-empty">尚无已配置研究资料；在本机启动配置中选择原研究批次和报告。</p> : null}
       {data.studies.map(s => <article className="study-row" key={s.id}><div className="study-row__title"><strong>{s.kind} · {s.name}</strong><span>{stateLabel(s.state)}</span></div>
         {s.mode ? <ModeBadge mode={s.mode}/> : null} {s.task_id ? <span>原任务 #{s.task_id}</span> : null}

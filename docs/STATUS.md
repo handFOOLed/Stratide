@@ -1,5 +1,9 @@
 # Stratide 当前状态
 
+**2026-11-04 / PR #86 R1：** 目录范围缺失/已知证券异常消失不再因目录内行情比例 100% 而 READY；新增交易所范围证据、前版目录对照和独立研究门禁，Dashboard 分开显示目录范围与目录内行情覆盖。停复牌统一显式 S/R 查询，缺任一类型的成功证据即受阻。仅合成定向修复，仍为同一 Draft，真实采集/模型/Paper 成交均为 0。[说明](M3_PR01.md)。
+
+**2026-11-04 / #82（Draft 开发交付）：** [M3-PR01](M3_PR01.md) 增加全市场日期证券池、EOD 按日批量增量、原 journal/单写者恢复、可信覆盖双分母、CLI 和只读 Dashboard；复用 V1/V2 及 TimesFM source gate。合成定向验证，不声明真实全市场已采集；当前真实接口权限未新实测，BSE 不支持研究准入，PIT/Paper/Live 不升级。
+
 **2026-11-04 / PR #80 R1 P1 修复：** Paper 意图改为单业务事件/单事务；缺源批次到冻结的确认截止后整批 NO_FILL、清预留，不生成价格/成交/NAV，旧未冻结订单也有到期恢复入口。[R1 本地定向验证](evidence/v1-closeout-b/r1-fix.md)。产品范围仍是 Owner CLI JSON + 单证券假设撮合，非研究候选自动转单；来源时间/公司行为是 Owner 声明，PIT/开盘实收/交易资格不升级。保持同一 Draft，未独立验收或自行合并。
 
 **2026-11-04 / #77（本期 Draft）：V1_ENGINEERING_COMPLETE。** 已实装当前 Paper 账本 v1 只读接口与历史报告分离、原本地 CPU/Fusion/OOS/Registry 集成、持久审批/通知、前日冻结的 EOD Paper 假设成交、UI 精修及 Windows 启停/基础备份恢复。[操作与真实限制](V1_COMPLETION.md) / [本地绿测](evidence/v1-closeout-b/README.md)。这是开发者自测状态，未自行 Ready/merge，不等于独立验收；#10/#17 保持开放，PIT/开盘实收 NOT_VERIFIED、交易资格 BLOCKED。N100 暂缓，不计 V1 门槛；下方旧状态保留原发生时间。

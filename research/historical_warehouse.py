@@ -752,10 +752,26 @@ class Warehouse:
 
 
 class Download:
+    # Shared request journal/transport for the historical and incremental EOD collectors.
+    fields = FIELDS
+    permission_source = PERMISSION_SOURCE
+    check_range = staticmethod(historical_range)
+    validate_rows = staticmethod(validate)
+    parse = staticmethod(parse_response)
+
+    def truncated(self, api, count):
+        return count >= CAP
+
+    def budget_used(self):
+        return self.db.execute("SELECT COUNT(*) FROM attempts").fetchone()[0]
+
+    def before_request(self, wait=0):
+        pass
+
     def __init__(self, warehouse, db, kind, start, end, transport, credential_source,
                  max_calls=25, total_cap=1600, rpm=10, min_free_bytes=1_073_741_824,
                  sleep=time.sleep, monotonic=time.monotonic, progress=None):
-        historical_range(start,end)
+        self.check_range(start,end)
         require(1 <= max_calls <= total_cap <= 10000, "INVALID_CALL_CAP")
         require(0 < rpm <= 30, "RATE_CAP_30_PER_MINUTE")
         self.w, self.db, self.start, self.end = warehouse, db, start, end
@@ -765,7 +781,7 @@ class Download:
         self.calls, self.last, self.stop_reason = 0, None, None
         self.progress = progress
         config = dict(start=start,end=end,max_calls=max_calls,total_cap=total_cap,rpm=rpm,
-                      credential_source=credential_source,permission_source=PERMISSION_SOURCE,version=VERSION)
+                      credential_source=credential_source,permission_source=self.permission_source,version=VERSION)
         with db:
             self.run = db.execute("INSERT INTO runs(kind,started,status,config,config_sha) VALUES(?,?,'RUNNING',?,?)",
                                   (kind,now(),canonical(config).decode(),sha(canonical(config)))).lastrowid
@@ -776,32 +792,34 @@ class Download:
         return dict(run_id=self.run,requests_this_run=self.calls,state=status,network_operation=True, **SAFE)
 
     def request(self, api, params):
-        require(api in FIELDS, "UNAUTHORIZED_API")
+        require(api in self.fields, "UNAUTHORIZED_API")
         permission = self.w.permission(self.db,api)
         require(permission not in ("PERMISSION_DENIED","AUTH_DENIED"), permission)
-        total = self.db.execute("SELECT COUNT(*) FROM attempts").fetchone()[0]
+        total = self.budget_used()
         require(self.calls < self.max_calls and total < self.total_cap, "CALL_CAP_REACHED")
         require(shutil.disk_usage(self.w.root).free >= self.min_free_bytes, "INSUFFICIENT_DISK")
         # Persist throttling across processes/resume, not only within this instance.
         prior = self.db.execute("SELECT started,ended,status,retry_after FROM attempts ORDER BY id DESC LIMIT 1").fetchone()
         if prior:
-            instant = dt.datetime.now(dt.timezone.utc)
+            instant = dt.datetime.fromisoformat(now())
             elapsed = (instant-dt.datetime.fromisoformat(prior["started"])).total_seconds()
             wait = max(0,60/self.rpm-elapsed)
             if prior["status"] == "RATE_LIMITED":
                 seconds = int(prior["retry_after"]) if prior["retry_after"] else 60
                 elapsed = (instant-dt.datetime.fromisoformat(prior["ended"])).total_seconds()
                 wait = max(wait,seconds-elapsed)
+            self.before_request(wait)
             self.sleep(wait)
+        self.before_request()
         with self.db:
             a = self.db.execute("""INSERT INTO attempts(run_id,api,params,fields,credential_source,permission_source,started,status,may_have_sent)
                                 VALUES(?,?,?,?,?,?,?,'SENDING',1)""",
-                                (self.run,api,canonical(params).decode(),FIELDS[api],self.credential_source,PERMISSION_SOURCE,now())).lastrowid
+                                (self.run,api,canonical(params).decode(),self.fields[api],self.credential_source,self.permission_source,now())).lastrowid
         self.calls += 1
         status, http, code, rows, fields, raw, retry_after = "NETWORK_OUTCOME_UNKNOWN",None,None,[],[],None,""
         clean, duplicates, canonical_sha = [],0,None
         try:
-            http, raw, retry_after = self.transport(api,params,FIELDS[api])
+            http, raw, retry_after = self.transport(api,params,self.fields[api])
             self.w.save_raw(a,raw)
             if http == 429:
                 status = "RATE_LIMITED"
@@ -812,11 +830,11 @@ class Download:
             elif not raw:
                 status = "EMPTY_REMOTE_RESPONSE"
             else:
-                status, code, fields, rows = parse_response(raw)
+                status, code, fields, rows = self.parse(raw)
                 if status == "OK":
-                    clean,duplicates = validate(api,params,fields,rows)
+                    clean,duplicates = self.validate_rows(api,params,fields,rows)
                     canonical_sha = sha(canonical(clean))
-                    status = "TRUNCATION_SUSPECTED" if len(rows) >= CAP else ("OK" if rows else "EMPTY")
+                    status = "TRUNCATION_SUSPECTED" if self.truncated(api,len(rows)) else ("OK" if rows else "EMPTY")
         except WarehouseError as e:
             status = str(e)
         except (OSError,TimeoutError,urllib.error.URLError,http_client.HTTPException):
