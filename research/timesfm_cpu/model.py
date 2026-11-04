@@ -80,7 +80,7 @@ def verify_model(directory):
 
 def validate_request(v):
     require(isinstance(v, dict) and set(v) == {"schema_version", "input_mode", "horizon", "max_context", "batch_size", "threads", "series", "repeats"}, "WORKER_SCHEMA")
-    require(v["schema_version"] == 1 and v["input_mode"] == "synthetic_test" and v["horizon"] == 20, "WORKER_RESEARCH_SCOPE")
+    require(v["schema_version"] == 1 and v["input_mode"] in ("synthetic_test", "historical_research_only") and v["horizon"] == 20, "WORKER_RESEARCH_SCOPE")
     require(type(v["max_context"]) is int and v["max_context"] in (64, 128, 256, 512)
             and type(v["batch_size"]) is int and 1 <= v["batch_size"] <= 4
             and type(v["threads"]) is int and 1 <= v["threads"] <= 4

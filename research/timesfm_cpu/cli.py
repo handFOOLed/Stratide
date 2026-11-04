@@ -85,11 +85,11 @@ def batch_path(name):
 
 def read_plan(name):
     path = batch_path(name) / "plan.json"
-    require(path.is_file() and not path.is_symlink() and path.stat().st_size <= 262144,"LOCAL_PLAN_MISSING_OR_SIZE")
+    require(path.is_file() and not path.is_symlink() and path.stat().st_size <= 2097152,"LOCAL_PLAN_MISSING_OR_SIZE")
     return loads(path.read_bytes())
 
 
-def task(name):
+def task(name, detailed=False):
     plan = read_plan(name)
     # Read-only SQLite, no writer bridge or automatic recovery.
     b = binding()
@@ -105,6 +105,10 @@ def task(name):
             return dict(state="FROZEN_NOT_RUN",billing="LOCAL_NO_BILLING")
         require(row["provider_id"] == "local-timesfm-2.5-cpu" and loads(row["input"])["summary"]["plan"] == plan,"LOCAL_TASK_CHANGED")
         require(db.execute("SELECT count(*) FROM calls WHERE task_id=?",(row["id"],)).fetchone()[0] == 0,"LOCAL_BILLING_INVALID")
+        if detailed:
+            return dict(id=str(row["id"]),status=row["status"],request=loads(row["request"]),
+                        input=loads(row["input"]),provider_id=row["provider_id"],provider_hash=row["provider_hash"],
+                        result=loads(row["result"]) if row["result"] else None,calls=[])
         return dict(id=str(row["id"]),state=row["status"],reason=row["reason"],provider_hash=row["provider_hash"],
                     result=loads(row["result"]) if row["result"] else None,billing="LOCAL_NO_BILLING",paper_allowed=False,live_allowed=False)
 
@@ -131,17 +135,71 @@ def once(name, runner=runtime.run):
         return task(name)
 
 
+def verify(name):
+    out = task(name)
+    require(out["state"] == "completed","LOCAL_TASK_INCOMPLETE")
+    plan = read_plan(name)
+    require(digest(verify_model(ROOT/"models/timesfm-2.5")) == plan["manifest_sha256"],"LOCAL_MODEL_CHANGED_NEW_TASK_REQUIRED")
+    bundle = out["result"]["research"]["risk_portfolio"]
+    require(bundle["receipt"]["code_sha256"] == plan["code_sha256"]
+            and bundle["receipt"]["manifest_sha256"] == plan["manifest_sha256"]
+            and bundle["authority"] == "RESEARCH_ONLY" and bundle["eligibility"] == "ELIGIBILITY_DENIED"
+            and bundle["paper_allowed"] is False and bundle["live_allowed"] is False,"LOCAL_RESULT_CHANGED")
+    require(bridge("decode",dict(plan=plan,response=out["result"]["worker_response"])) == bundle,"LOCAL_RESULT_CHANGED")
+    if plan.get("history"):
+        bridge("verify-result",out["result"])
+        require(str(out["result"]["task_id"]) == out["id"],"LOCAL_TASK_CHANGED")
+    out["verified"] = True
+    return out
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("command",choices=["descriptor","enable","disable","synthetic-freeze","once","status","report","verify","preflight","stop","bench"])
+    parser.add_argument("command",choices=["descriptor","enable","disable","synthetic-freeze","once","status","report","verify","preflight","stop","bench","historical-preflight","historical-freeze"])
     parser.add_argument("--name",default="local-risk")
     parser.add_argument("--series",type=int,default=1)
     parser.add_argument("--max-context",type=int,choices=[256,512],default=256)
     parser.add_argument("--batch-size",type=int,choices=[1,2,3,4],default=1)
     parser.add_argument("--development-cpu-diagnostic",action="store_true")
+    parser.add_argument("--v1-root",type=Path)
+    parser.add_argument("--v2-root",type=Path)
+    parser.add_argument("--symbols")
+    parser.add_argument("--as-of")
+    parser.add_argument("--context",type=int,default=84)
     args = parser.parse_args()
     try:
-        if args.command == "descriptor":
+        if args.command in ("historical-preflight", "historical-freeze"):
+            from history import read
+            require(args.v1_root is not None and args.v2_root is not None and args.symbols and args.as_of,
+                    "HISTORY_EXPLICIT_SOURCE_SYMBOLS_AS_OF_REQUIRED")
+            descriptor = bridge("descriptor")
+            f, history = read(descriptor,args.v1_root,args.v2_root,args.symbols.split(","),args.as_of,args.context)
+            manifest = verify_model(ROOT/"models/timesfm-2.5")
+            plan = dict(batch=args.name,frozen=f,history=history,manifest_sha256=digest(manifest),
+                        code_sha256=descriptor["code_sha256"],max_context=args.max_context,
+                        batch_size=args.batch_size,threads=2)
+            bridge("project",plan)
+            if args.command == "historical-preflight":
+                with runtime.lock(state_root()/"worker.lock"):
+                    isolation = runtime.run(b"probe")
+                out = dict(state="PARTIAL",quality=history["payload"]["quality"],
+                           input_sha256=history["payload_sha256"],isolation=isolation,billing="LOCAL_NO_BILLING",
+                           cloud_egress="REAL_MARKET_DATA_EGRESS_DENIED")
+            else:
+                # Exclusive private publication; incomplete writes cannot launch a task.
+                path = batch_path(args.name)
+                path.mkdir(parents=True,exist_ok=False)
+                raw = (json.dumps(plan,separators=(",",":"),allow_nan=False)+"\n").encode()
+                require(len(raw) <= 2097152,"LOCAL_PLAN_MISSING_OR_SIZE")
+                with (path/"plan.json").open("xb") as file:
+                    os.chmod(path/"plan.json",0o600)
+                    file.write(raw)
+                    file.flush()
+                    os.fsync(file.fileno())
+                out = dict(state="FROZEN_NOT_RUN",input_sha256=history["payload_sha256"],
+                           quality=history["payload"]["quality"],billing="LOCAL_NO_BILLING",
+                           historical_pit_status="NOT_VERIFIED",cloud_egress="REAL_MARKET_DATA_EGRESS_DENIED")
+        elif args.command == "descriptor":
             out = bridge("descriptor")
         elif args.command in ("enable","disable"):
             out = bridge(args.command)
@@ -156,18 +214,16 @@ def main():
             out = dict(state="FROZEN_NOT_RUN",billing="LOCAL_NO_BILLING")
         elif args.command == "once":
             out = once(args.name)
+            if out["state"] == "completed" and read_plan(args.name).get("history"):
+                from history import archive
+                out["archive"] = archive(args.name)
         elif args.command in ("status","report","verify"):
             out = task(args.name)
             if args.command == "verify" and out["state"] == "completed":
-                plan = read_plan(args.name)
-                require(digest(verify_model(ROOT/"models/timesfm-2.5")) == plan["manifest_sha256"],"LOCAL_MODEL_CHANGED_NEW_TASK_REQUIRED")
-                bundle = out["result"]["research"]["risk_portfolio"]
-                require(bundle["receipt"]["code_sha256"] == plan["code_sha256"]
-                        and bundle["receipt"]["manifest_sha256"] == plan["manifest_sha256"]
-                        and bundle["authority"] == "RESEARCH_ONLY" and bundle["eligibility"] == "ELIGIBILITY_DENIED"
-                        and bundle["paper_allowed"] is False and bundle["live_allowed"] is False,"LOCAL_RESULT_CHANGED")
-                require(bridge("decode",dict(plan=plan,response=out["result"]["worker_response"])) == bundle,"LOCAL_RESULT_CHANGED")
-                out["verified"] = True
+                out = verify(args.name)
+            if args.command in ("report","verify") and out["state"] == "completed" and read_plan(args.name).get("history"):
+                from history import archived
+                out["archive"] = archived(args.name)
         elif args.command == "preflight":
             manifest = verify_model(ROOT/"models/timesfm-2.5")
             with runtime.lock(state_root()/"worker.lock"):
@@ -182,7 +238,8 @@ def main():
                 out = benchmark(args.development_cpu_diagnostic)
         print(json.dumps(out,ensure_ascii=False,allow_nan=False))
         return 2 if out.get("state") in ("failed","cancelled") else 0
-    except (Rejected,OSError,ValueError,KeyError,subprocess.SubprocessError) as e:
-        print(json.dumps(dict(error_code=str(e) if isinstance(e,Rejected) else "LOCAL_COMMAND_FAILED",
+    except (Rejected,OSError,ValueError,KeyError,TypeError,sqlite3.Error,subprocess.SubprocessError) as e:
+        print(json.dumps(dict(coverage=getattr(e,"coverage",None),
+                              error_code=str(e) if isinstance(e,Rejected) else "LOCAL_COMMAND_FAILED",
                               billing="LOCAL_NO_BILLING",paper_allowed=False,live_allowed=False)))
         return 2

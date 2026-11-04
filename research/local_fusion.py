@@ -53,6 +53,9 @@ def check_model(name):
         manifest = model.verify_model(ROOT / "models/timesfm-2.5")
     except model.Rejected as error:
         raise j.Rejected(str(error)) from None
+    plan = cpu.read_plan(name)
+    j.require(not plan.get("history") and plan["frozen"]["input_mode"] == "synthetic_test",
+              "REAL_MARKET_DATA_EGRESS_DENIED")
     source = cpu.task(name)
     j.require(source["state"] == "completed" and source["billing"] == "LOCAL_NO_BILLING",
               "FUSION_LOCAL_PARENT_INCOMPLETE")

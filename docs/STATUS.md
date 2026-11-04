@@ -1,5 +1,11 @@
 # Stratide 当前状态
 
+**2026-11-04 / PR #75 R2：** 修复 Rust historical 当日收盘的盘后时点门禁；上海 16:00 边界和日期/时区一致性反证通过。历史 13/13、research Rust 71/71、旧 CPU 11 pass + 1 skip；真实 task 9 / Registry / report/verify 通过，0 新云/行情调用。[R2 证据](evidence/m2-pr20/r2/README.md)。保持 Draft，待固定 HEAD 复审。
+
+**2026-11-04 / PR #75 R1：** 历史模型 pin、完整纯 UNKNOWN opportunities、版本/未用字段已严格校验；来源索引改为证券+日期引用原 SHA，真实三证券 252 条来源绑定与 task 8 复核通过。57 个重算 SHA 反例先红后绿，历史套件 12/12、Rust 204/204，预算/授权/真实外发边界保持。[修复证据](evidence/m2-pr20/r1/README.md)。仍为 Draft，待新固定 HEAD 复审，未 Ready/merge。
+
+**2026-11-03 / #74 / M2-PR20（本分支 Draft）：** 基于最新 main `971eb4ba90507142b1d32ca80af2d15859790933`（含已合并 PR #60/#70/#72），[真实历史 → 本地 TimesFM](M2_PR20.md) 已实际跑通三证券 84 会话 → CPU → 原 Agent task 6 / Registry / report/verify。真实因子变化与缺口样本 BLOCKED；原 calls/预算/授权未变，新市场请求/云调用/计费为 0，真实风险外发 `REAL_MARKET_DATA_EGRESS_DENIED`。数据仍 PARTIAL、PIT 未验证，Paper/Live 禁止，N100 未验收。[本期开发证据](evidence/m2-pr20/README.md)。以下旧条目保留其发生时的状态，本段是当前增量。
+
 **2026-11-03 / #69 / PR #70 Linux R1：** 基于最新 main `b62c1171d8503e1f21e4b470847944c6fbe8dbf4`（PR #68 已合并），新增 [M2-PR18 本地 TimesFM 2.5 CPU](M2_PR18.md)，默认 OFF、独立 Worker、原任务/RiskExpertResult/Naive/EWMA，无新增计费或交易权限。开发/真实模型/Linux/N100 的实际验证状态分别记录于 [m2-pr18 evidence](evidence/m2-pr18/README.md)，N100 尚未验收；本分支保持 Draft。WSL2 Ubuntu ext4 已完成 Linux 隔离 4/4、0 skipped，真实 CPU 生产闭环、calls=0 与 Linux 16 点压力矩阵；[R1 命令/指标/回归限制](evidence/m2-pr18/linux-r1/README.md)。下方既有模块开发证据保留。
 
 > 截至 2026-11-03，基于开始时最新 `main e24f30f69b12fa303221ccd4fc6b8ea9084dc989`，PR #66 已合并；附本分支 #67 DeepSeek HTTPS 开发状态。这是**当前实现快照**，不是实盘承诺。Owner 已决定 **Core-first、UI-later**：后续核心功能先用 CLI/持久报告验收，最后按 PR #28 设计体系统一集成 UI。
@@ -8,6 +14,7 @@
 
 | 领域 | 实际状态 | 证据 |
 | --- | --- | --- |
+| M2-PR20 真实历史本地风险（本分支 Draft） | #74：显式 1–8 证券、前缀冻结/单位/版本/来源与质量，原 TimesFM CPU/任务/Registry；真实正常与拒绝样本及零云调用验证。ENGINEERING_PASS，PIT/样本外优势/前向资格不升级 | [操作](M2_PR20.md) / [证据](evidence/m2-pr20/README.md) |
 | M2-PR17 DeepSeek HTTPS（本分支 Draft） | #67：`ds4.1flash` → 官方 `deepseek-flash`；原 CNY Agent/Budget、受控密钥、纯合成输入、显式一次开关、PR15/PR62 研究闭环。默认 OFF；本次真实请求 `REAL_PROVIDER_NOT_RUN_OWNER_AUTHORIZATION_MISSING`，0 实际费用/真实密钥正文读取/新行情，不解锁 Paper/Live | [操作](M2_PR17.md) / [开发证据](evidence/m2-pr17/README.md) |
 | M2-PR16 云端结构化提案接线（PR #66 已合并） | #65：显式 recorded source → 原 Owner Rust 任务/统一预算 → PR15 强类型 AST/冻结/归档 → PR62 多候选三成本；loopback、预算/撤销/取消/崩溃/未知和篡改反证。该期真实 Provider BLOCKED，0 外发/付费/新行情/Token，不解锁交易 | [契约/操作](M2_PR16.md) / [原开发证据](evidence/m2-pr16/README.md) |
 | M2-PR15 自主策略研究闭环（PR #64 已合并） | #63：受限 AST、本地确定性四类提案、冻结实验与开发段反馈、PR62 同源多候选评测和匹配基准、持久失败/恢复及只读研究 Inbox 契约。原真实五年运行与开发证据保留；0 新行情/Token/云模型/付费，不解锁交易 | [契约/操作](M2_PR15.md) / [原开发证据](evidence/m2-pr15/README.md) |
@@ -39,15 +46,15 @@
 ## 仍未实现 / 未验证
 
 - **M1-PR07B / PR #38 已合并：** [公司行为证据包](M1_PR07B.md) 保留真实 12/19 字段和 `FACTS_PARTIAL / historical_pit=NOT_VERIFIED / ELIGIBILITY_DENIED`。原证据中的 `ACCOUNTING_NOT_IMPLEMENTED` 是冻结历史快照；PR #40 已实现隔离现金分红模型，真实账户税务、到账、递延负债、PIT 和开盘仍未验证。
-- **真实 Provider** 仍为 **REAL_PROVIDER_NOT_VERIFIED**；无 Owner 预算/接收方/数据范围授权不付费。既有 Agent 自测见 [证据](evidence/m2-pr02/README.md)。新增功能无需同步开发 UI，后续统一集成。
+- **真实 Provider**：PR #72 已验证显式授权的 synthetic 风险 → DeepSeek；本期只读复验原成功 task 4。真实市场/账户数据外发仍未授权，本地历史任务明确拒绝。新增功能无需同步 UI。
 - **真正连续的前向 Paper 成交/NAV**：现有两日 forward 是 observe-only；#47 只增加 NO_ORDERS Shadow 模块，真实 21 日观察尚未累积。[#10](https://github.com/handFOOLed/Stratide/issues/10) 的 `OPENING_SOURCE=BLOCKED / NOT VERIFIED`，可信开盘/费用门槛未解锁。历史回放不能计作 forward，EOD 连续性 PASS 不等于 M1 完成。
 - **真实公司行为处理和历史 PIT 认证**：未完成；隔离模型通过不能开放真实历史长窗口。真实券商、实盘资金、公共 Web、无人值守策略自动部署均未获授权。
 - [PR #15](https://github.com/handFOOLed/Stratide/pull/15) 是尚未合并的 Q01–Q69 访谈**设计参考**，其中“Web/Agent 推迟到 paper 之后”的旧排序已被 Owner [Issue #19](https://github.com/handFOOLed/Stratide/issues/19) 取代。
 
 ## 当前执行顺序
 
-1. **Sol / #65：** 从 `main 7f12f12` 独立交付结构化云提案完整接线；复用原 Rust Agent/Budget 与 PR15/62，以 recorded/loopback 验证，不付费、不外发、不重采集/全量复验旧数据。唯一 Draft，固定 HEAD 风险审查及 Owner 明确批准前不 Ready/合并。
-2. **后续核心任务：** Owner 再定范围；原 Operator 可继续采集，真实连续 21 日/独立事件覆盖/PIT/开盘及真实供应商仍未验证。[#36](https://github.com/handFOOLed/Stratide/issues/36) 的完整多模态消融尚未实现，真实付费、数据外发和交易均未获本期授权。
-3. **全部核心功能完成后：** Sol 按 PR #28 的设计体系统一集成全部 UI；旧同步 UI 要求被本 Owner 决定取代。
+1. **Sol / #74：** 真实历史数据与质量 → 本地 TimesFM 核心闭环，单个 Draft PR；开发者验证已完成，等待固定 HEAD 审查与 Owner 明确合并授权。
+2. **后续独立 Issue：** 预冻结样本外协议并比较 Naive/EWMA；继续真实前向 EOD。历史 PIT、公司行为、开盘与 N100 真机限制保留。
+3. **核心完成后：** 再按 PR #28 设计统一集成 UI，本期不改 Dashboard。
 
 所有任务由 Owner 定范围。Sol/DeepSeek 不自行合并；ChatGPT 对固定 HEAD 做风险分级审查，Owner 明确批准后 SHA 锁定合并。高风险预算/凭据/财务改动需针对性独立反证；不将开发者自测冒充独立验收。流程现行补充见 [AGENTS.md](../AGENTS.md)，原 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md) 保留历史决策，待显式协调新版验收规则。

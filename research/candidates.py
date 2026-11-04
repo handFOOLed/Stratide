@@ -134,6 +134,10 @@ def snapshot_provenance(task, store_name):
     if "local_timesfm_fusion_v1" in summary.get("scopes", []):
         import local_fusion
         return local_fusion.provenance(task, store_name)
+    if summary.get("mode") == "historical_research_only" and summary.get("summary", {}).get("phase") == "local_cpu_risk":
+        sys.path.insert(0, str(ROOT / "research/timesfm_cpu"))
+        import history
+        return history.provenance(task, store_name)
     if "risk_portfolio_v1" in summary.get("scopes", []):
         import portfolio_research
         return portfolio_research.provenance(task, store_name)
@@ -241,7 +245,7 @@ class Registry:
     def register(self, owner_input, agent_task, snapshot_store=None):
         require(owner_input is not None or agent_task is not None, "INPUT_REQUIRED")
         owner = read(owner_input, 32768) if owner_input else None
-        task = read(agent_task, 262144) if agent_task else None
+        task = read(agent_task, 4194304) if agent_task else None
         if task is not None:
             # Accept the existing task-detail API envelope or its saved data object.
             if "api_version" in task:

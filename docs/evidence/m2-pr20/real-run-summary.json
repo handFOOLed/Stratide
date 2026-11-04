@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-03",
+  "base_sha": "971eb4ba90507142b1d32ca80af2d15859790933",
+  "classification": "DEVELOPER_ENGINEERING_PASS_NOT_INDEPENDENT_ACCEPTANCE",
+  "real_run": "VERIFIED",
+  "environment": {
+    "os": "WSL2 Ubuntu 24.04",
+    "filesystem": "native ext4",
+    "python": "3.12.3",
+    "inference": "TimesFM 2.5 200M PyTorch CPU",
+    "resources_reused": true,
+    "model_downloads": 0
+  },
+  "input": {
+    "symbol_count": 3,
+    "observations_per_series": 84,
+    "as_of": "2022-03-31T08:00:00Z",
+    "context_start": "2021-11-26",
+    "context_cutoff": "2022-03-31",
+    "horizon_sessions": 20,
+    "target_axis": "ordinal_future_sessions_dates_unknown",
+    "input_mode": "historical_research_only",
+    "input_sha256": "656ac501eedc2b3cd6e3671fd509223b6ba1c57ccc8c97bfa7f836ac2c2584e3",
+    "plan_sha256": "5d395ef0de4f202ddc7b16c2c1437ccef6edb75b317370deb87cc389b2ac824a",
+    "frozen_sha256": "ccbfa56290236681ca299d800e7ca77ede255ebc9fc7add3e6d308b18fe4cdf0",
+    "dataset_versions": {
+      "daily": 107,
+      "sidecar": 414
+    }
+  },
+  "output": {
+    "task_id": "6",
+    "attempt": 1,
+    "task_state": "completed",
+    "verified": true,
+    "result_sha256": "9838f34ae330b24fca48d6bb27588589f29a658f114ebbf14f26b02569d870f2",
+    "registration_sha256": "e3e8cc80957ed570780ddde658dc1ce8448f03db5c753746a3cac0320d237369",
+    "duplicate_once_same_task": true,
+    "source_provenance": "EX_POST_ACTUAL_DOWNLOAD_ONLY",
+    "quality": "PARTIAL"
+  },
+  "model": {
+    "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+    "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+    "manifest_sha256": "d5e54a409cc4aa4e1aa7a2b308bab3500124e90644071a210aab4fbce23f2597",
+    "code_sha256": "28b37764e518aef5c62d68872f340c8aea4af903267cb5db1e9387b9892f8387",
+    "worker_request_sha256": "24c29a0a9bcfe9137377842af6cf226a5244d60f8cef5020303b0541a21bc82c"
+  },
+  "isolation": {
+    "mechanism": "systemd-cgroup-v2+bubblewrap",
+    "memory_max_bytes": 6442450944,
+    "memory_oom_group": true,
+    "memory_swap_max_bytes": 0
+  },
+  "metrics": {
+    "batch_timings": [
+      {
+        "seconds": 0.10169175300006827,
+        "series": 1
+      },
+      {
+        "seconds": 0.05949751200000719,
+        "series": 1
+      },
+      {
+        "seconds": 0.05899400900011642,
+        "series": 1
+      }
+    ],
+    "cgroup_cpu_seconds": 2.763098,
+    "cgroup_memory_peak_bytes": 1411567616,
+    "cpu_seconds": 2.728515441,
+    "failures": 0,
+    "load_seconds": 1.0815771410000252,
+    "peak_rss_bytes": 2076725248,
+    "resource_scope": "WHOLE_WORKER_CGROUP",
+    "wall_seconds": 2.8606005960000402
+  },
+  "billing": {
+    "billing": "LOCAL_NO_BILLING",
+    "provider_calls": 0,
+    "new_cloud_calls": 0,
+    "new_market_requests": 0,
+    "real_key_content_reads": 0,
+    "cloud_billing_delta_micro": 0,
+    "original_calls_before": 2,
+    "original_calls_after": 2,
+    "original_calls_sha256_unchanged": true,
+    "original_budget_authorization_meta_unchanged": true,
+    "original_settings_sha256_unchanged": true
+  },
+  "real_failure_samples": [
+    {
+      "kind": "ACTUAL_FACTOR_CHANGE",
+      "state": "BLOCKED",
+      "reason": "HISTORY_RAW_ACTION_DISCONTINUITY",
+      "observed": 84,
+      "expected": 84,
+      "coverage_ratio": 1.0
+    },
+    {
+      "state": "BLOCKED",
+      "reason": "HISTORY_MISSING_OR_SUSPENDED_DAY",
+      "coverage": {
+        "instrument": "000001.SZ",
+        "expected": 84,
+        "observed": 83,
+        "ratio": 0.9880952380952381,
+        "missing_dates": [
+          "20211129"
+        ]
+      },
+      "sample_kind": "SAFE_CONSTRUCTED_GAP_FROM_FROZEN_REAL_INPUT",
+      "original_input_sha256": "656ac501eedc2b3cd6e3671fd509223b6ba1c57ccc8c97bfa7f836ac2c2584e3"
+    }
+  ],
+  "real_egress": {
+    "error_code": "REAL_MARKET_DATA_EGRESS_DENIED",
+    "live_allowed": false,
+    "paper_allowed": false,
+    "state": "BLOCKED"
+  },
+  "prior_fusion_recording": {
+    "task_id": 4,
+    "verified": true,
+    "cloud_api_reexecuted": false
+  },
+  "historical_pit_status": "NOT_VERIFIED",
+  "out_of_sample_advantage": "NOT_VERIFIED",
+  "forward_paper_eligible": false,
+  "paper_allowed": false,
+  "live_allowed": false,
+  "N100_ACCEPTANCE": "NOT_VERIFIED"
+}

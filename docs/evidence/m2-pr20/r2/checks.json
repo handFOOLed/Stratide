@@ -1,0 +1,43 @@
+{
+  "reviewed_head": "7db63a069a8e06522e82e0a3bc6352cb6bcad925",
+  "red": {
+    "command": "python3 -B scripts/test-timesfm-history.py Tests.test_13_rehashed_same_day_close_requires_shanghai_post_close",
+    "exit_code": 1,
+    "accepted_preclose_cases": 6,
+    "production_at_reviewed_head": true
+  },
+  "green": {
+    "command": "python3 -B scripts/test-timesfm-history.py",
+    "exit_code": 0,
+    "passed": 13,
+    "skipped": 0,
+    "same_day_preclose_rejections": 6,
+    "equivalent_postclose_archive_verify_cases": 3,
+    "wrong_shanghai_date_rejections": 2
+  },
+  "regression": [
+    {
+      "command": "cargo test -p stratide-research --offline --locked -- --test-threads=1",
+      "exit_code": 0,
+      "passed": 71
+    },
+    {
+      "command": "python3 -B scripts/test-timesfm-cpu.py",
+      "exit_code": 0,
+      "passed": 11,
+      "skipped": 1,
+      "skip_reason": "Windows diagnostic Job test"
+    }
+  ],
+  "reused_unchanged_evidence": [
+    "R1 workspace Rust 204/204",
+    "R1 Fusion recorded/loopback 9/9",
+    "original Linux isolation and warehouse suites"
+  ],
+  "not_run": [
+    "full real warehouse/raw verification",
+    "paid cloud API regression",
+    "physical N100",
+    "independent fixed-HEAD acceptance"
+  ]
+}

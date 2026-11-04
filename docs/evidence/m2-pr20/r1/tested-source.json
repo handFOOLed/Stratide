@@ -1,0 +1,29 @@
+{
+  "reviewed_head": "b3995b94d5c75ee47de28c8d5481fa001738aada",
+  "files": {
+    "research/agent/Cargo.toml": {
+      "sha256": "ca63ae95772c8126e7424fd6b0801454538d36c1934155bd41a79c566d2fd3d9",
+      "git_blob_sha": "12fca7ffe60e4462f598cc26f25c91797527cf25"
+    },
+    "research/agent/src/risk_cpu.rs": {
+      "sha256": "d7258c26d9a80ad26285b0a3469f3fcd49148f2e22a2398b51a0e18b5ee6c637",
+      "git_blob_sha": "527c411f2f87887c10ae8ff1a7c3a4e42112d01d"
+    },
+    "research/agent/src/risk_history.rs": {
+      "sha256": "1f91e540212dce51912b1e69a04bf8f67efe16cd809a64aef09e1c5666025942",
+      "git_blob_sha": "cb8a70c8924e6dde0f1b004b3201e51ad5272881"
+    },
+    "research/agent/src/structured_tests.rs": {
+      "sha256": "e366cce90d72ae0e29cac591eeec0904a11145ce4ac8e6a2c4705023f42eb8f6",
+      "git_blob_sha": "a83b52129d00a07fbd32f53b2804c56e02cbd9a3"
+    },
+    "research/timesfm_cpu/history.py": {
+      "sha256": "255405f324f9f748c85232fc1078c09caea7339ff51d6bdf8d0ea9ded47b0d66",
+      "git_blob_sha": "2a7944ca97effc52fde7267c5b1878fedc0def9e"
+    },
+    "scripts/test-timesfm-history.py": {
+      "sha256": "bc93f1fc88ef870006136905d932ca9ec47e67f91cfd5713a209a5507a042f51",
+      "git_blob_sha": "5a1e0f73106c8ff3c0a7e346052c34a2f72096d1"
+    }
+  }
+}

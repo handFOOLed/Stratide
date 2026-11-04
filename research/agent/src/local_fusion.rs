@@ -26,6 +26,7 @@ const PRE_SNAPSHOT_ADAPTER_SHA: &str =
     "a5bd6c9a53d223a60fdfb25633d077b4f5ef1a2df93170af3a5f41f18db57474";
 
 const SYSTEM:&str="Return exactly one JSON TargetPortfolioProposal V1 using output_contract values and field types. Input is synthetic engineering evidence, never market alpha. Propose a falsifiable research hypothesis and stocks/cash or 100 percent cash. Missing return/opportunity/account facts remain UNKNOWN. Positions use only evidence instruments. Text arrays contain at least one concise item. No tools, code, URLs, permissions or orders. All cash is valid; weights plus cash equal 10000. Keep output below 2500 tokens. Return exactly the root keys in output_contract, with no wrapper or extra keys. All evidence and risk text fields shown as arrays must be arrays of strings, never objects. estimated_turnover_bps and estimated_fees_micro must be null.";
+const PR19_CODE_SHA: &str = "b2a855cd86acd7acd7cd09c224ba5946e67dd35a0fb7584209fc558fced188ab";
 pub fn code_sha() -> String {
     hash(
         concat!(
@@ -340,6 +341,10 @@ pub fn parent(c: &Connection, ctx: &Context, fresh: bool) -> Result<(cpu::Plan, 
     let i: InputSummary = serde_json::from_str(&input).map_err(|_| "LOCAL_TASK_CHANGED")?;
     let plan: cpu::Plan =
         serde_json::from_value(i.summary["plan"].clone()).map_err(|_| "LOCAL_PLAN_SCHEMA")?;
+    ensure(
+        plan.history.is_none() && plan.frozen.input_mode == "synthetic_test",
+        "REAL_MARKET_DATA_EGRESS_DENIED",
+    )?;
     let encoded = encoded.ok_or("FUSION_LOCAL_PARENT_INCOMPLETE")?;
     ensure(
         status == "completed"
@@ -349,7 +354,7 @@ pub fn parent(c: &Connection, ctx: &Context, fresh: bool) -> Result<(cpu::Plan, 
             && pin == plan.pin()
             && serde_json::to_value(&i).unwrap() == serde_json::to_value(plan.input()).unwrap()
             && plan.frozen.risk_model.id == "local-timesfm-2.5-cpu"
-            && plan.frozen.risk_model.fingerprint == cpu::code_sha()
+            && plan.frozen.risk_model.fingerprint == plan.code_sha256
             && hash(encoded.as_bytes()) == ctx.parent_result_sha256
             && rp::sha(&serde_json::to_value(&plan).unwrap()) == ctx.parent_plan_sha256,
         "FUSION_LOCAL_PARENT_CHANGED",
@@ -430,6 +435,10 @@ fn make_context(c: &Connection, s: &Settings, batch: &str) -> Result<(Context, c
     let input: Value = serde_json::from_str(&raw).map_err(|_| "LOCAL_PLAN_SCHEMA")?;
     let plan: cpu::Plan = serde_json::from_value(input["summary"]["plan"].clone())
         .map_err(|_| "LOCAL_PLAN_SCHEMA")?;
+    ensure(
+        plan.history.is_none() && plan.frozen.input_mode == "synthetic_test",
+        "REAL_MARKET_DATA_EGRESS_DENIED",
+    )?;
     let m = s
         .models
         .iter()
@@ -479,9 +488,9 @@ pub fn body(m: &Model, ctx: &Context, f: &rp::Frozen, bundle: &Value) -> Result<
 pub fn preflight(batch: &str) -> Result<Value> {
     let (b, c) = connection()?;
     let s = Settings::load(&b.settings_path)?;
+    let (ctx, plan, bundle) = make_context(&c, &s, batch)?;
     let (cfg, m) = configured(&c, &s)?;
     ds::key_metadata(&cfg.key_file)?;
-    let (ctx, plan, bundle) = make_context(&c, &s, batch)?;
     plan.validate(true)?;
     let paused: String = c.query_row("SELECT value FROM meta WHERE key='paused'", [], |r| {
         r.get(0)
@@ -914,7 +923,9 @@ pub fn inspect(batch: &str, verify: bool) -> Result<Value> {
     if verify {
         ensure(status == "completed", "FUSION_TASK_INCOMPLETE")?;
         ensure(
-            ctx.adapter_sha256 == code_sha() || ctx.adapter_sha256 == PRE_SNAPSHOT_ADAPTER_SHA,
+            ctx.adapter_sha256 == code_sha()
+                || ctx.adapter_sha256 == PRE_SNAPSHOT_ADAPTER_SHA
+                || ctx.adapter_sha256 == PR19_CODE_SHA,
             "FUSION_ADAPTER_CHANGED_NEW_TASK_REQUIRED",
         )?;
         let (input, pid, pin): (String, String, String) = c.query_row(

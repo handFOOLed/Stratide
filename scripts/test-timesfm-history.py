@@ -1,0 +1,419 @@
+"""Offline regression; recorded fixtures are not a real-market/model acceptance."""
+import copy
+import datetime as dt
+import importlib.util
+import json
+import os
+from pathlib import Path
+import sqlite3
+import subprocess
+import sys
+import tempfile
+import unittest
+from unittest.mock import patch
+
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/"research/timesfm_cpu"))
+import cli, history as h, model, runtime
+v1,v2=h.v1,h.v2
+spec=importlib.util.spec_from_file_location("cpu_fixture",ROOT/"scripts/test-timesfm-cpu.py")
+fixture=importlib.util.module_from_spec(spec); spec.loader.exec_module(fixture)
+A,B="20211101","20220930"
+ALL=list(v1.dates(A,B)); DAYS=[d for d in ALL if v1.day(d).weekday()<5]
+CODES=["600000.SH","000001.SZ","600519.SH","600001.SH","600002.SH","600003.SH","600004.SH","600005.SH"]
+CUTOFF=DAYS[83]
+ASOF=h.iso(CUTOFF)+"T08:00:00Z"
+
+class Recorded:
+    factor_day=None
+    suspend_day=None
+    def __call__(self,api,p,fields):
+        if api=="stock_basic":
+            rows=[dict(ts_code=c,symbol=c[:6],name="recorded",exchange=e,market="main",list_status="L",
+                       list_date="20000101",delist_date=None) for c in CODES
+                  if (e:=("SSE" if c.endswith(".SH") else "SZSE"))==p["exchange"]
+                  and p["list_status"]=="L" and (not p.get("ts_code") or p["ts_code"]==c)]
+        elif api=="trade_cal":
+            rows=[dict(exchange=p["exchange"],cal_date=d,is_open=int(d in DAYS),pretrade_date=None)
+                  for d in v1.dates(p["start_date"],p["end_date"])]
+        elif api=="daily":
+            d=p["trade_date"]; i=DAYS.index(d)
+            rows=[dict(ts_code=c,trade_date=d,open=str(10+i/100),high="20",low="9",
+                       close=f"{10+i/100:.2f}",pre_close=f"{10+(i-1)/100:.2f}",vol="100",amount="100")
+                  for c in CODES]
+        elif api=="adj_factor":
+            rows=[dict(ts_code=c,trade_date=p["trade_date"],adj_factor="2" if p["trade_date"]==self.factor_day else "1")
+                  for c in CODES]
+        else:
+            rows=[dict(ts_code=CODES[0],trade_date=p["trade_date"],suspend_type="S",suspend_timing=None)] if p["trade_date"]==self.suspend_day and p["suspend_type"]=="S" else []
+        fs=fields.split(",")
+        return 200,json.dumps(dict(code=0,msg="",data=dict(fields=fs,items=[[x.get(f) for f in fs] for x in rows]))).encode(),""
+
+class Tests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        assert cli.common_root()==ROOT,"Disposable standalone checkout required"
+        (ROOT/"state").mkdir(exist_ok=True)
+        cls.owner=ROOT/"state/history-test-owner"
+        commands=[]
+        if not cls.owner.exists():
+            commands.append([str(ROOT/"target/debug/stratided"),"--agent-init-fake",str(cls.owner)])
+        commands.append([str(ROOT/"target/debug/risk-portfolio-agent"),"init","--agent-dir",str(cls.owner)])
+        for args in commands:
+            q=subprocess.run(args,cwd=ROOT,capture_output=True); assert q.returncode==0,q.stdout
+        cls.desc=cli.bridge("descriptor")
+        cls.manifest={"fixture":"NO_REAL_MODEL"}
+        cls.tag="hist-"+os.urandom(4).hex()
+        cls.temp=tempfile.TemporaryDirectory(dir=ROOT/"state")
+        cls.w=v1.Warehouse(Path(cls.temp.name)/"v1")
+        cls.s=v2.Sidecar(Path(cls.temp.name)/"v2")
+        cls.t=Recorded()
+        with cls.w.write() as db:
+            d=v1.Download(cls.w,db,"fixture",A,B,cls.t,"recorded",max_calls=1000,total_cap=1000,min_free_bytes=0,sleep=lambda _:None)
+            d.metadata()
+            for day in DAYS:d.daily(day)
+            d.finish("DONE")
+        with cls.s.write() as db:
+            cls.s.import_v1(db,cls.w.root)
+            d=v2.Download(cls.s,db,"fixture",cls.t,"recorded",A,B,total_cap=1000,sleep=lambda _:None)
+            for day in DAYS:
+                for api in ("adj_factor","suspend_d"):d.collect(api,day)
+            d.finish("DONE")
+
+    @classmethod
+    def tearDownClass(cls):cls.temp.cleanup()
+
+    def plan(self,symbols=CODES):
+        f,hist=h.read(self.desc,self.w.root,self.s.root,symbols,ASOF)
+        return dict(batch=self.tag+"-"+self._testMethodName.split("_")[1],frozen=f,history=hist,
+                    manifest_sha256=model.digest(self.manifest),code_sha256=self.desc["code_sha256"],
+                    max_context=256,batch_size=1,threads=2)
+
+    def save(self,p):
+        path=cli.batch_path(p["batch"]); path.mkdir(parents=True,exist_ok=True)
+        (path/"plan.json").write_text(json.dumps(p))
+
+    def test_01_local_task_persist_decode_and_egress(self):
+        cli.bridge("enable")
+        p=self.plan(); self.save(p)
+        request=json.loads(cli.bridge("project",p)["worker_request_json"])
+        self.assertEqual(request["input_mode"],h.MODE)
+        model.validate_request(request)
+        with patch.object(cli,"verify_model",return_value=self.manifest),patch.object(runtime,"command",return_value=[]):
+            result=cli.once(p["batch"],fixture.fixture_response)
+            self.assertEqual(result["state"],"completed")
+            again=cli.once(p["batch"],lambda _:self.fail("Duplicate inference"))
+            self.assertEqual(result,again)
+        bundle=result["result"]["research"]["risk_portfolio"]
+        self.assertEqual(bundle["historical_research"]["historical_pit_status"],"NOT_VERIFIED")
+        self.assertFalse(bundle["paper_allowed"] or bundle["live_allowed"] or bundle["can_execute_forward_paper"])
+        cli.bridge("verify-result",result["result"])
+        with patch.object(cli,"verify_model",return_value=self.manifest):
+            saved=h.archive(p["batch"])
+            self.assertEqual(h.archived(p["batch"]),saved)
+            self.assertEqual(h.archive(p["batch"]),saved)
+        bad=copy.deepcopy(result["result"]); bad["attempt"]=2
+        with self.assertRaisesRegex(model.Rejected,"LOCAL_RESULT_SHA"):cli.bridge("verify-result",bad)
+        q=subprocess.run([str(ROOT/"target/debug/local-fusion-agent"),"preflight",p["batch"]],capture_output=True,cwd=ROOT)
+        self.assertEqual(json.loads(q.stdout)["error_code"],"REAL_MARKET_DATA_EGRESS_DENIED")
+        with sqlite3.connect(self.owner/"agent.sqlite") as db:
+            self.assertEqual(db.execute("select count(*) from calls").fetchone()[0],0)
+            self.assertEqual(db.execute("select count(*) from tasks where trigger_key=?",
+                             ("timesfm-cpu-v1:"+p["batch"],)).fetchone()[0],1)
+        p["history"]["payload"]["as_of"]="2000-01-01T00:00:00Z"
+        with self.assertRaises(model.Rejected):cli.bridge("project",p)
+
+    def test_02_future_prices_factors_do_not_change_prefix(self):
+        before=self.plan()
+        # Accepted future revisions exercise actual version selection and read-only queries.
+        with self.w.write() as db:
+            d=v1.Download(self.w,db,"future",A,B,self.t,"recorded",max_calls=10,total_cap=1000,min_free_bytes=0,sleep=lambda _:None)
+            result=d.request("daily",dict(trade_date=DAYS[-1]))
+            rows=[dict(x,close="12.00",high="20") for x in result["rows"]]
+            self.w.publish_day(db,DAYS[-1],rows,[result["id"]],"COMPLETE","RECORDED_FUTURE_MUTATION")
+            d.finish("DONE")
+        self.t.factor_day=DAYS[-1]
+        with self.s.write() as db:
+            d=v2.Download(self.s,db,"future",self.t,"recorded",A,B,sleep=lambda _:None)
+            d.collect("adj_factor",DAYS[-1],refresh=True); d.finish("DONE")
+        self.t.factor_day=None
+        after=self.plan()
+        self.assertEqual(before,after)
+        self.assertEqual(cli.bridge("project",before),cli.bridge("project",after))
+
+    def test_03_hash_pit_adjustment_and_identity_rejections(self):
+        p=self.plan()
+        for edit in (lambda x:x["history"]["payload"].update(historical_pit_status="VERIFIED"),
+                     lambda x:x["history"]["payload"].update(adjustment="qfq"),
+                     lambda x:x["frozen"]["series"][0]["observations"][-1].update(close_fen=1234567),
+                     lambda x:x["frozen"].update(as_of="2022-02-28T08:00:00Z")):
+            bad=copy.deepcopy(p);edit(bad)
+            with self.assertRaises(model.Rejected):cli.bridge("project",bad)
+        bad=copy.deepcopy(p);bad["history"]["payload_sha256"]="0"*64
+        with self.assertRaisesRegex(model.Rejected,"HISTORY_INPUT_SHA"):cli.bridge("project",bad)
+
+    def test_04_adapter_credible_data_failures(self):
+        p=self.plan(); payload=p["history"]["payload"]
+        daily=self.w.query(DAYS[0],CUTOFF,CODES,limit=2000)
+        factor=self.s.query("adj_factor",DAYS[0],CUTOFF,CODES,limit=2000)
+        susp=self.s.query("suspend_d",DAYS[0],CUTOFF,CODES,limit=2000)
+        catalog={x["ts_code"]:x for x in self.catalog()}
+        def call(d=daily,f=factor,s=susp,c=catalog):
+            return h.assemble(self.desc,CODES,ASOF,DAYS[:84],c,d,f,s,payload["dataset_versions"],payload["metadata"])
+        for field,value,code in (("close","0","HISTORY_PRICE_INVALID"),("vol","0","HISTORY_VOLUME_INVALID"),
+                                 ("pre_close","9","HISTORY_PRE_CLOSE_ACTION_OR_REVISION"),("ts_code","999999.SZ","HISTORY_MISSING_OR_SUSPENDED_DAY")):
+            bad=copy.deepcopy(daily);bad["rows"][len(CODES)+1]["values"][field]=value
+            with self.assertRaisesRegex(h.Blocked,code):call(d=bad)
+        bad=copy.deepcopy(daily);bad["rows"].pop(3)
+        with self.assertRaisesRegex(h.Blocked,"HISTORY_MISSING_OR_SUSPENDED_DAY") as got:call(d=bad)
+        self.assertLess(got.exception.coverage["ratio"],1)
+        bad=copy.deepcopy(daily);bad["rows"].insert(3,bad["rows"][3])
+        with self.assertRaisesRegex(h.Blocked,"HISTORY_DUPLICATE_DAY"):call(d=bad)
+        bad=copy.deepcopy(factor);bad["rows"][3]["data"]["adj_factor"]="2"
+        with self.assertRaisesRegex(h.Blocked,"HISTORY_RAW_ACTION_DISCONTINUITY"):call(f=bad)
+        bad=copy.deepcopy(susp);bad["rows"].append(dict(data=dict(ts_code=CODES[0],suspend_type="S")))
+        with self.assertRaisesRegex(h.Blocked,"HISTORY_SUSPENSION_REPORTED"):call(s=bad)
+        bad=copy.deepcopy(catalog);bad[CODES[0]]["list_date"]=CUTOFF
+        with self.assertRaisesRegex(h.Blocked,"HISTORY_LISTING_INTERVAL"):call(c=bad)
+
+    def catalog(self):
+        with self.w.read() as db:return self.w.latest_objects(db,"stock_basic")
+
+    def test_05_data_asof_model_changes_cannot_reuse_task(self):
+        p=self.plan(); old=cli.bridge("project",p)["provider_hash"]
+        q=copy.deepcopy(p);q["manifest_sha256"]="1"*64
+        self.assertNotEqual(cli.bridge("project",q)["provider_hash"],old)
+        f,hist=h.read(self.desc,self.w.root,self.s.root,CODES,h.iso(DAYS[84])+"T08:00:00Z")
+        q=copy.deepcopy(p);q.update(frozen=f,history=hist)
+        self.assertNotEqual(cli.bridge("project",q)["provider_hash"],old)
+        bad=copy.deepcopy(p);bad.pop("history")
+        with self.assertRaisesRegex(model.Rejected,"REAL_READINESS_BLOCKED"):cli.bridge("project",bad)
+
+    def test_07_history_interrupt_cancel_and_failure(self):
+        for label in ("interrupt","timeout","oom","cancel"):
+            cli.bridge("enable")
+            p=self.plan();p["batch"]+="-"+label;self.save(p)
+            if label=="interrupt":
+                cli.bridge("begin",p)
+                runner=lambda _:self.fail("Interrupted task retried")
+            elif label=="cancel":
+                def runner(raw):
+                    cli.bridge("disable")
+                    return fixture.fixture_response(raw)
+            else:
+                def runner(raw):
+                    raise model.Rejected("WORKER_TIMEOUT" if label=="timeout" else "WORKER_OOM")
+            with patch.object(cli,"verify_model",return_value=self.manifest),patch.object(runtime,"command",return_value=[]):
+                got=cli.once(p["batch"],runner)
+            self.assertEqual(got["state"],"cancelled" if label=="cancel" else "failed")
+            self.assertIsNone(got["result"])
+            if label=="interrupt":self.assertEqual(got["reason"],"WORKER_INTERRUPTED_NO_RETRY")
+
+    def test_08_sqlite_only_reads_keep_boundaries(self):
+        before=[(x.read_bytes(),x.stat().st_mtime_ns) for x in (self.w.path,self.s.path)]
+        self.plan()
+        after=[(x.read_bytes(),x.stat().st_mtime_ns) for x in (self.w.path,self.s.path)]
+        self.assertEqual(before,after)
+        # Raw is never consumed by this mode; default full inspection still rejects it.
+        link=self.w.root/"raw"/"unread-link";link.symlink_to(self.s.path)
+        try:
+            self.w.query(DAYS[0],CUTOFF,CODES,limit=2000,inspect_raw_paths=False)
+            with self.assertRaisesRegex(v1.WarehouseError,"WAREHOUSE_LINK_DENIED"):
+                self.w.query(DAYS[0],CUTOFF,CODES,limit=2000)
+        finally:link.unlink()
+        original=self.w.path;real=original.with_suffix(".saved")
+        original.rename(real);original.symlink_to(real)
+        try:
+            with self.assertRaisesRegex(v1.WarehouseError,"WAREHOUSE_LINK_DENIED"):
+                self.w.query(DAYS[0],CUTOFF,CODES,limit=2000,inspect_raw_paths=False)
+        finally:original.unlink();real.rename(original)
+
+    def test_09_eight_series_max_context_fits_contract(self):
+        p=self.plan()
+        f,hist=h.read(self.desc,self.w.root,self.s.root,CODES,h.iso(DAYS[191])+"T08:00:00Z",context=192)
+        p.update(frozen=f,history=hist)
+        self.assertLess(len(json.dumps(p).encode()),2097152)
+        request=json.loads(cli.bridge("project",p)["worker_request_json"])
+        self.assertEqual(len(request["series"]),8)
+        self.assertEqual(len(request["series"][0]["values"]),172)
+
+    @staticmethod
+    def rehash(p):
+        f=p["frozen"]
+        f["snapshot_ref"]=model.digest(dict(series=f["series"],calendar=f["calendar"]))
+        p["history"]["payload"]["frozen_sha256"]=model.digest(f)
+        p["history"]["payload_sha256"]=model.digest(p["history"]["payload"])
+
+    def test_10_rehashed_metadata_rejected_project_begin_verify(self):
+        cli.bridge("enable")
+        p=self.plan(CODES[:1]);self.save(p)
+        def response(raw):
+            v=fixture.fixture_response(raw);v["metrics"]={};return v
+        with patch.object(cli,"verify_model",return_value=self.manifest),patch.object(runtime,"command",return_value=[]):
+            original=cli.once(p["batch"],response)
+            self.assertTrue(cli.verify(p["batch"])["verified"])
+        with sqlite3.connect(self.owner/"agent.sqlite") as db:
+            saved=db.execute("SELECT input,provider_hash,result FROM tasks WHERE id=?",(original["id"],)).fetchone()
+        mutations=[
+            ("risk_model.id",lambda f:f["risk_model"].update(id="wrong-cpu"),"HISTORY_MODEL_PIN"),
+            ("risk_model.fingerprint",lambda f:f["risk_model"].update(fingerprint="a"*64),"HISTORY_MODEL_PIN"),
+            ("risk_model.bad_sha",lambda f:f["risk_model"].update(fingerprint="bad"),"HISTORY_MODEL_PIN"),
+            ("opportunity.missing",lambda f:f["opportunities"].clear(),"HISTORY_OPPORTUNITIES"),
+            ("opportunity.foreign",lambda f:f["opportunities"][0].update(instrument="600999.SH"),"HISTORY_OPPORTUNITIES"),
+            ("opportunity.duplicate",lambda f:f["opportunities"].append(copy.deepcopy(f["opportunities"][0])),"HISTORY_OPPORTUNITIES"),
+            ("opportunity.status",lambda f:f["opportunities"][0].update(status="VERIFIED_SYNTHETIC"),"HISTORY_OPPORTUNITIES"),
+            ("opportunity.evidence",lambda f:f["opportunities"][0].update(evidence=["unverified edge"]),"HISTORY_OPPORTUNITIES"),
+            ("prompt_version",lambda f:f.update(prompt_version="other-v1"),"HISTORY_VERSIONS_OR_UNUSED_FIELDS"),
+            ("strategy_version",lambda f:f.update(strategy_version="other-v1"),"HISTORY_VERSIONS_OR_UNUSED_FIELDS"),
+            ("fusion_model.id",lambda f:f["fusion_model"].update(id="fusion-deepseek"),"HISTORY_MODEL_PIN"),
+            ("fusion_model.fingerprint",lambda f:f["fusion_model"].update(fingerprint="a"*64),"HISTORY_MODEL_PIN"),
+            ("fusion_model.bad_sha",lambda f:f["fusion_model"].update(fingerprint="bad"),"HISTORY_MODEL_PIN"),
+            ("risk_recording.bad_sha",lambda f:f.update(risk_recording_sha256="bad"),"HISTORY_VERSIONS_OR_UNUSED_FIELDS"),
+            ("risk_recording.nonzero",lambda f:f.update(risk_recording_sha256="a"*64),"HISTORY_VERSIONS_OR_UNUSED_FIELDS"),
+            ("fusion_recording.bad_sha",lambda f:f.update(fusion_recording_sha256="bad"),"HISTORY_VERSIONS_OR_UNUSED_FIELDS"),
+            ("budget.zero",lambda f:f.update(batch_budget_micro=0),"HISTORY_VERSIONS_OR_UNUSED_FIELDS"),
+            ("budget.billable",lambda f:f.update(batch_budget_micro=2),"HISTORY_VERSIONS_OR_UNUSED_FIELDS"),
+            ("budget.overbound",lambda f:f.update(batch_budget_micro=1000000000001),"HISTORY_VERSIONS_OR_UNUSED_FIELDS")]
+        try:
+            for i,(name,mutate,reason) in enumerate(mutations):
+                bad=copy.deepcopy(p);mutate(bad["frozen"]);self.rehash(bad)
+                for action in ("project","begin"):
+                    candidate=copy.deepcopy(bad);candidate["batch"]+=f"-negative-{i}"
+                    with self.subTest(field=name,entry=action),self.assertRaisesRegex(model.Rejected,reason):
+                        cli.bridge(action,candidate)
+                # Forge all self-described task/result hashes in the disposable
+                # fixture DB. Verification must reach semantic validation, not
+                # merely reject an old hash left behind by the test.
+                value=copy.deepcopy(original["result"])
+                bundle=value["research"]["risk_portfolio"]
+                bundle["receipt"].update(frozen_input_sha256=model.digest(bad["frozen"]),
+                    historical_input_sha256=bad["history"]["payload_sha256"],plan_sha256=model.digest(bad))
+                bundle["historical_research"]["input_sha256"]=bad["history"]["payload_sha256"]
+                summary=json.loads(saved[0])
+                summary.update(version="timesfm-cpu-v1:"+model.digest(bad))
+                summary["summary"]["plan"]=bad
+                value["input_summary_version"]=summary["version"]
+                value.pop("result_sha256");value["result_sha256"]=model.digest(value)
+                pin=model.digest(dict(code=bad["code_sha256"],manifest=bad["manifest_sha256"],revision=model.REVISION,
+                    weight=model.WEIGHT_SHA,context=bad["max_context"],batch=bad["batch_size"],threads=bad["threads"],
+                    history_sha256=bad["history"]["payload_sha256"]))
+                self.save(bad)
+                with sqlite3.connect(self.owner/"agent.sqlite") as db:
+                    db.execute("UPDATE tasks SET input=?,provider_hash=?,result=? WHERE id=?",
+                        (json.dumps(summary),pin,json.dumps(value),original["id"]))
+                with self.subTest(field=name,entry="verify"),patch.object(cli,"verify_model",return_value=self.manifest):
+                    with self.assertRaisesRegex(model.Rejected,reason):cli.verify(bad["batch"])
+        finally:
+            self.save(p)
+            with sqlite3.connect(self.owner/"agent.sqlite") as db:
+                db.execute("UPDATE tasks SET input=?,provider_hash=?,result=? WHERE id=?",(*saved,original["id"]))
+        with patch.object(cli,"verify_model",return_value=self.manifest):
+            self.assertTrue(cli.verify(p["batch"])["verified"])
+
+    def test_11_multisecurity_daily_sources_are_bound(self):
+        p=self.plan()
+        daily=self.w.query(DAYS[0],CUTOFF,CODES,limit=2000)
+        factors=self.s.query("adj_factor",DAYS[0],CUTOFF,CODES,limit=2000)
+        susp=self.s.query("suspend_d",DAYS[0],CUTOFF,CODES,limit=2000)
+        catalog={x["ts_code"]:x for x in self.catalog()}
+        # Distinct recorded per-security receipts make same-day overwriting and
+        # cross-security substitution observable, even when real full-day
+        # requests legitimately share a single provenance manifest.
+        for i,row in enumerate(daily["rows"]):
+            source=copy.deepcopy(row["availability"])
+            source["attempts"][0].update(id=10000+i,
+                metadata_sha=model.digest(dict(instrument=row["values"]["ts_code"],i=i)),
+                response_sha=model.digest(dict(recorded_response=i)))
+            row["availability"]=source;row["source_sha"]=model.digest(source)
+        f,hist=h.assemble(self.desc,CODES,ASOF,DAYS[:84],catalog,daily,factors,susp,
+            p["history"]["payload"]["dataset_versions"],p["history"]["payload"]["metadata"])
+        p.update(frozen=f,history=hist)
+        sources=hist["payload"]["sources"]["daily"]
+        expected={x["values"]["ts_code"]+":"+x["values"]["trade_date"]:x["source_sha"] for x in daily["rows"]}
+        self.assertEqual(sources,expected)
+        manifests=hist["payload"]["sources"]["daily_manifests"]
+        self.assertEqual(manifests,{x["source_sha"]:x["availability"] for x in daily["rows"]})
+        for key,sha in expected.items():
+            self.assertEqual(model.digest(manifests[sha]),sha)
+        self.assertEqual(len(sources),len(CODES)*84)
+        cli.bridge("project",p)
+        keys=list(sources)
+        for kind in ("missing","missing_manifest","cross_security","received_time","source_sha"):
+            bad=copy.deepcopy(p);index=bad["history"]["payload"]["sources"]["daily"]
+            manifests=bad["history"]["payload"]["sources"]["daily_manifests"]
+            if kind=="missing":index.pop(keys[0])
+            elif kind=="missing_manifest":manifests.pop(index[keys[0]])
+            elif kind=="cross_security":index[keys[0]]=index[keys[1]]
+            elif kind=="received_time":manifests[index[keys[0]]]["attempts"][0]["obtained_at"]="2099-01-01T00:00:00Z"
+            else:manifests[index[keys[0]]]["attempts"][0]["response_sha"]="b"*64
+            self.rehash(bad)
+            for action in ("project","begin"):
+                with self.subTest(mutation=kind,entry=action),self.assertRaisesRegex(model.Rejected,"HISTORY_DAILY_SOURCE_BINDING"):
+                    cli.bridge(action,bad)
+
+    def test_12_json_result_sha_survives_decimal_roundtrip(self):
+        # Public decimals exercise exact float roundtrip independently of any
+        # private market/forecast values.
+        for decimal in (0.10826151818037033,0.10974205285310745,0.24411113560199738,0.20956620573997498):
+            result=dict(public_decimal=decimal)
+            result["result_sha256"]=model.digest(result)
+            with self.subTest(decimal=decimal):
+                self.assertTrue(cli.bridge("verify-result",result)["verified"])
+
+    def test_13_rehashed_same_day_close_requires_shanghai_post_close(self):
+        cli.bridge("enable")
+        p=self.plan(CODES[:1])
+        f,hist=h.read(self.desc,self.w.root,self.s.root,CODES[:1],"2022-03-31T08:00:00Z")
+        p.update(frozen=f,history=hist)
+        def at(stamp,suffix):
+            value=copy.deepcopy(p);value["batch"]+="-"+suffix
+            value["frozen"]["as_of"]=stamp
+            value["history"]["payload"]["as_of"]=stamp
+            self.rehash(value)
+            return value
+        # Keep the very same March 31 closes, including the last close.
+        # Only the decision instant and all self-described SHA fields change.
+        early=("2022-03-31T00:00:00Z",
+               "2022-03-31T07:59:59Z",
+               "2022-03-31T15:59:59+08:00")
+        for i,stamp in enumerate(early):
+            bad=at(stamp,f"early-{i}")
+            for action in ("project","begin"):
+                with self.subTest(as_of=stamp,entry=action):
+                    with self.assertRaisesRegex(model.Rejected,"HISTORY_CLOSE_NOT_AVAILABLE"):
+                        cli.bridge(action,bad)
+        # Equivalent instants may carry different UTC offsets/calendar dates.
+        valid=("2022-03-31T08:00:00Z",
+               "2022-03-31T16:00:00+08:00",
+               "2022-03-30T23:00:00-09:00")
+        for i,stamp in enumerate(valid):
+            good=at(stamp,f"valid-{i}")
+            with self.subTest(as_of=stamp,entry="post_close_archive_verify"):
+                cli.bridge("project",good)
+                self.save(good)
+                with patch.object(cli,"verify_model",return_value=self.manifest),patch.object(runtime,"command",return_value=[]):
+                    self.assertEqual(cli.once(good["batch"],fixture.fixture_response)["state"],"completed")
+                    record=h.archive(good["batch"])
+                    self.assertEqual(h.archived(good["batch"]),record)
+                    self.assertTrue(cli.verify(good["batch"])["verified"])
+        # Post-close alone cannot move March 31 closes onto another decision day.
+        bad=at("2022-04-01T08:00:00Z","wrong-day")
+        for action in ("project","begin"):
+            with self.subTest(entry=action,as_of="wrong Shanghai day"):
+                with self.assertRaisesRegex(model.Rejected,"HISTORY_CUTOFF_OR_ACTION_GAP"):
+                    cli.bridge(action,bad)
+
+    def test_06_old_synthetic_mode_still_works(self):
+        p=dict(batch="legacy-fixture",frozen=cli.frozen(self.desc),manifest_sha256="1"*64,
+               code_sha256=self.desc["code_sha256"],max_context=256,batch_size=1,threads=2)
+        p["frozen"]["input_mode"]="historical_backfill_ex_post"
+        with self.assertRaisesRegex(model.Rejected,"REAL_READINESS_BLOCKED"):cli.bridge("project",p)
+        p["frozen"]["input_mode"]="synthetic_test"
+        raw=cli.bridge("project",p)["worker_request_json"].encode()
+        self.assertEqual(cli.bridge("decode",dict(plan=p,response=fixture.fixture_response(raw)))["risk_experts"][0]["input_mode"],"synthetic_test")
+        p["code_sha256"]="26c92639fd78b143c4bd400988f447f29fcb52294319734555bae14efe669f2a"
+        # Read-only prior implementation receipts remain verifiable; fresh work requires new code.
+        cli.bridge("evaluate-project",p)
+        with self.assertRaisesRegex(model.Rejected,"LOCAL_PIN_CHANGED"):cli.bridge("project",p)
+
+if __name__=="__main__":unittest.main(verbosity=2)

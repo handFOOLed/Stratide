@@ -1,0 +1,61 @@
+{
+  "reviewed_head": "b3995b94d5c75ee47de28c8d5481fa001738aada",
+  "red": {
+    "command": "python3 -B scripts/test-timesfm-history.py Tests.test_10_rehashed_metadata_rejected_project_begin_verify Tests.test_11_multisecurity_daily_sources_are_bound",
+    "exit_code": 1,
+    "accepted_invalid_metadata_cases": 57,
+    "field_variants": 19,
+    "entries": [
+      "project",
+      "begin",
+      "verify"
+    ],
+    "source_overwrite_reproduced": true
+  },
+  "decimal_red": {
+    "command": "cargo build -p stratide-research --bins --offline --locked; python3 -B scripts/test-timesfm-history.py Tests.test_12_json_result_sha_survives_decimal_roundtrip",
+    "exit_code": 1,
+    "errors": 4,
+    "public_float32_seed": 74,
+    "private_forecasts_used": false
+  },
+  "green": {
+    "command": "cargo build -p stratide-research --bins --offline --locked; python3 -B scripts/test-timesfm-history.py",
+    "exit_code": 0,
+    "passed": 12,
+    "skipped": 0,
+    "metadata_rejections": 57,
+    "source_mutation_rejections": 10,
+    "decimal_roundtrip_cases": 4
+  },
+  "regression": [
+    {
+      "command": "cargo test --workspace --offline --locked -- --test-threads=1",
+      "exit_code": 0,
+      "passed": 204
+    },
+    {
+      "command": "python3 -B scripts/test-timesfm-cpu.py",
+      "exit_code": 0,
+      "passed": 11,
+      "skipped": 1,
+      "skip_reason": "Windows diagnostic Job test"
+    },
+    {
+      "command": "PR19_TEST_DRIVER=<LIBTEST> python3 -B scripts/test-local-timesfm-fusion.py",
+      "exit_code": 0,
+      "passed": 9,
+      "skipped": 0
+    }
+  ],
+  "reused_unchanged_evidence": [
+    "PR75 original Linux isolation 4/4",
+    "PR75 V1/V2 query/readonly suites"
+  ],
+  "not_run": [
+    "full real warehouse/raw verification",
+    "paid cloud API regression",
+    "physical N100",
+    "independent fixed-HEAD acceptance"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "reviewed_head": "7db63a069a8e06522e82e0a3bc6352cb6bcad925",
+  "files": {
+    "research/agent/src/risk_history.rs": {
+      "sha256": "788437318c61915ea94c85c4e6a693ac4f1a864c144effa1785de177918ced1b",
+      "git_blob_sha": "1583b3929c24b6a26c6c714cc484c2e815509afb"
+    },
+    "scripts/test-timesfm-history.py": {
+      "sha256": "8c2f6274015fd1328fbb512b4291a101d86d3397e2e0c207c4b995034de25826",
+      "git_blob_sha": "d1ebfe59ba1782785aa16b8ec49e10d8f7ab19e0"
+    }
+  }
+}

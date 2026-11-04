@@ -6,9 +6,11 @@
 
 ## 当前状态
 
-- **M2-PR19 真实 Fusion（#71 / Draft PR #72）：** 原本地 TimesFM → 真实 `deepseek-flash` → 严格组合 → 原 Registry/Inbox/report/verify 已通过。Owner 追加授权的一次调用收到 1065/722 token，返回合法 100% 现金研究组合；两次授权合计估算 ¥0.015420，首次失败及预留保留。同一真实 Agent 共享 CNY ¥5/日、¥100/月（Asia/Shanghai），Fusion 已 OFF，Paper/Live 不开放。见[运行与状态](docs/M2_PR19.md)和[真实证据](docs/evidence/m2-pr19/README.md)。
+- **M2-PR20 真实历史本地风险（#74 / 本分支 Draft）：** 已有真实 V1/V2 数据与质量标签 → 前缀冻结 → TimesFM CPU → 原任务/Registry/report/verify 已实际通过三证券。真实因子变化/缺口拒绝，新行情请求、云调用及计费均为 0；真实风险结果禁止外发。PIT、样本外优势、Paper/Live 与 N100 资格仍未验证。见[操作](docs/M2_PR20.md)和[证据](docs/evidence/m2-pr20/README.md)。
 
-- **M2-PR18 本地 TimesFM CPU（#69 / Draft / 默认 OFF）：** 固定官方 TimesFM 2.5 200M 权重与 CPU 依赖，按需 Python Worker 接原风险结果/Naive/EWMA；WSL2 Linux 隔离 4/4、真实 CPU 生产闭环及 16 点压力矩阵已实测；生产目标 N100 Linux，N100 验收仍 `NOT_VERIFIED`。不改变旧云路径或 Paper/Live 权限。见[运行与隔离边界](docs/M2_PR18.md)、[Linux 证据与回归限制](docs/evidence/m2-pr18/linux-r1/README.md)。
+- **M2-PR19 真实 Fusion（#71 / PR #72 已合并）：** 原本地 TimesFM → 真实 `deepseek-flash` → 严格组合 → 原 Registry/Inbox/report/verify 已通过。Owner 追加授权的一次调用收到 1065/722 token，返回合法 100% 现金研究组合；两次授权合计估算 ¥0.015420，首次失败及预留保留。同一真实 Agent 共享 CNY ¥5/日、¥100/月（Asia/Shanghai），Fusion 已 OFF，Paper/Live 不开放。见[运行与状态](docs/M2_PR19.md)和[真实证据](docs/evidence/m2-pr19/README.md)。
+
+- **M2-PR18 本地 TimesFM CPU（#69 / PR #70 已合并 / 默认 OFF）：** 固定官方 TimesFM 2.5 200M 权重与 CPU 依赖，按需 Python Worker 接原风险结果/Naive/EWMA；WSL2 Linux 隔离 4/4、真实 CPU 生产闭环及 16 点压力矩阵已实测；生产目标 N100 Linux，N100 验收仍 `NOT_VERIFIED`。不改变旧云路径或 Paper/Live 权限。见[运行与隔离边界](docs/M2_PR18.md)、[Linux 证据与回归限制](docs/evidence/m2-pr18/linux-r1/README.md)。
 
 - **M2-PR17 DeepSeek HTTPS（#67 / 默认 OFF）：** 真实 API model 固定为 `deepseek-flash`，本模块内部默认 ID 为 `ds4.1flash`。复用原 Agent/CNY Budget 与 PR15 AST/PR62 离线评价；开发验证使用 recorded/loopback，真实请求为 `REAL_PROVIDER_NOT_RUN_OWNER_AUTHORIZATION_MISSING`，Paper/Live 仍 BLOCKED。见[操作与边界](docs/M2_PR17.md)和[测试证据](docs/evidence/m2-pr17/README.md)。
 
@@ -27,7 +29,7 @@ Owner 首次使用：在既有真实 CNY Agent 的 `settings.json` 手动填日/
 - **现金分红模型已合并（PR #40）：** [CASH_DIVIDEND_V1](docs/M1_PR08.md) 完成隔离现金分红的登记→应收/税负→到账、统一 NAV/Risk、七报告和独立算法复算；旧 synthetic CLI、v3/68 日保持兼容。
 - **历史分红桥接已合并（PR #42）：** [历史分红桥接 V1](docs/M1_PR09.md) 将原冻结行情、PR38 证据和显式模型假设接入 v4、原 SMA5/20、七报告及独立算法/双基准；实际运行 77 会话 **EXPLORATORY_EX_POST**，真实 PIT 新增 **0 天**，真实准入继续拒绝。
 - **仍受阻：** 仅 68 个历史交易日、3 笔模拟成交，长窗口公司行为/费用证据 `DATA_BLOCKED`；真实 EOD 两日 `EOD_CONTINUITY_VERIFIED`，开盘源仍 BLOCKED，**尚无真正前向模拟成交或 NAV**。
-- **当前顺序：** PR #50/#52/#54 已合并。本分支 [#55 云风险专家与自主组合](docs/M2_PR11.md) 将 BigQuery TimesFM 2.5、DeepSeek flash 两套生产 Adapter 经原 Rust Agent/统一预算接到原 Registry/Inbox；完整 recorded/loopback 合成 E2E，支持三只股票+现金及 100% 现金。默认 OFF，真实云 `CLOUD_NOT_AUTHORIZED / NOT_BILLED`，BigQuery 费用上界未核实则禁止付费。真实前向仍两日，PR54 资格及模型 context 仍 BLOCKED；没有 Paper/Live 订单或权限。[#36](https://github.com/handFOOLed/Stratide/issues/36) 的真实研究能力仍待数据和模型证据；核心完成后统一集成 UI。见 [当前状态](docs/STATUS.md)。
+- **当前顺序：** #74 交付真实历史 → 本地 TimesFM 核心闭环，单个 Draft 等待固定 HEAD 审查。后续预冻结样本外协议、积累前向 EOD；UI 在核心之后。见[当前状态](docs/STATUS.md)。
 - **PR #56 审查修复：** 新链路须显式绑定已有 Owner AgentDir/配置，与旧 Agent 共用同一费用库，不再初始化第二个预算。预算修复已获源码复审确认；原 PR52/54 三套盘后完整回归 **10+4+13 项均 exit 0**，PR #56 后续已合并，原开发证据保留；见 [R1 证据](docs/evidence/m2-pr11/r1/README.md)。
 
 ## Windows 本地体验

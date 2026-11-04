@@ -462,8 +462,10 @@ class Warehouse:
                 db.close()
 
     @contextlib.contextmanager
-    def read(self):
-        self.check_paths(descendants=True)
+    def read(self, *, inspect_raw_paths=True):
+        # SQLite-only consumers never open raw descendants. Default verification
+        # retains the original full path inventory; both modes fence DB/WAL/lock.
+        self.check_paths(descendants=inspect_raw_paths)
         # Read an existing lock without creating/writing it, fencing the race
         # between WAL inspection and an immutable read of a changing main file.
         with writer_lock(self.root,readonly=True):
@@ -651,14 +653,14 @@ class Warehouse:
                                      "HISTORICAL_CODE_MAPPING_NOT_VERIFIED", "MISSING_OR_NOT_TRADING_UNVERIFIED",
                                      "NO_CORPORATE_ACTION_OR_SUSPENSION_VERIFICATION", "NO_HISTORICAL_PIT"])
 
-    def query(self, start, end, symbols=(), trade_date=None, as_of_version=None, limit=100):
+    def query(self, start, end, symbols=(), trade_date=None, as_of_version=None, limit=100, *, inspect_raw_paths=True):
         historical_range(start,end)
         require(1 <= limit <= 10000, "QUERY_LIMIT_1_TO_10000")
         for code in symbols:
             exchange(code)
         if trade_date:
             require(start <= trade_date <= end, "DATE_SCOPE_MISMATCH")
-        with self.read() as db:
+        with self.read(inspect_raw_paths=inspect_raw_paths) as db:
             args = [start,end]
             if as_of_version is not None:
                 require(as_of_version > 0, "INVALID_VERSION")
