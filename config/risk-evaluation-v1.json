@@ -1,0 +1,79 @@
+{
+  "base_sha": "d557aa1cd721df66accdddbe7b22afb184736ecc",
+  "baselines": [
+    "naive_last_rolling20_rms",
+    "ewma_daily_squared_return_constant_forecast"
+  ],
+  "cloud_egress": "REAL_MARKET_DATA_EGRESS_DENIED",
+  "context_closes": 84,
+  "ewma_lambda": 0.94,
+  "fusion_comparability": {
+    "deepseek": "SYNTHETIC_RECORDED_ONLY_EXCLUDED_FROM_REAL_OOS",
+    "local_rule": "NOT_IMPLEMENTED_NO_SECOND_REAL_OOS_ENTRY"
+  },
+  "holdout_exposure": "PR62/64 historical research and PR75 examples; no protected independent holdout",
+  "holdout_was_previously_exposed": true,
+  "horizons": [
+    5,
+    20
+  ],
+  "live_allowed": false,
+  "max_horizon": 20,
+  "metrics": [
+    "MAE",
+    "RMSE",
+    "sMAPE",
+    "horizon_mean_absolute_error",
+    "paired_per_sample_MAE_difference"
+  ],
+  "minimum_complete_origins_per_split": 20,
+  "missing_policy": "reject_entire_asset_origin_no_imputation_no_asset_replacement",
+  "model": {
+    "batch_size": 1,
+    "id": "google/timesfm-2.5-200m-pytorch",
+    "max_context": 256,
+    "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+    "threads": 2,
+    "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8"
+  },
+  "origin_rule": "first_known_open_session_on_or_after_month_day_15",
+  "paper_allowed": false,
+  "protocol_version": "risk-oos-v1",
+  "quality_policy": "PR75_strict_prefix_and_realized_window_no_detected_action_not_PIT",
+  "return_definition": "close[t]/close[t-1]-1",
+  "sample_weight": "equal_asset_origin_then_equal_target_session",
+  "schema_version": 1,
+  "source_end": "20241231",
+  "source_start": "20211101",
+  "sources": [
+    "TUSHARE_V1_UNADJUSTED",
+    "TUSHARE_V2_ADJ_FACTOR_SUSPEND_D",
+    "PR75_PREFIX_QUALITY"
+  ],
+  "split_policy": "purge_origin_unless_all_20_targets_within_same_split",
+  "splits": [
+    {
+      "from": "20220101",
+      "name": "development",
+      "through": "20221231"
+    },
+    {
+      "from": "20230101",
+      "name": "validation",
+      "through": "20231231"
+    },
+    {
+      "from": "20240101",
+      "name": "test",
+      "through": "20241231"
+    }
+  ],
+  "symbols": [
+    "600000.SH",
+    "000001.SZ",
+    "600519.SH"
+  ],
+  "target": "rolling20_rms_daily_return_ratio",
+  "target_definition": "sqrt(mean(last_20_daily_returns_squared)); first_target_is_next_session",
+  "uncertainty": "overlapping_targets_and_correlated_assets; descriptive_paired_ranges_not_independent_CI"
+}
