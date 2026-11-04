@@ -278,6 +278,7 @@ export interface AgentInput {
 }
 
 export interface AgentStatus {
+  dashboard_mode?: 'attached_explicit_operations' | 'worker';
   service: string;
   paused: boolean;
   worker_concurrency: string;
@@ -354,6 +355,7 @@ export interface AgentResult {
 }
 
 export interface AgentTaskDetail {
+  artifact?: unknown;
   id: string;
   status: string;
   reason: string | null;

@@ -2,6 +2,7 @@
 pub mod cash_dividend;
 mod engine;
 mod model;
+pub mod paper_eod;
 mod store;
 pub use model::*;
 pub use store::{AuditEntry, Ledger};

@@ -1,6 +1,7 @@
 #![recursion_limit = "256"]
 mod forward;
 mod paper;
+mod paper_eod;
 mod replay;
 use std::{collections::BTreeMap, env, process::ExitCode};
 use stratide_contracts::*;
@@ -28,6 +29,7 @@ fn run(args: Vec<String>) -> Result<(), String> {
         "paper-replay" | "paper-report" | "paper-dividend-replay" | "paper-dividend-report" | "paper-dividend-benchmark" | "paper-dividend-cash-benchmark"
         | "paper-historical-dividend-replay" | "paper-historical-dividend-report" | "paper-historical-dividend-benchmark" | "paper-historical-dividend-cash-benchmark" => replay::run(&args)?,
         "paper-benchmark" => replay::benchmark::run(&args)?,
+        "paper-eod-init" | "paper-eod-intent" | "paper-eod-confirm" | "paper-eod-expire" => paper_eod::run(&args)?,
         command if command.starts_with("paper-") => paper::run(command, &args[1..])?,
         "help" | "--help" | "-h" => println!(
             "stratide-cli status\nstratide-cli risk-demo\n\
@@ -45,6 +47,11 @@ paper-match-synthetic <目录>
 paper-status <目录>
 \
 paper-apply <目录> <唯一事件ID> <可信命令JSON文件>
+paper-eod-init <新账本目录> <Owner资金/风险/身份配置JSON> <来源版本ID>
+paper-eod-intent <原账本> <唯一事件ID> <前日盘后意图JSON>
+paper-eod-confirm <原账本> <唯一事件ID> <次日盘后来源JSON>
+paper-eod-expire <原账本> <唯一事件ID>（截止后整批 NO_FILL；不需要行情JSON）
+EOD 成交仅 EX_POST_OPEN_ASSUMPTION；意图/数量/撮合模型须前日冻结，无实盘权限。
 paper-replay <输入JSON> <账本目录> <报表目录> --sha256 <输入文件SHA256> <上述全部六项参数>
 paper-report <输入JSON> <账本目录> <报表目录> --sha256 <输入文件SHA256>
 paper-dividend-replay <schema3模型JSON> <新v4账本目录> <报表目录> --sha256 <SHA256> <六项参数>

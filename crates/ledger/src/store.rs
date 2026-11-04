@@ -12,7 +12,7 @@ use std::{
 /// the OS releases the advisory lock on death, without stale-PID guessing.
 pub struct Ledger {
     db: Connection,
-    _lock: File,
+    _lock: Option<File>,
     state: State,
     head: String,
     sequence: i64,
@@ -144,7 +144,7 @@ impl Ledger {
         tx.commit().map_err(|e| e.to_string())?;
         Ok(Self {
             db,
-            _lock: lock,
+            _lock: Some(lock),
             state,
             head,
             sequence: 0,
@@ -156,6 +156,21 @@ impl Ledger {
     /// verify every state hash and cash/share/fee conservation before any write.
     pub fn open(path: impl AsRef<Path>) -> Result<Self> {
         let (db, lock) = connection(path.as_ref(), false)?;
+        Self::load(db, Some(lock), false)
+    }
+    /// Consistent read transaction; no journal-mode change, writer lock,
+    /// recovery, or financial mutation on a Dashboard refresh.
+    pub fn read(path: impl AsRef<Path>) -> Result<Self> {
+        let db = Connection::open_with_flags(
+            path.as_ref().join("ledger.sqlite"),
+            OpenFlags::SQLITE_OPEN_READ_ONLY,
+        )
+        .map_err(|e| e.to_string())?;
+        db.execute_batch("PRAGMA query_only=ON; BEGIN;")
+            .map_err(|e| e.to_string())?;
+        Self::load(db, None, true)
+    }
+    fn load(db: Connection, lock: Option<File>, read_only: bool) -> Result<Self> {
         let version: i64 = db
             .pragma_query_value(None, "user_version", |r| r.get(0))
             .map_err(|e| e.to_string())?;
@@ -228,7 +243,7 @@ impl Ledger {
             state: state.ok_or("空账本不能恢复或自动初始化")?,
             head,
             sequence,
-            poisoned: false,
+            poisoned: read_only,
         })
     }
 

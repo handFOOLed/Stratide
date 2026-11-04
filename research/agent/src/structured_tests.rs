@@ -243,6 +243,9 @@ fn one_real_loopback(
             );
             std::thread::sleep(Duration::from_millis(5));
         };
+        // Winsock inherits the listener's nonblocking mode on accept. This
+        // fixture intentionally reads a complete request with a finite timeout.
+        socket.set_nonblocking(false).unwrap();
         socket
             .set_read_timeout(Some(Duration::from_secs(5)))
             .unwrap();

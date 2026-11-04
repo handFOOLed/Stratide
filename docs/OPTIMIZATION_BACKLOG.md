@@ -1,5 +1,7 @@
 # Stratide｜后续优化清单（Optimization Backlog）
 
+**2026-11-04 / #77 已实现与遗留划分：** 当前账户/历史分离、原研究结果/预算/审批通知可用、Windows 启停和 manifest/SQLite 备份恢复、现有 UI 精修已交付本期 Draft，见 [V1 收尾](V1_COMPLETION.md)。保留的优化包括官方账单核销、其他硬件部署/长稳及后续更高保真模拟，不再把它们列作本期功能缺口。#10/#17 的真实证据仍待补充，不声称交易资格通过；N100 延后。下方旧建议中已涉及本期显示/接线的部分以本段为准，金融规则专项仍需另定范围。
+
 > **状态：仅记录，不立即实施。** 2026-11-03 建立。此文档不是开发授权、真实 API/数据外发授权，也不修改任何代码、账本、已发生费用或交易准入。具体实施须由 Owner 另行选定独立 Issue/PR，再按固定 HEAD 审查、Owner 合并的流程执行。
 >
 > 关联：[M2-PR19 / Issue #71](https://github.com/handFOOLed/Stratide/issues/71)、[Draft PR #72](https://github.com/handFOOLed/Stratide/pull/72)、[PR18 Linux 验收](https://github.com/handFOOLed/Stratide/pull/70)。

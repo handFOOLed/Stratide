@@ -1,5 +1,7 @@
 # Stratide Paper 阶段路线图（当前执行版）
 
+**2026-11-04 / #77 产品集成已实装（Draft）：** [V1 本地产品闭环](V1_COMPLETION.md) 已达到工程收尾，含当前/历史独立来源、原研究/任务/预算、审批通知、假设成交与 Windows 恢复。Owner 合并决定仍待进行。#10/#17 缺证据与真实交易资格保持原判定；N100/Linux 服务器化暂缓，不计本次 Done。后续真实观察不得由合成测试补齐。[本地检查](evidence/v1-closeout-b/README.md)。
+
 **2026-11-04 最新规则 / #19 → #76 → #77：** 先完成 PR #78 的评价/Fusion 修复，再推进产品集成；[本期说明](V1_EVALUATION.md)。个人模式以相关本地绿测和简报验收，大包证据、先红后绿和外部固定 HEAD 审查可选，开发者不自行合并。#10/#17 仍记录证据缺口，但不阻挡工程交付、EOD Paper 或 Dashboard 集成，不可冒称 PIT/开盘实收/已验证可交易。T 日已知数据可冻结 T+1 意图；T+1 盘后确认的开盘价撮合须标 `EX_POST_OPEN_ASSUMPTION`，不得看到价格后改意图。唯一 Risk→Execution→Ledger、真实数据不外发、¥5/日 ¥100/月、Paper-only 和 N100 NOT_VERIFIED 保持。下方为历史阶段记录，与本段冲突时以本段为准。
 
 **PR #75 R1 / 2026-11-04：** 模型身份、UNKNOWN opportunity 集合和多证券来源绑定修复已完成开发验证，见 [R1 反证与真实复核](evidence/m2-pr20/r1/README.md)；保持同一 Draft，等待固定 HEAD 复审。历史 PIT、Paper/Live 与 N100 状态不升级。

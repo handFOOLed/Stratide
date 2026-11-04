@@ -1,5 +1,9 @@
 # Stratide 当前状态
 
+**2026-11-04 / PR #80 R1 P1 修复：** Paper 意图改为单业务事件/单事务；缺源批次到冻结的确认截止后整批 NO_FILL、清预留，不生成价格/成交/NAV，旧未冻结订单也有到期恢复入口。[R1 本地定向验证](evidence/v1-closeout-b/r1-fix.md)。产品范围仍是 Owner CLI JSON + 单证券假设撮合，非研究候选自动转单；来源时间/公司行为是 Owner 声明，PIT/开盘实收/交易资格不升级。保持同一 Draft，未独立验收或自行合并。
+
+**2026-11-04 / #77（本期 Draft）：V1_ENGINEERING_COMPLETE。** 已实装当前 Paper 账本 v1 只读接口与历史报告分离、原本地 CPU/Fusion/OOS/Registry 集成、持久审批/通知、前日冻结的 EOD Paper 假设成交、UI 精修及 Windows 启停/基础备份恢复。[操作与真实限制](V1_COMPLETION.md) / [本地绿测](evidence/v1-closeout-b/README.md)。这是开发者自测状态，未自行 Ready/merge，不等于独立验收；#10/#17 保持开放，PIT/开盘实收 NOT_VERIFIED、交易资格 BLOCKED。N100 暂缓，不计 V1 门槛；下方旧状态保留原发生时间。
+
 **2026-11-04 / #76 / PR #78 R1 修复：** 新增[冻结风险评价、前向只读审计与 FusionResearcherV1](V1_EVALUATION.md)，修复受控结论/未信任假说隔离及冻结门槛结构性不可达的报告；[本地绿测简报](evidence/v1-closeout-a/r1-fix.md)。按更新后的 #19/#76，个人模式无需强制大包证据或外部固定 HEAD 验收，由 Owner 决定合并，开发者不自行 Ready/merge。#10/#17 的缺口限制 PIT/开盘实收/已验证可交易声明，不阻挡工程交付、EOD Paper 或 Dashboard 集成；真实外发禁令、¥5/日 ¥100/月和 Paper-only 保持。本 PR 不新增 Paper 成交路径；#77 负责后续集成。下方旧条目保留发生时状态。
 
 **2026-11-04 / PR #75 R2：** 修复 Rust historical 当日收盘的盘后时点门禁；上海 16:00 边界和日期/时区一致性反证通过。历史 13/13、research Rust 71/71、旧 CPU 11 pass + 1 skip；真实 task 9 / Registry / report/verify 通过，0 新云/行情调用。[R2 证据](evidence/m2-pr20/r2/README.md)。保持 Draft，待固定 HEAD 复审。

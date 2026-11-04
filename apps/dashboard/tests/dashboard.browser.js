@@ -24,7 +24,7 @@ test('overview is the single home for NAV, chart, positions and five recent fill
   await expect(page.locator('.risk-card')).not.toContainText(/累计盈亏|累计收益率|最大日回撤|累计费用/);
   await expect(page.locator('.account-card')).not.toContainText('可用现金');
   await expect(page.locator('.account-card')).not.toContainText('最后估值');
-  await expect(page.locator('.recent-fills-card .card__foot')).toHaveText('点击查看详情');
+  await expect(page.locator('.recent-fills-card .card__foot')).toContainText('共 2 笔');
 
   // Type floor: body 15-16px, table and secondary text >= ~13.5px.
   const sizes = await page.evaluate(() => {
@@ -46,9 +46,9 @@ test('overview is the single home for NAV, chart, positions and five recent fill
   expect(sizes.subtitle).toBeGreaterThanOrEqual(13.5);
   expect(sizes.summary).toBeGreaterThanOrEqual(15);
 
-  // Both bottom lists reserve exactly five rows whether or not data fills them.
+  // An empty position card stays compact, without five fabricated rows.
   const emptyWindow = await page.locator('.positions-card .overview-empty').evaluate((el) => el.getBoundingClientRect().height);
-  expect(emptyWindow).toBeGreaterThanOrEqual(5 * 44 - 1);
+  expect(emptyWindow).toBeLessThan(5 * 44);
 
   await page.locator('.recent-fills-card tbody tr .row-link').first().click();
   const dialog = page.getByRole('dialog');
@@ -90,7 +90,7 @@ test('overview P&L uses semantic colors and aligns numbers within each unit grou
     expect(amounts[0].color).toBe(rendered.colors[tone]);
     expect(amounts[1].color).toBe(rendered.colors.neutral);
     expect(ratios[0].color).toBe(rendered.colors[tone]);
-    expect(ratios[1].color).toBe(rendered.colors.loss);
+    expect(ratios[1].color).toBe(rendered.colors.neutral);
     expect(rendered.daily).toBe(rendered.colors[tone]);
     expect(amounts[0].currencyX).toBeLessThan(ratios[0].currencyX);
     expect(Math.abs(amounts[0].currencyX - amounts[1].currencyX)).toBeLessThanOrEqual(0.5);
@@ -103,7 +103,7 @@ test('overview P&L uses semantic colors and aligns numbers within each unit grou
   await page.goto('/');
   await expect(page.getByTestId('nav-value')).toBeVisible();
   await checkValues('loss');
-  await page.route('**/api/account', async (route) => {
+  await page.route('**/api{,/v1}/account', async (route) => {
     const response = await route.fetch();
     const body = await response.json();
     body.data.session_pnl_fen = '76';
@@ -116,26 +116,26 @@ test('overview P&L uses semantic colors and aligns numbers within each unit grou
   await checkValues('gain');
 });
 
-test('NAV axis tops out at a power of ten, draws five dashed 20% steps and keeps points on hover only', async ({ page }) => {
+test('NAV uses its actual range, five equal 20% steps, principal baseline and corresponding short-series points', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByTestId('nav-value')).toBeVisible();
   await expect(page.getByRole('button', { name: '30D', exact: true })).toHaveAttribute('aria-pressed', 'true');
 
-  // 9,928.93 -> ceiling 10,000, split into five 20% steps.
+  // Actual range and principal, split into five equal display intervals.
   await expect(page.locator('.chart-grid-line')).toHaveCount(6);
   const axis = await page.locator('.chart-svg text').allTextContents();
-  expect(axis).toContain('¥10,000');
-  expect(axis).toContain('¥0');
-  expect(axis).toContain('¥2,000');
+  expect(axis).toContain('本金');
+  expect(axis).not.toContain('¥0');
   const dash = await page.locator('.chart-grid-line').first().evaluate((el) => getComputedStyle(el).strokeDasharray);
   expect(dash).not.toBe('none');
 
-  // No standing data points; a single point appears only while the pointer is over the plot.
-  await expect(page.locator('.chart-svg circle')).toHaveCount(0);
+  // Short series retain a point for each actual observation.
+  const standing = await page.locator('.chart-svg circle').count();
+  expect(standing).toBeGreaterThan(0);
   await page.locator('.chart-svg').hover({ position: { x: 220, y: 90 } });
-  await expect(page.locator('.chart-svg circle')).toHaveCount(1);
+  await expect(page.locator('.chart-svg circle')).toHaveCount(standing + 1);
   await page.mouse.move(2, 2);
-  await expect(page.locator('.chart-svg circle')).toHaveCount(0);
+  await expect(page.locator('.chart-svg circle')).toHaveCount(standing);
 
   await page.getByRole('button', { name: '全部', exact: true }).click();
   await expect(page.locator('.chart-card .card__subtitle')).toContainText('4 个报告日');
@@ -199,9 +199,8 @@ test('notifications are honest and settings show one category at a time with wor
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/#notifications');
   await expect(page.getByRole('heading', { name: '通知审批' })).toBeVisible();
-  await expect(page.getByText('通知渠道', { exact: true })).toBeVisible();
-  await expect(page.getByText('审批', { exact: true })).toBeVisible();
-  await expect(page.getByText('未接入').first()).toBeVisible();
+  await expect(page.getByText('本机研究控制尚未解锁。', {exact:true})).toBeVisible();
+  await expect(page.getByRole('button', {name:'前往 Agent 管理解锁'})).toBeVisible();
   await expect(page.locator('[data-testid="nav-value"]')).toHaveCount(0);
 
   await page.goto('/#settings');
@@ -243,7 +242,7 @@ test('notifications are honest and settings show one category at a time with wor
 
 test('empty, invalid, missing-valuation and offline states stay visible and honest', async ({ page }) => {
   await page.goto('http://127.0.0.1:8732/');
-  await expect(page.getByText('尚未选择 Paper 报告', { exact: true })).toBeVisible();
+  await expect(page.getByText('当前 Paper 账户尚未配置', { exact: true })).toBeVisible();
   await expect(page.getByTestId('nav-value')).toHaveCount(0);
 
   await page.goto('http://127.0.0.1:8733/');

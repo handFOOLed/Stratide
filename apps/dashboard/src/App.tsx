@@ -13,13 +13,16 @@ import { usePaperData } from './state/usePaperData';
 import { useHealth } from './state/useHealth';
 import { useResearch } from './state/useResearch';
 import { useAgent } from './state/useAgent';
+import { useWorkspace } from './lib/workspace';
 
 export function App() {
   const route = useRoute();
-  const paper = usePaperData();
+  const paper = usePaperData('selected_report');
+  const current = usePaperData('current');
   const health = useHealth();
   const research = useResearch();
-  const agent = useAgent(route.page === 'agents');
+  const agent = useAgent(route.page === 'agents' || route.page === 'notifications' || route.page === 'settings');
+  const workspace = useWorkspace();
   const mainRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const previousPage = useRef(route.page);
@@ -43,8 +46,10 @@ export function App() {
 
   const refreshAll = () => {
     paper.refresh();
+    current.refresh();
     health.refresh();
     research.refresh();
+    workspace.refresh();
     if (route.page === 'agents' && agent.phase === 'ready') {
       void agent.refresh({ silent: true });
     }
@@ -57,6 +62,7 @@ export function App() {
         <HistoryPage
           paper={paper}
           research={research}
+          workspace={workspace}
           tab={route.tab}
           onTab={(tab: HistoryTab) => navigate({ page: 'history', tab })}
           titleRef={titleRef}
@@ -64,16 +70,18 @@ export function App() {
       );
       break;
     case 'agents':
-      page = <AgentPage agent={agent} titleRef={titleRef} />;
+      page = <AgentPage agent={agent} workspace={workspace} titleRef={titleRef} />;
       break;
     case 'notifications':
-      page = <NotificationsPage health={health} titleRef={titleRef} />;
+      page = <NotificationsPage agent={agent} titleRef={titleRef} />;
       break;
     case 'settings':
       page = (
         <SettingsPage
           paper={paper}
           health={health}
+          workspace={workspace}
+          agent={agent}
           section={route.section}
           onSection={(section: SettingsSection) => navigate({ page: 'settings', section })}
           titleRef={titleRef}
@@ -82,7 +90,7 @@ export function App() {
       break;
     case 'overview':
     default:
-      page = <OverviewPage paper={paper} titleRef={titleRef} />;
+      page = <OverviewPage paper={current} titleRef={titleRef} />;
       break;
   }
 
@@ -90,10 +98,10 @@ export function App() {
     <AppShell
       route={route}
       health={health}
-      meta={paper.meta}
-      paperError={paper.error}
+      meta={route.page==='history'?paper.meta:current.meta}
+      paperError={route.page==='history'?paper.error:current.error}
       onRefresh={refreshAll}
-      refreshing={paper.refreshing || health.checking}
+      refreshing={paper.refreshing || current.refreshing || health.checking}
       mainRef={mainRef}
     >
       <div className="page-frame" key={route.page}>

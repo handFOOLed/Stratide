@@ -1,6 +1,7 @@
 pub mod budget;
 pub mod config;
 pub mod deepseek;
+pub mod desktop;
 pub mod eod_snapshot;
 pub mod fusion_researcher;
 pub mod local_fusion;

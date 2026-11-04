@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "python": "python3",
+  "workspace": "/home/OWNER/projects/Stratide",
+  "operations": [
+    {"id":"local-risk","label":"运行本地 TimesFM 冻结研究","kind":"local_timesfm","batch":"owner-frozen-risk"}
+  ],
+  "timesfm_batches": ["owner-frozen-risk"],
+  "fusion_batches": [],
+  "evaluation_dirs": [],
+  "registry_dirs": [],
+  "evidence_files": [],
+  "backup_manifest": null
+}

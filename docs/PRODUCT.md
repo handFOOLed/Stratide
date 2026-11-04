@@ -2,6 +2,8 @@
 
 Status: **agreed product principles**, not a profitability claim.
 
+**2026-11-04 Owner decision / #77:** V1 closes with the Windows local product and existing WSL2 CPU Worker integration. N100 hardware, Linux server operation and hardware-specific tuning are deferred, not V1 acceptance gates. Current Paper and historical research remain separate; only explicitly labelled EOD `EX_POST_OPEN_ASSUMPTION` fills are added. See [V1 completion](V1_COMPLETION.md).
+
 ## Current phase and responsibility
 
 **2026-11-03 Owner decision / Issue #69:** TimesFM 2.5 forecasting has a specific local CPU-only exception: an offline on-demand Python Worker, targeting an N100 Linux mini host. This is not local LLM inference. Cloud LLM research remains separately authorized; no CUDA, cloud TimesFM, desktop remote fallback, EOD scheduling or trading admission is introduced by [M2-PR18](M2_PR18.md).

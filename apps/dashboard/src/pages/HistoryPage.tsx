@@ -33,6 +33,8 @@ import type { Fill, Order, StrategyRecord } from '../lib/types';
 import type { HistoryTab } from '../lib/route';
 import type { PaperDataState } from '../state/usePaperData';
 import type { ResearchState } from '../state/useResearch';
+import { WorkspaceStudies } from '../components/domain/WorkspaceStudies';
+import type { WorkspaceState } from '../lib/workspace';
 
 const TAB_LABELS = {
   fills: '成交',
@@ -45,12 +47,13 @@ const TAB_LABELS = {
 interface HistoryProps {
   paper: PaperDataState;
   research: ResearchState;
+  workspace: WorkspaceState;
   tab: HistoryTab;
   onTab: (tab: HistoryTab) => void;
   titleRef?: Ref<HTMLHeadingElement>;
 }
 
-export function HistoryPage({ paper, research, tab, onTab, titleRef }: HistoryProps) {
+export function HistoryPage({ paper, research, workspace, tab, onTab, titleRef }: HistoryProps) {
   const bundle = paper.bundle;
   const meta = paper.meta;
   const counts = {
@@ -88,7 +91,7 @@ export function HistoryPage({ paper, research, tab, onTab, titleRef }: HistoryPr
 
   let content: ReactNode;
   if (tab === 'research') {
-    content = <ResearchTab research={research} />;
+    content = <><WorkspaceStudies workspace={workspace}/><ResearchTab research={research} /></>;
   } else if (paper.phase === 'loading') {
     content = <HistorySkeleton />;
   } else if (!bundle || !meta) {
@@ -507,9 +510,7 @@ function DailyTab({ bundle }: { bundle: NonNullable<PaperDataState['bundle']> })
                         {formatBps(row.return_bps, { signed: true })}
                       </td>
                       <td>
-                        <Badge tone={row.valuation_error ? 'warning' : 'success'}>
-                          {row.valuation_error ? '估值缺失' : '有效'}
-                        </Badge>
+                        {row.valuation_error ? <Badge tone="warning">估值缺失</Badge> : '—'}
                       </td>
                       <td className="row-action-cell" aria-hidden="true"><span className="row-chevron">›</span></td>
                     </tr>
@@ -592,7 +593,7 @@ function StrategiesTab({
                   </td>
                   <td>{record.deployment.group_id}</td>
                   <td className="cell-mono">{record.deployment.frozen_version}</td>
-                  <td><Badge tone="neutral">{record.status === 'snapshot_record_only' ? '快照记录' : record.status}</Badge></td>
+                  <td><Badge tone="neutral">{record.status === 'snapshot_record_only' ? '快照记录' : 'Paper 假设记录'}</Badge></td>
                   <td className={'num ' + signClass(record.pnl_fen)}>{formatCny(record.pnl_fen, { signed: true })}</td>
                   <td className={'num ' + ((parseInteger(record.drawdown_bps) ?? 0n) > 0n ? 'loss' : '')}>{formatBps(record.drawdown_bps)}</td>
                   <td className="cell-reason" title={record.unavailable_reason ?? ''}>{record.unavailable_reason || '—'}</td>

@@ -1,5 +1,18 @@
 # Agent V1 本机 API
 
+## Issue #77：本地审批与通知
+
+沿用本节 Owner/Origin 检查与 v1 信封。`GET inbox` 返回原 Agent DB 中的审批和已结束任务通知；`GET operations` 列本机配置的固定研究；`GET prompts` 仅返回版本化安全内置 Prompt，不含上下文/凭据。以下路径均加 `/api/agent/`：
+
+| POST 路径 | JSON | 持久语义 |
+| --- | --- | --- |
+| `approvals` | `{id,operation}` | 32 位 hex 请求 ID，同 ID 同操作幂等；记录操作 SHA，许可一小时过期 |
+| `decide` | `{id,decision}` | approve/reject/revoke/start；CAS 消费一次执行许可，拒绝重复启动 |
+| `read-notifications` | `{ids:["原task ID"]}` | 仅标明列出的已结束任务已读；最多 50 条 |
+| `stop-local` | `{}` | 原 CPU stop/disable，不撤回已发云请求 |
+
+通用 `POST tasks` 可带 `X-Stratide-Idempotency`（32 位 hex）；重复同内容返回原任务，变更内容拒绝。配置 `--desktop-config` 时附着原 Agent、不启动第二个任务循环，通用建任务/EOD 开关拒绝，改用已配置操作。重启将旧 running 审批标记结果未知，不重发；原任务/预算/云授权不重建。完整语义见 [V1_COMPLETION](V1_COMPLETION.md)。
+
 与 [原 Paper API](DASHBOARD_API.md) 共用 127.0.0.1 同源静态服务与 `{api_version,state,snapshot,data,error}` 信封。旧账户/订单路由保持 GET，写入仍为 405。业务金额/ID/用量以十进制字符串返回；预算单位是 micro_currency_1e-6，不是 Paper 的 fen。
 
 ## 权限与请求

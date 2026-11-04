@@ -203,6 +203,26 @@ impl Store {
             ensure(enabled.as_deref() == Some("true"), "OWNER_DISABLED")?;
             ensure(paused != "true", "OWNER_PAUSED")?;
         }
+        if let Some(key) = trigger.filter(|key| key.starts_with("dashboard:")) {
+            let prior: Option<(i64, String, String)> = tx
+                .query_row(
+                    "SELECT id,request,input FROM tasks WHERE trigger_key=?1",
+                    [key],
+                    |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+                )
+                .optional()?;
+            if let Some((id, old_request, old_input)) = prior {
+                ensure(
+                    old_request
+                        == serde_json::to_string(request).map_err(|_| "TASK_INPUT_INVALID")?
+                        && old_input
+                            == serde_json::to_string(input).map_err(|_| "INPUT_INVALID")?,
+                    "TASK_REQUEST_KEY_CONFLICT",
+                )?;
+                tx.commit()?;
+                return Ok(id);
+            }
+        }
         crate::multimodal::require_enabled(&tx, trigger)?;
         let count: i64 = tx.query_row("SELECT COUNT(*) FROM tasks", [], |r| r.get(0))?;
         ensure(count < settings.max_tasks as i64, "TASK_STORAGE_LIMIT")?;
@@ -265,7 +285,7 @@ impl Store {
     pub fn cancel(&self, id: i64, now: DateTime<Utc>) -> Result<()> {
         let changed=self.connect()?.execute("UPDATE tasks SET status=CASE WHEN status='queued' THEN 'cancelled' ELSE 'cancel_requested' END,
             cancel_requested_at=?1,finished_at=CASE WHEN status='queued' THEN ?1 ELSE finished_at END,reason='OWNER_CANCEL_REQUESTED'
-            WHERE id=?2 AND status IN ('queued','running')",params![now.to_rfc3339(),id])?;
+            WHERE id=?2 AND status IN ('queued','running','local_running')",params![now.to_rfc3339(),id])?;
         ensure(changed == 1, "TASK_NOT_CANCELLABLE")
     }
     pub fn retry(&self, id: i64) -> Result<()> {
@@ -273,7 +293,7 @@ impl Store {
         let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
         let changed = tx.execute(
             "UPDATE tasks SET status='queued',reason='OWNER_SAFE_RETRY',finished_at=NULL
-            WHERE id=?1 AND status='failed' AND (SELECT COUNT(*) FROM calls WHERE task_id=?1)<2
+            WHERE id=?1 AND status='failed' AND provider_id!='local-timesfm-2.5-cpu' AND (SELECT COUNT(*) FROM calls WHERE task_id=?1)<2
             AND NOT EXISTS(SELECT 1 FROM calls WHERE task_id=?1 AND state!='no_charge')",
             [id],
         )?;
@@ -309,6 +329,7 @@ impl Store {
             "price_version":r.get::<_,String>(7)?,"reason":r.get::<_,Option<String>>(8)?,"day":r.get::<_,String>(9)?,"month":r.get::<_,String>(10)?})))?
             .collect::<std::result::Result<Vec<_>,_>>()?;
         let retryable = value["status"] == "failed"
+            && value["provider_id"] != "local-timesfm-2.5-cpu"
             && calls.len() < 2
             && calls.iter().all(|c| c["state"] == "no_charge");
         value["calls"] = json!(calls);

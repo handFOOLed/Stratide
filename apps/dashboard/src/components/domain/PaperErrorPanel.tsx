@@ -2,9 +2,12 @@ import type { ApiError } from '../../lib/api';
 import { Button } from '../ui/Button';
 import { EmptyState } from '../ui/EmptyState';
 import { Card } from '../ui/Card';
+import { TechnicalDetails } from './WorkspaceStudies';
 
 function describe(error: Pick<ApiError, 'code' | 'message'>): { title: string; detail: string; hint?: string } {
   switch (error.code) {
+    case 'CURRENT_PAPER_ACCOUNT_UNCONFIGURED':
+      return {title:'当前 Paper 账户尚未配置',detail:'在本机启动配置中选择原 Paper 账本。历史报告继续在历史页显示，不作为当前账户资金。'};
     case 'NO_SNAPSHOT':
       return {
         title: '尚未选择 Paper 报告',
@@ -56,13 +59,13 @@ export function PaperErrorPanel({
         icon="alert-triangle"
         title={info.title}
         description={info.detail}
-        code={error.code + (error.status ? ' · HTTP ' + String(error.status) : '')}
         actions={
           <Button variant="secondary" icon="refresh" onClick={onRetry}>
             重新读取
           </Button>
         }
       />
+      <TechnicalDetails value={error}/>
       {info.hint ? (
         <div className="command-hint">
           <span className="command-hint__label">启动示例</span>

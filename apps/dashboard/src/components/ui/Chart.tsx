@@ -1,4 +1,4 @@
-import { useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { PointerEvent, RefObject } from 'react';
 import { buildChartModel, chartDayLabel, chartMetricValue } from '../../lib/chart';
 import type { ChartMetric } from '../../lib/chart';
@@ -36,23 +36,24 @@ export function EquityChart({
   label,
   heightClass,
   navTopFen = null,
+  baselineFen = null,
 }: {
   rows: EquityRow[];
   metric: ChartMetric;
   label: string;
   heightClass?: string;
   navTopFen?: bigint | null;
+  baselineFen?: bigint | null;
 }) {
   const frameRef = useRef<HTMLDivElement>(null);
   const measured = useElementSize(frameRef);
   const width = measured.width > 16 ? measured.width : 760;
   const height = measured.height > 16 ? measured.height : 260;
   const model = useMemo(
-    () => buildChartModel(rows, metric, width, height, { navTopFen }),
-    [height, metric, navTopFen, rows, width],
+    () => buildChartModel(rows, metric, width, height, { navTopFen, baselineFen }),
+    [height, metric, navTopFen, baselineFen, rows, width],
   );
   const [hover, setHover] = useState<number | null>(null);
-  const gradientId = 'chart-area-' + useId().replace(/[^a-zA-Z0-9_-]/g, '');
 
   const points = useMemo(
     () => model?.points.filter((point): point is NonNullable<typeof point> => point !== null) ?? [],
@@ -148,12 +149,6 @@ export function EquityChart({
           }
         }}
       >
-        <defs>
-          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" className="chart-stop-top" />
-            <stop offset="100%" className="chart-stop-bottom" />
-          </linearGradient>
-        </defs>
 
         {/* Five equal steps: a faint dashed gridline every 20% of the axis. */}
         {model.ticks.map((tick) => (
@@ -181,14 +176,8 @@ export function EquityChart({
           />
         ) : null}
 
-        {model.areas.map((area, index) => (
-          <path
-            key={'area-' + String(index)}
-            className="chart-area"
-            d={area}
-            style={{ fill: 'url(#' + gradientId + ')' }}
-          />
-        ))}
+        {model.baselineY !== null ? <g><line className="chart-zero" x1={model.plot.left} x2={model.plot.right} y1={model.baselineY} y2={model.baselineY}/><text className="chart-axis-text" x={model.plot.right} y={model.baselineY-5} textAnchor="end">本金</text></g> : null}
+        {points.length <= 7 ? points.map(p=><circle className="chart-dot" key={p.day} cx={p.x} cy={p.y} r={3}/>) : null}
         {model.segments.map((segment, index) => (
           <path key={'line-' + String(index)} className="chart-line" d={segment} />
         ))}

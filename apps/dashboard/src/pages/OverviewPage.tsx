@@ -29,6 +29,7 @@ import type { RangeValue } from '../lib/storage';
 import { rangeRows } from '../lib/format';
 import type { Fill, Position } from '../lib/types';
 import type { PaperDataState } from '../state/usePaperData';
+import { navigate } from '../lib/route';
 
 const PAGE_SIZE = 5;
 
@@ -78,6 +79,7 @@ function OverviewSkeleton() {
 export function OverviewPage({ paper, titleRef }: { paper: PaperDataState; titleRef?: Ref<HTMLHeadingElement> }) {
   const [range, setRange] = useState<RangeValue>(() => readPreference('range', '30D', RANGE_VALUES));
   const [page, setPage] = useState(0);
+  const [fillPage, setFillPage] = useState(0);
   const positions = useSelection<Position>();
   const fills = useSelection<Fill>();
 
@@ -89,8 +91,8 @@ export function OverviewPage({ paper, titleRef }: { paper: PaperDataState; title
     [bundle, range],
   );
   const recentFills = useMemo(
-    () => (bundle ? [...bundle.fills].reverse().slice(0, 5) : []),
-    [bundle],
+    () => (bundle ? [...bundle.fills].reverse().slice(fillPage * PAGE_SIZE, (fillPage + 1) * PAGE_SIZE) : []),
+    [bundle, fillPage],
   );
   const sortedPositions = useMemo(
     () => (bundle ? [...bundle.positions].sort((a, b) => a.instrument.code.localeCompare(b.instrument.code)) : []),
@@ -124,7 +126,7 @@ export function OverviewPage({ paper, titleRef }: { paper: PaperDataState; title
     <header className="page-header page-header--compact">
       <div className="page-header__main">
         <h1 className="page-title" ref={titleRef} tabIndex={-1}>
-          账户
+          总览
         </h1>
       </div>
       <div className="page-header__side">
@@ -162,6 +164,9 @@ export function OverviewPage({ paper, titleRef }: { paper: PaperDataState; title
   }
 
   if (!bundle || !meta) return null;
+  if (meta.mode === 'historical_replay') {
+    return <div className="overview-page">{header}<Card><CardBody><h2 className="card__title">当前 Paper 账户尚未配置</h2><p>已选择的是事后历史报告。报告的净值、持仓与交易保留在历史页，不作为当前 Paper 账户。</p><Button variant="secondary" onClick={() => navigate({page:'history',tab:'daily'})}>查看历史报告</Button></CardBody></Card></div>;
+  }
 
   const account = bundle.account;
   const risk = account.risk;
@@ -171,7 +176,7 @@ export function OverviewPage({ paper, titleRef }: { paper: PaperDataState; title
   const missingValuations = chartRows.filter((row) => parseInteger(row.nav_fen) === null).length;
   const hasValuationError = Boolean(account.valuation_error);
   const pnlClass = signClass(account.session_pnl_fen);
-  const drawdownClass = (parseInteger(account.max_daily_observation_drawdown_bps) ?? 0n) > 0n ? 'loss' : '';
+  const drawdownClass = '';
   const firstVisible = sortedPositions.length === 0 ? 0 : currentPage * PAGE_SIZE + 1;
   const lastVisible = currentPage * PAGE_SIZE + visiblePositions.length;
 
@@ -298,7 +303,9 @@ export function OverviewPage({ paper, titleRef }: { paper: PaperDataState; title
                 metric="nav"
                 label="当前 Paper 账户资产曲线"
                 navTopFen={navTopFen}
+                baselineFen={parseInteger(account.initial_nav_fen)}
               />
+              <p className="chart-axis-note">纵轴自适应 · 每格为显示范围的 20%</p>
             </div>
           </Card>
         </div>
@@ -367,7 +374,7 @@ export function OverviewPage({ paper, titleRef }: { paper: PaperDataState; title
             <div className="card__head card__head--compact">
               <div className="card__heading">
                 <h2 className="card__title">最近成交</h2>
-                <p className="card__subtitle">最近 5 笔</p>
+                <p className="card__subtitle">已确认模拟成交 · 每页 5 笔</p>
               </div>
             </div>
             {recentFills.length === 0 ? (
@@ -413,7 +420,8 @@ export function OverviewPage({ paper, titleRef }: { paper: PaperDataState; title
               </Table>
             )}
             <div className="card__foot card__foot--end">
-              <span className="pager__count">点击查看详情</span>
+              <span className="pager__count">共 {bundle.fills.length} 笔</span>
+              <Pager page={fillPage + 1} pageCount={Math.max(1, Math.ceil(bundle.fills.length / PAGE_SIZE))} onPage={next=>setFillPage(next-1)} label="成交分页"/>
             </div>
           </Card>
         </div>

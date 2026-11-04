@@ -1,5 +1,11 @@
 # Dashboard V1 只读 API
 
+## Issue #77：当前账户与研究扩展
+
+`GET /api/v1/{account,equity,positions,strategies,fills,orders}` 读取显式 `--paper-ledger` 的当前 Paper 账本。未配置时返回 409 `CURRENT_PAPER_ACCOUNT_UNCONFIGURED`；所选历史报告不会替代当前 NAV。原 `GET /api/{account,...}` 保持所选报告语义；同时配置时历史页仍读原报告。显式 synthetic 演示始终保留合成标记。账本写入者保持原 SQLite EXCLUSIVE 生命周期；写入尚未退出时读取可失败，不能用旧报告冒充新数据。
+
+`GET /api/v1/workspace` 返回 `schema_version=1` 的原 CPU/Fusion/OOS/Registry、证据和备份状态，`paper_allowed/live_allowed=false`；读取不会推理、创建任务或调用 Provider。研究数值保持原报告的比值/计数单位；Paper 金额/股数仍按下节十进制字符串。操作、配置和恢复见 [V1_COMPLETION](V1_COMPLETION.md)。
+
 仅用于 127.0.0.1 本地 paper-only Dashboard，默认端口 8710。Owner 启动时选定一个已发布六报告目录。没有 HTTP 文件路径参数、账户切换或财务写入路由。M2-PR02 的研究任务写操作单独限定在经过 Owner 认证的 `/api/agent/…`，见 [Agent API](AGENT_API.md)；下文 Paper 账户路由仍只读。
 
 ## 响应与数字

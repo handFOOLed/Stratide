@@ -1,5 +1,7 @@
 # Local development helpers
 
+**V1 Windows 本地收尾 / #77：** `local-windows.ps1 start/status/stop` 管理单次本机 Dashboard；`dashboard-workspace.py` 为已配置原研究提供只读投影与固定审批操作；`local-backup.py create/verify/restore` 提供 manifest、SQLite integrity 和默认 dry-run 的全新目录恢复。配置样例在 `config/`，完整步骤、WSL 原 Worker 接线与恢复限制见 [V1_COMPLETION](../docs/V1_COMPLETION.md)。
+
 ## Time-Series + Fusion 本机研究
 
 `python -B scripts/multimodal-research.py --name <名称> init --snapshot-store <已有store>` 默认 OFF，`enable/disable/once/status/history/verify/report` 提供完整离线核心链路。`experiment --label <版本> --time-series-model local-test-momentum` 显式新建模型实验，`--without-fusion` 提供数值对照；复用原 Rust Agent、Budget 与 Registry/Inbox，不外发原始数据、不执行代码或模板。`python -B scripts/test-multimodal-research.py --evidence docs/evidence/m2-pr10` 运行双 25 日 synthetic 生产 CLI 与反证；生产 CLI 使用当天真实盘后时钟。见 [M2-PR10](../docs/M2_PR10.md)。
