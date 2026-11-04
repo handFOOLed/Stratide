@@ -4,7 +4,7 @@
 
 **放宽**
 
-- EOD 决策（收盘后）可用**下一交易日** Tushare `daily.open` 作为默认 Paper 成交价假设。`stk_auction` 与盘中开盘窗口实收是可选增强，不再挡住 EOD Paper 工程推进。见 [开盘证据](M1_PR04B_OPENING_EVIDENCE.md)。
+- **T 日盘后研究 / T+1 Paper：** T 日盘后取得并校验的 T 日 `daily.open` 可作为 T 日已知历史输入，供 T 日盘后研究并冻结 T+1 意图；T 日 open **不是** T+1 成交价。若采用 T+1 `daily.open` 作为 Paper 成交价假设，须 T+1 盘后取得该字段，按 T 日已冻结的意图、数量和撮合规则事后确认，标记 `EX_POST_OPEN_ASSUMPTION`，不得看过 T+1 数据后选择性下单、撤单或改价，也不能冒充开盘实收。现金、费用、停牌及唯一 Risk→Execution→Ledger 逐笔校验保持。 `stk_auction` 是可选增强，不挡工程实现。
 - [#10](https://github.com/handFOOLed/Stratide/issues/10) 与 [#17](https://github.com/handFOOLed/Stratide/issues/17) 继续如实保留 `BLOCKED` / `NOT_VERIFIED` 和缺口，但**不再挡住工程合并、V1 收尾 PR 或 Dashboard 集成**。它们只挡住「宣称已验证可交易 / PIT 已过 / 开盘流已实收」。
 - 个人模式下，大包脱敏证据、先红后绿全套、强制固定 HEAD 外部审查改为**可选**。日常合入以 Owner 本地相关绿测加简短说明为准。预算、外发、账本安全改动仍建议保留针对性反证。
 
@@ -65,9 +65,9 @@ M2-PR20 / #74 已由 PR #75 并入 `main d557aa1`。下方 R1/R2 段落保留合
 
 ## 当前执行顺序
 
-1. **EOD Paper 工程：** 收盘后决策按次日 `daily.open` 默认成交假设推进可运行闭环。缺 `stk_auction` 权限或 #10 的 `OPENING_SOURCE=BLOCKED` 不暂停实现、合并或 Dashboard 集成。成交记录须标明这是日线开盘价假设，不是开盘流实收。
-2. **V1 收尾与 Dashboard：** #10 / #17 的缺口标签不阻挡集成。宣称 PIT 已过、开盘流已实收或已验证可交易时，标签保持 `BLOCKED` / `NOT_VERIFIED`。
-3. **个人模式合入：** Owner 本地相关绿测加简短说明。固定 HEAD 外部审查、大包证据和先红后绿全套为可选。预算、外发、账本改动仍建议针对性反证。Sol/DeepSeek 不自行合并。
-4. **仍由 Owner 另定范围：** 样本外协议、N100 真机验收、开盘窗口实收增强。视觉基准仍是已合并 PR #28；是否立刻做整站 UI 由 Owner 定范围，不再被 #10/#17 的 `BLOCKED` 挡住。
+1. **Paper 时点：** T 日盘后取得并校验的 T 日 `daily.open` 可作为 T 日已知历史输入，供 T 日盘后研究并冻结 T+1 意图；T 日 open **不是** T+1 成交价。若采用 T+1 `daily.open` 作为 Paper 成交价假设，须 T+1 盘后取得该字段，按 T 日已冻结的意图、数量和撮合规则事后确认，标记 `EX_POST_OPEN_ASSUMPTION`，不得看过 T+1 数据后选择性下单、撤单或改价，也不能冒充开盘实收。现金、费用、停牌及唯一 Risk→Execution→Ledger 逐笔校验保持。
+2. **最新开发顺序：** [#76](https://github.com/handFOOLed/Stratide/issues/76) 研究评价/Prompt（[PR #78](https://github.com/handFOOLed/Stratide/pull/78) 审查中）→ 合并后 [#77](https://github.com/handFOOLed/Stratide/issues/77) Dashboard/Agent/审批通知/N100 部署。#10/#17 的缺口保持，但不阻塞工程合入。
+3. **个人模式合入：** Owner 本地相关绿测＋简短说明；固定 HEAD 外部审查、大包脱敏证据和先红后绿全套可选。预算、外发、凭据与 Risk/Ledger 安全变更仍建议针对性反证，实现者不得自行合并。
+4. **仍待真实验证：** PIT、开盘实收、已验证可交易性及 N100 真机保持 `NOT_VERIFIED`；PR #28 是视觉参考，不指定 UI/UX 负责人。
 
 所有任务由 Owner 定范围。不得把开发者自测写成独立验收。`REAL_MARKET_DATA_EGRESS_DENIED`、CNY ¥5/日、¥100/月与 Paper-only 保持有效。流程见 [AGENTS.md](../AGENTS.md)。[ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md) 保留历史决策，本页不静默改写该 ADR。
