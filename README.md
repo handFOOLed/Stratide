@@ -28,8 +28,8 @@ Owner 首次使用：在既有真实 CNY Agent 的 `settings.json` 手动填日/
 - **公司行为证据已合并（PR #38）：** [证据包 V1](docs/M1_PR07B.md) 保留真实公告的 `FACTS_PARTIAL / historical_pit=NOT_VERIFIED`，没有真实历史准入。
 - **现金分红模型已合并（PR #40）：** [CASH_DIVIDEND_V1](docs/M1_PR08.md) 完成隔离现金分红的登记→应收/税负→到账、统一 NAV/Risk、七报告和独立算法复算；旧 synthetic CLI、v3/68 日保持兼容。
 - **历史分红桥接已合并（PR #42）：** [历史分红桥接 V1](docs/M1_PR09.md) 将原冻结行情、PR38 证据和显式模型假设接入 v4、原 SMA5/20、七报告及独立算法/双基准；实际运行 77 会话 **EXPLORATORY_EX_POST**，真实 PIT 新增 **0 天**，真实准入继续拒绝。
-- **仍受阻：** 仅 68 个历史交易日、3 笔模拟成交，长窗口公司行为/费用证据 `DATA_BLOCKED`；真实 EOD 两日 `EOD_CONTINUITY_VERIFIED`，开盘源仍 BLOCKED，**尚无真正前向模拟成交或 NAV**。
-- **当前顺序：** #74 交付真实历史 → 本地 TimesFM 核心闭环，单个 Draft 等待固定 HEAD 审查。后续预冻结样本外协议、积累前向 EOD；UI 在核心之后。见[当前状态](docs/STATUS.md)。
+- **证据缺口（不挡工程合并）：** 长窗口公司行为/费用仍 `DATA_BLOCKED`（[#17](https://github.com/handFOOLed/Stratide/issues/17#issuecomment-6623137271)）；真实 EOD 两日 `EOD_CONTINUITY_VERIFIED`，开盘流 `OPENING_SOURCE=BLOCKED / NOT_VERIFIED`（[#10](https://github.com/handFOOLed/Stratide/issues/10#issuecomment-6623136884)）。尚无连续前向 Paper 成交或 NAV。自 2026-11-04 起，这些标签不阻止 EOD Paper、V1 收尾或 Dashboard 工程合并；收盘后的 EOD 决策可用次日 `daily.open` 作为默认 Paper 成交假设。它们只阻止宣称 PIT 已过、开盘流已实收或已验证可交易。见 [当前状态](docs/STATUS.md)。
+- **当前顺序：** #74 / PR #75 已并入 main。后续 EOD Paper 按次日 `daily.open` 假设推进；个人模式日常合入为 Owner 本地相关绿测加简短说明，固定 HEAD 外部审查可选。见 [Issue #19 决策](https://github.com/handFOOLed/Stratide/issues/19#issuecomment-6623136559) 与 [当前状态](docs/STATUS.md)。
 - **PR #56 审查修复：** 新链路须显式绑定已有 Owner AgentDir/配置，与旧 Agent 共用同一费用库，不再初始化第二个预算。预算修复已获源码复审确认；原 PR52/54 三套盘后完整回归 **10+4+13 项均 exit 0**，PR #56 后续已合并，原开发证据保留；见 [R1 证据](docs/evidence/m2-pr11/r1/README.md)。
 
 ## Windows 本地体验
@@ -47,7 +47,7 @@ pwsh -NoProfile -File scripts/start-dashboard.ps1 -ReportDir 'docs/evidence/m0-p
 
 ## 团队与文档
 
-- **Owner：** 范围与合并决定；**Sol：** 后端、Agent、接口和关键测试；**DeepSeek：** 信息架构、字体/组件、布局与平滑动效；**ChatGPT：** 固定 HEAD 审查、获授权后合并。
+- **Owner：** 范围与合并决定；**Sol：** 后端、Agent、接口和关键测试；**DeepSeek：** 信息架构、字体/组件、布局与平滑动效；**ChatGPT：** 审查可选。个人模式日常合入以 Owner 本地相关绿测和简短说明为准；预算、外发、账本改动仍建议针对性反证。
 - [DeepSeek UI 交接规范](docs/UI_HANDOFF_DEEPSEEK.md) · [编码规则](AGENTS.md) · [产品原则](docs/PRODUCT.md) · [风险规范](docs/RISK_POLICY.md) · [历史 ADR](docs/adr/)。
 
 **所有历史回放均不等于实时前向验证；不接入实盘券商。**

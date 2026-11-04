@@ -1,10 +1,12 @@
 # Stratide Paper 阶段路线图（当前执行版）
 
-**PR #75 R1 / 2026-11-04：** 模型身份、UNKNOWN opportunity 集合和多证券来源绑定修复已完成开发验证，见 [R1 反证与真实复核](evidence/m2-pr20/r1/README.md)；保持同一 Draft，等待固定 HEAD 复审。历史 PIT、Paper/Live 与 N100 状态不升级。
+**2026-11-04 / [#19](https://github.com/handFOOLed/Stratide/issues/19#issuecomment-6623136559)：** 个人自用门限放宽，执行口径以 [STATUS](STATUS.md) 为准。EOD 收盘后决策可用次日 `daily.open`；[#10](https://github.com/handFOOLed/Stratide/issues/10#issuecomment-6623136884) / [#17](https://github.com/handFOOLed/Stratide/issues/17#issuecomment-6623137271) 的 `BLOCKED` / `NOT_VERIFIED` 不挡工程合并、V1 收尾或 Dashboard 集成，只挡已验证可交易、PIT 已过、开盘流已实收的宣称。个人模式的固定 HEAD 外部审查、大包证据和先红后绿全套为可选。不放宽 `REAL_MARKET_DATA_EGRESS_DENIED`、CNY ¥5/日 ¥100/月、Paper-only。
 
-**当前 #74 / M2-PR20（本分支 Draft）：** [真实历史 → 本地 TimesFM](M2_PR20.md) 已完成实际三证券 CPU 推理、原任务/Registry 和 report/verify；[开发证据](evidence/m2-pr20/README.md)。真实数据外发拒绝，新云调用/计费/行情请求为 0。ENGINEERING_PASS 不提升 PIT、样本外优势、Paper/Live 或 N100 资格。PR #70/#72 已在当前 main；下方旧阶段记录保留原发生时状态。
+**PR #75 R1 / 2026-11-04：** 模型身份、UNKNOWN opportunity 集合和多证券来源绑定修复已完成开发验证，见 [R1 反证与真实复核](evidence/m2-pr20/r1/README.md)。PR #75 已并入 main；本段保留当时 Draft 记录。历史 PIT、开盘流实收与 N100 状态不因该合并升级为已验证可交易。
 
-> 2026-11-03；最新实现与数据边界见 [STATUS](STATUS.md)。Owner 已决定 **Core-first、UI-later**：后续核心功能不要求同期 Dashboard/UI，最终按已合并 PR #28 的视觉基准统一集成。旧各 PR 实施/验收细节仍保存在 `docs/M0_*.md`、`docs/M1_*.md`、`docs/M2_PR01.md` 与 `docs/evidence/`。
+**M2-PR20 / #74（PR #75 已合并）：** [真实历史 → 本地 TimesFM](M2_PR20.md) 已完成实际三证券 CPU 推理、原任务/Registry 和 report/verify；[开发证据](evidence/m2-pr20/README.md)。真实数据外发拒绝，新云调用/计费/行情请求为 0。ENGINEERING_PASS 不提升 PIT、样本外优势、开盘流实收、Paper/Live 或 N100 资格。下方旧阶段记录保留原发生时状态。
+
+> 2026-11-03；最新实现与数据边界见 [STATUS](STATUS.md)。当时的 **Core-first、UI-later** 指核心功能不强制同期整站视觉重构，视觉基准仍是已合并 PR #28。2026-11-04 起，#10/#17 的 `BLOCKED` 不再挡住 Dashboard 集成。旧各 PR 实施/验收细节仍保存在 `docs/M0_*.md`、`docs/M1_*.md`、`docs/M2_PR01.md` 与 `docs/evidence/`。
 
 ## 已完成（已并入 main）
 
@@ -12,7 +14,7 @@
 2. **M1 已实现部分**：[PR #8](https://github.com/handFOOLed/Stratide/pull/8)、[#9](https://github.com/handFOOLed/Stratide/pull/9)、[#12](https://github.com/handFOOLed/Stratide/pull/12)、[#14](https://github.com/handFOOLed/Stratide/pull/14)、[#18](https://github.com/handFOOLed/Stratide/pull/18)：真实 EOD **observe-only**、68 日历史探索性回测、独立研究评价和长窗口 DATA_BLOCKED 调查。**M1 前向 Paper 成交仍未完成**。
 3. **M2 Web V1**：[PR #21](https://github.com/handFOOLed/Stratide/pull/21)：localhost 同源只读 API 与可启动 Dashboard，Owner 指定一个已发布的报告快照；历史回放不进入前向账户 NAV。
 4. **Agent V1 与视觉基准**：#22 核心及 PR #27 状态修复已在 main；[PR #28](https://github.com/handFOOLed/Stratide/pull/28) 确立视觉基准，不代表功能全部完成。真实 Provider 未验证。
-5. **M2-PR04 候选链路**：[PR #30](https://github.com/handFOOLed/Stratide/pull/30) 已合并于 `05ab0b9`；[#31](https://github.com/handFOOLed/Stratide/issues/31#issuecomment-6512910618) A/B 双线独立 PASS。真实两日 `EOD_CONTINUITY_VERIFIED`；`OPENING_SOURCE` 仍 BLOCKED，研究仍不足，不产生前向成交权限。
+5. **M2-PR04 候选链路**：[PR #30](https://github.com/handFOOLed/Stratide/pull/30) 已合并于 `05ab0b9`；[#31](https://github.com/handFOOLed/Stratide/issues/31#issuecomment-6512910618) A/B 双线独立 PASS。真实两日 `EOD_CONTINUITY_VERIFIED`；`OPENING_SOURCE` 标签仍为 BLOCKED（开盘流实收未验证），研究仍不足。该合并本身没有授予已验证可交易资格。2026-11-04 起，此标签不阻止以次日 `daily.open` 推进 EOD Paper 工程。
 6. **M2-PR05 研究快照**：[PR #33](https://github.com/handFOOLed/Stratide/pull/33) 已合并于 `2fdd05d`，#32 完成；既有 EOD 离线只读核验、持久快照、状态和消费，见 [契约](M2_PR05.md)。
 7. **M2-PR06 显式 Fake Agent 闭环**：[PR #35](https://github.com/handFOOLed/Stratide/pull/35) 已合并于 `a522c29`，#34 完成；显式 EOD 快照 → 本地 fake 持久任务 → 候选研究来源。保留独立 scope、禁止云外发/自动 EOD 和资格拒绝，见 [契约](M2_PR06.md)。
 
@@ -50,15 +52,15 @@ PR #42 的[历史公司行为桥接 V1](M1_PR09.md)、PR #44 的[EOD 自动研�
 
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |
-| **当前 #74** | **Sol** | M2-PR20 真实历史/质量 → 本地 TimesFM → 原任务/Registry；单个 Draft，固定 HEAD 审查及 Owner 明确批准后才可合并，真实数据不外发。 |
-| **后续核心** | Owner 再定范围 | #10 真实开盘、PIT、账户税/到账仍受阻；#36 完整多模态消融及真实供应商未验证。 |
-| **核心全部完成后** | **Sol** | 按 PR #28 的设计体系统一集成 UI；本期不改 UI。 |
+| **已合并 #74** | **Sol** | M2-PR20 真实历史/质量 → 本地 TimesFM → 原任务/Registry 已由 PR #75 并入 main。真实数据仍然不外发。 |
+| **EOD Paper / V1** | Owner 定范围，Sol 实现 | 收盘后决策按次日 `daily.open` 推进。#10 开盘流实收、#17 公司行为/历史 PIT、账户税/到账保持 `NOT_VERIFIED`，不挡工程合并与 V1 收尾，只挡「已验证可交易」宣称。#36 完整多模态消融及真实供应商仍未验证。 |
+| **Dashboard** | Owner 定范围 | #10/#17 的 `BLOCKED` 不再挡住集成。视觉基准仍是 PR #28。 |
 
 ## 一直有效的边界
 
-- **数据语义分离**：`synthetic_test` 是测试、`historical_replay` 是事后历史模拟、`forward_paper` 必须是实际时间推进的模拟成交。当前 forward 仅 observe-only，不能制造交易/净值。
+- **数据语义分离**：`synthetic_test` 是测试、`historical_replay` 是事后历史模拟、`forward_paper` 必须是实际时间推进的模拟成交。已经落地的 forward 记录仍是 observe-only，不能把它们改写成已有成交或 NAV。后续 EOD Paper 可以用次日 `daily.open` 做标明来源的成交假设；这仍然是 Paper，不是 Live，也不是开盘流已实收。
 - **研究与交易分权**：Agent 只有研究提案权，没有实盘/模拟账户写入权、风险设置权或独立准入权。平台不可因 UI 或模型故障放松金融安全。
-- **版本与验收**：交可运行的 Draft PR，开发者附真实自测，ChatGPT 固定 HEAD 审查；预算/凭据/账本等高风险点做针对性独立反证，Owner 明确授权后才合并。当前补充见 [AGENTS](../AGENTS.md)，历史 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md) 尚待显式修订。
+- **版本与验收**：交可运行的变更和简短说明。个人模式日常合入为 Owner 本地相关绿测；大包证据、先红后绿全套和固定 HEAD 外部审查可选。预算、外发、账本安全改动仍建议针对性反证。Sol/DeepSeek 不自合并。当前补充见 [AGENTS](../AGENTS.md)。历史 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md) 保留原文，本路线图不静默改写它。
 - **无真钱交易**：禁止券商委托、实盘、公开远程服务以及冒充真实交易资格。真实历史样本中的 68 日/3 笔成交不能证明收益优势。
 
 **目标：一次交付完整的可使用功能，证据不够时敢于报告 BLOCKED。**
