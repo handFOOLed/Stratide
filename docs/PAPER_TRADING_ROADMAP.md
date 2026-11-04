@@ -1,6 +1,6 @@
 # Stratide Paper 阶段路线图（当前执行版）
 
-**2026-11-04 / [#19](https://github.com/handFOOLed/Stratide/issues/19#issuecomment-6623136559)：** 个人自用门限放宽，执行口径以 [STATUS](STATUS.md) 为准。EOD 收盘后决策可用次日 `daily.open`；[#10](https://github.com/handFOOLed/Stratide/issues/10#issuecomment-6623136884) / [#17](https://github.com/handFOOLed/Stratide/issues/17#issuecomment-6623137271) 的 `BLOCKED` / `NOT_VERIFIED` 不挡工程合并、V1 收尾或 Dashboard 集成，只挡已验证可交易、PIT 已过、开盘流已实收的宣称。个人模式的固定 HEAD 外部审查、大包证据和先红后绿全套为可选。不放宽 `REAL_MARKET_DATA_EGRESS_DENIED`、CNY ¥5/日 ¥100/月、Paper-only。
+**2026-11-04 / [#19](https://github.com/handFOOLed/Stratide/issues/19#issuecomment-6623136559)：** 个人自用门限放宽：#10/#17 证据缺口不挡工程合并；固定 HEAD 外部审查可选，预算/外发/Risk/Ledger 安全约束不变。T 日盘后取得并校验的 T 日 `daily.open` 可作为 T 日已知历史输入，供 T 日盘后研究并冻结 T+1 意图；T 日 open **不是** T+1 成交价。若采用 T+1 `daily.open` 作为 Paper 成交价假设，须 T+1 盘后取得该字段，按 T 日已冻结的意图、数量和撮合规则事后确认，标记 `EX_POST_OPEN_ASSUMPTION`，不得看过 T+1 数据后选择性下单、撤单或改价，也不能冒充开盘实收。现金、费用、停牌及唯一 Risk→Execution→Ledger 逐笔校验保持。
 
 **PR #75 R1 / 2026-11-04：** 模型身份、UNKNOWN opportunity 集合和多证券来源绑定修复已完成开发验证，见 [R1 反证与真实复核](evidence/m2-pr20/r1/README.md)。PR #75 已并入 main；本段保留当时 Draft 记录。历史 PIT、开盘流实收与 N100 状态不因该合并升级为已验证可交易。
 
@@ -53,14 +53,14 @@ PR #42 的[历史公司行为桥接 V1](M1_PR09.md)、PR #44 的[EOD 自动研�
 | 顺序 | Owner/执行责任 | 任务 / DoD |
 | --- | --- | --- |
 | **已合并 #74** | **Sol** | M2-PR20 真实历史/质量 → 本地 TimesFM → 原任务/Registry 已由 PR #75 并入 main。真实数据仍然不外发。 |
-| **EOD Paper / V1** | Owner 定范围，Sol 实现 | 收盘后决策按次日 `daily.open` 推进。#10 开盘流实收、#17 公司行为/历史 PIT、账户税/到账保持 `NOT_VERIFIED`，不挡工程合并与 V1 收尾，只挡「已验证可交易」宣称。#36 完整多模态消融及真实供应商仍未验证。 |
-| **Dashboard** | Owner 定范围 | #10/#17 的 `BLOCKED` 不再挡住集成。视觉基准仍是 PR #28。 |
+| **EOD Paper / V1** | 按当前任务实施 | T 日盘后取得并校验的 T 日 `daily.open` 可作为 T 日已知历史输入，供 T 日盘后研究并冻结 T+1 意图；T 日 open **不是** T+1 成交价。若采用 T+1 `daily.open` 作为 Paper 成交价假设，须 T+1 盘后取得该字段，按 T 日已冻结的意图、数量和撮合规则事后确认，标记 `EX_POST_OPEN_ASSUMPTION`，不得看过 T+1 数据后选择性下单、撤单或改价，也不能冒充开盘实收。现金、费用、停牌及唯一 Risk→Execution→Ledger 逐笔校验保持。 #10/#17 仍标 `BLOCKED/NOT_VERIFIED`，不挡工程合并。 |
+| **#76 → #77** | 按当前任务实施 | [#76](https://github.com/handFOOLed/Stratide/issues/76) 研究评价/Prompt（[PR #78](https://github.com/handFOOLed/Stratide/pull/78) 审查中）→ [#77](https://github.com/handFOOLed/Stratide/issues/77) Dashboard/Agent/审批通知/部署。PR #28 只是视觉参考，不指定 UI/UX 负责人。 |
 
 ## 一直有效的边界
 
 - **数据语义分离**：`synthetic_test` 是测试、`historical_replay` 是事后历史模拟、`forward_paper` 必须是实际时间推进的模拟成交。已经落地的 forward 记录仍是 observe-only，不能把它们改写成已有成交或 NAV。后续 EOD Paper 可以用次日 `daily.open` 做标明来源的成交假设；这仍然是 Paper，不是 Live，也不是开盘流已实收。
 - **研究与交易分权**：Agent 只有研究提案权，没有实盘/模拟账户写入权、风险设置权或独立准入权。平台不可因 UI 或模型故障放松金融安全。
-- **版本与验收**：交可运行的变更和简短说明。个人模式日常合入为 Owner 本地相关绿测；大包证据、先红后绿全套和固定 HEAD 外部审查可选。预算、外发、账本安全改动仍建议针对性反证。Sol/DeepSeek 不自合并。当前补充见 [AGENTS](../AGENTS.md)。历史 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md) 保留原文，本路线图不静默改写它。
+- **版本与验收**：交可运行的变更和简短说明。个人模式日常合入为 Owner 本地相关绿测；大包证据、先红后绿全套和固定 HEAD 外部审查可选。预算、外发、账本安全改动仍建议针对性反证。实现者不得自行合并。当前补充见 [AGENTS](../AGENTS.md)。历史 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md) 保留原文，本路线图不静默改写它。
 - **无真钱交易**：禁止券商委托、实盘、公开远程服务以及冒充真实交易资格。真实历史样本中的 68 日/3 笔成交不能证明收益优势。
 
 **目标：一次交付完整的可使用功能，证据不够时敢于报告 BLOCKED。**
