@@ -20,6 +20,7 @@ import type {
 export type AgentPhase = 'locked' | 'loading' | 'ready' | 'error';
 
 export interface CreateTaskInput {
+  request_key: string;
   name: string;
   goal: string;
   scope: string;
@@ -239,7 +240,8 @@ export function useAgent(active: boolean): AgentState {
       if (!token) return { error: new ApiError('OWNER_TOKEN_REQUIRED', '请先解锁 Agent。', 401) };
       setBusy('create');
       try {
-        const created = await createAgentTask(token, input);
+        const {request_key,...request} = input;
+        const created = await createAgentTask(token, request, request_key);
         pageBeforeRef.current = null;
         setPageBefore(null);
         await loadAll(token, null, { silent: true });
@@ -269,8 +271,8 @@ export function useAgent(active: boolean): AgentState {
           try {
             const nextDetail = await loadAgentTask(token, id);
             if (mounted.current) setDetail(nextDetail);
-          } catch {
-            // The list refresh already reflects the durable state; keep the drawer as-is.
+          } catch (e) {
+            setDetailError(friendlyError(e));
           }
         }
         return null;

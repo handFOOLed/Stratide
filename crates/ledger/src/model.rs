@@ -197,11 +197,26 @@ pub struct State {
     /// and hashes are unchanged; no existing ledger is migrated.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cash_dividends: Option<crate::cash_dividend::CashDividendBook>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub paper_eod: Option<crate::paper_eod::PaperEodBook>,
 }
 
 /// Trusted-core commands. No Worker/control-network API is exposed by this crate.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Command {
+    FreezePaperIntentsV1 {
+        now: Timestamp,
+        target_day: TradingDay,
+        decision_source_sha256: String,
+    },
+    ExPostOpenAssumptionV1 {
+        now: Timestamp,
+        bar: DailyBar,
+        rules: TradingRules,
+        source_sha256: String,
+        source_received_at: Timestamp,
+        corporate_actions_verified: bool,
+    },
     CashDividendV1 {
         event_id: String,
         phase: crate::cash_dividend::DividendPhase,

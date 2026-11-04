@@ -33,6 +33,7 @@ impl State {
             equity,
             valuation_error: None,
             cash_dividends: None,
+            paper_eod: None,
         })
     }
 
@@ -122,6 +123,27 @@ impl State {
     }
 
     pub(crate) fn apply(&mut self, cmd: &Command) -> Result<()> {
+        if self.paper_eod.as_ref().is_some_and(|b| b.pending.is_some())
+            && !matches!(
+                cmd,
+                Command::ExPostOpenAssumptionV1 { .. } | Command::Freeze { .. }
+            )
+        {
+            return Err("PAPER_INTENTS_FROZEN：不得看过后续数据后改选或撤销意图".into());
+        }
+        if self
+            .provenance
+            .source_version
+            .starts_with("paper-eod-assumption-v1")
+            && matches!(
+                cmd,
+                Command::HistoricalNextOpenV1 { .. }
+                    | Command::Match { .. }
+                    | Command::CashDividendV1 { .. }
+            )
+        {
+            return Err("PAPER_EOD_SINGLE_EXECUTION_PATH_REQUIRED".into());
+        }
         if let Some(book) = &self.cash_dividends {
             if matches!(cmd, Command::Observe { external_flow_fen, .. } if *external_flow_fen != 0)
             {
@@ -150,6 +172,30 @@ impl State {
             }
         }
         match cmd {
+            Command::FreezePaperIntentsV1 {
+                now,
+                target_day,
+                decision_source_sha256,
+            } => {
+                self.freeze_paper_intents(*now, *target_day, decision_source_sha256)?;
+            }
+            Command::ExPostOpenAssumptionV1 {
+                now,
+                bar,
+                rules,
+                source_sha256,
+                source_received_at,
+                corporate_actions_verified,
+            } => {
+                self.ex_post_open(
+                    *now,
+                    bar,
+                    rules,
+                    source_sha256,
+                    *source_received_at,
+                    *corporate_actions_verified,
+                )?;
+            }
             Command::CashDividendV1 {
                 event_id,
                 phase,

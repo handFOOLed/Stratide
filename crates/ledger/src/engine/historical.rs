@@ -4,7 +4,7 @@ impl State {
     /// This branch models an unobserved historical open. It deliberately never
     /// constructs OpeningEvidence and never inspects high/low/close/volume to
     /// qualify a fill. The close is observed only AFTER execution accounting.
-    pub(super) fn historical_next_open(
+    pub(crate) fn historical_next_open(
         &mut self,
         b: &DailyBar,
         rules: &TradingRules,

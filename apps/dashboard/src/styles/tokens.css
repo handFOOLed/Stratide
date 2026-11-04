@@ -2,7 +2,7 @@
 :root {
   color-scheme: light;
 
-  --font-sans: "Inter", "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", "PingFang SC",
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "PingFang SC",
     "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans SC", sans-serif;
   --font-mono: "SFMono-Regular", "Cascadia Mono", "Cascadia Code", Consolas, "Liberation Mono", monospace;
 
@@ -16,8 +16,8 @@
   --fs-xl: 18px;
   --fs-2xl: 21px;
   --fs-3xl: 24px;
-  --fs-4xl: 29px;
-  --fs-display: 38px;
+  --fs-4xl: 28px;
+  --fs-display: 48px;
 
   --lh-tight: 1.15;
   --lh-snug: 1.35;
@@ -42,9 +42,9 @@
   --space-14: 56px;
   --space-16: 64px;
 
-  --radius-xs: 5px;
-  --radius-sm: 7px;
-  --radius-md: 9px;
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-pill: 999px;
@@ -67,7 +67,7 @@
   --text: #191a1c;
   --text-secondary: #4d5157;
   --text-muted: #61666e;
-  --text-faint: #72787f;
+  --text-faint: #6e747a;
   --text-inverse: #fbfbfc;
 
   --accent: #2f6fed;
@@ -89,9 +89,9 @@
   --danger: #b32e26;
   --danger-soft: #fdf0ee;
   --danger-border: #f0d2ce;
-  --success: #0b7350;
-  --success-soft: #ecf7f1;
-  --success-border: #cfe8dc;
+  --success: #4d5157;
+  --success-soft: #f2f3f5;
+  --success-border: #e5e7eb;
 
   --focus: #2f6fed;
   --overlay: rgba(20, 21, 23, 0.42);
@@ -113,7 +113,7 @@
   --chart-line: #2f6fed;
   --chart-line-soft: #7ea4f8;
   --chart-grid: #e8eaee;
-  --chart-axis: #7c828b;
+  --chart-axis: #61666e;
   --chart-cursor: #b8bcc3;
   --chart-gain: #b3352c;
   --chart-loss: #0b7350;
@@ -123,9 +123,9 @@
   --sidebar-w: 236px;
   --topbar-h: 56px;
   --page-pad: clamp(16px, 2vw, 32px);
-  --content-max: 1600px;
+  --content-max: 1280px;
   --table-row-h: 44px;
-  --table-head-h: 32px;
+  --table-head-h: 36px;
   --row-5-h: 220px;
 
   --motion-hover: 140ms;
@@ -186,9 +186,9 @@
   --danger: #ff9188;
   --danger-soft: #2a1716;
   --danger-border: #4d2b28;
-  --success: #66d9a8;
-  --success-soft: #10251b;
-  --success-border: #244d3a;
+  --success: #b3b6bc;
+  --success-soft: #1a1b1d;
+  --success-border: #3a3c41;
 
   --focus: #7ba5ff;
   --overlay: rgba(0, 0, 0, 0.64);

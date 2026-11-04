@@ -15,14 +15,14 @@ export function ModeBadge({ mode }: { mode: string | null | undefined }) {
   const info = mode ? MODE_LABELS[mode] : undefined;
   return (
     <Badge tone={info?.tone ?? 'neutral'} title={info?.description}>
-      {info?.label ?? mode ?? '未知模式'}
+      {info?.label ?? '未知模式（见技术详情）'}
     </Badge>
   );
 }
 
 export function EvidenceBadge({ evidence }: { evidence: string | null | undefined }) {
   if (!evidence) return <Badge tone="neutral">证据未知</Badge>;
-  return <Badge tone={evidence === 'engine_test_only' ? 'warning' : 'accent'}>{EVIDENCE_LABELS[evidence] ?? evidence}</Badge>;
+  return <Badge tone={evidence === 'engine_test_only' ? 'warning' : 'neutral'}>{EVIDENCE_LABELS[evidence] ?? '证据待核对'}</Badge>;
 }
 
 export function SideBadge({ side }: { side: string }) {
@@ -39,16 +39,16 @@ export function OrderStatusBadge({ status, label }: { status: string; label: str
 
 export function TaskStatusBadge({ status }: { status: string }) {
   return (
-    <Badge tone={TASK_STATUS_TONES[status] ?? 'neutral'}>
-      {TASK_STATUS_LABELS[status] ?? status}
+    <Badge tone={TASK_STATUS_TONES[status] ?? 'neutral'} title={status}>
+      {TASK_STATUS_LABELS[status] ?? '状态待核对'}
     </Badge>
   );
 }
 
 export function AvailabilityBadge({ availability }: { availability: string }) {
   return (
-    <Badge tone={AVAILABILITY_TONES[availability] ?? 'neutral'}>
-      {AVAILABILITY_LABELS[availability] ?? availability}
+    <Badge tone={AVAILABILITY_TONES[availability] ?? 'neutral'} title={availability}>
+      {AVAILABILITY_LABELS[availability] ?? '状态待核对'}
     </Badge>
   );
 }
@@ -59,7 +59,7 @@ export function SnapshotBadges({ meta }: { meta: SnapshotMeta | null }) {
     <>
       <ModeBadge mode={meta.mode} />
       <Badge tone="outline">源日 {meta.last_day ? meta.last_day.slice(0, 4) + '-' + meta.last_day.slice(4, 6) + '-' + meta.last_day.slice(6, 8) : '—'}</Badge>
-      <Badge tone="outline">{meta.market_freshness === 'snapshot_only_not_live' ? '最后发布快照 · 非实时' : meta.market_freshness}</Badge>
+      <Badge tone="outline">仅快照 · 非实时</Badge>
     </>
   );
 }

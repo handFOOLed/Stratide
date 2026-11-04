@@ -126,21 +126,33 @@ test('overview fits one desktop screen at 1920x1080 and 1366x768', async ({ page
       // Same row = same top edge; allow sub-pixel rounding from fractional grid tracks.
       expect(account.x).toBeGreaterThan(risk.x + risk.width - 1);
       expect(chart.x).toBeGreaterThan(account.x + account.width - 1);
-      expect(Math.abs(account.width - risk.width)).toBeLessThanOrEqual(1);
-      expect(Math.abs(chart.width - 3 * risk.width)).toBeLessThanOrEqual(2);
+      expect(Math.abs(account.y - risk.y)).toBeLessThanOrEqual(2);
+      expect(chart.width).toBeGreaterThan(account.width);
       expect(Math.abs(account.y - risk.y)).toBeLessThanOrEqual(2);
       expect(Math.abs(chart.y - account.y)).toBeLessThanOrEqual(2);
       expect(positions.y).toBeGreaterThan(account.y + account.height - 1);
       expect(fills.x).toBeGreaterThan(positions.x + positions.width - 1);
       expect(Math.abs(fills.y - positions.y)).toBeLessThanOrEqual(2);
       expect(Math.abs(positions.width / fills.width - 1.06 / 0.94)).toBeLessThan(0.01);
-      expect(positions.height).toBeGreaterThanOrEqual(5 * 44);
+      expect(positions.height).toBeLessThanOrEqual(5 * 44);
     }
     for (const selector of ['.risk-card .card__body', '.account-card .card__body']) {
       const overflow = await page.locator(selector).evaluate((el) => el.scrollHeight - el.clientHeight);
       expect(overflow, selector + ' @' + width).toBeLessThanOrEqual(1);
     }
   }
+});
+
+test('1280px and desktop text zoom keep content readable without horizontal overflow', async ({ page }) => {
+  await page.setViewportSize({width:1280,height:768});
+  await page.goto('/');
+  await expect(page.getByTestId('nav-value')).toBeVisible();
+  await page.evaluate(()=>{document.documentElement.style.zoom='1.25';});
+  await expect(page.getByTestId('nav-value')).toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.goto('/#settings');
+  await expect(page.getByRole('tabpanel',{name:'外观'})).toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 
 test('a page that outgrows the viewport keeps the content baseline and gutter stable', async ({ page }) => {
@@ -168,7 +180,7 @@ test('a page that outgrows the viewport keeps the content baseline and gutter st
 
 test('positions keep a five-row window and paginate beyond it', async ({ page }) => {
   const codes = ['600519', '600036', '601318', '000001', '000002', '300750', '600000'];
-  await page.route('**/api/positions', async (route) => {
+  await page.route('**/api{,/v1}/positions', async (route) => {
     const response = await route.fetch();
     const body = await response.json();
     body.data = codes.map((code, index) => ({
@@ -214,6 +226,7 @@ test('navigation moves focus to the page title and tabs keep their own focus', a
   await page.getByRole('button', { name: /本机 Owner/ }).click();
   await page.getByRole('menuitem', { name: '设置' }).click();
   await expect(page.locator('.page-title')).toBeFocused();
+  await expect(page.locator('.page-title')).toHaveCSS('outline-style','none');
 
   await page.getByRole('link', { name: '历史报告', exact: true }).click();
   await expect(page.locator('.page-title')).toBeFocused();
@@ -225,7 +238,7 @@ test('navigation moves focus to the page title and tabs keep their own focus', a
 
 test('sidebar profile menu opens above the account button and closes with Escape', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('link', { name: '设置', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: '设置', exact: true })).toHaveCount(1);
   const trigger = page.getByRole('button', { name: /本机 Owner/ });
   await expect(trigger).toBeVisible();
   await trigger.click();

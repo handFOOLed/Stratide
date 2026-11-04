@@ -15,9 +15,9 @@ export interface PaperDataState {
   refresh: () => void;
 }
 
-const TERMINAL_CODES = new Set(['NO_SNAPSHOT', 'INVALID_SNAPSHOT', 'SNAPSHOT_CHANGED']);
+const TERMINAL_CODES = new Set(['NO_SNAPSHOT', 'INVALID_SNAPSHOT', 'SNAPSHOT_CHANGED','CURRENT_PAPER_ACCOUNT_UNCONFIGURED','INVALID_CURRENT_LEDGER']);
 
-export function usePaperData(): PaperDataState {
+export function usePaperData(purpose:'current'|'selected_report'): PaperDataState {
   const [bundle, setBundle] = useState<PaperBundle | null>(null);
   const [meta, setMeta] = useState<SnapshotMeta | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
@@ -36,7 +36,7 @@ export function usePaperData(): PaperDataState {
     const current = generation.current;
     setRefreshing(true);
     setLoading(true);
-    loadPaperBundle({ signal: controller.signal })
+    loadPaperBundle(purpose,{ signal: controller.signal })
       .then((result) => {
         if (!mounted.current || generation.current !== current) return;
         setBundle(result.bundle);
@@ -59,7 +59,7 @@ export function usePaperData(): PaperDataState {
         setLoading(false);
         setRefreshing(false);
       });
-  }, []);
+  }, [purpose]);
 
   useEffect(() => {
     mounted.current = true;

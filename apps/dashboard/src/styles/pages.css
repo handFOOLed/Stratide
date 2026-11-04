@@ -5,14 +5,13 @@
 .overview-page {
   display: flex;
   flex-direction: column;
-  min-height: calc(100dvh - var(--topbar-h) - 26px);
-  max-height: 820px;
+  min-height: 0;
 }
 
 .overview-grid {
   display: grid;
-  flex: 1;
-  grid-template-rows: minmax(min-content, 0.95fr) minmax(0, 1.05fr);
+  flex: 0;
+  grid-template-rows: auto auto;
   gap: 14px;
   min-height: 0;
 }
@@ -26,6 +25,7 @@
 
 .overview-top {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 3fr);
+  align-items: start;
 }
 
 .overview-bottom {
@@ -35,7 +35,7 @@
 /* Both list cards share the row height so their footers line up. */
 .positions-card,
 .recent-fills-card {
-  align-self: stretch;
+  align-self: start;
   max-height: 420px;
 }
 
@@ -283,11 +283,11 @@
 }
 
 .positions-card .table-scroll {
-  min-height: calc(var(--table-head-h) + var(--table-row-h) * 5);
+  min-height: 0;
 }
 
 .recent-fills-card .table-scroll {
-  min-height: calc(var(--table-head-h) + var(--table-row-h) * 5);
+  min-height: 0;
 }
 
 .overview-empty {
@@ -295,13 +295,16 @@
   flex: 1;
   align-items: center;
   justify-content: center;
-  min-height: calc(var(--table-row-h) * 5);
+  min-height: 72px;
 }
 
 .overview-empty .empty-state {
   min-height: 0;
   padding: 18px;
 }
+.overview-empty .empty-state__icon {display:none;}
+.account-card, .chart-card {min-height:300px;}
+.chart-card .chart-frame {height:236px;flex:none;}
 
 .positions-card .card__foot,
 .recent-fills-card .card__foot {
@@ -555,17 +558,7 @@
   overflow: hidden;
 }
 
-.agent-gate::after {
-  position: absolute;
-  top: -80px;
-  right: -60px;
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--accent-soft), transparent 68%);
-  content: "";
-  pointer-events: none;
-}
+/* §2.4/§8.5: the gate action carries hierarchy without a decorative glow. */
 
 .agent-gate__icon {
   display: grid;
@@ -1376,7 +1369,7 @@
 /* One clean half-light / half-dark tile, with neutral marks that read on both. */
 .theme-preview--system {
   border-color: #d9dce1;
-  background: linear-gradient(104deg, #f6f7f9 0 48%, #0a0a0b 48% 100%);
+  background: var(--surface-sunken);
 }
 
 .theme-preview--system .theme-preview__side {
@@ -2053,3 +2046,28 @@
     font-size: 13.5px;
   }
 }
+
+/* #77 §2.1/§3.3/§5.7: shared rhythm, neutral outcomes, readable disclosures. */
+.approval-layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: var(--space-6); align-items: start; }
+.study-row { padding: var(--space-4) 0; border-bottom: 1px solid var(--divider); overflow-wrap: anywhere; }
+.study-row:last-child { border-bottom: 0; }
+.study-row__title { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-4); }
+.study-row p { margin-top: var(--space-2); }
+.technical-details { margin-top: var(--space-3); font-size: var(--fs-xs); color: var(--text-secondary); }
+.technical-details summary { cursor: pointer; min-height: 32px; padding: var(--space-1) 0; }
+.technical-details pre { max-width: 100%; max-height: 400px; overflow: auto; padding: var(--space-3); background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); white-space: pre-wrap; overflow-wrap: anywhere; }
+.positions-card:has(.pager) .table-scroll, .recent-fills-card:has(.pager) .table-scroll {min-height:calc(var(--table-head-h) + var(--table-row-h) * 5);}
+.workspace-studies, .agent-grid + .card { margin-top: var(--space-6); }
+.compact-empty { padding: var(--space-3) 0; color: var(--text-secondary); }
+.page-title:focus { outline: none; }
+.page-title:focus-visible { outline: none; } /* Route titles are programmatically focused, never tab stops. */
+.page-header--compact .page-title { font-size: var(--fs-3xl); }
+.agent-gate__icon, .notification-empty__icon { display: none; }
+.badge { border-radius: var(--radius-xs); }
+.chart-axis-note { color: var(--text-muted); font-size: var(--fs-2xs); padding: 4px 12px 8px; }
+@media (min-width: 1500px) and (min-height: 950px) {
+  .overview-top { grid-template-columns: minmax(220px, 1fr) minmax(260px, 1fr) minmax(0, 2fr); }
+  .overview-page { min-height: 0; height: auto; }
+  .account-value { font-size: 40px; }
+}
+@media (max-width: 1000px) { .approval-layout { grid-template-columns: 1fr; } }

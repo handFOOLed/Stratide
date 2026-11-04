@@ -41,10 +41,17 @@ fn run() -> Result<(), String> {
     }
     let config = Config::parse(args.into_iter())?;
     let assets = Assets::load(&config.assets_dir)?;
-    let app = App::load(
+    let mut app = App::load(
         config.report_dir.as_deref(),
         config.evaluation_file.as_deref(),
     );
+    app.desktop = config
+        .desktop_config
+        .as_deref()
+        .map(stratided::desktop::Desktop::load)
+        .transpose()
+        .map_err(|e| e.0)?;
+    app.paper_ledger = config.paper_ledger.clone();
     let server = bind_local(config.port)?;
     let report_source = config.report_dir.clone();
     let evaluation_source = config.evaluation_file.clone();
@@ -64,7 +71,12 @@ fn run() -> Result<(), String> {
                     })
                 });
             }
-            Agent::open(dir, config.agent_config.as_deref(), app.agent_summary()).map(|a| {
+            let a = if config.desktop_config.is_some() {
+                Agent::attach(dir, config.agent_config.as_deref(), app.agent_summary())
+            } else {
+                Agent::open(dir, config.agent_config.as_deref(), app.agent_summary())
+            };
+            a.map(|a| {
                 a.with_summary_source(move || {
                     Ok(
                         App::load(report_source.as_deref(), evaluation_source.as_deref())
@@ -75,7 +87,11 @@ fn run() -> Result<(), String> {
         })
         .transpose();
     let agent = match agent_result {
-        Ok(Some(agent)) => match agent.start() {
+        Ok(Some(agent)) => match if config.desktop_config.is_some() {
+            Ok(())
+        } else {
+            agent.start()
+        } {
             Ok(()) => Some(agent),
             Err(e) => {
                 eprintln!("研究服务不可用：{}；Paper 只读服务继续运行。", e.0);
@@ -88,6 +104,9 @@ fn run() -> Result<(), String> {
             None
         }
     };
+    if let Some(a) = &agent {
+        a.store().desktop_recover().map_err(|e| e.0)?;
+    }
     println!(
         "Stratide Paper Dashboard: http://127.0.0.1:{}\nPaper 账户只读；研究控制需本机 Owner 令牌。Ctrl+C 停止。",
         config.port

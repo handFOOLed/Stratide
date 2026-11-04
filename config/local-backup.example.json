@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {"name": "agent", "path": "C:/REPLACE/WITH/ORIGINAL/agent"},
+    {"name": "paper", "path": "C:/REPLACE/WITH/ORIGINAL/paper-ledger"},
+    {"name": "research", "path": "C:/REPLACE/WITH/ORIGINAL/research-state"}
+  ]
+}

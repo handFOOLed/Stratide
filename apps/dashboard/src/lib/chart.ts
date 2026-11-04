@@ -1,4 +1,4 @@
-import { formatAxisCny, formatBps, formatDay, parseDayMs, parseInteger } from './format.ts';
+import { formatAxisCny, formatBps, formatCny, formatDay, parseDayMs, parseInteger } from './format.ts';
 import type { EquityRow } from './types.ts';
 
 export type ChartMetric = 'nav' | 'pnl' | 'return';
@@ -32,6 +32,7 @@ export interface ChartModel {
   ticks: ChartTick[];
   xTicks: ChartXAxisTick[];
   zeroY: number | null;
+  baselineY: number | null;
   validCount: number;
   totalCount: number;
   firstDay: string | null;
@@ -134,7 +135,7 @@ export function buildChartModel(
   metric: ChartMetric,
   width: number,
   height: number,
-  options: { navTopFen?: bigint | null } = {},
+  options: { navTopFen?: bigint | null; baselineFen?: bigint | null } = {},
 ): ChartModel | null {
   if (rows.length === 0 || width <= 0 || height <= 0) return null;
   const key = METRIC_KEY[metric];
@@ -148,11 +149,15 @@ export function buildChartModel(
   let min: bigint;
   let max: bigint;
   if (metric === 'nav') {
-    // NAV is a positive quantity: 0 -> 10^ceil(log10(max(current NAV, window max))).
-    const current = options.navTopFen ?? null;
-    const top = decimalCeiling(current !== null && current > rawMax ? current : rawMax);
-    min = 0n;
-    max = top;
+    // §2.1: show the actual range and principal; five equal intervals retain
+    // the existing 20%-of-domain grid. Never force zero or use an unlabeled cut.
+    const baseline = options.baselineFen;
+    const low = baseline !== undefined && baseline !== null && baseline < rawMin ? baseline : rawMin;
+    const high = baseline !== undefined && baseline !== null && baseline > rawMax ? baseline : rawMax;
+    const span = high - low;
+    const padding = span > 4n ? span / 5n : 1n;
+    min = low > padding ? low - padding : 0n;
+    max = high + padding;
   } else {
     min = rawMin > 0n ? 0n : rawMin;
     max = rawMax < 0n ? 0n : rawMax;
@@ -230,11 +235,11 @@ export function buildChartModel(
     ticks.push({
       y: top + (plotHeight * index) / 5,
       value,
-      label: metricLabel(metric, value),
+      label: metric === 'nav' && delta < 50_000n ? formatCny(value) : metricLabel(metric, value),
     });
   }
 
-  const xCount = width < 420 ? 2 : width < 680 ? 3 : width < 920 ? 4 : 5;
+  const xCount = rows.length <= 7 ? rows.length : width < 420 ? 2 : width < 680 ? 3 : width < 920 ? 4 : 5;
   const xTicks: ChartXAxisTick[] = [];
   const seen = new Set<number>();
   const lastIndex = rows.length - 1;
@@ -262,6 +267,7 @@ export function buildChartModel(
     ticks,
     xTicks,
     zeroY,
+    baselineY: metric === 'nav' && options.baselineFen !== undefined && options.baselineFen !== null ? yFor(options.baselineFen) : null,
     validCount: valid.length,
     totalCount: rows.length,
     firstDay: rows[0]?.day ?? null,

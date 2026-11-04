@@ -1,5 +1,7 @@
 # Stratide 本地 Web Dashboard V1
 
+**V1 / Issue #77：** 现已支持当前 Paper 专用 v1 接口、原研究/OOS/Registry、持久审批通知与 Windows 启停/恢复，详见 [完整操作](../../docs/V1_COMPLETION.md)。总览读取显式 `--paper-ledger`，历史页保留 `--report-dir`；历史报告不能成为当前 NAV。下面原只读报告启动方式继续兼容。
+
 关联 [Issue #20](https://github.com/handFOOLed/Stratide/issues/20) 与 [Issue #22](https://github.com/handFOOLed/Stratide/issues/22)。本机 paper-only、同源；总览/历史展示启动时明确指定的一个完整六报告固定快照。Agent 管理已接入持久研究任务、预算、模型选择、取消/暂停和 EOD；操作见 [Agent V1](../../docs/M2_PR02.md)。通知仍为未接入状态，浅色/深色/系统主题与 reduced-motion 保留。UI 已按 M2-PR03 重构为 React 19 + TypeScript + 共享设计系统；信息归属、token 与动效规范见 [UI 设计系统](../../docs/UI_DESIGN_SYSTEM.md)。不提供财务写入或网页导出。
 
 ## Windows 启动

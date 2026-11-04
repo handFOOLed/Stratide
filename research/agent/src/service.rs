@@ -23,7 +23,7 @@ struct Inner {
     owner_token: String,
     summary_source: Option<Arc<dyn Fn() -> Result<InputSummary> + Send + Sync>>,
     current_summary: Mutex<(Option<DateTime<Utc>>, InputSummary)>,
-    _lock: File,
+    _lock: Option<File>,
     fault: Mutex<Option<String>>,
 }
 #[derive(Clone)]
@@ -31,16 +31,34 @@ pub struct Agent(Arc<Inner>);
 
 impl Agent {
     pub fn open(dir: &Path, config_path: Option<&Path>, summary: InputSummary) -> Result<Self> {
+        Self::load(dir, config_path, summary, true)
+    }
+    /// Dashboard observes the original store without owning the Worker lifetime
+    /// lock. Explicit CLI operations still acquire the original exclusive lock.
+    pub fn attach(dir: &Path, config_path: Option<&Path>, summary: InputSummary) -> Result<Self> {
+        Self::load(dir, config_path, summary, false)
+    }
+    fn load(
+        dir: &Path,
+        config_path: Option<&Path>,
+        summary: InputSummary,
+        worker: bool,
+    ) -> Result<Self> {
         fs::create_dir_all(dir).map_err(|_| "AGENT_DIRECTORY_UNAVAILABLE")?;
-        let lock = OpenOptions::new()
-            .create(true)
-            .truncate(false)
-            .read(true)
-            .write(true)
-            .open(dir.join("agent.lock"))
-            .map_err(|_| "AGENT_LOCK_UNAVAILABLE")?;
-        lock.try_lock_exclusive()
-            .map_err(|_| "AGENT_ALREADY_RUNNING")?;
+        let lock = if worker {
+            let lock = OpenOptions::new()
+                .create(true)
+                .truncate(false)
+                .read(true)
+                .write(true)
+                .open(dir.join("agent.lock"))
+                .map_err(|_| "AGENT_LOCK_UNAVAILABLE")?;
+            lock.try_lock_exclusive()
+                .map_err(|_| "AGENT_ALREADY_RUNNING")?;
+            Some(lock)
+        } else {
+            None
+        };
         let config_path = config_path
             .map(Path::to_path_buf)
             .unwrap_or_else(|| dir.join("settings.json"));
@@ -51,7 +69,9 @@ impl Agent {
         };
         let store = Store::open(dir, &settings)?;
         crate::risk_binding::check_settings_path(&store, &config_path)?;
-        store.recover(Utc::now())?;
+        if worker {
+            store.recover(Utc::now())?;
+        }
         let token_path = dir.join("owner-token");
         if !token_path.exists() {
             let mut options = OpenOptions::new();
@@ -195,6 +215,11 @@ impl Agent {
     pub fn status(&self, now: DateTime<Utc>) -> Result<Value> {
         let settings = self.settings()?;
         let mut result = self.store().status(&settings, now)?;
+        result["dashboard_mode"] = json!(if self.0._lock.is_some() {
+            "worker"
+        } else {
+            "attached_explicit_operations"
+        });
         result["worker_error"] = json!(self.0.fault.lock().ok().and_then(|f| f.clone()));
         result["input"] = serde_json::to_value(
             &self
@@ -261,7 +286,24 @@ impl Agent {
         self.store()
             .create(&self.settings()?, request, &self.summary(now)?, now, None)
     }
+    pub fn create_once(&self, request: &TaskRequest, key: &str, now: DateTime<Utc>) -> Result<i64> {
+        ensure(
+            key.len() == 32 && key.bytes().all(|b| b.is_ascii_hexdigit()),
+            "TASK_REQUEST_KEY_INVALID",
+        )?;
+        self.store().create(
+            &self.settings()?,
+            request,
+            &self.summary(now)?,
+            now,
+            Some(&format!("dashboard:{key}")),
+        )
+    }
     pub fn control(&self, action: &str, value: &Value, now: DateTime<Utc>) -> Result<Value> {
+        ensure(
+            self.0._lock.is_some() || action != "eod",
+            "DASHBOARD_EXPLICIT_OPERATIONS_ONLY",
+        )?;
         let s = self.settings()?;
         match action {
             "pause" => self.store().set("paused", "true")?,

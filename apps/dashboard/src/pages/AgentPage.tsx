@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import type { FormEvent, Ref } from 'react';
 import { PageHeader } from '../components/ui/PageHeader';
 import { Card, CardBody, CardHead } from '../components/ui/Card';
@@ -34,6 +34,12 @@ import {
 import type { AgentCall, AgentModel, AgentStatus, AgentTask, AgentTaskDetail } from '../lib/types';
 import type { AgentState } from '../state/useAgent';
 import { formatDay } from '../lib/format';
+import { ResearchOperations } from '../components/domain/ResearchOperations';
+import { humanReason } from '../lib/api';
+import { ModeBadge } from '../components/domain/Badges';
+import { stateLabel } from '../lib/workspace';
+import { WorkspaceStudies, TechnicalDetails } from '../components/domain/WorkspaceStudies';
+import type { WorkspaceState } from '../lib/workspace';
 
 function isBusy(agent: AgentState, prefix: string): boolean {
   return Boolean(agent.busy && agent.busy.startsWith(prefix));
@@ -77,7 +83,7 @@ function defaultRange(sourceDay: string | undefined): { start: string; end: stri
   return { start: source, end: source };
 }
 
-export function AgentPage({ agent, titleRef }: { agent: AgentState; titleRef?: Ref<HTMLHeadingElement> }) {
+export function AgentPage({ agent, workspace, titleRef }: { agent: AgentState; workspace: WorkspaceState; titleRef?: Ref<HTMLHeadingElement> }) {
   const toast = useToast();
   const [unlockOpen, setUnlockOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
@@ -219,9 +225,11 @@ export function AgentPage({ agent, titleRef }: { agent: AgentState; titleRef?: R
   const budget = status.budget;
   const budgetConfigured = budget.state === 'configured';
   const defaultModel = status.models.find((model) => model.id === status.default_model) ?? null;
-  const canCreate = Boolean(defaultModel) && budgetConfigured;
+  const canCreate = Boolean(defaultModel) && budgetConfigured && status.dashboard_mode !== 'attached_explicit_operations';
   const createDisabledReason = !defaultModel
     ? '尚未配置默认研究模型，不能创建任务。'
+    : status.dashboard_mode === 'attached_explicit_operations'
+      ? '请使用下方冻结研究入口，沿用原 Worker、预算与来源绑定。'
     : !budgetConfigured
       ? '日/月预算未配置，付费研究已被阻止。'
       : '';
@@ -277,24 +285,24 @@ export function AgentPage({ agent, titleRef }: { agent: AgentState; titleRef?: R
               </div>
 
               {status.worker_error ? (
-                <Callout tone="danger" title="Worker 报告错误" className="runtime-warning">{status.worker_error}</Callout>
+                <Callout tone="warning" title="Worker 报告错误" className="runtime-warning">{humanReason(status.worker_error)}<TechnicalDetails value={{reason:status.worker_error}}/></Callout>
               ) : null}
 
               <div className="runtime-meta">
                 <div><span>Worker 并发</span><strong>{status.worker_concurrency}</strong></div>
                 <div><span>默认模型</span><strong>{defaultModel?.label ?? '未配置'}</strong></div>
-                <div><span>研究资格</span><strong>{RESEARCH_QUALIFICATION_LABELS[status.qualification] ?? status.qualification}</strong></div>
+                <div><span>研究资格</span><strong title={status.qualification}>{RESEARCH_QUALIFICATION_LABELS[status.qualification] ?? '资格待核对'}</strong></div>
                 <div><span>自动 fallback</span><strong>关闭 · 仅 Owner 切换</strong></div>
               </div>
 
-              <div className="eod-block">
+              <div className="eod-block" hidden={status.dashboard_mode==='attached_explicit_operations'}>
                 <div className="eod-head">
                   <div>
                     <h3 className="eod-title">EOD 自动研究</h3>
                     <p className="eod-desc">默认关闭；只为最新有效源日派发，同源日不重复。最终状态以服务端持久记录为准。</p>
                   </div>
                   <div className="eod-switch">
-                    <span className="eod-switch-label">{status.eod.enabled ? '已启用' : 'OFF'}</span>
+                    <span className="eod-switch-label">{status.eod.enabled ? '已启用' : '已停用'}</span>
                     <Switch
                       checked={status.eod.enabled}
                       busy={isBusy(agent, 'control:eod')}
@@ -313,9 +321,9 @@ export function AgentPage({ agent, titleRef }: { agent: AgentState; titleRef?: R
                     <div className="eod-latest__body">
                       <span>源日 {status.eod.latest.source_day || '—'}</span>
                       <Badge tone={status.eod.latest.disposition === 'completed' ? 'success' : status.eod.latest.disposition === 'failed' || status.eod.latest.disposition === 'outcome_uncertain' ? 'warning' : 'neutral'}>
-                        {EOD_DISPOSITION_LABELS[status.eod.latest.disposition ?? ''] ?? status.eod.latest.disposition ?? '未知'}
+                        {EOD_DISPOSITION_LABELS[status.eod.latest.disposition ?? ''] ?? '状态待核对'}
                       </Badge>
-                      <span className="muted">{status.eod.latest.reason || status.eod.reason || '无额外原因'}</span>
+                      <span className="muted" title={status.eod.latest.reason || status.eod.reason || ''}>{humanReason(status.eod.latest.reason || status.eod.reason || null)}</span>
                     </div>
                   ) : (
                     <span className="muted">尚无 EOD 派发记录 · 已记录跳过 {status.eod.skipped} 次</span>
@@ -345,6 +353,8 @@ export function AgentPage({ agent, titleRef }: { agent: AgentState; titleRef?: R
         </div>
       </div>
 
+      {agent.token !== null ? <ResearchOperations token={agent.token}/> : null}
+      <WorkspaceStudies workspace={workspace}/>
       <TaskDrawer agent={agent} status={status} />
 
       <Modal
@@ -502,7 +512,7 @@ function ModelsCard({ status, agent }: { status: AgentStatus; agent: AgentState 
                   </Badge>
                   <AvailabilityBadge availability={selected.availability} />
                 </div>
-                <span className="model-selected__meta">{selected.kind} · {selected.model} · 授权 {selected.authorization}</span>
+                <span className="model-selected__meta" title={selected.authorization}>{selected.kind==='fake'?'本地合成':'云 API'} · {selected.model} · {selected.authorization==='authorized'?'原授权有效':'授权受阻，查看技术原因'}</span>
                 {selected.last_reason ? (
                   <span className="model-selected__meta">最近 Provider 观察：{selected.last_reason}</span>
                 ) : null}
@@ -534,13 +544,13 @@ function ModelsCard({ status, agent }: { status: AgentStatus; agent: AgentState 
                 {status.models.map((model) => (
                   <tr key={model.id}>
                     <td><span className="cell-title">{model.label}</span><span className="cell-sub">{model.id}</span></td>
-                    <td><span className="cell-sub">{model.kind}</span><span className="cell-mono">{model.model}</span></td>
-                    <td>{model.authorization}</td>
+                    <td><span className="cell-sub">{model.kind==='fake'?'本地合成':'云 API'}</span><span className="cell-mono">{model.model}</span></td>
+                    <td title={model.authorization}>{model.authorization==='authorized'?'原授权有效':'授权受阻'}</td>
                     <td>
                       <AvailabilityBadge availability={model.availability} />
-                      {model.last_reason ? <span className="cell-sub">{model.last_reason}</span> : null}
+                      {model.last_reason ? <span className="cell-sub" title={model.last_reason}>{humanReason(model.last_reason)}</span> : null}
                     </td>
-                    <td><Badge tone={model.verification === 'FAKE_SYNTHETIC_ONLY' ? 'warning' : 'warning'}>{VERIFICATION_LABELS[model.verification] ?? model.verification}</Badge></td>
+                    <td><Badge tone="neutral" title={model.verification}>{VERIFICATION_LABELS[model.verification] ?? '待核验'}</Badge></td>
                     <td className="cell-mono">{model.price_version}</td>
                   </tr>
                 ))}
@@ -720,7 +730,7 @@ function TasksCard({
                       {cost ? formatMicro(cost, { currency: status.budget.currency }) : '—'}
                     </td>
                     <td className="cell-reason" title={task.conclusion || task.reason || ''}>
-                      {task.conclusion || task.reason || '等待执行'}
+                      {task.conclusion || humanReason(task.reason) || '等待执行'}
                     </td>
                     <td onClick={(event) => event.stopPropagation()}>
                       <div className="row-actions">
@@ -789,7 +799,7 @@ function TaskDrawer({ agent, status }: { agent: AgentState; status: AgentStatus 
   const toast = useToast();
   const detail = agent.detail;
   const currency = status.budget.currency;
-  const canCancel = detail ? ['queued', 'running'].includes(detail.status) : false;
+  const canCancel = detail ? ['queued', 'running', 'local_running'].includes(detail.status) : false;
   const canRetry = detail?.retryable === true;
   return (
     <Drawer
@@ -885,23 +895,23 @@ function TaskDetailBody({ detail, currency }: { detail: AgentTaskDetail; currenc
           <dt>创建时间</dt><dd>{formatDateTime(detail.created_at)}</dd>
           <dt>开始 / 完成</dt><dd>{formatDateTime(detail.started_at)} / {formatDateTime(detail.finished_at)}</dd>
           <dt>取消申请</dt><dd>{detail.cancel_requested_at ? formatDateTime(detail.cancel_requested_at) : '—'}</dd>
-          <dt>原因</dt><dd>{detail.reason || '—'}</dd>
+          <dt>原因</dt><dd>{humanReason(detail.reason)}<TechnicalDetails value={{reason:detail.reason}}/></dd>
         </dl>
       </div>
 
       <div className="drawer__section">
         <h3 className="drawer__section-title">冻结输入与模型</h3>
         <dl className="kv">
-          <dt>输入模式</dt><dd>{detail.input.mode}</dd>
+          <dt>输入模式</dt><dd><ModeBadge mode={detail.input.mode}/></dd>
           <dt>实际摘要源日</dt><dd>{detail.input.source_day || '无已发布报告'}</dd>
           <dt>摘要版本</dt><dd className="code-chip">{detail.input.version}</dd>
-          <dt>研究范围</dt><dd>{detail.input.scopes.join(' · ') || '—'}</dd>
+          <dt>研究范围</dt><dd>原冻结来源范围<TechnicalDetails value={detail.input}/></dd>
           <dt>模型 / 配置</dt><dd>{detail.provider_id} <span className="code-chip">{detail.provider_hash.slice(0, 16)}…</span></dd>
         </dl>
         <p className="drawer-note">详情读取只读取本地已保存记录，不调用模型。</p>
       </div>
 
-      {result ? (
+      {result && Array.isArray(result.research.evidence) ? (
         <div className="drawer__section">
           <h3 className="drawer__section-title">研究结果</h3>
           <div className="inline-row inline-row--tight result-badges">
@@ -930,15 +940,18 @@ function TaskDetailBody({ detail, currency }: { detail: AgentTaskDetail; currenc
           </div>
           <Callout tone="warning" title="限制">{result.limitations}</Callout>
         </div>
+      ) : result ? (
+        <div className="drawer__section"><h3 className="drawer__section-title">已保存研究产物</h3><p>本地风险或结构化研究输出；模型自由文本仅为未核验假设。</p><TechnicalDetails value={result}/></div>
       ) : (
         <div className="drawer__section">
           <h3 className="drawer__section-title">研究结果</h3>
-          <p className="muted">尚无已保存研究输出。此详情不会发起推理。</p>
+          <p className="muted">{detail.artifact===undefined?'尚无已保存研究输出。此详情不会发起推理。':'已保存结构化研究产物，见下方详情。'}</p>
         </div>
       )}
 
       <div className="drawer__section">
         <h3 className="drawer__section-title">费用与调用记录</h3>
+        {detail.artifact !== undefined ? <><p>已保存本地风险或结构化研究输出；模型自由文本仅为未核验假设。</p><TechnicalDetails value={detail.artifact}/></> : null}
         <p className="drawer-note">云端收到用量仍不是最终账单；未知结果保留最大预留，不自动重发。</p>
         {detail.calls.length === 0 ? (
           <p className="muted">尚未预留或发出调用。</p>
@@ -959,13 +972,13 @@ function TaskDetailBody({ detail, currency }: { detail: AgentTaskDetail; currenc
                 {detail.calls.map((call) => (
                   <tr key={call.id}>
                     <td className="cell-mono">{call.id}</td>
-                    <td>{call.state}</td>
+                    <td title={call.state}>{stateLabel(call.state)}</td>
                     <td className="num">
                       {formatMicro(call.maximum_micro)} / {formatMicro(call.settled_micro)} / {formatMicro(call.usage_micro)}
                     </td>
                     <td className="cell-mono">{call.price_version}</td>
                     <td className="cell-mono">{call.day} / {call.month}</td>
-                    <td className="cell-reason">{call.reason || '—'}</td>
+                    <td className="cell-reason" title={call.reason || ''}>{humanReason(call.reason)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -1102,6 +1115,7 @@ function CreateTaskForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [formCode, setFormCode] = useState<string | null>(null);
+  const requestKey=useRef(crypto.randomUUID().replaceAll('-',''));
   const loading = agent.busy === 'create';
 
   const submit = async (event: FormEvent) => {
@@ -1126,6 +1140,7 @@ function CreateTaskForm({
     setFormError(null);
     setFormCode(null);
     const result = await agent.createTask({
+      request_key:requestKey.current,
       name: name.trim(),
       goal: goal.trim(),
       scope: scope.trim(),
@@ -1138,7 +1153,7 @@ function CreateTaskForm({
       setFormCode(result.error.code);
       return;
     }
-    if (result.id) onDone(result.id);
+    if (result.id) {requestKey.current=crypto.randomUUID().replaceAll('-','');onDone(result.id);}
   };
 
   return (

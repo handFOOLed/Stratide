@@ -60,6 +60,7 @@ export function SidebarContent({
           </div>
         </nav>
       </div>
+      <a href="#settings/appearance" className="nav-item sidebar-settings" aria-current={route.page==='settings'?'page':undefined} onClick={onNavigate}><span className="nav-icon" aria-hidden="true"><Icon name="settings"/></span><span className="nav-text">设置</span></a>
       <UserMenu onNavigate={onNavigate} />
     </aside>
   );

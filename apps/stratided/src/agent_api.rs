@@ -53,6 +53,7 @@ pub fn reply(app: &App, agent: Option<&Agent>, req: &mut Request, port: u16) -> 
         return error(401, "OWNER_TOKEN_REQUIRED");
     }
     let path = req.url().to_string();
+    let request_key = single("X-Stratide-Idempotency");
     let body = if method == "POST" {
         if single("Content-Type").as_deref() != Some("application/json") {
             return error(415, "JSON_REQUIRED");
@@ -78,6 +79,79 @@ pub fn reply(app: &App, agent: Option<&Agent>, req: &mut Request, port: u16) -> 
         if method == "GET" && path == "/api/agent/status" {
             return agent.status(now);
         }
+        if method == "GET" && path == "/api/agent/inbox" {
+            return agent.store().desktop_inbox(now);
+        }
+        if method == "POST" && path == "/api/agent/stop-local" && body == json!({}) {
+            return app
+                .desktop
+                .as_ref()
+                .ok_or("DESKTOP_NOT_CONFIGURED")?
+                .stop_local();
+        }
+        if method == "GET" && path == "/api/agent/prompts" {
+            return Ok(
+                json!({"version":"fusion-researcher-v1","visibility":"SAFE_BUILTIN_PROMPT_NO_CONTEXT_OR_CREDENTIALS",
+                "developer":include_str!("../../../research/agent/prompts/fusion-researcher-v1-developer.txt")}),
+            );
+        }
+        if method == "GET" && path == "/api/agent/operations" {
+            return Ok(app.desktop.as_ref().map(|d|d.actions()).unwrap_or_else(||json!({"operations":[],"scope":"LOCAL_RESEARCH_ONLY","real_market_cloud_egress":false})));
+        }
+        if method == "POST" && path == "/api/agent/approvals" {
+            #[derive(Deserialize)]
+            #[serde(deny_unknown_fields)]
+            struct Input {
+                id: String,
+                operation: String,
+            }
+            let input: Input =
+                serde_json::from_value(body).map_err(|_| "APPROVAL_INPUT_INVALID")?;
+            return app
+                .desktop
+                .as_ref()
+                .ok_or("DESKTOP_NOT_CONFIGURED")?
+                .request(agent, &input.id, &input.operation);
+        }
+        if method == "POST" && path == "/api/agent/decide" {
+            #[derive(Deserialize)]
+            #[serde(deny_unknown_fields)]
+            struct Input {
+                id: String,
+                decision: String,
+            }
+            let input: Input =
+                serde_json::from_value(body).map_err(|_| "APPROVAL_INPUT_INVALID")?;
+            return if input.decision == "start" {
+                app.desktop
+                    .as_ref()
+                    .ok_or("DESKTOP_NOT_CONFIGURED")?
+                    .start(agent, &input.id)
+            } else {
+                agent
+                    .store()
+                    .desktop_decide(&input.id, &input.decision, now)
+            };
+        }
+        if method == "POST" && path == "/api/agent/read-notifications" {
+            #[derive(Deserialize)]
+            #[serde(deny_unknown_fields)]
+            struct Input {
+                ids: Vec<String>,
+            }
+            let input: Input = serde_json::from_value(body).map_err(|_| "TASK_ID_INVALID")?;
+            stratide_research::ensure(
+                !input.ids.is_empty() && input.ids.len() <= 50,
+                "NOTIFICATION_INPUT_LIMIT",
+            )?;
+            return agent.store().desktop_mark_read(
+                &input
+                    .ids
+                    .iter()
+                    .map(|s| parse_id(s))
+                    .collect::<stratide_research::Result<Vec<_>>>()?,
+            );
+        }
         if method == "GET"
             && (path == "/api/agent/tasks" || path.starts_with("/api/agent/tasks?before="))
         {
@@ -89,9 +163,18 @@ pub fn reply(app: &App, agent: Option<&Agent>, req: &mut Request, port: u16) -> 
             return agent.store().list(before);
         }
         if method == "POST" && path == "/api/agent/tasks" {
+            stratide_research::ensure(
+                app.desktop.is_none(),
+                "DASHBOARD_USE_REGISTERED_RESEARCH_OPERATION",
+            )?;
             let input: TaskRequest =
                 serde_json::from_value(body).map_err(|_| "TASK_INPUT_INVALID")?;
-            return Ok(json!({"id":agent.create(&input,now)?.to_string(),"status":"queued"}));
+            let id = if let Some(key) = &request_key {
+                agent.create_once(&input, key, now)?
+            } else {
+                agent.create(&input, now)?
+            };
+            return agent.store().task(id);
         }
         if method == "POST" && path == "/api/agent/control" {
             let control: Control = serde_json::from_value(body).map_err(|_| "CONTROL_INVALID")?;

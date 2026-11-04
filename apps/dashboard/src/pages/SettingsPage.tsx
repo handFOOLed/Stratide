@@ -14,6 +14,10 @@ import type { PaperDataState } from '../state/usePaperData';
 import type { HealthState } from '../state/useHealth';
 import { useTheme } from '../state/ThemeProvider';
 import { EvidenceBadge } from '../components/domain/Badges';
+import { TechnicalDetails } from '../components/domain/WorkspaceStudies';
+import type { WorkspaceState } from '../lib/workspace';
+import type { AgentState } from '../state/useAgent';
+import { formatMicro } from '../lib/format';
 
 const SECTION_ICONS: Record<SettingsSection, IconName> = {
   appearance: 'sun',
@@ -59,17 +63,20 @@ export function SettingsPage({
   section,
   onSection,
   titleRef,
+  workspace,
+  agent,
 }: {
   paper: PaperDataState;
   health: HealthState;
   section: SettingsSection;
   onSection: (section: SettingsSection) => void;
   titleRef?: Ref<HTMLHeadingElement>;
+  workspace: WorkspaceState;
+  agent: AgentState;
 }) {
   const { theme, motion, setTheme, setMotion } = useTheme();
   const meta = paper.meta;
   const gaps = Array.isArray(meta?.gaps) ? meta.gaps : [];
-  const notificationStatusText = health.error ? '状态不可读' : health.data?.notifications ?? 'unknown';
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const onTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
@@ -138,13 +145,18 @@ export function SettingsPage({
     if (section === 'data') {
       return (
         <CardBody className="data-card">
+          <h2 className="card__title">来源、时效与完整性</h2>
+          <p>历史 PIT 尚未验证；开盘流实收尚未验证。盘后 daily.open 仅支持前日冻结意图的事后 Paper 假设。</p>
+          <p className="muted">Tushare 未复权日线：价格为元、成交量为手（100 股）、金额为千元；以实际取得时间记录来源，不推断历史首次发布时间。</p>
+          {workspace.data!==null && workspace.data.admission!==undefined?<div className="mini-table-wrap"><table className="mini-table"><caption>真实数据资格清单</caption><thead><tr><th>待补证据</th><th>状态</th><th>任务</th></tr></thead><tbody>{workspace.data.admission.matrix.map(row=><tr key={row.dependency}><td>{row.required_evidence}</td><td>受阻</td><td>{row.issue}</td></tr>)}</tbody></table><TechnicalDetails value={workspace.data.admission}/></div>:null}
+          {workspace.data !== null ? workspace.data.evidence.map(e=><div className="study-row" key={e.id}><strong>{e.name}</strong><p>已有本地来源记录；交易资格仍受原准入判定约束。</p><TechnicalDetails value={e}/></div>) : null}
           {paper.phase === 'loading' ? (
             <p className="muted">正在读取数据连接信息…</p>
           ) : meta ? (
             <>
               <Kv
                 items={[
-                  { label: '账户快照', value: meta.snapshot_id },
+                  { label: '账户快照', value: meta.snapshot_id.slice(0,8)+'…'+meta.snapshot_id.slice(-6) },
                   { label: '来源', value: meta.source },
                   { label: '来源版本', value: meta.source_version },
                   {
@@ -152,7 +164,6 @@ export function SettingsPage({
                     value: (
                       <span className="inline-row inline-row--tight">
                         <EvidenceBadge evidence={meta.evidence_class} />
-                        <span className="mono">{meta.evidence_class}</span>
                       </span>
                     ),
                   },
@@ -164,9 +175,9 @@ export function SettingsPage({
                     label: '最后有效估值',
                     value: meta.last_valid_valuation_at ? formatDateTime(meta.last_valid_valuation_at) : formatDay(meta.as_of),
                   },
-                  { label: '发布方式', value: meta.publication + ' · ' + meta.refresh_policy },
-                  { label: '行情时效', value: meta.market_freshness },
-                  { label: '前向账户', value: meta.forward_account },
+                  { label: '发布方式', value: meta.publication==='authoritative_paper_ledger'?'原 Paper 账本，只读事务':'最后发布报告，更新需重启' },
+                  { label: '行情时效', value: '仅盘后/快照，非实时' },
+                  { label: '前向账户', value: '尚未验证前向成交' },
                   {
                     label: '未观察日历日',
                     value: String(meta.unobserved_calendar_days_including_weekends ?? '—'),
@@ -233,7 +244,11 @@ export function SettingsPage({
               模型、费率、预算和云授权由本机维护；Web 不提供加额、清锁或密钥读取。
             </SecurityRow>
             <SecurityRow icon="server" title="通知审批">
-              通知状态：{notificationStatusText}；审批服务未接入。
+              {health.error ? '本地服务状态不可读。' : health.data!==null && health.data.notifications==='local_persistent_inbox'?'本机持久通知与研究审批可用；审批不提升预算、云外发或交易权限。':'尚未配置 Agent 控制服务；在本机启动时指定原 Agent 目录。'}
+            </SecurityRow>
+            <SecurityRow icon="database" title="Provider 与共享预算">
+              {agent.status===null?'解锁 Agent 管理后查看原 Provider 与预算。':`日上限 ${formatMicro(agent.status.budget.daily_limit_micro,{currency:agent.status.budget.currency})}，月上限 ${formatMicro(agent.status.budget.monthly_limit_micro,{currency:agent.status.budget.currency})}。实际账单可能不同于估算。`}
+              真实行情、TimesFM 风险及派生摘要不得发给 DeepSeek。
             </SecurityRow>
           </div>
         </CardBody>
@@ -250,6 +265,10 @@ export function SettingsPage({
             { label: '后端', value: 'Rust stratided · 127.0.0.1' },
             { label: '静态资源', value: '本地 app.js / app.css，无 CDN、无遥测' },
             { label: '界面技术', value: 'React 19 + TypeScript + esbuild' },
+            { label: '本地运行', value: 'Windows 11；按需复用 WSL2 TimesFM CPU' },
+            { label: '备份与恢复', value: 'scripts/local-backup.py；先校验与 dry-run，恢复到新目录' },
+            { label: '最近备份', value: workspace.data!==null && workspace.data.backup!==undefined && workspace.data.backup.state==='VERIFIED_LOCAL_BACKUP'?`完整性已核对，共 ${workspace.data.backup.files} 个文件`:'尚无已核对的备份清单；在本机配置指定备份 manifest' },
+            { label: 'N100 部署', value: '已延后，不属于 V1 完成条件' },
           ]}
         />
       </CardBody>

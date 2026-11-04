@@ -1,6 +1,9 @@
 import type { BadgeTone } from '../components/ui/Badge';
 
 export const MODE_LABELS: Record<string, { label: string; tone: BadgeTone; description: string }> = {
+  ex_post_paper_assumption: {label:'Paper 假设成交',tone:'warning',description:'前一日冻结意图，次日盘后事后确认；不是开盘实收或真实交易。'},
+  historical_research_only: {label:'事后历史研究',tone:'neutral',description:'事后取得的历史输入，仅本地研究。'},
+  forward_observed_eod: {label:'前向盘后观察',tone:'neutral',description:'实际时间戳记录的盘后观察，不等于已成交。'},
   synthetic_test: {
     label: '合成测试',
     tone: 'warning',
@@ -19,6 +22,8 @@ export const MODE_LABELS: Record<string, { label: string; tone: BadgeTone; descr
 };
 
 export const EVIDENCE_LABELS: Record<string, string> = {
+  EX_POST_OPEN_ASSUMPTION: '事后开盘价假设',
+  exploratory_historical_replay_not_pit_verified:'事后历史 · PIT 未验证',
   engine_test_only: '引擎测试证据',
   exploratory_not_verified: '探索性 · PIT 未核验',
   independent_verified: '独立核验证据',
@@ -28,6 +33,7 @@ export const EVIDENCE_LABELS: Record<string, string> = {
 export const TASK_STATUS_LABELS: Record<string, string> = {
   queued: '排队中',
   running: '研究中',
+  local_running: '本地研究中',
   completed: '已完成',
   failed: '失败',
   cancel_requested: '已申请取消',
@@ -39,8 +45,9 @@ export const TASK_STATUS_LABELS: Record<string, string> = {
 export const TASK_STATUS_TONES: Record<string, BadgeTone> = {
   queued: 'neutral',
   running: 'accent',
-  completed: 'success',
-  failed: 'danger',
+  completed: 'neutral',
+  failed: 'warning',
+  local_running: 'accent',
   cancel_requested: 'warning',
   cancelled: 'neutral',
   outcome_uncertain: 'warning',
@@ -50,8 +57,8 @@ export const TASK_STATUS_TONES: Record<string, BadgeTone> = {
 export const ORDER_STATUS_TONES: Record<string, BadgeTone> = {
   Open: 'neutral',
   PartiallyFilled: 'accent',
-  Filled: 'success',
-  Rejected: 'danger',
+  Filled: 'neutral',
+  Rejected: 'warning',
   Expired: 'warning',
 };
 
@@ -86,7 +93,9 @@ export const AVAILABILITY_TONES: Record<string, BadgeTone> = {
 
 export const VERIFICATION_LABELS: Record<string, string> = {
   FAKE_SYNTHETIC_ONLY: 'FAKE / SYNTHETIC',
-  REAL_PROVIDER_NOT_VERIFIED: 'REAL_PROVIDER_NOT_VERIFIED',
+  REAL_PROVIDER_NOT_VERIFIED: '真实服务尚未验证',
+  REAL_PROVIDER_CALL_OBSERVED: '已有真实调用记录',
+  LOCAL_NO_BILLING: '本地不计费',
   VERIFIED: '已核验',
 };
 
