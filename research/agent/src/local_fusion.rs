@@ -25,13 +25,18 @@ const GRANT: &str = "deepseek-synthetic-fusion-grant-v1";
 const PRE_SNAPSHOT_ADAPTER_SHA: &str =
     "a5bd6c9a53d223a60fdfb25633d077b4f5ef1a2df93170af3a5f41f18db57474";
 
+const LEGACY_ROLE_ADAPTER_SHA: &str =
+    "e979cf6ba7894239493c1a72daac7dbff3e4357a1ddf342aab14d1052c1772e7";
 const SYSTEM:&str="Return exactly one JSON TargetPortfolioProposal V1 using output_contract values and field types. Input is synthetic engineering evidence, never market alpha. Propose a falsifiable research hypothesis and stocks/cash or 100 percent cash. Missing return/opportunity/account facts remain UNKNOWN. Positions use only evidence instruments. Text arrays contain at least one concise item. No tools, code, URLs, permissions or orders. All cash is valid; weights plus cash equal 10000. Keep output below 2500 tokens. Return exactly the root keys in output_contract, with no wrapper or extra keys. All evidence and risk text fields shown as arrays must be arrays of strings, never objects. estimated_turnover_bps and estimated_fees_micro must be null.";
 const PR19_CODE_SHA: &str = "b2a855cd86acd7acd7cd09c224ba5946e67dd35a0fb7584209fc558fced188ab";
 pub fn code_sha() -> String {
     hash(
         concat!(
             include_str!("local_fusion.rs"),
-            include_str!("bin/local-fusion-agent.rs")
+            include_str!("bin/local-fusion-agent.rs"),
+            include_str!("fusion_researcher.rs"),
+            include_str!("../prompts/fusion-researcher-v1-system.txt"),
+            include_str!("../prompts/fusion-researcher-v1-developer.txt")
         )
         .as_bytes(),
     )
@@ -461,6 +466,10 @@ pub fn body(m: &Model, ctx: &Context, f: &rp::Frozen, bundle: &Value) -> Result<
     let experts = bundle["risk_experts"]
         .as_array()
         .ok_or("RISK_EVIDENCE_REQUIRED")?;
+    let researcher = ctx.adapter_sha256 == code_sha();
+    if researcher {
+        crate::fusion_researcher::validate_evidence(f, experts)?;
+    }
     let summary:Vec<Value>=experts.iter().map(|e|json!({"instrument":e["instrument"],"volatility_forecast":e["volatility_forecast"],
         "target":e["target"],"unit":e["unit"],"market_regime":e["market_regime"],"naive":e["baseline_comparison"]["naive"],
         "ewma":e["baseline_comparison"]["ewma"],"uncertainty":e["uncertainty"],"quality_blockers":e["quality_blockers"],
@@ -472,12 +481,21 @@ pub fn body(m: &Model, ctx: &Context, f: &rp::Frozen, bundle: &Value) -> Result<
         "rationale":"string","evidence_for":["string"],"evidence_against":["string"],"risk_assessment":["string"],
         "invalidation_conditions":["string"],"next_experiment":["string"],"limitations":["string"],
         "estimated_turnover_bps":null,"estimated_fees_micro":null,"authority":"RESEARCH_ONLY"});
-    let user = json!({"mode":"SYNTHETIC_ENGINEERING_ONLY","synthetic_risk_summary":summary,
+    let mut user = json!({"mode":"SYNTHETIC_ENGINEERING_ONLY","synthetic_risk_summary":summary,
         "source_refs":{"snapshot_sha256":f.snapshot_ref,"local_result_sha256":ctx.parent_result_sha256,
             "local_plan_sha256":ctx.parent_plan_sha256,"model_weight_sha256":cpu::WEIGHT_SHA},
         "opportunity":"UNKNOWN_NO_RETURN_EVIDENCE","account":"UNKNOWN_NO_ACCOUNT_ORDERS","output_contract":contract,
         "positions_contract":"optional [{instrument,target_weight_bps}] only evidence instruments; cash plus positions exactly 10000"});
-    let body = json!({"model":m.model,"messages":[{"role":"system","content":SYSTEM},{"role":"user","content":user.to_string()}],
+    let system = if researcher {
+        user["researcher_contract"] = json!({"version":crate::fusion_researcher::VERSION,
+            "prompt_sha256":crate::fusion_researcher::prompt_sha(),"narrative_authority":"UNTRUSTED_HYPOTHESIS_NOT_EVIDENCE"});
+        user["output_contract"]["evidence_for"] = json!(["SYNTHETIC_RISK_EVIDENCE_ONLY"]);
+        user["output_contract"]["limitations"] = json!(crate::fusion_researcher::LIMITATIONS);
+        crate::fusion_researcher::instructions()
+    } else {
+        SYSTEM.to_owned()
+    };
+    let body = json!({"model":m.model,"messages":[{"role":"system","content":system},{"role":"user","content":user.to_string()}],
         "max_tokens":m.max_output_tokens,"thinking":{"type":"disabled"},"response_format":{"type":"json_object"},"stream":false});
     ensure(
         body.to_string().len() + 1024 <= m.max_input_tokens as usize,
@@ -675,6 +693,9 @@ pub fn decode(
         .ok_or("PORTFOLIO_JSON")?;
     let portfolio: rp::Portfolio = serde_json::from_str(content).map_err(|_| "PORTFOLIO_SCHEMA")?;
     portfolio.bind(f, &[f.snapshot_ref.clone(), f.strategy_hash()])?;
+    if ctx.adapter_sha256 == code_sha() {
+        crate::fusion_researcher::validate_portfolio(&portfolio)?;
+    }
     let mut result = rp::safe();
     result["paper_allowed"] = json!(false);
     result["portfolio"] = serde_json::to_value(&portfolio).unwrap();
@@ -700,6 +721,11 @@ pub fn decode(
         "input_tokens":i,"output_tokens":o,"maximum_reserved_micro":m.cost(m.max_input_tokens,m.max_output_tokens)?,
         "usage_estimate_micro":m.cost(i,o)?,"price_version":m.price.as_ref().ok_or("PRICE_UNCONFIGURED")?.version,
         "billing":"USAGE_ESTIMATE_MAXIMUM_HELD_UNTIL_OWNER_INVOICE_RECONCILIATION","actual_bill_micro":null,"currency":"CNY"});
+    if ctx.adapter_sha256 == code_sha() {
+        result["receipt"]["prompt_version"] = json!(crate::fusion_researcher::VERSION);
+        result["receipt"]["prompt_sha256"] = json!(crate::fusion_researcher::prompt_sha());
+        result["receipt"]["narrative_authority"] = json!("UNTRUSTED_HYPOTHESIS_NOT_EVIDENCE");
+    }
     rp::validate_output(&result)?;
     Ok((result, i, o))
 }
@@ -925,7 +951,8 @@ pub fn inspect(batch: &str, verify: bool) -> Result<Value> {
         ensure(
             ctx.adapter_sha256 == code_sha()
                 || ctx.adapter_sha256 == PRE_SNAPSHOT_ADAPTER_SHA
-                || ctx.adapter_sha256 == PR19_CODE_SHA,
+                || ctx.adapter_sha256 == PR19_CODE_SHA
+                || ctx.adapter_sha256 == LEGACY_ROLE_ADAPTER_SHA,
             "FUSION_ADAPTER_CHANGED_NEW_TASK_REQUIRED",
         )?;
         let (input, pid, pin): (String, String, String) = c.query_row(

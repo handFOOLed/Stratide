@@ -1,5 +1,7 @@
 # Stratide 当前状态
 
+**2026-11-04 / #76 / 本分支 Draft：** PR #75 已合并，当前基线 `d557aa1`；新增[冻结风险评价、前向只读审计与 FusionResearcherV1](V1_EVALUATION.md)。本地真实效果、工程自测和独立资格分别报告；#10/#17 保持 Open，真实数据不外发、Paper/Live 不解锁。下方旧条目保留发生时的状态。
+
 **2026-11-04 / PR #75 R2：** 修复 Rust historical 当日收盘的盘后时点门禁；上海 16:00 边界和日期/时区一致性反证通过。历史 13/13、research Rust 71/71、旧 CPU 11 pass + 1 skip；真实 task 9 / Registry / report/verify 通过，0 新云/行情调用。[R2 证据](evidence/m2-pr20/r2/README.md)。保持 Draft，待固定 HEAD 复审。
 
 **2026-11-04 / PR #75 R1：** 历史模型 pin、完整纯 UNKNOWN opportunities、版本/未用字段已严格校验；来源索引改为证券+日期引用原 SHA，真实三证券 252 条来源绑定与 task 8 复核通过。57 个重算 SHA 反例先红后绿，历史套件 12/12、Rust 204/204，预算/授权/真实外发边界保持。[修复证据](evidence/m2-pr20/r1/README.md)。仍为 Draft，待新固定 HEAD 复审，未 Ready/merge。

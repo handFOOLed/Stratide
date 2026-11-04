@@ -1,5 +1,7 @@
 # Stratide Paper 阶段路线图（当前执行版）
 
+**2026-11-04 / #76 / 本分支 Draft：** PR #75 已合并，当前基线 `d557aa1`；新增[冻结风险评价、前向只读审计与 FusionResearcherV1](V1_EVALUATION.md)。本地真实效果、工程自测和独立资格分别报告；#10/#17 保持 Open，真实数据不外发、Paper/Live 不解锁。下方旧条目保留发生时的状态。
+
 **PR #75 R1 / 2026-11-04：** 模型身份、UNKNOWN opportunity 集合和多证券来源绑定修复已完成开发验证，见 [R1 反证与真实复核](evidence/m2-pr20/r1/README.md)；保持同一 Draft，等待固定 HEAD 复审。历史 PIT、Paper/Live 与 N100 状态不升级。
 
 **当前 #74 / M2-PR20（本分支 Draft）：** [真实历史 → 本地 TimesFM](M2_PR20.md) 已完成实际三证券 CPU 推理、原任务/Registry 和 report/verify；[开发证据](evidence/m2-pr20/README.md)。真实数据外发拒绝，新云调用/计费/行情请求为 0。ENGINEERING_PASS 不提升 PIT、样本外优势、Paper/Live 或 N100 资格。PR #70/#72 已在当前 main；下方旧阶段记录保留原发生时状态。

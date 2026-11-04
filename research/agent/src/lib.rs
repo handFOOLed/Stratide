@@ -2,6 +2,7 @@ pub mod budget;
 pub mod config;
 pub mod deepseek;
 pub mod eod_snapshot;
+pub mod fusion_researcher;
 pub mod local_fusion;
 #[cfg(test)]
 mod local_fusion_tests;
