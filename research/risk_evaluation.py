@@ -206,8 +206,35 @@ def sample_scores(predictions, actual, horizons=(5,20)):
     return scores
 
 
+def protocol_capacity(p):
+    """Calendar-independent upper bound for the frozen monthly origin rule.
+
+    Purging/context/calendar gaps may reduce it; more symbols never increase it.
+    This diagnosis changes no frozen threshold, date, sample or qualification.
+    """
+    out = {}
+    for split in p["splits"]:
+        first, last = data.v1.day(split["from"]), data.v1.day(split["through"])
+        month = first.replace(day=1)
+        maximum = 0
+        while month <= last:
+            candidate = max(first, month.replace(day=15))
+            maximum += candidate <= last and candidate.month == month.month and candidate.year == month.year
+            month = (month.replace(day=28) + dt.timedelta(days=4)).replace(day=1)
+        required = p["minimum_complete_origins_per_split"]
+        out[split["name"]] = dict(status="STRUCTURALLY_UNREACHABLE" if maximum < required else "POTENTIALLY_REACHABLE",
+            maximum_monthly_origins=maximum, required_complete_origins=required)
+    return out
+
+
+def hypothesis_verdict(p):
+    return ("STRUCTURALLY_UNREACHABLE" if any(x["status"] == "STRUCTURALLY_UNREACHABLE"
+            for x in protocol_capacity(p).values()) else "INSUFFICIENT_EVIDENCE")
+
+
 def aggregate(records, p):
     out = {}
+    capacities = protocol_capacity(p)
     for split in p["splits"]:
         rows = [r for r in records if r["split"] == split["name"]]
         good = [r for r in rows if r["state"] == "SCORED"]
@@ -223,7 +250,10 @@ def aggregate(records, p):
                         "worker_cpu_seconds_total":sum(r.get("resources",{}).get("cpu_seconds",0) for r in rows),
                         "peak_worker_rss_bytes":max((r.get("resources",{}).get("peak_rss_bytes",0) for r in rows),default=0),
                         "peak_cgroup_memory_bytes":max((r.get("resources",{}).get("cgroup_memory_peak_bytes",0) for r in rows),default=0)},
-                      status="EX_POST_RESEARCH_ONLY" if origins >= p["minimum_complete_origins_per_split"] else "INSUFFICIENT_EVIDENCE",
+                      protocol_capacity=capacities[split["name"]],
+                      sample_evidence_status="MINIMUM_ORIGINS_MET" if origins >= p["minimum_complete_origins_per_split"] else "INSUFFICIENT_EVIDENCE",
+                      status=("STRUCTURALLY_UNREACHABLE" if capacities[split["name"]]["status"] == "STRUCTURALLY_UNREACHABLE" else
+                              "EX_POST_RESEARCH_ONLY" if origins >= p["minimum_complete_origins_per_split"] else "INSUFFICIENT_EVIDENCE"),
                       metrics={}, paired={})
         for name in MODELS:
             result["metrics"][name] = {}
@@ -332,10 +362,10 @@ def run(out, runner=runtime.run):
         require(before == data.file_receipts(f["roots"]), "EVALUATION_SOURCE_MUTATED")
         require(f["implementation_sha256"] == code_sha(), "EVALUATION_CODE_CHANGED_DURING_RUN")
         from evidence_audit import blockers
-        report = dict(schema_version=1, version=VERSION, pin=pin, protocol_sha256=f["protocol_sha256"],
+        report = dict(schema_version=2, version=VERSION, pin=pin, protocol_sha256=f["protocol_sha256"],
             classification="EX_POST_RESEARCH_ONLY" if f["source_origin"] == "REAL_LOCAL_HISTORY" else "SYNTHETIC_TEST_ONLY",
             REAL_OOS="EX_POST_EVALUATED_PIT_NOT_VERIFIED" if f["source_origin"] == "REAL_LOCAL_HISTORY" and any(r["state"] == "SCORED" for r in records) else "NOT_VERIFIED",
-            hypothesis_verdict="INSUFFICIENT_EVIDENCE", holdout_was_previously_exposed=True,
+            hypothesis_verdict=hypothesis_verdict(p), protocol_capacity=protocol_capacity(p), holdout_was_previously_exposed=True,
             target=p["target"], unit="daily_return_ratio", sample_weight=p["sample_weight"],
             horizons=p["horizons"], uncertainty=p["uncertainty"], splits=aggregate(records,p),
             counts=dict(Counter(r["state"] for r in records)), samples=records,
@@ -354,7 +384,9 @@ def summary(out):
     return dict(state="SEALED" if report else "INTERRUPTED" if (Path(out)/"started.json").exists() else "FROZEN_NOT_RUN",
                 pin=pin, protocol_sha256=f["protocol_sha256"], origins=len(f["origins"]),
                 samples=sum(report.get("counts",{}).values()), counts=report.get("counts",{}),
-                REAL_OOS=report.get("REAL_OOS","NOT_RUN"), hypothesis_verdict="INSUFFICIENT_EVIDENCE",
+                REAL_OOS=report.get("REAL_OOS","NOT_RUN"), hypothesis_verdict=hypothesis_verdict(f["protocol"]),
+                protocol_capacity=protocol_capacity(f["protocol"]), stored_report_schema_version=report.get("schema_version"),
+                capacity_assessment="READ_ONLY_PROTOCOL_DIAGNOSIS_NOT_REQUALIFICATION",
                 metrics_visibility="LOCAL_REPORT_ONLY_NO_MARKET_DERIVATIVES_IN_STDOUT", **SAFE)
 
 

@@ -20,10 +20,12 @@ def blockers(observation=None):
     ]
     root = Path(__file__).resolve().parents[1]
     matrix = [dict(dependency=k,status="BLOCKED",reason=reason,required_evidence=required,
+                   scope="REAL_DATA_EGRESS_AUTHORIZATION" if k=="real_fusion" else "EVIDENCE_CLAIM_ONLY",
                    source=source,source_sha256=j.sha((root/source).read_bytes()),issue=issue)
               for k,reason,required,source,issue in entries]
-    return dict(schema_version=1, engineering="SEPARATE_FROM_QUALIFICATION", historical_ex_post="RESEARCH_ONLY",
-                historical_pit="BLOCKED", forward_paper="BLOCKED", live="BLOCKED", matrix=matrix,
+    return dict(schema_version=2, engineering="SEPARATE_FROM_QUALIFICATION", historical_ex_post="RESEARCH_ONLY",
+                engineering_merge_blocked=False, eod_paper_integration_blocked=False,
+                historical_pit="BLOCKED", forward_paper="NOT_VERIFIED", live="BLOCKED", matrix=matrix,
                 observation=observation, orders=0,fills=0,nav=None,
                 independent_acceptance="NOT_PERFORMED_BY_THIS_DEVELOPER")
 
@@ -150,4 +152,6 @@ def audit(observer, through, out, operator=None, v1_root=None, v2_root=None):
     write(path/"audit-seal.json",dict(report_sha256=digest))
     return dict(state="AUDITED",report_sha256=digest, observation={k:obs.get(k) for k in
                 ("data_mode","on_time_days","longest_consecutive_known_open_days","cumulative_continuity","current_continuity")},
-                operator_state=op["state"],admission="BLOCKED",new_http_calls=0,key_content_read=False,**SAFE)
+                operator_state=op["state"],admission="EVIDENCE_GAPS_RECORDED",
+                engineering_merge_blocked=False,eod_paper_integration_blocked=False,
+                new_http_calls=0,key_content_read=False,**SAFE)

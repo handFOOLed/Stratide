@@ -36,13 +36,13 @@ fn run() -> Result<Value> {
         )?;
         return Ok(json!({"valid":true,"prompt_version":f::VERSION,"billable_calls":0}));
     }
-    let p: rp::Portfolio =
-        serde_json::from_value(v["portfolio"].clone()).map_err(|_| "PORTFOLIO_SCHEMA")?;
-    p.bind(
+    let response: f::Response =
+        serde_json::from_value(v["response"].clone()).map_err(|_| "PORTFOLIO_SCHEMA")?;
+    response.portfolio.bind(
         &frozen,
         &[frozen.snapshot_ref.clone(), frozen.strategy_hash()],
     )?;
-    f::validate_portfolio(&p)?;
+    f::validate_response(&response)?;
     Ok(
         json!({"valid":true,"prompt_version":f::VERSION,"prompt_sha256":f::prompt_sha(),
         "authority":"RESEARCH_ONLY","billable_calls":0,"paper_allowed":false,"live_allowed":false}),

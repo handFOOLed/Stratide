@@ -68,7 +68,8 @@ class Tests(unittest.TestCase):
         self.assertEqual(self.run_fixture(out,lambda _:self.fail("Repeated inference")),result)
         self.assertTrue(e.verify(out)["verified"])
         for split in report["splits"].values():
-            self.assertEqual(split["status"],"INSUFFICIENT_EVIDENCE")
+            self.assertEqual(split["status"],"STRUCTURALLY_UNREACHABLE")
+            self.assertEqual(split["sample_evidence_status"],"INSUFFICIENT_EVIDENCE")
             self.assertGreater(split["metrics"]["timesfm"]["20"]["points"],0)
 
     def test_02_future_quality_never_enters_prediction(self):
@@ -143,6 +144,12 @@ class Tests(unittest.TestCase):
         content["data_mode"]="synthetic_test"
         self.assertEqual(audit.accumulate(content,{"20261028":True,"20261029":True},"20261029","20261102")["cumulative_continuity"],"NOT_VERIFIED")
         self.assertTrue(all(x["status"]=="BLOCKED" for x in audit.blockers()["matrix"]))
+        gaps=audit.blockers()
+        self.assertFalse(gaps["engineering_merge_blocked"])
+        self.assertFalse(gaps["eod_paper_integration_blocked"])
+        self.assertEqual(gaps["forward_paper"],"NOT_VERIFIED")
+        for item in gaps["matrix"]:
+            self.assertEqual(item["scope"],"REAL_DATA_EGRESS_AUTHORIZATION" if item["dependency"]=="real_fusion" else "EVIDENCE_CLAIM_ONLY")
 
     def test_08_independent_quality_oracle_rejects_captured_faults(self):
         out,_=self.frozen();self.run_fixture(out)
@@ -196,5 +203,50 @@ class Tests(unittest.TestCase):
                 self.run_fixture(out,runner)
         self.assertFalse((out/"seal.json").exists())
         self.assertEqual(e.summary(out)["state"],"INTERRUPTED")
+
+    def test_12_perfect_data_cannot_reach_frozen_protocol_threshold(self):
+        p=e.read(ROOT/"config/risk-evaluation-v1.json")
+        scores=e.sample_scores({m:[0.01]*20 for m in e.MODELS},[0.01]*20)
+        records=[dict(split=s["name"],origin=s["from"][:4]+f"{month:02}15",state="SCORED",
+                      sample_id=f"{s['name']}-{month}-{symbol}",scores=scores)
+                 for s in p["splits"] for month in range(1,13) for symbol in p["symbols"]]
+        for result in e.aggregate(records,p).values():
+            self.assertEqual(result["coverage"],1)
+            self.assertEqual(result["distinct_origins"],12)
+            self.assertEqual(result["status"],"STRUCTURALLY_UNREACHABLE")
+            self.assertEqual(result["protocol_capacity"],dict(status="STRUCTURALLY_UNREACHABLE",
+                maximum_monthly_origins=12,required_complete_origins=20))
+        self.assertEqual(p["minimum_complete_origins_per_split"],20)
+
+    def test_13_capacity_is_separate_from_observed_missingness_and_legacy_seals(self):
+        p=copy.deepcopy(self.p)
+        p["minimum_complete_origins_per_split"]=2
+        scores=e.sample_scores({m:[0.01]*20 for m in e.MODELS},[0.01]*20)
+        records=[dict(split="development",origin="20220315",state="SCORED",sample_id="one",scores=scores)]
+        result=e.aggregate(records,p)["development"]
+        self.assertEqual(result["protocol_capacity"]["status"],"POTENTIALLY_REACHABLE")
+        self.assertEqual(result["status"],"INSUFFICIENT_EVIDENCE")
+        records.append(dict(records[0],origin="20220415",sample_id="two"))
+        result=e.aggregate(records,p)["development"]
+        self.assertEqual(result["status"],"EX_POST_RESEARCH_ONLY")
+        self.assertEqual(result["sample_evidence_status"],"MINIMUM_ORIGINS_MET")
+        out,_=self.frozen();self.run_fixture(out)
+        report=e.read(out/"report.json")
+        independent.verify_capacity(report,self.p)
+        bad=copy.deepcopy(report);bad["splits"]["test"]["protocol_capacity"]["maximum_monthly_origins"]=20
+        with self.assertRaisesRegex(ValueError,"INDEPENDENT_PROTOCOL_CAPACITY"):
+            independent.verify_capacity(bad,self.p)
+        # Recreate the old schema as a synthetic historical artifact, then seal it.
+        report["schema_version"]=1;report.pop("protocol_capacity");report["hypothesis_verdict"]="INSUFFICIENT_EVIDENCE"
+        for split in report["splits"].values():
+            split.pop("protocol_capacity");split.pop("sample_evidence_status");split["status"]="INSUFFICIENT_EVIDENCE"
+        (out/"report.json").write_text(json.dumps(report))
+        seal=e.read(out/"seal.json");seal["files"]["report.json"]=e.model.sha_file(out/"report.json")
+        (out/"seal.json").write_text(json.dumps(seal))
+        before={p.name:p.read_bytes() for p in out.glob("*.json")}
+        checked=independent.verify(out)
+        self.assertEqual(checked["stored_report_schema_version"],1)
+        self.assertEqual(e.verify(out)["hypothesis_verdict"],"STRUCTURALLY_UNREACHABLE")
+        self.assertEqual(before,{p.name:p.read_bytes() for p in out.glob("*.json")})
 
 if __name__=="__main__":unittest.main()

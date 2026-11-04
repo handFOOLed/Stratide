@@ -27,6 +27,8 @@ const PRE_SNAPSHOT_ADAPTER_SHA: &str =
 
 const LEGACY_ROLE_ADAPTER_SHA: &str =
     "e979cf6ba7894239493c1a72daac7dbff3e4357a1ddf342aab14d1052c1772e7";
+const PR78_R1_ADAPTER_SHA: &str =
+    "4686ab55ecc60385210d608dde678e66bf363ccf87fd0736abdca5dfdf6920b1";
 const SYSTEM:&str="Return exactly one JSON TargetPortfolioProposal V1 using output_contract values and field types. Input is synthetic engineering evidence, never market alpha. Propose a falsifiable research hypothesis and stocks/cash or 100 percent cash. Missing return/opportunity/account facts remain UNKNOWN. Positions use only evidence instruments. Text arrays contain at least one concise item. No tools, code, URLs, permissions or orders. All cash is valid; weights plus cash equal 10000. Keep output below 2500 tokens. Return exactly the root keys in output_contract, with no wrapper or extra keys. All evidence and risk text fields shown as arrays must be arrays of strings, never objects. estimated_turnover_bps and estimated_fees_micro must be null.";
 const PR19_CODE_SHA: &str = "b2a855cd86acd7acd7cd09c224ba5946e67dd35a0fb7584209fc558fced188ab";
 pub fn code_sha() -> String {
@@ -36,7 +38,9 @@ pub fn code_sha() -> String {
             include_str!("bin/local-fusion-agent.rs"),
             include_str!("fusion_researcher.rs"),
             include_str!("../prompts/fusion-researcher-v1-system.txt"),
-            include_str!("../prompts/fusion-researcher-v1-developer.txt")
+            include_str!("../prompts/fusion-researcher-v1-developer.txt"),
+            include_str!("../prompts/fusion-researcher-v1-legacy-system.txt"),
+            include_str!("../prompts/fusion-researcher-v1-legacy-developer.txt")
         )
         .as_bytes(),
     )
@@ -467,7 +471,8 @@ pub fn body(m: &Model, ctx: &Context, f: &rp::Frozen, bundle: &Value) -> Result<
         .as_array()
         .ok_or("RISK_EVIDENCE_REQUIRED")?;
     let researcher = ctx.adapter_sha256 == code_sha();
-    if researcher {
+    let legacy_role = ctx.adapter_sha256 == PR78_R1_ADAPTER_SHA;
+    if researcher || legacy_role {
         crate::fusion_researcher::validate_evidence(f, experts)?;
     }
     let summary:Vec<Value>=experts.iter().map(|e|json!({"instrument":e["instrument"],"volatility_forecast":e["volatility_forecast"],
@@ -486,12 +491,29 @@ pub fn body(m: &Model, ctx: &Context, f: &rp::Frozen, bundle: &Value) -> Result<
             "local_plan_sha256":ctx.parent_plan_sha256,"model_weight_sha256":cpu::WEIGHT_SHA},
         "opportunity":"UNKNOWN_NO_RETURN_EVIDENCE","account":"UNKNOWN_NO_ACCOUNT_ORDERS","output_contract":contract,
         "positions_contract":"optional [{instrument,target_weight_bps}] only evidence instruments; cash plus positions exactly 10000"});
-    let system = if researcher {
+    let system = if researcher || legacy_role {
         user["researcher_contract"] = json!({"version":crate::fusion_researcher::VERSION,
-            "prompt_sha256":crate::fusion_researcher::prompt_sha(),"narrative_authority":"UNTRUSTED_HYPOTHESIS_NOT_EVIDENCE"});
+            "prompt_sha256":if legacy_role {crate::fusion_researcher::legacy_prompt_sha()} else {crate::fusion_researcher::prompt_sha()},
+            "narrative_authority":"UNTRUSTED_HYPOTHESIS_NOT_EVIDENCE"});
         user["output_contract"]["evidence_for"] = json!(["SYNTHETIC_RISK_EVIDENCE_ONLY"]);
         user["output_contract"]["limitations"] = json!(crate::fusion_researcher::LIMITATIONS);
-        crate::fusion_researcher::instructions()
+        if legacy_role {
+            crate::fusion_researcher::legacy_instructions()
+        } else {
+            for (key, value) in crate::fusion_researcher::controlled_text()
+                .as_object()
+                .unwrap()
+            {
+                user["output_contract"][key] = value.clone();
+            }
+            user["output_contract"]["proposal_id"] = json!("fusion-research");
+            user["output_contract"] = json!({"portfolio":user["output_contract"],
+                "conclusions":crate::fusion_researcher::conclusions(&[f.snapshot_ref.clone(),f.strategy_hash()]),
+                "untrusted_hypothesis":{"classification":"UNTRUSTED_HYPOTHESIS","text":"Falsifiable research hypothesis only"}});
+            user["researcher_contract"]["output_envelope"] =
+                json!(crate::fusion_researcher::CONTRACT);
+            crate::fusion_researcher::instructions()
+        }
     } else {
         SYSTEM.to_owned()
     };
@@ -691,14 +713,31 @@ pub fn decode(
     let content = choices[0]["message"]["content"]
         .as_str()
         .ok_or("PORTFOLIO_JSON")?;
-    let portfolio: rp::Portfolio = serde_json::from_str(content).map_err(|_| "PORTFOLIO_SCHEMA")?;
+    let researcher = ctx.adapter_sha256 == code_sha();
+    let (portfolio, annotations) = if researcher {
+        let response: crate::fusion_researcher::Response =
+            serde_json::from_str(content).map_err(|_| "PORTFOLIO_SCHEMA")?;
+        crate::fusion_researcher::validate_response(&response)?;
+        (
+            response.portfolio,
+            Some((response.conclusions, response.untrusted_hypothesis)),
+        )
+    } else {
+        let portfolio: rp::Portfolio =
+            serde_json::from_str(content).map_err(|_| "PORTFOLIO_SCHEMA")?;
+        if ctx.adapter_sha256 == PR78_R1_ADAPTER_SHA {
+            crate::fusion_researcher::validate_legacy_portfolio(&portfolio)?;
+        }
+        (portfolio, None)
+    };
     portfolio.bind(f, &[f.snapshot_ref.clone(), f.strategy_hash()])?;
-    if ctx.adapter_sha256 == code_sha() {
-        crate::fusion_researcher::validate_portfolio(&portfolio)?;
-    }
     let mut result = rp::safe();
     result["paper_allowed"] = json!(false);
     result["portfolio"] = serde_json::to_value(&portfolio).unwrap();
+    if let Some((conclusions, hypothesis)) = annotations {
+        result["conclusions"] = conclusions;
+        result["untrusted_hypothesis"] = serde_json::to_value(hypothesis).unwrap();
+    }
     result["strategy_artifact_sha256"] = json!(rp::sha(&result["portfolio"]));
     result["risk_evidence_sha256"] = json!(rp::sha(parent));
     result["discovery"]=json!(portfolio.candidate_instruments.iter().filter(|id|!f.series.iter().any(|s|s.instrument==**id))
@@ -721,9 +760,13 @@ pub fn decode(
         "input_tokens":i,"output_tokens":o,"maximum_reserved_micro":m.cost(m.max_input_tokens,m.max_output_tokens)?,
         "usage_estimate_micro":m.cost(i,o)?,"price_version":m.price.as_ref().ok_or("PRICE_UNCONFIGURED")?.version,
         "billing":"USAGE_ESTIMATE_MAXIMUM_HELD_UNTIL_OWNER_INVOICE_RECONCILIATION","actual_bill_micro":null,"currency":"CNY"});
-    if ctx.adapter_sha256 == code_sha() {
+    if researcher || ctx.adapter_sha256 == PR78_R1_ADAPTER_SHA {
         result["receipt"]["prompt_version"] = json!(crate::fusion_researcher::VERSION);
-        result["receipt"]["prompt_sha256"] = json!(crate::fusion_researcher::prompt_sha());
+        result["receipt"]["prompt_sha256"] = json!(if researcher {
+            crate::fusion_researcher::prompt_sha()
+        } else {
+            crate::fusion_researcher::legacy_prompt_sha()
+        });
         result["receipt"]["narrative_authority"] = json!("UNTRUSTED_HYPOTHESIS_NOT_EVIDENCE");
     }
     rp::validate_output(&result)?;
@@ -952,7 +995,8 @@ pub fn inspect(batch: &str, verify: bool) -> Result<Value> {
             ctx.adapter_sha256 == code_sha()
                 || ctx.adapter_sha256 == PRE_SNAPSHOT_ADAPTER_SHA
                 || ctx.adapter_sha256 == PR19_CODE_SHA
-                || ctx.adapter_sha256 == LEGACY_ROLE_ADAPTER_SHA,
+                || ctx.adapter_sha256 == LEGACY_ROLE_ADAPTER_SHA
+                || ctx.adapter_sha256 == PR78_R1_ADAPTER_SHA,
             "FUSION_ADAPTER_CHANGED_NEW_TASK_REQUIRED",
         )?;
         let (input, pid, pin): (String, String, String) = c.query_row(
@@ -993,6 +1037,7 @@ pub fn inspect(batch: &str, verify: bool) -> Result<Value> {
     }
     Ok(
         json!({"state":status,"task_id":id,"context":ctx,"frozen":plan.frozen,"local_risk":parent,"result":result,
+        "conclusion_contract":if ctx.adapter_sha256 == code_sha() {crate::fusion_researcher::CONTRACT} else {"LEGACY_UNTRUSTED_HYPOTHESIS_NOT_REQUALIFIED"},
         "result_storage_sha256":raw.map(|s|hash(s.as_bytes())),"verified":verify,"paper_allowed":false,"live_allowed":false}),
     )
 }

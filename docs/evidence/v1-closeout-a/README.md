@@ -1,5 +1,7 @@
 # V1 收尾 A 开发者证据（Issue #76）
 
+以下保留原 HEAD `152443e` 的开发记录，不作为新验收门禁。最新 R1 修复与相关本地绿测见 [简报](r1-fix.md)；个人模式规则和证据声明范围以 [当前说明](../../V1_EVALUATION.md)为准。
+
 - **基线：** `d557aa1cd721df66accdddbe7b22afb184736ecc`（PR #75 merge）。
 - **协议先行提交：** `7c42a67`；配置字节 SHA `fab03053a63963c06c904f2f421886cadd9f541edb2f698e2d1caed6c94fc8a1`，canonical JSON SHA `471d7e7136ec2645ce7210025f47fddcb18b372bacbc6ee2bdeb904435689cec`。
 - **最终实现源码：** `e9fd6878816f10e0be22b869322242340349edb1`。其后提交只增加本目录证据，最终 PR HEAD 可用 [tested-source.json](tested-source.json) 逐文件 SHA 对照。单人、agents=0、WSL2 Ubuntu 原生 ext4。

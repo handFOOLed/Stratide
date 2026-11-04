@@ -112,6 +112,32 @@ def source_reasons(raw):
     return reasons
 
 
+def verify_capacity(report, p):
+    """Independent month arithmetic; legacy sealed reports remain byte-identical."""
+    capacities = {}
+    for split in p["splits"]:
+        start_year,start_month=int(split["from"][:4]),int(split["from"][4:6])
+        end_year,end_month=int(split["through"][:4]),int(split["through"][4:6])
+        maximum=(end_year-start_year)*12+end_month-start_month+1
+        if int(split["through"][6:]) < 15: maximum-=1
+        required=p["minimum_complete_origins_per_split"]
+        capacities[split["name"]]=dict(status="STRUCTURALLY_UNREACHABLE" if maximum<required else "POTENTIALLY_REACHABLE",
+            maximum_monthly_origins=maximum,required_complete_origins=required)
+        if report["schema_version"] == 2:
+            rows=[r for r in report["samples"] if r["split"]==split["name"] and r["state"]=="SCORED"]
+            count=len({r["origin"] for r in rows})
+            agg=report["splits"][split["name"]]
+            check(agg["protocol_capacity"]==capacities[split["name"]]
+                  and agg["distinct_origins"]==count
+                  and agg["sample_evidence_status"]==("MINIMUM_ORIGINS_MET" if count>=required else "INSUFFICIENT_EVIDENCE")
+                  and agg["status"]==("STRUCTURALLY_UNREACHABLE" if maximum<required else
+                      "EX_POST_RESEARCH_ONLY" if count>=required else "INSUFFICIENT_EVIDENCE"),"INDEPENDENT_PROTOCOL_CAPACITY")
+    if report["schema_version"] == 2:
+        verdict="STRUCTURALLY_UNREACHABLE" if any(v["status"]=="STRUCTURALLY_UNREACHABLE" for v in capacities.values()) else "INSUFFICIENT_EVIDENCE"
+        check(report["protocol_capacity"]==capacities and report["hypothesis_verdict"]==verdict,"INDEPENDENT_PROTOCOL_CAPACITY")
+    return capacities
+
+
 def verify(out):
     out=Path(out).absolute()
     check(not any(p.is_symlink() for p in (out,*out.parents)),"INDEPENDENT_OUTPUT_LINK")
@@ -124,6 +150,8 @@ def verify(out):
         path=out/name
         check(".." not in Path(name).parts and path.is_relative_to(out) and not path.is_symlink() and sha(path)==expected,"INDEPENDENT_REPORT_HASH")
     p=f["protocol"]
+    check(report["schema_version"] in (1,2),"INDEPENDENT_REPORT_SCHEMA")
+    capacities=verify_capacity(report,p)
     check(p["target"] == report["target"] == "rolling20_rms_daily_return_ratio" and p["horizons"] == [5,20]
           and p["holdout_was_previously_exposed"] is True,"INDEPENDENT_TARGET")
     # Independently derive month origins and purge windows from the frozen exchange calendar.
@@ -222,7 +250,9 @@ def verify(out):
           and report["cloud_egress"]=="REAL_MARKET_DATA_EGRESS_DENIED" and report["calls"]==report["billable_calls"]==report["budget_writes"]==0,
           "INDEPENDENT_AUTHORITY")
     return dict(verified=True,verification="INDEPENDENT_STANDARD_LIBRARY_RECOMPUTATION_NOT_INDEPENDENT_ACCEPTANCE",
-                pin=pin,samples=len(records),scored=scored,quality_decisions_recomputed=quality_checked,metrics_uploaded=False,real_data_egress=False)
+                pin=pin,samples=len(records),scored=scored,quality_decisions_recomputed=quality_checked,
+                protocol_capacity=capacities,stored_report_schema_version=report["schema_version"],
+                capacity_assessment="READ_ONLY_PROTOCOL_DIAGNOSIS_NOT_REQUALIFICATION",metrics_uploaded=False,real_data_egress=False)
 
 
 if __name__=="__main__":
