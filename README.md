@@ -28,8 +28,8 @@ Owner 首次使用：在既有真实 CNY Agent 的 `settings.json` 手动填日/
 - **公司行为证据已合并（PR #38）：** [证据包 V1](docs/M1_PR07B.md) 保留真实公告的 `FACTS_PARTIAL / historical_pit=NOT_VERIFIED`，没有真实历史准入。
 - **现金分红模型已合并（PR #40）：** [CASH_DIVIDEND_V1](docs/M1_PR08.md) 完成隔离现金分红的登记→应收/税负→到账、统一 NAV/Risk、七报告和独立算法复算；旧 synthetic CLI、v3/68 日保持兼容。
 - **历史分红桥接已合并（PR #42）：** [历史分红桥接 V1](docs/M1_PR09.md) 将原冻结行情、PR38 证据和显式模型假设接入 v4、原 SMA5/20、七报告及独立算法/双基准；实际运行 77 会话 **EXPLORATORY_EX_POST**，真实 PIT 新增 **0 天**，真实准入继续拒绝。
-- **仍受阻：** 仅 68 个历史交易日、3 笔模拟成交，长窗口公司行为/费用证据 `DATA_BLOCKED`；真实 EOD 两日 `EOD_CONTINUITY_VERIFIED`，开盘源仍 BLOCKED，**尚无真正前向模拟成交或 NAV**。
-- **当前顺序：** #74 交付真实历史 → 本地 TimesFM 核心闭环，单个 Draft 等待固定 HEAD 审查。后续预冻结样本外协议、积累前向 EOD；UI 在核心之后。见[当前状态](docs/STATUS.md)。
+- **证据缺口（不挡工程合并）：** 长窗口公司行为/费用仍 `DATA_BLOCKED`（[#17](https://github.com/handFOOLed/Stratide/issues/17#issuecomment-6623137271)）；真实 EOD 两日 `EOD_CONTINUITY_VERIFIED`，开盘流 `OPENING_SOURCE=BLOCKED / NOT_VERIFIED`（[#10](https://github.com/handFOOLed/Stratide/issues/10#issuecomment-6623136884)）。尚无连续前向 Paper 成交或 NAV。自 2026-11-04 起，这些标签不阻止 EOD Paper、V1 收尾或 Dashboard 工程合并；收盘后的 EOD 决策可用次日 `daily.open` 作为默认 Paper 成交假设。它们只阻止宣称 PIT 已过、开盘流已实收或已验证可交易。见 [当前状态](docs/STATUS.md)。 T 日盘后实际取得并校验的 T 日 `daily.open` 是已知历史输入，可用于研究并冻结 T+1 意图；T 日 open **不是** T+1 成交价。若按 T+1 `daily.open` 模拟成交，须于 T+1 盘后取得该字段，按 T 日已冻结的订单意图、数量及撮合规则事后确认，标记 `EX_POST_OPEN_ASSUMPTION`，不得看到 T+1 结果后选择性下单/撤单，也不能冒充开盘实收。现金、费用、停牌及唯一 Risk→Ledger 逐笔校验保持。
+- **当前顺序：** [#76](https://github.com/handFOOLed/Stratide/issues/76) 研究评价/Prompt（[PR #78](https://github.com/handFOOLed/Stratide/pull/78) 审查中）→ [#77](https://github.com/handFOOLed/Stratide/issues/77) 产品集成/部署；Owner 按本地相关绿测和简短说明作日常合并决定，外部固定 HEAD 审查可选，高风险修改建议定向反证。
 - **PR #56 审查修复：** 新链路须显式绑定已有 Owner AgentDir/配置，与旧 Agent 共用同一费用库，不再初始化第二个预算。预算修复已获源码复审确认；原 PR52/54 三套盘后完整回归 **10+4+13 项均 exit 0**，PR #56 后续已合并，原开发证据保留；见 [R1 证据](docs/evidence/m2-pr11/r1/README.md)。
 
 ## Windows 本地体验
@@ -47,7 +47,7 @@ pwsh -NoProfile -File scripts/start-dashboard.ps1 -ReportDir 'docs/evidence/m0-p
 
 ## 团队与文档
 
-- **Owner：** 范围与合并决定；**Sol：** 后端、Agent、接口和关键测试；**DeepSeek：** 信息架构、字体/组件、布局与平滑动效；**ChatGPT：** 固定 HEAD 审查、获授权后合并。
-- [DeepSeek UI 交接规范](docs/UI_HANDOFF_DEEPSEEK.md) · [编码规则](AGENTS.md) · [产品原则](docs/PRODUCT.md) · [风险规范](docs/RISK_POLICY.md) · [历史 ADR](docs/adr/)。
+- **Owner：** 范围与合并决定；**实现者：** 授权功能、相关测试和简短说明；**ChatGPT：** 可选的风险分级审查。不指定 UI/UX 负责人。
+- [编码规则](AGENTS.md) · [产品原则](docs/PRODUCT.md) · [风险规范](docs/RISK_POLICY.md) · [历史 ADR](docs/adr/)。
 
 **所有历史回放均不等于实时前向验证；不接入实盘券商。**
