@@ -1,5 +1,7 @@
 # Stratide Paper 阶段路线图（当前执行版）
 
+**PR #75 R1 / 2026-11-04：** 模型身份、UNKNOWN opportunity 集合和多证券来源绑定修复已完成开发验证，见 [R1 反证与真实复核](evidence/m2-pr20/r1/README.md)；保持同一 Draft，等待固定 HEAD 复审。历史 PIT、Paper/Live 与 N100 状态不升级。
+
 **当前 #74 / M2-PR20（本分支 Draft）：** [真实历史 → 本地 TimesFM](M2_PR20.md) 已完成实际三证券 CPU 推理、原任务/Registry 和 report/verify；[开发证据](evidence/m2-pr20/README.md)。真实数据外发拒绝，新云调用/计费/行情请求为 0。ENGINEERING_PASS 不提升 PIT、样本外优势、Paper/Live 或 N100 资格。PR #70/#72 已在当前 main；下方旧阶段记录保留原发生时状态。
 
 > 2026-11-03；最新实现与数据边界见 [STATUS](STATUS.md)。Owner 已决定 **Core-first、UI-later**：后续核心功能不要求同期 Dashboard/UI，最终按已合并 PR #28 的视觉基准统一集成。旧各 PR 实施/验收细节仍保存在 `docs/M0_*.md`、`docs/M1_*.md`、`docs/M2_PR01.md` 与 `docs/evidence/`。

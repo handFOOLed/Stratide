@@ -1,5 +1,7 @@
 # Stratide 当前状态
 
+**2026-11-04 / PR #75 R1：** 历史模型 pin、完整纯 UNKNOWN opportunities、版本/未用字段已严格校验；来源索引改为证券+日期引用原 SHA，真实三证券 252 条来源绑定与 task 8 复核通过。57 个重算 SHA 反例先红后绿，历史套件 12/12、Rust 204/204，预算/授权/真实外发边界保持。[修复证据](evidence/m2-pr20/r1/README.md)。仍为 Draft，待新固定 HEAD 复审，未 Ready/merge。
+
 **2026-11-03 / #74 / M2-PR20（本分支 Draft）：** 基于最新 main `971eb4ba90507142b1d32ca80af2d15859790933`（含已合并 PR #60/#70/#72），[真实历史 → 本地 TimesFM](M2_PR20.md) 已实际跑通三证券 84 会话 → CPU → 原 Agent task 6 / Registry / report/verify。真实因子变化与缺口样本 BLOCKED；原 calls/预算/授权未变，新市场请求/云调用/计费为 0，真实风险外发 `REAL_MARKET_DATA_EGRESS_DENIED`。数据仍 PARTIAL、PIT 未验证，Paper/Live 禁止，N100 未验收。[本期开发证据](evidence/m2-pr20/README.md)。以下旧条目保留其发生时的状态，本段是当前增量。
 
 **2026-11-03 / #69 / PR #70 Linux R1：** 基于最新 main `b62c1171d8503e1f21e4b470847944c6fbe8dbf4`（PR #68 已合并），新增 [M2-PR18 本地 TimesFM 2.5 CPU](M2_PR18.md)，默认 OFF、独立 Worker、原任务/RiskExpertResult/Naive/EWMA，无新增计费或交易权限。开发/真实模型/Linux/N100 的实际验证状态分别记录于 [m2-pr18 evidence](evidence/m2-pr18/README.md)，N100 尚未验收；本分支保持 Draft。WSL2 Ubuntu ext4 已完成 Linux 隔离 4/4、0 skipped，真实 CPU 生产闭环、calls=0 与 Linux 16 点压力矩阵；[R1 命令/指标/回归限制](evidence/m2-pr18/linux-r1/README.md)。下方既有模块开发证据保留。

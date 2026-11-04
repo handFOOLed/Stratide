@@ -17,6 +17,7 @@ pub fn code_sha() -> String {
     hash(
         concat!(
             include_str!("risk_cpu.rs"),
+            include_str!("../Cargo.toml"),
             include_str!("risk_history.rs"),
             include_str!("../../../research/timesfm_cpu/history.py"),
             include_str!("../../../research/historical_warehouse.py"),
@@ -59,7 +60,7 @@ impl Plan {
             "LOCAL_PIN_CHANGED_NEW_TASK_REQUIRED",
         )?;
         if let Some(h) = &self.history {
-            h.validate(&self.frozen)?;
+            h.validate(&self.frozen, &self.code_sha256)?;
         } else {
             self.frozen.validate(if fresh {
                 Utc::now()

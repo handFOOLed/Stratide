@@ -195,7 +195,9 @@ fn test_deepseek_config(dir: &Path) -> crate::deepseek::Config {
         "# Synthetic test credential\n```text\nsk-syntheticTESTcredential1234567890\n```\n",
     )
     .unwrap();
-    let now = chrono::Utc::now();
+    // Match the Python fixture's margin while WSL synchronizes its clock.
+    // Production authorization and price-time checks remain unchanged.
+    let now = chrono::Utc::now() - chrono::Duration::minutes(5);
     crate::deepseek::Config {
         version: 1,
         key_file,

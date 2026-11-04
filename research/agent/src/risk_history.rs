@@ -12,7 +12,7 @@ pub struct History {
     pub payload: Value,
 }
 impl History {
-    pub fn validate(&self, f: &rp::Frozen) -> Result<()> {
+    pub fn validate(&self, f: &rp::Frozen, code_sha256: &str) -> Result<()> {
         let p = &self.payload;
         ensure(
             rp::sha(p) == self.payload_sha256
@@ -40,6 +40,25 @@ impl History {
                 && f.account_facts == "UNKNOWN_NO_ACCOUNT_ORDERS",
             "HISTORY_SCOPE_OR_PIT_MISUSE",
         )?;
+        // This local adapter has one model and no Fusion/recording/billing path.
+        // A recomputed content hash cannot authorize a different identity.
+        let unused_sha = "0".repeat(64);
+        ensure(
+            f.risk_model.id == "local-timesfm-2.5-cpu"
+                && f.risk_model.fingerprint == code_sha256
+                && rp::valid_sha(&f.risk_model.fingerprint)
+                && f.fusion_model.id == "UNUSED_REAL_EGRESS_DENIED"
+                && f.fusion_model.fingerprint == unused_sha,
+            "HISTORY_MODEL_PIN",
+        )?;
+        ensure(
+            f.prompt_version == rp::PROMPT
+                && f.strategy_version == "historical-timesfm-v1"
+                && f.batch_budget_micro == 1
+                && f.risk_recording_sha256 == unused_sha
+                && f.fusion_recording_sha256 == unused_sha,
+            "HISTORY_VERSIONS_OR_UNUSED_FIELDS",
+        )?;
         let at = f.as_of.parse::<DateTime<Utc>>().map_err(|_| "RISK_AS_OF")?;
         ensure(at <= Utc::now(), "HISTORY_AS_OF")?;
         let day = at.with_timezone(&chrono_tz::Asia::Shanghai).date_naive();
@@ -65,6 +84,13 @@ impl History {
                     .map(|i| format!("session+{i:03}"))
                     .collect::<Vec<_>>(),
             "HISTORY_TARGET_AXIS",
+        )?;
+        let daily_sources = p["sources"]["daily"]
+            .as_object()
+            .ok_or("HISTORY_DAILY_SOURCE_BINDING")?;
+        ensure(
+            daily_sources.len() == f.series.len() * n,
+            "HISTORY_DAILY_SOURCE_BINDING",
         )?;
         let mut names = BTreeSet::new();
         for ((s, r), q) in f.series.iter().zip(raw).zip(quality) {
@@ -116,6 +142,35 @@ impl History {
                         && factors[i]["adj_factor"] == factors[0]["adj_factor"],
                     "HISTORY_ROW_BINDING_OR_FUTURE",
                 )?;
+                let key = format!("{}:{}", s.instrument, d.format("%Y%m%d"));
+                let source_sha = daily_sources
+                    .get(&key)
+                    .and_then(Value::as_str)
+                    .ok_or("HISTORY_DAILY_SOURCE_BINDING")?;
+                ensure(
+                    row["source_sha256"] == source_sha,
+                    "HISTORY_DAILY_SOURCE_BINDING",
+                )?;
+                let source = p["sources"]["daily_manifests"]
+                    .get(source_sha)
+                    .ok_or("HISTORY_DAILY_SOURCE_BINDING")?;
+                let attempts = source["attempts"]
+                    .as_array()
+                    .ok_or("HISTORY_DAILY_SOURCE_BINDING")?;
+                ensure(
+                    rp::sha(source) == row["source_sha256"]
+                        && !attempts.is_empty()
+                        && attempts.iter().all(|a| {
+                            rp::valid_sha(a["metadata_sha"].as_str().unwrap_or(""))
+                                && rp::valid_sha(a["response_sha"].as_str().unwrap_or(""))
+                        })
+                        && attempts
+                            .iter()
+                            .filter_map(|a| a["obtained_at"].as_str())
+                            .max()
+                            == Some(o.available_at.as_str()),
+                    "HISTORY_DAILY_SOURCE_BINDING",
+                )?;
             }
             ensure(
                 s.observations.last().unwrap().trade_day == day.to_string()
@@ -125,6 +180,20 @@ impl History {
                         (o[1].close_fen as f64 / o[0].close_fen as f64 - 1.).abs() <= 0.35
                     }),
                 "HISTORY_CUTOFF_OR_ACTION_GAP",
+            )?;
+        }
+        ensure(
+            f.opportunities.len() == names.len(),
+            "HISTORY_OPPORTUNITIES",
+        )?;
+        let mut opportunities = BTreeSet::new();
+        for o in &f.opportunities {
+            ensure(
+                names.contains(&o.instrument)
+                    && opportunities.insert(&o.instrument)
+                    && o.status == "UNKNOWN"
+                    && o.evidence.is_empty(),
+                "HISTORY_OPPORTUNITIES",
             )?;
         }
         Ok(())

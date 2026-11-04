@@ -124,7 +124,8 @@ def assemble(descriptor, symbols, as_of, days, catalog, daily, factors, suspensi
                    coverage="PARTIAL", quality=quality, blockers=BLOCKERS,
                    units=dict(prices="CNY_yuan", volume="lot_100_shares", amount="CNY_thousand_yuan"),
                    dataset_versions=versions, metadata=metadata, series=raw_series,
-                   sources=dict(daily={x["values"]["trade_date"]:x["availability"] for x in daily["rows"]},
+                   sources=dict(daily={x["values"]["ts_code"]+":"+x["values"]["trade_date"]:x["source_sha"] for x in daily["rows"]},
+                                daily_manifests={x["source_sha"]:x["availability"] for x in daily["rows"]},
                                 adj_factor=factors["partitions"], suspend_d=suspensions["partitions"]),
                    frozen_sha256=digest(f), cloud_egress="REAL_MARKET_DATA_EGRESS_DENIED")
     return f, dict(payload_sha256=digest(payload), payload=payload)

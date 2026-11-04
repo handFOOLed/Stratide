@@ -83,8 +83,8 @@ class Tests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):cls.temp.cleanup()
 
-    def plan(self):
-        f,hist=h.read(self.desc,self.w.root,self.s.root,CODES,ASOF)
+    def plan(self,symbols=CODES):
+        f,hist=h.read(self.desc,self.w.root,self.s.root,symbols,ASOF)
         return dict(batch=self.tag+"-"+self._testMethodName.split("_")[1],frozen=f,history=hist,
                     manifest_sha256=model.digest(self.manifest),code_sha256=self.desc["code_sha256"],
                     max_context=256,batch_size=1,threads=2)
@@ -236,6 +236,129 @@ class Tests(unittest.TestCase):
         request=json.loads(cli.bridge("project",p)["worker_request_json"])
         self.assertEqual(len(request["series"]),8)
         self.assertEqual(len(request["series"][0]["values"]),172)
+
+    @staticmethod
+    def rehash(p):
+        f=p["frozen"]
+        f["snapshot_ref"]=model.digest(dict(series=f["series"],calendar=f["calendar"]))
+        p["history"]["payload"]["frozen_sha256"]=model.digest(f)
+        p["history"]["payload_sha256"]=model.digest(p["history"]["payload"])
+
+    def test_10_rehashed_metadata_rejected_project_begin_verify(self):
+        cli.bridge("enable")
+        p=self.plan(CODES[:1]);self.save(p)
+        def response(raw):
+            v=fixture.fixture_response(raw);v["metrics"]={};return v
+        with patch.object(cli,"verify_model",return_value=self.manifest),patch.object(runtime,"command",return_value=[]):
+            original=cli.once(p["batch"],response)
+            self.assertTrue(cli.verify(p["batch"])["verified"])
+        with sqlite3.connect(self.owner/"agent.sqlite") as db:
+            saved=db.execute("SELECT input,provider_hash,result FROM tasks WHERE id=?",(original["id"],)).fetchone()
+        mutations=[
+            ("risk_model.id",lambda f:f["risk_model"].update(id="wrong-cpu"),"HISTORY_MODEL_PIN"),
+            ("risk_model.fingerprint",lambda f:f["risk_model"].update(fingerprint="a"*64),"HISTORY_MODEL_PIN"),
+            ("risk_model.bad_sha",lambda f:f["risk_model"].update(fingerprint="bad"),"HISTORY_MODEL_PIN"),
+            ("opportunity.missing",lambda f:f["opportunities"].clear(),"HISTORY_OPPORTUNITIES"),
+            ("opportunity.foreign",lambda f:f["opportunities"][0].update(instrument="600999.SH"),"HISTORY_OPPORTUNITIES"),
+            ("opportunity.duplicate",lambda f:f["opportunities"].append(copy.deepcopy(f["opportunities"][0])),"HISTORY_OPPORTUNITIES"),
+            ("opportunity.status",lambda f:f["opportunities"][0].update(status="VERIFIED_SYNTHETIC"),"HISTORY_OPPORTUNITIES"),
+            ("opportunity.evidence",lambda f:f["opportunities"][0].update(evidence=["unverified edge"]),"HISTORY_OPPORTUNITIES"),
+            ("prompt_version",lambda f:f.update(prompt_version="other-v1"),"HISTORY_VERSIONS_OR_UNUSED_FIELDS"),
+            ("strategy_version",lambda f:f.update(strategy_version="other-v1"),"HISTORY_VERSIONS_OR_UNUSED_FIELDS"),
+            ("fusion_model.id",lambda f:f["fusion_model"].update(id="fusion-deepseek"),"HISTORY_MODEL_PIN"),
+            ("fusion_model.fingerprint",lambda f:f["fusion_model"].update(fingerprint="a"*64),"HISTORY_MODEL_PIN"),
+            ("fusion_model.bad_sha",lambda f:f["fusion_model"].update(fingerprint="bad"),"HISTORY_MODEL_PIN"),
+            ("risk_recording.bad_sha",lambda f:f.update(risk_recording_sha256="bad"),"HISTORY_VERSIONS_OR_UNUSED_FIELDS"),
+            ("risk_recording.nonzero",lambda f:f.update(risk_recording_sha256="a"*64),"HISTORY_VERSIONS_OR_UNUSED_FIELDS"),
+            ("fusion_recording.bad_sha",lambda f:f.update(fusion_recording_sha256="bad"),"HISTORY_VERSIONS_OR_UNUSED_FIELDS"),
+            ("budget.zero",lambda f:f.update(batch_budget_micro=0),"HISTORY_VERSIONS_OR_UNUSED_FIELDS"),
+            ("budget.billable",lambda f:f.update(batch_budget_micro=2),"HISTORY_VERSIONS_OR_UNUSED_FIELDS"),
+            ("budget.overbound",lambda f:f.update(batch_budget_micro=1000000000001),"HISTORY_VERSIONS_OR_UNUSED_FIELDS")]
+        try:
+            for i,(name,mutate,reason) in enumerate(mutations):
+                bad=copy.deepcopy(p);mutate(bad["frozen"]);self.rehash(bad)
+                for action in ("project","begin"):
+                    candidate=copy.deepcopy(bad);candidate["batch"]+=f"-negative-{i}"
+                    with self.subTest(field=name,entry=action),self.assertRaisesRegex(model.Rejected,reason):
+                        cli.bridge(action,candidate)
+                # Forge all self-described task/result hashes in the disposable
+                # fixture DB. Verification must reach semantic validation, not
+                # merely reject an old hash left behind by the test.
+                value=copy.deepcopy(original["result"])
+                bundle=value["research"]["risk_portfolio"]
+                bundle["receipt"].update(frozen_input_sha256=model.digest(bad["frozen"]),
+                    historical_input_sha256=bad["history"]["payload_sha256"],plan_sha256=model.digest(bad))
+                bundle["historical_research"]["input_sha256"]=bad["history"]["payload_sha256"]
+                summary=json.loads(saved[0])
+                summary.update(version="timesfm-cpu-v1:"+model.digest(bad))
+                summary["summary"]["plan"]=bad
+                value["input_summary_version"]=summary["version"]
+                value.pop("result_sha256");value["result_sha256"]=model.digest(value)
+                pin=model.digest(dict(code=bad["code_sha256"],manifest=bad["manifest_sha256"],revision=model.REVISION,
+                    weight=model.WEIGHT_SHA,context=bad["max_context"],batch=bad["batch_size"],threads=bad["threads"],
+                    history_sha256=bad["history"]["payload_sha256"]))
+                self.save(bad)
+                with sqlite3.connect(self.owner/"agent.sqlite") as db:
+                    db.execute("UPDATE tasks SET input=?,provider_hash=?,result=? WHERE id=?",
+                        (json.dumps(summary),pin,json.dumps(value),original["id"]))
+                with self.subTest(field=name,entry="verify"),patch.object(cli,"verify_model",return_value=self.manifest):
+                    with self.assertRaisesRegex(model.Rejected,reason):cli.verify(bad["batch"])
+        finally:
+            self.save(p)
+            with sqlite3.connect(self.owner/"agent.sqlite") as db:
+                db.execute("UPDATE tasks SET input=?,provider_hash=?,result=? WHERE id=?",(*saved,original["id"]))
+        with patch.object(cli,"verify_model",return_value=self.manifest):
+            self.assertTrue(cli.verify(p["batch"])["verified"])
+
+    def test_11_multisecurity_daily_sources_are_bound(self):
+        p=self.plan()
+        daily=self.w.query(DAYS[0],CUTOFF,CODES,limit=2000)
+        factors=self.s.query("adj_factor",DAYS[0],CUTOFF,CODES,limit=2000)
+        susp=self.s.query("suspend_d",DAYS[0],CUTOFF,CODES,limit=2000)
+        catalog={x["ts_code"]:x for x in self.catalog()}
+        # Distinct recorded per-security receipts make same-day overwriting and
+        # cross-security substitution observable, even when real full-day
+        # requests legitimately share a single provenance manifest.
+        for i,row in enumerate(daily["rows"]):
+            source=copy.deepcopy(row["availability"])
+            source["attempts"][0].update(id=10000+i,
+                metadata_sha=model.digest(dict(instrument=row["values"]["ts_code"],i=i)),
+                response_sha=model.digest(dict(recorded_response=i)))
+            row["availability"]=source;row["source_sha"]=model.digest(source)
+        f,hist=h.assemble(self.desc,CODES,ASOF,DAYS[:84],catalog,daily,factors,susp,
+            p["history"]["payload"]["dataset_versions"],p["history"]["payload"]["metadata"])
+        p.update(frozen=f,history=hist)
+        sources=hist["payload"]["sources"]["daily"]
+        expected={x["values"]["ts_code"]+":"+x["values"]["trade_date"]:x["source_sha"] for x in daily["rows"]}
+        self.assertEqual(sources,expected)
+        manifests=hist["payload"]["sources"]["daily_manifests"]
+        self.assertEqual(manifests,{x["source_sha"]:x["availability"] for x in daily["rows"]})
+        for key,sha in expected.items():
+            self.assertEqual(model.digest(manifests[sha]),sha)
+        self.assertEqual(len(sources),len(CODES)*84)
+        cli.bridge("project",p)
+        keys=list(sources)
+        for kind in ("missing","missing_manifest","cross_security","received_time","source_sha"):
+            bad=copy.deepcopy(p);index=bad["history"]["payload"]["sources"]["daily"]
+            manifests=bad["history"]["payload"]["sources"]["daily_manifests"]
+            if kind=="missing":index.pop(keys[0])
+            elif kind=="missing_manifest":manifests.pop(index[keys[0]])
+            elif kind=="cross_security":index[keys[0]]=index[keys[1]]
+            elif kind=="received_time":manifests[index[keys[0]]]["attempts"][0]["obtained_at"]="2099-01-01T00:00:00Z"
+            else:manifests[index[keys[0]]]["attempts"][0]["response_sha"]="b"*64
+            self.rehash(bad)
+            for action in ("project","begin"):
+                with self.subTest(mutation=kind,entry=action),self.assertRaisesRegex(model.Rejected,"HISTORY_DAILY_SOURCE_BINDING"):
+                    cli.bridge(action,bad)
+
+    def test_12_json_result_sha_survives_decimal_roundtrip(self):
+        # Public decimals exercise exact float roundtrip independently of any
+        # private market/forecast values.
+        for decimal in (0.10826151818037033,0.10974205285310745,0.24411113560199738,0.20956620573997498):
+            result=dict(public_decimal=decimal)
+            result["result_sha256"]=model.digest(result)
+            with self.subTest(decimal=decimal):
+                self.assertTrue(cli.bridge("verify-result",result)["verified"])
 
     def test_06_old_synthetic_mode_still_works(self):
         p=dict(batch="legacy-fixture",frozen=cli.frozen(self.desc),manifest_sha256="1"*64,
