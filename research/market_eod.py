@@ -564,6 +564,17 @@ def cli(argv=None):
         elif args.action in ("once", "watch"):
             while True:
                 result = market.once(token_source=args.credential_source)
+                # Optional research is a separate failure boundary AFTER the
+                # collector committed its result. Even an unavailable Agent DB
+                # must not stop future EOD polls. Explicit stops still propagate.
+                try:
+                    if (common_root() / "state/risk-portfolio/agent-binding.json").is_file():
+                        import market_research
+                        result["research"] = market_research.once(market)
+                except Exception:
+                    # Do not depend on that same failed DB to report the fault,
+                    # or expose exception text containing private paths/payloads.
+                    result["research"] = dict(state="BLOCKED", reason="RESEARCH_UNAVAILABLE")
                 if args.action == "once":
                     break
                 print(json.dumps(result, ensure_ascii=False), flush=True)

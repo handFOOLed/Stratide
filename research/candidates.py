@@ -131,6 +131,9 @@ def handoff(candidate_id=None, evaluation_id=None):
 
 def snapshot_provenance(task, store_name):
     summary = task["input"] if task else {}
+    if "market-research-v1" in summary.get("scopes", []):
+        import market_research
+        return market_research.provenance(task, store_name)
     if "local_timesfm_fusion_v1" in summary.get("scopes", []):
         import local_fusion
         return local_fusion.provenance(task, store_name)

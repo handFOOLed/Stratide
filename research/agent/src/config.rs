@@ -180,6 +180,7 @@ impl Settings {
                 "MODEL_CONFIG_INVALID",
             )?;
             match m.kind.as_str() {
+                crate::market_research::POLICY => crate::market_research::validate_model(m)?,
                 crate::local_fusion::POLICY => crate::local_fusion::validate_model(m)?,
                 "structured_research_v1" => crate::structured::validate_model(m)?,
                 "bigquery_forecast_v1" | "deepseek_portfolio_v1" => {
@@ -287,6 +288,9 @@ impl Model {
         hash(&serde_json::to_vec(self).expect("model JSON"))
     }
     pub fn authorize(&self, scopes: &[String], budget: Option<&Budget>) -> Result<()> {
+        if crate::market_research::is_model(self) {
+            return crate::market_research::authorize(self, scopes, budget);
+        }
         if crate::local_fusion::is_model(self) {
             return crate::local_fusion::authorize(self, scopes, budget);
         }

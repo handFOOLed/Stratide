@@ -2071,3 +2071,16 @@
   .account-value { font-size: 40px; }
 }
 @media (max-width: 1000px) { .approval-layout { grid-template-columns: 1fr; } }
+
+/* Existing settings tokens; group spacing exceeds control spacing. */
+.market-research-settings { min-width: 0; display: grid; gap: var(--space-4); margin-bottom: var(--space-8); }
+.market-research-settings h3 { margin-top: var(--space-6); }
+.market-research-settings p { margin: 0; overflow-wrap: anywhere; }
+.market-research-settings form { display: grid; gap: var(--space-4); min-width: 0; }
+.market-research-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: var(--space-4); }
+.market-research-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.market-research-checks { display: grid; gap: var(--space-3); border: 0; padding: 0; margin: 0; min-width: 0; }
+.market-research-checks legend { margin-bottom: var(--space-3); font-weight: 600; }
+.market-research-checks label, .market-research-check { display: flex; align-items: baseline; gap: var(--space-2); }
+.market-research-run { display: grid; min-width: 0; gap: var(--space-3); padding: var(--space-4); background: var(--surface-subtle); border-radius: var(--radius-md); }
+.market-research-preview { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 480px; overflow: auto; font-size: var(--fs-sm); }

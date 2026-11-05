@@ -1,0 +1,13 @@
+test_01_screen_freeze_loopback_and_restart_no_duplicate (__main__.Tests.test_01_screen_freeze_loopback_and_restart_no_duplicate) ... ok
+test_02_unauthorized_revoked_expired_and_scope_rejected_no_calls (__main__.Tests.test_02_unauthorized_revoked_expired_and_scope_rejected_no_calls) ... ok
+test_03_unknown_provider_is_terminal_and_reserved (__main__.Tests.test_03_unknown_provider_is_terminal_and_reserved) ... ok
+test_04_shared_budget_exhaustion_zero_http (__main__.Tests.test_04_shared_budget_exhaustion_zero_http) ... ok
+test_05_partial_cpu_failure_and_future_input_rejected (__main__.Tests.test_05_partial_cpu_failure_and_future_input_rejected) ... ok
+test_06_concurrent_agent_processes_pay_once (__main__.Tests.test_06_concurrent_agent_processes_pay_once) ... ok
+test_07_partial_timesfm_result_cannot_enter_cloud (__main__.Tests.test_07_partial_timesfm_result_cannot_enter_cloud) ... ok
+test_08_crash_after_dispatch_unknown_never_resends (__main__.Tests.test_08_crash_after_dispatch_unknown_never_resends) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 61.196s
+
+OK

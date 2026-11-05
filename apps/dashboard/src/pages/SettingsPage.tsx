@@ -18,6 +18,7 @@ import { TechnicalDetails } from '../components/domain/WorkspaceStudies';
 import type { WorkspaceState } from '../lib/workspace';
 import type { AgentState } from '../state/useAgent';
 import { formatMicro } from '../lib/format';
+import { MarketResearchPanel } from '../components/domain/MarketResearchPanel';
 
 const SECTION_ICONS: Record<SettingsSection, IconName> = {
   appearance: 'sun',
@@ -233,6 +234,7 @@ export function SettingsPage({
     if (section === 'security') {
       return (
         <CardBody className="security-card">
+          <MarketResearchPanel token={agent.token} />
           <div className="security-list">
             <SecurityRow icon="shield" title="Paper 模式">
               只读报告快照，未连接券商或实盘账户。
@@ -248,7 +250,7 @@ export function SettingsPage({
             </SecurityRow>
             <SecurityRow icon="database" title="Provider 与共享预算">
               {agent.status===null?'解锁 Agent 管理后查看原 Provider 与预算。':`日上限 ${formatMicro(agent.status.budget.daily_limit_micro,{currency:agent.status.budget.currency})}，月上限 ${formatMicro(agent.status.budget.monthly_limit_micro,{currency:agent.status.budget.currency})}。实际账单可能不同于估算。`}
-              真实行情、TimesFM 风险及派生摘要不得发给 DeepSeek。
+              真实行情、TimesFM 风险及派生摘要默认拒绝外发；须在上方明确授权字段与范围。
             </SecurityRow>
           </div>
         </CardBody>
