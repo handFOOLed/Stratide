@@ -1,0 +1,233 @@
+/* AI 研究页专用样式（由页面改造维护；共享组件样式在 components.css / shell.css）。 */
+
+/* ---------- 运行状态 ---------- */
+.agent-runtime .runtime-lead {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--text);
+  font-size: var(--fs-base);
+  line-height: var(--lh-relaxed);
+}
+
+.agent-runtime .runtime-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.agent-runtime .runtime-meta {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.agent-runtime .eod-latest__body {
+  flex-wrap: wrap;
+}
+
+.agent-runtime .diagnostics {
+  margin-top: var(--space-2);
+}
+
+.agent-tasks .tasks-table {
+  min-width: 1040px;
+}
+
+.agent-tasks .tasks-table th:nth-child(1) {
+  width: 27%;
+}
+
+.agent-tasks .tasks-table th:nth-child(4) {
+  width: 34%;
+}
+
+/* ---------- 模型设置 ---------- */
+.model-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--border-faint);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+}
+
+.model-summary__main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.model-summary__label {
+  color: var(--text-muted);
+  font-size: var(--fs-2xs);
+}
+
+.model-summary__name {
+  color: var(--text);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.model-settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.agent-models .model-config-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+}
+
+/* ---------- 任务详情抽屉 ---------- */
+.detail-sentence {
+  margin: var(--space-2) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-base);
+  line-height: var(--lh-relaxed);
+}
+
+.task-detail .drawer__section .status-line {
+  display: flex;
+}
+
+.task-detail .diagnostics {
+  margin-top: var(--space-3);
+}
+
+.drawer .diagnostics__summary {
+  gap: var(--space-2);
+}
+
+.drawer .diagnostics__title {
+  flex: 1 1 auto;
+}
+
+.drawer .diagnostics__hint {
+  display: none;
+}
+
+.drawer .diagnostics__copy {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* ---------- 研究报告 ---------- */
+.agent-grid .workspace-studies {
+  margin-top: 0;
+}
+
+.report-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.report-row__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+}
+
+.report-row__titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.report-row__name {
+  color: var(--text);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.report-row__meta {
+  color: var(--text-muted);
+  font-size: var(--fs-2xs);
+  overflow-wrap: anywhere;
+}
+
+.report-row__summary {
+  margin-top: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-base);
+  overflow-wrap: anywhere;
+}
+
+.report-market__title {
+  color: var(--text);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  line-height: var(--lh-snug);
+}
+
+.runtime-summary {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.runtime-lead--note {
+  margin-top: var(--space-1);
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+}
+
+.study-row .diagnostics {
+  margin-top: var(--space-2);
+}
+
+.report-advanced {
+  margin-top: var(--space-4);
+}
+
+.report-advanced .study-row:first-child {
+  padding-top: 0;
+}
+
+/* ---------- 设置页：AI 服务面板（由本页组件维护） ---------- */
+.provider-panel .provider-status {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.provider-status__value {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.provider-status__value strong {
+  overflow-wrap: anywhere;
+}
+
+.provider-panel .diagnostics {
+  margin-top: var(--space-2);
+}
+
+/* ---------- 窄屏 ---------- */
+@media (max-width: 860px) {
+  .agent-runtime .runtime-actions {
+    width: 100%;
+  }
+
+  .agent-runtime .runtime-actions .btn {
+    flex: 1 1 auto;
+  }
+
+  .agent-runtime .runtime-meta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .model-summary {
+    align-items: flex-start;
+  }
+}

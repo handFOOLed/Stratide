@@ -1,0 +1,494 @@
+/* 总览页专用样式（由页面改造维护；共享组件样式在 components.css / shell.css）。 */
+
+.overview-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* 上手清单在宽屏下分两列，避免把资产与曲线挤出第一屏。 */
+@media (min-width: 1180px) {
+  .overview-page .checklist__items {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-6);
+  }
+}
+
+/* ---------- 加载骨架 ---------- */
+.overview-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.overview-skeleton__bar {
+  height: 64px;
+  border-radius: var(--radius-lg);
+}
+
+.overview-skeleton__checklist {
+  height: 150px;
+  border-radius: var(--radius-lg);
+}
+
+.overview-skeleton__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+/* ---------- 上次读取失败提示 ---------- */
+.overview-stale__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+/* ---------- 交易保护 ---------- */
+.overview-protection-line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 20px;
+  padding: 0 2px;
+}
+
+.overview-protection-line__reason {
+  color: var(--text-muted);
+  font-size: var(--fs-2xs);
+}
+
+.overview-protection-card {
+  border-color: var(--status-attention-border);
+  background: var(--status-attention-soft);
+}
+
+.overview-protection-card .card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 14px 18px;
+}
+
+.overview-protection-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+.overview-protection-card__counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+}
+
+.overview-protection-card__counts strong {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.overview-protection-card__hint {
+  color: var(--text-muted);
+  font-size: var(--fs-2xs);
+}
+
+.overview-protection-card__data {
+  max-width: 72ch;
+  color: var(--status-attention);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+}
+
+/* ---------- 第一屏：资产与曲线 ---------- */
+.overview-main {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.28fr);
+  gap: var(--space-3);
+  align-items: stretch;
+}
+
+.overview-main > .card {
+  min-width: 0;
+}
+
+.overview-asset-card .card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-4);
+  height: 100%;
+}
+
+.overview-asset-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.overview-asset-total {
+  min-width: 0;
+}
+
+.overview-asset-total .card__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.overview-asset-value {
+  margin-top: var(--space-2);
+  color: var(--text);
+  white-space: nowrap;
+  font-size: clamp(30px, 3.2vw, 44px);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+
+.overview-asset-deltas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+}
+
+.overview-asset-delta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 96px;
+}
+
+.overview-asset-delta__label {
+  color: var(--text-muted);
+  font-size: var(--fs-2xs);
+  line-height: 1.4;
+}
+
+.overview-asset-delta__value {
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+  line-height: 1.2;
+}
+
+.overview-asset-delta__sub {
+  color: var(--text-muted);
+  font-size: var(--fs-2xs);
+}
+
+.overview-asset-secondary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: auto 0 0;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--divider);
+}
+
+.overview-asset-secondary > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.overview-asset-secondary dt {
+  color: var(--text-muted);
+  font-size: var(--fs-2xs);
+  white-space: nowrap;
+}
+
+.overview-asset-secondary dd {
+  margin: 0;
+  overflow: hidden;
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- 资产曲线 ---------- */
+.overview-chart-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.overview-chart-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 240px;
+  padding: 2px 12px 12px;
+}
+
+.overview-chart-body .chart-frame {
+  flex: 1;
+  height: auto;
+  min-height: 216px;
+  margin-top: 0;
+}
+
+.overview-chart-empty {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.overview-chart-empty .empty-state {
+  min-height: 0;
+  padding: 16px;
+}
+
+/* ---------- 持仓与成交 ---------- */
+.overview-lists {
+  display: grid;
+  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.overview-lists > .card {
+  min-width: 0;
+}
+
+.overview-list-card {
+  overflow: hidden;
+}
+
+.overview-list-card .card__head {
+  padding: 13px 18px 10px;
+}
+
+.overview-list-card .table-scroll {
+  overflow-x: auto;
+}
+
+.overview-positions-table {
+  min-width: 520px;
+}
+
+.overview-fills-table {
+  min-width: 560px;
+  table-layout: fixed;
+}
+
+.overview-fills-table th:nth-child(1) {
+  width: 25%;
+}
+
+.overview-fills-table th:nth-child(2) {
+  width: 25%;
+}
+
+.overview-fills-table th:nth-child(3) {
+  width: 14%;
+}
+
+.overview-fills-table th:nth-child(4) {
+  width: 17%;
+}
+
+.overview-fills-table th:nth-child(5) {
+  width: 19%;
+}
+
+.overview-list-foot {
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: 8px 16px;
+}
+
+/* 持仓与成交都为空时，合并成一个紧凑区块。 */
+.overview-combined-empty {
+  padding: 2px 6px;
+}
+
+.overview-combined-empty .empty-state {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  justify-items: start;
+  column-gap: var(--space-4);
+  row-gap: 3px;
+  min-height: 0;
+  padding: 14px 18px;
+  text-align: left;
+}
+
+.overview-combined-empty .empty-state__icon {
+  grid-row: 1 / span 2;
+  margin-bottom: 0;
+}
+
+.overview-combined-empty .empty-state__title,
+.overview-combined-empty .empty-state__desc {
+  grid-column: 2;
+}
+
+.overview-combined-empty .empty-state__desc {
+  max-width: none;
+}
+
+/* ---------- 底部诊断信息 ---------- */
+.overview-diagnostics {
+  margin-top: var(--space-1);
+}
+
+/* ---------- 模拟交易规则摘要 ---------- */
+.portfolio-rules .card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 16px 18px 18px;
+}
+
+.portfolio-rules__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+.portfolio-rules__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  line-height: 1.35;
+}
+
+.portfolio-rules__subtitle {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+
+.portfolio-rules__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-faint);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+}
+
+.portfolio-rules__grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.portfolio-rules__grid dt {
+  color: var(--text-muted);
+  font-size: var(--fs-2xs);
+  white-space: nowrap;
+}
+
+.portfolio-rules__grid dd {
+  margin: 0;
+  overflow: hidden;
+  color: var(--text);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.portfolio-rules__empty .empty-state {
+  min-height: 0;
+  padding: 16px;
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 1180px) {
+  .overview-main,
+  .overview-lists {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .overview-main > .card,
+  .overview-lists > .card {
+    min-height: 0;
+  }
+
+  .overview-chart-body {
+    min-height: 260px;
+  }
+
+  .overview-asset-secondary {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .overview-asset-secondary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: var(--space-3);
+  }
+
+  .portfolio-rules__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .overview-page {
+    gap: var(--space-2);
+  }
+
+  .overview-chart-body {
+    min-height: 230px;
+    padding: 2px 8px 8px;
+  }
+
+  .overview-asset-value {
+    font-size: 32px;
+  }
+
+  .overview-asset-deltas {
+    gap: var(--space-4);
+  }
+
+  .overview-combined-empty .empty-state {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 14px;
+  }
+
+  .overview-combined-empty .empty-state__icon {
+    grid-row: auto;
+    margin-bottom: 2px;
+  }
+
+  .overview-combined-empty .empty-state__title,
+  .overview-combined-empty .empty-state__desc {
+    grid-column: 1;
+  }
+
+  .portfolio-rules__grid {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--space-3);
+  }
+
+  .overview-list-card .card__head {
+    padding: 12px 14px 9px;
+  }
+}

@@ -1,10 +1,30 @@
-import { Badge } from '../ui/Badge';
+import { Callout } from '../ui/Callout';
+import { Diagnostics } from '../ui/Diagnostics';
 import { Drawer } from '../ui/Overlay';
 import { Kv } from '../ui/Kv';
-import { parseInteger } from '../../lib/format';
-import { formatBps, formatCny, formatDay } from '../../lib/format';
+import { StatusBadge } from '../ui/StatusBadge';
+import { formatBps, formatCny, formatDay, parseInteger } from '../../lib/format';
+import { humanReasonText, statusView } from '../../lib/status';
+import type { StatusView } from '../../lib/status';
 import type { EquityRow } from '../../lib/types';
-import { DrawerNote, DrawerSection } from './DrawerSection';
+import { DrawerSection } from './DrawerSection';
+
+function moneyText(value: string | null): string {
+  return parseInteger(value) === null ? '未记录' : formatCny(value);
+}
+
+function signedMoneyText(value: string | null): string {
+  return parseInteger(value) === null ? '未记录' : formatCny(value, { signed: true });
+}
+
+function returnText(value: string | null): string {
+  return parseInteger(value) === null ? '未记录' : formatBps(value, { signed: true });
+}
+
+function missingValueStatus(reason: string): StatusView {
+  const human = humanReasonText(reason);
+  return human === null ? statusView('attention', '数据缺失') : statusView('attention', '数据缺失', human);
+}
 
 export function DayDrawer({
   row,
@@ -21,39 +41,54 @@ export function DayDrawer({
   const nav = parseInteger(row.nav_fen);
   const cash = parseInteger(row.cash_fen);
   const holdings = nav !== null && cash !== null ? (nav - cash).toString() : null;
-  const previousNav = previous ? parseInteger(previous.nav_fen) : null;
+  const previousNav = previous === null ? null : parseInteger(previous.nav_fen);
   const change = nav !== null && previousNav !== null ? (nav - previousNav).toString() : null;
+  const valuation = row.valuation_error === null ? statusView('ok', '数据正常') : missingValueStatus(row.valuation_error);
   return (
     <Drawer
       open={open}
       onClose={onClose}
-      eyebrow="逐日核对"
+      eyebrow="每日账本"
       title={formatDay(row.day)}
-      meta={<Badge tone={row.valuation_error ? 'warning' : 'success'}>{row.valuation_error ? '估值缺失' : '有效估值'}</Badge>}
+      meta={<StatusBadge status={valuation} size="sm" />}
     >
-      <DrawerSection title="当日账户">
-        <Kv
-          items={[
-            { label: '账户净值', value: formatCny(row.nav_fen) },
-            { label: '现金', value: formatCny(row.cash_fen) },
-            { label: '隐含持仓市值', value: formatCny(holdings) },
-            { label: '累计盈亏', value: formatCny(row.cumulative_pnl_fen, { signed: true }) },
-            { label: '累计收益率', value: formatBps(row.return_bps, { signed: true }) },
-            { label: '较上一源日', value: change === null ? '—' : formatCny(change, { signed: true }) },
-            { label: '估值状态', value: row.valuation_error || '有效' },
-          ]}
-        />
-        <DrawerNote>
-          隐含持仓市值 = 报告中的 NAV − 现金，仅用于核对六报告内部一致性，不是独立行情估值。
-        </DrawerNote>
-      </DrawerSection>
+      <div data-testid="day-drawer">
+        {row.valuation_error === null ? null : (
+          <Callout tone="warning" className="drawer-callout">
+            这天的估值数据不完整，缺失的数字保持空白。
+          </Callout>
+        )}
 
-      <DrawerSection title="核对口径">
-        <p className="prose">
-          本页只读取已发布六报告中的逐日字段。当前 API 没有提供逐日外部资金流和逐日费用拆分，因此“较上一源日”不声称已扣除资金流，也不替代完整 TWR。
-        </p>
-        <DrawerNote>缺失估值保留为 null，不用前后日期插值或零值填补。</DrawerNote>
-      </DrawerSection>
+        <DrawerSection title="当日账户">
+          <Kv
+            items={[
+              { label: '账户资产', value: moneyText(row.nav_fen) },
+              { label: '现金', value: moneyText(row.cash_fen) },
+              { label: '持仓市值', value: holdings === null ? '未记录' : formatCny(holdings) },
+              { label: '累计盈亏', value: signedMoneyText(row.cumulative_pnl_fen) },
+              { label: '累计收益率', value: returnText(row.return_bps) },
+              { label: '较上一数据日', value: change === null ? '未记录' : formatCny(change, { signed: true }) },
+            ]}
+          />
+          <p className="drawer-note">持仓市值 = 账户资产 − 现金。</p>
+          <p className="drawer-note">较上一数据日只比较账面资产，未扣除资金转入转出。</p>
+        </DrawerSection>
+
+        <div className="drawer-diagnostics">
+          <Diagnostics
+            title="账本诊断信息"
+            items={[
+              { label: '数据日期', value: formatDay(row.day) },
+              { label: '估值状态（原始值）', value: row.valuation_error ?? '无错误' },
+              { label: '账户资产（原始值）', value: row.nav_fen ?? '未记录' },
+              { label: '现金（原始值）', value: row.cash_fen ?? '未记录' },
+              { label: '累计盈亏（原始值）', value: row.cumulative_pnl_fen ?? '未记录' },
+              { label: '累计收益率（原始值）', value: row.return_bps ?? '未记录' },
+            ]}
+            data={{ row, previous }}
+          />
+        </div>
+      </div>
     </Drawer>
   );
 }

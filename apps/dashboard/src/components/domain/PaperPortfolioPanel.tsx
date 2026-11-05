@@ -1,29 +1,72 @@
-import { Card, CardBody, CardHead } from '../ui/Card';
-import { TechnicalDetails } from './WorkspaceStudies';
-import { formatCny, formatDay } from '../../lib/format';
+import { Card, CardBody } from '../ui/Card';
+import { InfoHint } from '../ui/InfoHint';
+import { EmptyState } from '../ui/EmptyState';
+import { StatusLine } from '../ui/StatusBadge';
+import { countText, formatCny } from '../../lib/format';
+import { statusView } from '../../lib/status';
+import { TERMS } from '../../lib/copy';
 import type { Order, PaperPortfolio } from '../../lib/types';
 
-export function PaperPortfolioPanel({portfolio, orders}: {portfolio:PaperPortfolio|null; orders:Order[]}) {
+/**
+ * 普通投资者能看懂的模拟交易规则摘要。
+ * 批次、冻结、拒绝、容量等内部记录只出现在总览页底部的“诊断信息”里。
+ */
+export function PaperPortfolioPanel({
+  portfolio,
+}: {
+  portfolio: PaperPortfolio | null;
+  orders: Order[];
+}) {
   if (portfolio === null) return null;
-  return <Card><CardHead title="多证券共享 Paper · 冻结与结算"/><CardBody>
-    <p>{portfolio.automatic ? '新意图已启用' : 'Owner 已暂停新意图'} · 固定目标 {formatCny(portfolio.target_value_fen)}/证券 · 最多 {portfolio.max_positions} 只持仓 · 每日最多 {portfolio.max_daily_orders} 笔。</p>
-    <p className="muted">仅 Paper 假设模拟。日线开盘在盘后实收后按已冻结顺序记账；真实开盘、历史 PIT 和可交易性均未核验。模型权重不授予交易权限。</p>
-    {portfolio.capacity_scope === 'Batch' ? <p>整批共享成交容量：{portfolio.capacity_shares} 股；按冻结顺序消耗，余量 NO_FILL。</p> : <p className="muted">旧冻结策略：容量为历史每单语义。</p>}
-    {portfolio.unverified_eod_assumption === undefined || portfolio.unverified_eod_assumption === null ? <p className="muted">未批准公司行为未核验的假设成交，仅接受核验输入。</p> : <p className="muted">Owner 已批准 {portfolio.unverified_eod_assumption.version}：公司行为未核验，使用昨收连续和复权因子未变的明确假设；总敞口另限 {formatCny(portfolio.unverified_eod_assumption.max_exposure)}，不代表真实可交易。</p>}
-    {portfolio.recoveries === undefined ? null : portfolio.recoveries.map(r=><p key={r.valuation.day}>NO_TRADE_REBASE · {formatDay(r.previous_day)} → {formatDay(r.valuation.day)} 当前估值恢复；缺口与恢复日的当日盈亏不可用，未补历史成交，未解除风险锁。</p>)}
-    {portfolio.batches.map(b => <section className="study-row" key={b.decision_day}>
-      <h3 className="card__title">{formatDay(b.decision_day)} 决策 → {formatDay(b.target_day)} 目标交易日</h3>
-      <p>{b.finalized_at === null ? '批次已冻结，等待目标日盘后来源或截止' : '批次已终结'} · {b.candidate === null ? '研究未就绪' : '原候选任务 #'+b.candidate.task_id} · {b.order_ids.length} 笔审批 · {b.rejections.length} 项编译拒绝</p>
-      <p className="muted">{b.reason}</p>
-      {b.order_ids.map(id => {
-        const order = orders.find(o => o.order_id === id);
-        if (order === undefined) return <p key={id}>原订单 {id}：未取得账本投影</p>;
-        return <p key={id}>{order.instrument.code} · {order.side === 'Buy' ? '买入' : '卖出'} {order.quantity} 股 · 已模拟确认 {order.confirmed_filled_shares} 股 · {order.status} · {order.reason}</p>;
-      })}
-      {b.rejections.map(([i,reason])=><p key={i.market+i.code}>{i.code} · 未提交 · {reason}</p>)}
-      <TechnicalDetails value={b}/>
-    </section>)}
-    {portfolio.batches.length === 0 ? <p>尚无冻结批次。暖机不足 84 个 READY 会话或缺少原研究证据时保持空仓，原 EOD 继续采集。</p> : null}
-    <TechnicalDetails value={{policy_version:portfolio.policy_version,policy_sha256:portfolio.policy_sha256}}/>
-  </CardBody></Card>;
+  const automatic = portfolio.automatic;
+  const status = automatic
+    ? statusView('ok', '正常', '新的模拟交易计划会自动生成')
+    : statusView('attention', '已暂停', '暂停期间不会生成新的模拟交易计划');
+  const emptyDescription = automatic
+    ? '尚未产生模拟交易批次；数据准备完成后会自动开始。'
+    : '尚未产生模拟交易批次；自动生成当前已暂停。';
+
+  return (
+    <Card className="portfolio-rules" data-testid="portfolio-rules">
+      <CardBody>
+        <div className="portfolio-rules__head">
+          <div>
+            <h2 className="portfolio-rules__title">
+              模拟交易规则
+              <InfoHint label="模拟交易规则说明">
+                系统在收盘后生成计划，下个交易日按开盘价模拟成交；只在本机模拟，不连接券商。
+              </InfoHint>
+            </h2>
+            <p className="portfolio-rules__subtitle">系统按这些规则自动更新模拟交易，不需要你逐笔操作。</p>
+          </div>
+          <StatusLine status={status} />
+        </div>
+
+        <dl className="portfolio-rules__grid">
+          <div>
+            <dt>单只目标金额</dt>
+            <dd className="numeric">{formatCny(portfolio.target_value_fen)}</dd>
+          </div>
+          <div>
+            <dt>最多持仓数量</dt>
+            <dd className="numeric">{countText(portfolio.max_positions, '只')}</dd>
+          </div>
+          <div>
+            <dt>每日最多订单数</dt>
+            <dd className="numeric">{countText(portfolio.max_daily_orders, '笔')}</dd>
+          </div>
+          <div>
+            <dt>成交方式</dt>
+            <dd>{TERMS.simulatedFill}</dd>
+          </div>
+        </dl>
+
+        {portfolio.batches.length === 0 ? (
+          <div className="portfolio-rules__empty">
+            <EmptyState compact icon="calendar" title="还没有模拟交易" description={emptyDescription} />
+          </div>
+        ) : null}
+      </CardBody>
+    </Card>
+  );
 }

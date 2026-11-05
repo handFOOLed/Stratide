@@ -1,21 +1,28 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Ref } from 'react';
 import { PageHeader } from '../components/ui/PageHeader';
-import { Card, CardBody, CardHead } from '../components/ui/Card';
+import { Card, CardHead } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
-import { readInbox, readNotices, stateLabel } from '../lib/workspace';
+import { StatusBadge } from '../components/ui/StatusBadge';
+import { Diagnostics } from '../components/ui/Diagnostics';
+import { useToast } from '../components/ui/Toast';
+import { readInbox, readNotices } from '../lib/workspace';
 import type { Inbox } from '../lib/workspace';
 import { friendlyError } from '../lib/api';
 import { formatDateTime } from '../lib/format';
+import { countText } from '../lib/format';
+import { notificationTitle, researchTaskName, taskStatusView } from '../lib/status';
+import { navigate } from '../lib/route';
 import type { AgentState } from '../state/useAgent';
 import { useInterval } from '../lib/hooks';
+import { EMPTY } from '../lib/copy';
 
 export function NotificationsPage({ agent, titleRef }: { agent: AgentState; titleRef?: Ref<HTMLHeadingElement> }) {
   const [inbox, setInbox] = useState<Inbox | null>(null);
   const [error, setError] = useState('');
-  const [pendingRead, setPendingRead] = useState<string | null>(null);
-  const timer = useRef<number | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const toast = useToast();
   const token = agent.token;
 
   const refresh = useCallback(async () => {
@@ -30,77 +37,111 @@ export function NotificationsPage({ agent, titleRef }: { agent: AgentState; titl
 
   useEffect(() => {
     void refresh();
-    return () => {
-      if (timer.current !== null) window.clearTimeout(timer.current);
-    };
   }, [refresh]);
-  useInterval(() => void refresh(), token === null ? null : 6000);
+  useInterval(() => void refresh(), token === null ? null : 8000);
 
-  const markRead = () => {
-    if (token === null || inbox === null || inbox.notifications.length === 0) return;
-    const first = inbox.notifications[0];
-    if (first === undefined) return;
-    setPendingRead(first.id);
-    timer.current = window.setTimeout(() => {
-      void readNotices(token, inbox.notifications.map((notice) => notice.id))
-        .then(() => {
-          setPendingRead(null);
-          void refresh();
-        })
-        .catch((caught) => {
-          setPendingRead(null);
-          setError(friendlyError(caught).message);
-        });
-      timer.current = null;
-    }, 5000);
+  const taskById = useMemo(() => {
+    const map = new Map<string, (typeof agent.tasks)[number]>();
+    for (const task of agent.tasks) map.set(task.id, task);
+    return map;
+  }, [agent.tasks]);
+
+  const markRead = async (ids: string[]) => {
+    if (token === null || ids.length === 0) return;
+    setBusy(ids.length === 1 ? ids[0] : 'all');
+    try {
+      await readNotices(token, ids);
+      await refresh();
+      toast.push({ title: ids.length === 1 ? '已标为已读' : '全部标为已读', tone: 'success' });
+    } catch (caught) {
+      toast.push({ title: '操作未完成', description: friendlyError(caught).message, tone: 'danger' });
+    } finally {
+      setBusy(null);
+    }
   };
+
+  const openTask = (id: string) => {
+    void agent.openTask(id);
+    navigate({ page: 'agents' });
+  };
+
+  const notifications = inbox?.notifications ?? [];
+  const unread = notifications.filter((notice) => !notice.read);
 
   return (
     <>
       <PageHeader title="通知" titleRef={titleRef} />
-      {error ? <p role="alert">{error}</p> : null}
+      {error ? <p role="alert" className="form-error">{error}</p> : null}
       <Card>
         <CardHead
-          title="任务通知"
+          title="研究通知"
+          subtitle={notifications.length === 0 ? '研究任务结束后，结果会出现在这里' : countText(unread.length, '条') + '未读'}
           actions={
-            <Button variant="ghost" size="sm" disabled={pendingRead !== null || inbox === null || inbox.notifications.length === 0} onClick={markRead}>
-              标为已读
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={unread.length === 0 || busy !== null}
+              loading={busy === 'all'}
+              onClick={() => void markRead(unread.map((notice) => notice.id))}
+            >
+              全部标为已读
             </Button>
           }
         />
-        <CardBody>
-          {pendingRead !== null ? (
-            <div role="status" className="inline-row">
-              <span>5 秒后标为已读</span>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => {
-                  if (timer.current !== null) window.clearTimeout(timer.current);
-                  timer.current = null;
-                  setPendingRead(null);
-                }}
-              >
-                撤销
-              </Button>
-            </div>
-          ) : null}
-          {inbox === null ? (
-            <p className="muted">正在读取记录…</p>
-          ) : inbox.notifications.length === 0 ? (
-            <EmptyState compact icon="notifications" title="还没有通知" description="研究任务结束或出错时会出现在这里。" />
-          ) : (
-            inbox.notifications.map((notice) => (
-              <article className="study-row" key={notice.id}>
-                <div className="study-row__title">
-                  <strong>任务 #{notice.id} · {stateLabel(notice.status)}</strong>
-                  <span>{notice.read ? '已读' : '未读'}</span>
-                </div>
-                <p>{formatDateTime(notice.at)}</p>
-              </article>
-            ))
-          )}
-        </CardBody>
+        {inbox === null ? (
+          <p className="muted notice-loading">正在读取通知…</p>
+        ) : notifications.length === 0 ? (
+          <EmptyState compact icon="notifications" title={EMPTY.noticesTitle} description={EMPTY.noticesBody} />
+        ) : (
+          <ul className="notice-list" aria-label="研究通知">
+            {notifications.map((notice) => {
+              const task = taskById.get(notice.id);
+              const status = taskStatusView(notice.status, notice.reason, task?.conclusion ?? null);
+              const title = task !== undefined && task.provider_id === 'market-research-status'
+                ? '研究未运行'
+                : notificationTitle(notice.status);
+              const subject = task === undefined ? '' : researchTaskName(task.created_at, task.name);
+              const result = status.reason ?? (status.kind === 'ok' ? '研究已完成，可在任务详情查看结论' : '可在任务详情查看结果');
+              return (
+                <li key={notice.id} className="notice-row" data-read={notice.read ? 'true' : 'false'}>
+                  <span className="notice-dot" aria-hidden="true" />
+                  {notice.read ? null : <span className="sr-only">未读</span>}
+                  <div className="notice-body">
+                    <div className="notice-title-row">
+                      <span className="notice-title">{title}</span>
+                      <StatusBadge status={status} size="sm" />
+                    </div>
+                    <p className="notice-result">{result}</p>
+                    <div className="notice-meta">
+                      {subject === '' ? null : <span>{subject}</span>}
+                      <span>{formatDateTime(notice.at)}</span>
+                    </div>
+                  </div>
+                  <div className="notice-actions">
+                    <Button size="sm" variant="secondary" onClick={() => openTask(notice.id)}>
+                      查看任务
+                    </Button>
+                    {notice.read ? null : (
+                      <Button size="sm" variant="ghost" disabled={busy !== null} onClick={() => void markRead([notice.id])}>
+                        标为已读
+                      </Button>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        <div className="card__foot">
+          <Diagnostics
+            title="通知记录诊断信息"
+            items={[
+              { label: '通知条数', value: String(notifications.length) },
+              { label: '未读条数', value: String(unread.length) },
+            ]}
+            data={{ notifications, approvals: inbox?.approvals ?? [] }}
+          />
+        </div>
       </Card>
     </>
   );
