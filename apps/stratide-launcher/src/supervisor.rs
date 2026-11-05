@@ -31,6 +31,7 @@ struct Supervisor {
     previous: Option<SupervisorState>,
     dashboard: Option<Dashboard>,
     watch: Option<Watch>,
+    backfill: Option<Child>,
     dashboard_next: Instant,
     dashboard_failures: u32,
     dashboard_healthy: bool,
@@ -73,6 +74,7 @@ pub fn run() -> Result<i32, String> {
         previous,
         dashboard: None,
         watch: None,
+        backfill: None,
         dashboard_next: Instant::now(),
         dashboard_failures: 0,
         dashboard_healthy: false,
@@ -175,9 +177,91 @@ impl Supervisor {
             }
             self.ensure_dashboard()?;
             self.ensure_watch()?;
+            self.ensure_backfill()?;
             self.publish()?;
             std::thread::sleep(Duration::from_millis(750));
         }
+    }
+
+    /// Backfill runs under the supervisor, not under the dashboard: the job
+    /// object kills the dashboard's children on every restart, while a batch can
+    /// take tens of minutes at the provider rate limit.
+    fn ensure_backfill(&mut self) -> Result<(), String> {
+        if let Some(child) = self.backfill.as_mut() {
+            match child.try_wait() {
+                Ok(None) => return Ok(()),
+                Ok(Some(exit)) => {
+                    log(
+                        &self.layout,
+                        &format!("market backfill exited code={:?}", exit.code()),
+                    );
+                    let _ = std::fs::remove_file(self.backfill_request());
+                    self.backfill = None;
+                    return Ok(());
+                }
+                Err(_) => return Ok(()),
+            }
+        }
+        let request = self.backfill_request();
+        if !request.is_file() {
+            return Ok(());
+        }
+        let script = self.layout.app.join("scripts").join("eod-operator.py");
+        // Both processes take the warehouse writer lock; the watch resumes by
+        // itself after the batch because ensure_watch sees no live child.
+        if let Some(mut watch) = self.watch.take() {
+            if let Some(watch_child) = watch.child.as_mut() {
+                let _ = watch_child.kill();
+                let _ = watch_child.wait();
+            }
+        }
+        let mut command = Command::new(self.layout.python());
+        command
+            .args(["-B", "-X", "utf8"])
+            .arg(&script)
+            .args(["market", "backfill", "--sessions", "84", "--rounds", "6"])
+            .current_dir(&self.layout.app)
+            .env("STRATIDE_STATE_ROOT", &self.layout.data)
+            .env("STRATIDE_BIN_DIR", self.layout.app.join("bin"))
+            .env("PYTHONUTF8", "1")
+            .env("PYTHONIOENCODING", "utf-8")
+            .env_remove("STRATIDE_TUSHARE_TOKEN")
+            .stdin(Stdio::null());
+        let stdout = append_log(&self.layout.logs.join("market-backfill.out.log"))?;
+        let stderr = append_log(&self.layout.logs.join("market-backfill.err.log"))?;
+        command.stdout(stdout).stderr(stderr);
+        win::hide_console(&mut command);
+        let mut child = match command.spawn() {
+            Ok(child) => child,
+            Err(error) => {
+                log(
+                    &self.layout,
+                    &format!("market backfill spawn failed: {error}"),
+                );
+                let _ = std::fs::remove_file(&request);
+                return Ok(());
+            }
+        };
+        if let Err(error) = self.job.assign(&child) {
+            let _ = child.kill();
+            let _ = child.wait();
+            log(
+                &self.layout,
+                &format!("market backfill job assign failed: {error}"),
+            );
+            let _ = std::fs::remove_file(&request);
+            return Ok(());
+        }
+        log(
+            &self.layout,
+            &format!("market backfill started pid={:?}", child.id()),
+        );
+        self.backfill = Some(child);
+        Ok(())
+    }
+
+    fn backfill_request(&self) -> std::path::PathBuf {
+        self.layout.data.join("backfill.request")
     }
 
     fn ensure_dashboard(&mut self) -> Result<(), String> {
@@ -393,6 +477,10 @@ impl Supervisor {
     }
 
     fn ensure_watch(&mut self) -> Result<(), String> {
+        // A historical backfill owns the warehouse writer lock until it exits.
+        if self.backfill.is_some() {
+            return Ok(());
+        }
         if self.layout.watch_restart_path().is_file() {
             self.layout.clear_watch_restart();
             if let Some(watch) = self.watch.as_mut() {

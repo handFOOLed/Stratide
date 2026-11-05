@@ -19,10 +19,12 @@ import type { WorkspaceState } from '../lib/workspace';
 import type { AgentState } from '../state/useAgent';
 import { formatMicro } from '../lib/format';
 import { MarketResearchPanel } from '../components/domain/MarketResearchPanel';
+import { ProviderPanel } from '../components/domain/ProviderPanel';
 import { RuntimePanel } from '../components/domain/RuntimePanel';
 
 const SECTION_ICONS: Record<SettingsSection, IconName> = {
   appearance: 'sun',
+  ai: 'key',
   runtime: 'server',
   data: 'database',
   security: 'shield',
@@ -98,6 +100,10 @@ export function SettingsPage({
   };
 
   const panel = (() => {
+    if (section === 'ai') {
+      return <CardBody><ProviderPanel /></CardBody>;
+    }
+
     if (section === 'runtime') {
       return <RuntimePanel />;
     }

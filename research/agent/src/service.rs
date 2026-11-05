@@ -153,6 +153,10 @@ impl Agent {
     pub fn store(&self) -> &Store {
         &self.0.store
     }
+    /// The Owner-managed settings file this Agent was opened with.
+    pub fn settings_path(&self) -> &std::path::Path {
+        &self.0.config_path
+    }
     pub fn authorized(&self, candidate: &str) -> bool {
         let expected = self.0.owner_token.as_bytes();
         let actual = candidate.as_bytes();

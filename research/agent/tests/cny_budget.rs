@@ -13,6 +13,7 @@ fn setup() -> (tempfile::TempDir, Settings, Store) {
     let cfg = deepseek::Config {
         version: 1,
         key_file: dir.path().join("not-read.md"),
+    credential_target: None,
         grant_version: "deepseek-synthetic-fusion-grant-v1".into(),
         synthetic_only: true,
         provider_terms_reviewed: true,

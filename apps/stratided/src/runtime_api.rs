@@ -198,8 +198,12 @@ fn market(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
         .get("action")
         .and_then(Value::as_str)
         .ok_or_else(|| layout_error(400, "MARKET_INPUT_INVALID"))?;
-    if !["init", "enable", "disable"].contains(&action) {
+    if !["init", "enable", "disable", "status", "backfill", "backfill-state"].contains(&action) {
         return Err(layout_error(400, "MARKET_INPUT_INVALID"));
+    }
+    if action == "backfill-state" {
+        let request = layout.data.join("backfill.request");
+        return Ok(layout_envelope(200, json!({"running": request.is_file()})));
     }
     let script = layout.app.join("scripts").join("eod-operator.py");
     if !script.is_file() {
@@ -229,7 +233,11 @@ fn market(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
         }
         command.arg("--start-date").arg(start_date);
     }
-    match stratide_runtime::run_capture(command, Duration::from_secs(180)) {
+    if action == "backfill" {
+        return backfill(layout, command);
+    }
+    let timeout = if action == "status" { 60 } else { 180 };
+    match stratide_runtime::run_capture(command, Duration::from_secs(timeout)) {
         Ok((Some(0), stdout, _)) => {
             let value: Value = serde_json::from_slice(&stdout)
                 .unwrap_or_else(|_| json!({"raw": String::from_utf8_lossy(&stdout).chars().take(4000).collect::<String>()}));
@@ -251,6 +259,17 @@ fn market(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
     }
 }
 
+/// The collector may run for tens of minutes at the provider rate limit, so the
+/// dashboard only leaves a request file; the long-lived supervisor owns the
+/// process and clears the request when it exits.
+fn backfill(layout: &Layout, _command: Command) -> Result<Reply, Reply> {
+    let request = layout.data.join("backfill.request");
+    if request.is_file() {
+        return Err(layout_error(409, "BACKFILL_ALREADY_RUNNING"));
+    }
+    std::fs::write(&request, b"84").map_err(|_| layout_error(409, "BACKFILL_REQUEST_FAILED"))?;
+    Ok(layout_envelope(200, json!({"state": "STARTED", "sessions": 84})))
+}
 fn open_folder(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
     let target = body
         .get("target")

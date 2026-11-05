@@ -92,6 +92,20 @@ pub fn reply(app: &App, agent: Option<&Agent>, req: &mut Request, port: u16) -> 
                 };
             }
         }
+        if method == "GET" && path == "/api/agent/provider" {
+            return stratide_research::provider_setup::status(agent);
+        }
+        if method == "POST" {
+            if path == "/api/agent/provider" {
+                return stratide_research::provider_setup::configure(agent, &body);
+            }
+            if path == "/api/agent/provider/test" && body == json!({}) {
+                return stratide_research::provider_setup::test(agent);
+            }
+            if path == "/api/agent/provider/remove" && body == json!({}) {
+                return stratide_research::provider_setup::remove(agent);
+            }
+        }
         if method == "GET" && path == "/api/agent/status" {
             return agent.status(now);
         }

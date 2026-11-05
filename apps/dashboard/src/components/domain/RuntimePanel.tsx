@@ -110,6 +110,8 @@ export function RuntimePanel() {
   });
   const [wslLoaded, setWslLoaded] = useState(false);
   const [wslProbe, setWslProbe] = useState<WslProbeResult | null>(null);
+  const [history, setHistory] = useState<{ last: string | null; missing: number; start: string | null } | null>(null);
+  const [backfillRunning, setBackfillRunning] = useState(false);
   const controller = useRef<AbortController | null>(null);
 
   const refresh = useCallback((silent = false) => {
@@ -131,14 +133,38 @@ export function RuntimePanel() {
       });
   }, []);
 
+  const loadHistory = useCallback(() => {
+    runtimeAction('market', { action: 'backfill-state' })
+      .then((value) => {
+        const state = value as { running?: boolean };
+        setBackfillRunning(state.running === true);
+      })
+      .catch(() => setBackfillRunning(false));
+    runtimeAction('market', { action: 'status' })
+      .then((value) => {
+        const report = value as {
+          gaps?: unknown[];
+          last_successful_date?: string | null;
+          config?: { start_date?: string };
+        };
+        setHistory({
+          last: report.last_successful_date ?? null,
+          missing: report.gaps?.length ?? 0,
+          start: report.config?.start_date ?? null,
+        });
+      })
+      .catch(() => setHistory(null));
+  }, []);
+
   useEffect(() => {
     refresh();
+    loadHistory();
     const timer = window.setInterval(() => refresh(true), 15_000);
     return () => {
       window.clearInterval(timer);
       controller.current?.abort();
     };
-  }, [refresh]);
+  }, [refresh, loadHistory]);
 
   useEffect(() => {
     if (!status || wslLoaded) return;
@@ -493,6 +519,36 @@ export function RuntimePanel() {
                 onClick={() => act('disable', 'market', { action: 'disable' }, 'EOD 采集已停用')}
               >
                 安全停用采集
+              </Button>
+            </div>
+          </div>
+
+          <div className="install-setup__row">
+            <div>
+              <strong>历史补录</strong>
+              <p className="muted">
+                {backfillRunning
+                  ? '补录正在后台运行；行情库写入期间进度稍后可见，完成后会自动停止。'
+                  : '研究需要最近 84 个交易日。补录在后台按数据源限额运行，通常 30–60 分钟；期间可关闭页面。'}
+                {!backfillRunning && history
+                  ? ` 已就绪 ${history.last ?? '—'}，还缺 ${history.missing} 个交易日。`
+                  : ''}
+              </p>
+            </div>
+            <div className="install-actions">
+              <Button
+                size="sm"
+                variant="secondary"
+                disabled={!token || busy !== null || backfillRunning || status?.dependencies.market_eod.state !== 'INITIALIZED'}
+                loading={busy === 'backfill'}
+                onClick={() =>
+                  act('backfill', 'market', { action: 'backfill', sessions: 84 }, '补录已在后台开始').then(loadHistory)
+                }
+              >
+                {backfillRunning ? '补录进行中' : '补录 84 个交易日'}
+              </Button>
+              <Button size="sm" variant="ghost" disabled={!token} onClick={loadHistory}>
+                刷新进度
               </Button>
             </div>
           </div>

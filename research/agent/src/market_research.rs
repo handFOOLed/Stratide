@@ -691,7 +691,7 @@ pub fn prepare(m: &Model, input: &Value) -> Result<Prepared> {
     let (plan, bundle) = parent(&c, &ctx)?;
     let body = request(m, &ctx, &plan, &bundle)?;
     let cfg = credential_config(&c)?;
-    let key = ds::read_key_file(&cfg.key_file)?;
+    let key = ds::read_key(&cfg)?;
     ensure(
         !body.to_string().contains(key.as_str()),
         "DEEPSEEK_SECRET_IN_REQUEST_DENIED",
