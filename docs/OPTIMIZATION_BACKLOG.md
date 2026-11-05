@@ -1,5 +1,7 @@
 # Stratide｜后续优化清单（Optimization Backlog）
 
+> **现行状态｜2026-11-05**：V2 数据、自动研究、多证券共享 Paper 的工程模块 #82/#83/#84（PR #86/#87/#88）已合并；**当前仅执行 #85 Windows 安装、自启与双击启动，由 DeepSeek 负责**。本页属于非本期优化池，**不覆盖 #85**。原“PR #72 合并前”排序已失效，#72 早已合并；下方历史成本、测试及状态数字保留其发生时含义，不等于目前所有数据真实 E2E 已验证。当前产品状态请看 [STATUS](STATUS.md) / [#85](https://github.com/handFOOLed/Stratide/issues/85)。
+
 **2026-11-04 / #77 已实现与遗留划分：** 当前账户/历史分离、原研究结果/预算/审批通知可用、Windows 启停和 manifest/SQLite 备份恢复、现有 UI 精修已交付本期 Draft，见 [V1 收尾](V1_COMPLETION.md)。保留的优化包括官方账单核销、其他硬件部署/长稳及后续更高保真模拟，不再把它们列作本期功能缺口。#10/#17 的真实证据仍待补充，不声称交易资格通过；N100 延后。下方旧建议中已涉及本期显示/接线的部分以本段为准，金融规则专项仍需另定范围。
 
 > **状态：仅记录，不立即实施。** 2026-11-03 建立。此文档不是开发授权、真实 API/数据外发授权，也不修改任何代码、账本、已发生费用或交易准入。具体实施须由 Owner 另行选定独立 Issue/PR，再按固定 HEAD 审查、Owner 合并的流程执行。
@@ -35,20 +37,18 @@
 | REL-01 | **旧 PR56 Python 时间有效性回归间歇失败** | `test-risk-portfolio.py` 某些场次在预期撤销/非法证券测试之前触发 `FUTURE_OR_STALE_SNAPSHOT`；曾单项复跑通过 | 独立复现并固定时钟/fixture 行为；**不降低 as-of / 来源时点安全门禁** |
 | REL-02 | **Rust 默认并行 Ledger 锁冲突** | 已有默认并行测试出现本地 writer lock / `os error 11`；串行全仓通过 | 用独立临时库/互斥测试资源修复并行稳定性；不动真实账本写入/唯一 writer 保证 |
 | REL-03 | **Linux 真机 N100 验收** | WSL2 Ubuntu ext4 / 9700X 上 TimesFM 真实推理和 6GiB cgroup 隔离已通过，`N100_ACCEPTANCE=NOT_VERIFIED` | N100 实机验证 CPU 热/冷延迟、峰值内存、OOM/清理、与 EOD/UI 共存、长期稳定性，不能将 9700X 性能外推 |
-| REL-04 | **旧研究持久只读验证** | [PR #72 审查评论](https://github.com/handFOOLed/Stratide/pull/72#issuecomment-6604866896)：历史 `verify/report` 不应因后续 Provider grant/价格更新而失效 | **这是 PR #72 当前合并前的 P1 阻断，不得仅当“以后优化”搁置**；仅作为跨模块防回归索引 |
+| REL-04 | **旧研究持久只读验证** | [PR #72 审查评论](https://github.com/handFOOLed/Stratide/pull/72#issuecomment-6604866896)：历史 `verify/report` 不应因后续 Provider grant/价格更新而失效 | PR #72 已合并；原 P1 是当时必须在合并前修复的历史问题，现仅作持久只读验证的防回归索引 |
 | RSH-01 | **真实市场研究的可用性/PIT 门禁** | 目前真实 TimesFM + DeepSeek 验证只对 synthetic 风险摘要成立，`RESEARCH_ONLY`，`ELIGIBILITY_DENIED` | 独立审查数据授权、as-of、公司行为、真实行情来源和独立前向评测后再考虑开通，**不能因模型接通自动放行 Paper/Live** |
 | RSH-02 | **真实效果与基线对照** | TimesFM 的已完成 walk-forward 为合成测试；Naive/EWMA 仍可能优于模型 | 事先冻结真实 out-of-sample 实验和统计口径，逐题核对成本/退化，报告收益、风险及失败负例，禁止宣称已有 alpha |
 | OPS-01 | **统一仪表盘与预算解释** | 当前 CLI 中预算已可查看，但“预留/估算/核销”容易混淆；未来 Dashboard 有独立 Agent 管理规划 | 接 UI 时复用 BILL-01/06 的定义，减少冗余滑块，显示日/月时间窗及停止调用控制；不让前端直接绕过 Rust Budget |
 | OPS-02 | **WSL2 与部署路径约定** | Owner 将 Ubuntu 虚拟盘迁往 Windows `E:\\WSL2`，Linux 构建、`.venv`、模型应在 Ubuntu **原生 ext4** | 未来 Codex 工作目录采用 `~/projects/Stratide` 或独立 PR worktree；不要在 `/mnt/e/WSL2` 构建 |
 | OPS-03 | **模型与依赖升级策略** | TimesFM 固定 2.5 200M/CPU 权重 revision，旧运行证明可复现；DeepSeek model 是供应商 alias | 评估新版本须有单独变更、权重 SHA、成本/内存对照和回滚；禁自动升级或静默改变历史结果 |
 
-## 4. 排序与启动条件
+## 4. 当前排序与启动条件（2026-11-05）
 
-- **现在**：只保存本优化清单，不改计费代码、不追加真实 API 调用、不修改已发生的两笔 calls/预留、不改变 ¥5/¥100、不合并 PR #72。
-- **PR #72 合并前**：按已有审查先修 **REL-04 / 历史只读验证 P1**，不要以本清单替代阻断修复。
-- **后续第一个独立优化模块**：优先将 **BILL-01、BILL-02、BILL-06** 组成“费用语义/缓存峰谷估算与展示”小 PR；默认仍**保留原预算预留机制**，避免把估算改进误当释放资金授权。
-- **涉及实际释放预留的 BILL-03/04**：另发明确的账单核销协议与安全验收，Owner 单独批准。
-- **独立技术债**：REL-01、REL-02 分开处理；REL-03 等 N100 真机到位；RSH-01/02 等数据许可及研究目标清晰时推进。
+- **立即开发**：仅 [#85 Windows 产品交付](https://github.com/handFOOLed/Stratide/issues/85)，由 DeepSeek 负责。它不得为改善收费界面改动 Agent 的预算、费率估算或逐笔预留释放协议；亦不得触发未授权云请求。
+- **此清单其他项目均未授权实施**：BILL-01/02/06 可作为后续独立费用 UX/估算提案；BILL-03/04 需另发可信账单核销协议和 Owner 明确批准。预留≠用量估算≠实际发票的边界保持。
+- **技术债与证据**：REL-01/02 视复现触发；REL-03 N100 硬件验证延期；RSH-01/02 仍需独立 PIT、真实市场与样本外证据。PR #72 已合并，历史的“合并前修复”行不再是当前执行任务。
 
 ## 5. 文档维护约定
 
