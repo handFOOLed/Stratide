@@ -25,7 +25,7 @@ export const PAGE_LABELS: Record<PageKey, string> = {
   overview: '总览',
   history: '历史报告',
   agents: 'Agent 管理',
-  notifications: '通知审批',
+  notifications: '通知',
   settings: '设置',
 };
 

@@ -45,7 +45,7 @@ export function NotificationsPage({agent,titleRef}: {agent: AgentState; titleRef
       timer.current=null;
     },5000);
   };
-  return <><PageHeader title="通知审批" titleRef={titleRef}/>
+  return <><PageHeader title="通知" titleRef={titleRef}/>
     {token===null?<Card><CardBody><p>本机研究控制尚未解锁。</p><Button onClick={()=>navigate({page:'agents'})}>前往 Agent 管理解锁</Button></CardBody></Card>:<>
       {error?<p role="alert">{error}</p>:null}
       <div className="approval-layout"><Card><CardHead title="研究审批"/><CardBody>

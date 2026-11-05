@@ -49,9 +49,8 @@ pub fn reply(app: &App, agent: Option<&Agent>, req: &mut Request, port: u16) -> 
     let Some(agent) = agent else {
         return error(503, "AGENT_NOT_CONFIGURED");
     };
-    if !single("X-Stratide-Owner").is_some_and(|v| agent.authorized(&v)) {
-        return error(401, "OWNER_TOKEN_REQUIRED");
-    }
+    // Local single-Owner install: Host/Origin/Sec-Fetch-Site above still bound
+    // the caller to this exact loopback origin; no separate page token is kept.
     let path = req.url().to_string();
     let request_key = single("X-Stratide-Idempotency");
     let body = if method == "POST" {

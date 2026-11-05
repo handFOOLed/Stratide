@@ -222,7 +222,6 @@ export async function agentFetch<T>(token: string, path: string, options: AgentR
       credentials: 'omit',
       headers: {
         Accept: 'application/json',
-        'X-Stratide-Owner': token,
         ...(options.idempotencyKey === undefined ? {} : {'X-Stratide-Idempotency':options.idempotencyKey}),
         ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
       },

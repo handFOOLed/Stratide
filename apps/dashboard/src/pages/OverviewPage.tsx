@@ -175,6 +175,7 @@ export function OverviewPage({ paper, titleRef }: { paper: PaperDataState; title
   const strategyFreezes = risk?.strategy_freezes?.length ?? 0;
   const totalFreezes = accountFreezes + strategyFreezes;
   const missingValuations = chartRows.filter((row) => parseInteger(row.nav_fen) === null).length;
+  const valuedDays = chartRows.length - missingValuations;
   const hasValuationError = Boolean(account.valuation_error);
   const pnlClass = signClass(account.session_pnl_fen);
   const drawdownClass = '';
@@ -221,6 +222,11 @@ export function OverviewPage({ paper, titleRef }: { paper: PaperDataState; title
                   <span>估值 {hasValuationError ? '缺失' : '有效'}</span>
                 </div>
               </div>
+              <p className="risk-card__note">
+                {totalFreezes > 0
+                  ? '存在风控锁时，新的模拟下单会被阻止；解除需要你确认。'
+                  : '当前没有风控锁。触线会自动阻止新的模拟下单。'}
+              </p>
 
             </CardBody>
           </Card>
@@ -299,14 +305,27 @@ export function OverviewPage({ paper, titleRef }: { paper: PaperDataState; title
               </div>
             </div>
             <div className="chart-body">
-              <EquityChart
-                rows={chartRows}
-                metric="nav"
-                label="当前 Paper 账户资产曲线"
-                navTopFen={navTopFen}
-                baselineFen={parseInteger(account.initial_nav_fen)}
-              />
-              <p className="chart-axis-note">纵轴自适应 · 每格为显示范围的 20%</p>
+              {valuedDays >= 2 ? (
+                <>
+                  <EquityChart
+                    rows={chartRows}
+                    metric="nav"
+                    label="当前 Paper 账户资产曲线"
+                    navTopFen={navTopFen}
+                    baselineFen={parseInteger(account.initial_nav_fen)}
+                  />
+                  <p className="chart-axis-note">纵轴自适应 · 每格为显示范围的 20%</p>
+                </>
+              ) : (
+                <div className="overview-empty overview-empty--chart">
+                  <EmptyState
+                    compact
+                    icon="activity"
+                    title="净值曲线将在第二个交易日出现"
+                    description="当前只有 1 个报告日；每天盘后采集完成后会自动延长这条曲线。"
+                  />
+                </div>
+              )}
             </div>
           </Card>
         </div>
@@ -427,6 +446,19 @@ export function OverviewPage({ paper, titleRef }: { paper: PaperDataState; title
           </Card>
         </div>
       </div>
+
+      {bundle.fills.length === 0 && valuedDays < 2 ? (
+        <Card className="overview-guide">
+          <CardBody>
+            <h2 className="card__title">接下来会发生什么</h2>
+            <ol className="guide-steps">
+              <li><strong>每天盘后</strong>自动采集全市场行情，时间约 16:10–18:00。</li>
+              <li><strong>数据满 84 个交易日后</strong>，本机模型与已授权的云研究才会生成候选。</li>
+              <li><strong>通过风控后</strong>，才会在你的 {formatCny(account.initial_nav_fen)} 模拟账户里产生模拟成交。</li>
+            </ol>
+          </CardBody>
+        </Card>
+      ) : null}
 
       <PaperPortfolioPanel portfolio={account.portfolio === undefined ? null : account.portfolio} orders={bundle.orders}/>
       <PositionDrawer

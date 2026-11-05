@@ -85,7 +85,6 @@ function defaultRange(sourceDay: string | undefined): { start: string; end: stri
 
 export function AgentPage({ agent, workspace, titleRef }: { agent: AgentState; workspace: WorkspaceState; titleRef?: Ref<HTMLHeadingElement> }) {
   const toast = useToast();
-  const [unlockOpen, setUnlockOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
   const status = agent.status;
@@ -97,92 +96,13 @@ export function AgentPage({ agent, workspace, titleRef }: { agent: AgentState; w
       titleRef={titleRef}
       side={
         unlocked ? (
-          <>
-            <Badge tone="success">本机会话已解锁</Badge>
-            <span className="page-meta">{agent.lastUpdated ? '更新于 ' + formatClock(agent.lastUpdated) : '等待读取'}</span>
-            <Button
-              size="sm"
-              variant="ghost"
-              icon="lock"
-              onClick={() => {
-                agent.lock();
-                toast.push({ title: '已锁定本机会话', description: 'Owner 令牌已从页面内存移除。', tone: 'info' });
-              }}
-            >
-              锁定
-            </Button>
-          </>
-        ) : (
-          <Badge tone="outline">未解锁</Badge>
-        )
+          <span className="page-meta">
+            {agent.lastUpdated ? '更新于 ' + formatClock(agent.lastUpdated) : '等待读取'}
+          </span>
+        ) : null
       }
     />
   );
-
-  if (agent.phase === 'locked') {
-    return (
-      <>
-        {header}
-        {agent.error ? (
-          <Callout tone="warning" title="研究会话不可用" className="stale-banner">
-            {agent.error.message}
-          </Callout>
-        ) : null}
-        <div className="grid agent-gate-grid">
-          <div className="col-7">
-            <Card className="agent-gate">
-              <div className="agent-gate__icon" aria-hidden="true"><Icon name="lock" size={22} /></div>
-              <h2 className="agent-gate__title">解锁本机研究控制</h2>
-              <p className="agent-gate__desc">
-                使用本机 Owner 令牌查看和管理研究任务。
-              </p>
-              <ul className="gate-points">
-                <li><Icon name="key" size={14} /><span>令牌仅保存在页面内存，刷新后需重新解锁。</span></li>
-                <li><Icon name="database" size={14} /><span>刷新列表与查看详情不会调用付费模型。</span></li>
-              </ul>
-              <div className="agent-gate__actions">
-                <Button variant="primary" icon="unlock" onClick={() => setUnlockOpen(true)}>
-                  输入 Owner 令牌
-                </Button>
-                <span className="agent-gate__hint">从本机 Agent 目录的 owner-token 文件复制</span>
-              </div>
-            </Card>
-          </div>
-          <div className="col-5">
-            <Card className="agent-boundary">
-              <CardHead
-                title="研究边界"
-                actions={<Badge tone="outline">Paper only</Badge>}
-              />
-              <div className="boundary-list">
-                <div className="boundary-item">
-                  <span className="boundary-item__icon"><Icon name="file" /></span>
-                  <div><strong>持久任务</strong><p>任务、结果与调用记录保存在本机。</p></div>
-                </div>
-                <div className="boundary-item">
-                  <span className="boundary-item__icon"><Icon name="wallet" /></span>
-                  <div><strong>硬预算</strong><p>日/月上限与调用预留由可信服务执行。</p></div>
-                </div>
-                <div className="boundary-item">
-                  <span className="boundary-item__icon"><Icon name="shield" /></span>
-                  <div><strong>无交易权限</strong><p>探索性研究不授予策略资格或实盘许可。</p></div>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-        <UnlockModal
-          open={unlockOpen}
-          agent={agent}
-          onClose={() => setUnlockOpen(false)}
-          onSuccess={() => {
-            setUnlockOpen(false);
-            toast.push({ title: '已解锁本机研究控制', description: '令牌仅在当前页面内存中保留。', tone: 'success' });
-          }}
-        />
-      </>
-    );
-  }
 
   if (agent.phase === 'loading') {
     return (
@@ -213,7 +133,6 @@ export function AgentPage({ agent, workspace, titleRef }: { agent: AgentState; w
             actions={
               <>
                 <Button variant="secondary" icon="refresh" onClick={() => void agent.refresh()}>重新读取</Button>
-                <Button variant="ghost" onClick={agent.lock}>锁定会话</Button>
               </>
             }
           />
@@ -289,10 +208,10 @@ export function AgentPage({ agent, workspace, titleRef }: { agent: AgentState; w
               ) : null}
 
               <div className="runtime-meta">
-                <div><span>Worker 并发</span><strong>{status.worker_concurrency}</strong></div>
+                <div><span>并行任务</span><strong>{status.worker_concurrency}</strong></div>
                 <div><span>默认模型</span><strong>{defaultModel?.label ?? '未配置'}</strong></div>
-                <div><span>研究资格</span><strong title={status.qualification}>{RESEARCH_QUALIFICATION_LABELS[status.qualification] ?? '资格待核对'}</strong></div>
-                <div><span>自动 fallback</span><strong>关闭 · 仅 Owner 切换</strong></div>
+                <div><span>研究定位</span><strong title={status.qualification}>{RESEARCH_QUALIFICATION_LABELS[status.qualification] ?? '资格待核对'}</strong></div>
+                <div><span>模型切换</span><strong>仅你手动选择</strong></div>
               </div>
 
               <div className="eod-block" hidden={status.dashboard_mode==='attached_explicit_operations'}>
@@ -501,8 +420,9 @@ function ModelsCard({ status, agent }: { status: AgentStatus; agent: AgentState 
               ))}
             </Select>
           </Field>
-          <div className="model-selected">
+          <div className="model-selected-field">
             <span className="field__label">当前默认配置</span>
+            <div className="model-selected">
             {selected ? (
               <div className="model-selected__body">
                 <span className="model-selected__name">{selected.label}</span>
@@ -520,6 +440,7 @@ function ModelsCard({ status, agent }: { status: AgentStatus; agent: AgentState 
             ) : (
               <span className="muted">未配置模型</span>
             )}
+            </div>
           </div>
         </div>
 
@@ -987,82 +908,6 @@ function TaskDetailBody({ detail, currency }: { detail: AgentTaskDetail; currenc
         )}
       </div>
     </>
-  );
-}
-
-function UnlockModal({
-  open,
-  agent,
-  onClose,
-  onSuccess,
-}: {
-  open: boolean;
-  agent: AgentState;
-  onClose: () => void;
-  onSuccess: () => void;
-}) {
-  const [token, setToken] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [errorCode, setErrorCode] = useState<string | null>(null);
-  const loading = agent.busy === 'unlock';
-
-  const submit = async (event: FormEvent) => {
-    event.preventDefault();
-    setError(null);
-    setErrorCode(null);
-    if (!token.trim()) {
-      setError('请输入本机 Owner 令牌。');
-      return;
-    }
-    const failure = await agent.unlock(token);
-    if (failure) {
-      setError(failure.message);
-      setErrorCode(failure.code);
-      return;
-    }
-    setToken('');
-    onSuccess();
-  };
-
-  return (
-    <Modal
-      open={open}
-      onClose={() => {
-        if (!loading) onClose();
-      }}
-      title="解锁本机研究控制"
-      description="令牌只保存在当前页面内存，不写入浏览器存储或 URL。"
-      footer={
-        <>
-          <Button variant="ghost" onClick={onClose} disabled={loading}>取消</Button>
-          <Button variant="primary" type="submit" form="agent-unlock-form" loading={loading}>解锁</Button>
-        </>
-      }
-    >
-      <form id="agent-unlock-form" onSubmit={submit}>
-        <Field
-          label="本机 Owner 令牌"
-          htmlFor="agent-owner-token"
-          hint="从本机 Agent 目录的 owner-token 文件复制。刷新页面后需要重新解锁。"
-          error={error}
-        >
-          <TextInput
-            id="agent-owner-token"
-            type="password"
-            autoComplete="off"
-            spellCheck={false}
-            minLength={32}
-            maxLength={128}
-            value={token}
-            onChange={(event) => setToken(event.target.value)}
-            required
-            data-autofocus
-          />
-        </Field>
-        {errorCode ? <p className="field__error">错误代码：{errorCode}</p> : null}
-        {error ? <Callout tone="danger" className="form-error" role="alert">{error}</Callout> : null}
-      </form>
-    </Modal>
   );
 }
 

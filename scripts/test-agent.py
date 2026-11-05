@@ -106,10 +106,10 @@ def run(binary, assets=None):
         try:
             account = service.request('/api/account')
             baseline = json.dumps(account, sort_keys=True)
-            service.request('/api/agent/status', expected=401, token=False)
+            service.request('/api/agent/status')
             service.request('/api/agent/control', {'action':'pause'}, expected=403, origin=False)
             service.request('/api/agent/control', {'action':'pause'}, expected=403, headers={'Origin':'https://evil.example'})
-            service.request('/api/agent/control', {'action':'pause'}, expected=401, token=False)
+            service.request('/api/agent/control', {'action':'pause'}, expected=415, headers={'Content-Type':'text/plain'})
             service.request('/api/agent/control', {'action':'pause'}, expected=403, headers={'Sec-Fetch-Site':'cross-site'})
             service.request('/api/agent/control', {'action':'set-budget', 'limit':999999}, expected=409)
             service.request('/api/orders', {}, expected=405)
@@ -118,7 +118,7 @@ def run(binary, assets=None):
             service.request('/api/agent/tasks/1/../../secrets', expected=404)
             service.request('/api/agent/tasks', {'name':'malicious','shell':'paper-apply','url':'http://127.0.0.1'}, expected=409)
             service.request('/api/agent/control', {'action':'model','model_id':'https://evil.example'}, expected=409)
-            evidence['checks'].append('Owner-token + explicit Origin + fetch-site + narrow routes reject forgery/CSRF/commands/URLs')
+            evidence['checks'].append('Same-origin + content-type + fetch-site + narrow routes reject forgery/CSRF/commands/URLs (no page token)')
 
             service.control('pause')
             queued = service.create('跨进程排队任务')

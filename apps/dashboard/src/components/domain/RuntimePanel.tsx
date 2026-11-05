@@ -86,7 +86,9 @@ function explain(value: DependencyStatus): string {
   const parts: string[] = [];
   if (value.version) parts.push('v' + value.version);
   if (value.distributions && value.distributions.length > 0) parts.push(value.distributions.join(' / '));
-  if (value.reason) parts.push(value.reason);
+  // Raw reason codes only surface in the collapsed technical details.
+  const friendly = value.reason ? REASONS[value.reason] : undefined;
+  if (friendly) parts.push(friendly);
   if (value.note) parts.push(value.note);
   return parts.join(' · ');
 }
@@ -254,24 +256,31 @@ export function RuntimePanel() {
           <div className="install-item">
             <div className="install-item__head"><strong>本地服务</strong><Badge tone={status?.service.healthy ? 'success' : 'danger'}>{status?.service.healthy ? '在线' : '离线'}</Badge></div>
             <p className="muted">127.0.0.1:{status?.port ?? '—'} · 仅本机 · Paper-only</p>
-            <p className="muted mono">{status?.service.instance_id ?? ''}</p>
           </div>
           <div className="install-item">
             <div className="install-item__head"><strong>后台 Supervisor</strong><Badge tone={tone(supervisor?.status ?? 'UNKNOWN')}>{supervisor?.status ?? '—'}</Badge></div>
             <p className="muted">{reasonText}</p>
-            <p className="muted">PID {supervisor?.pid ?? '—'} · 更新 {supervisor?.updated_at ? formatDateTime(supervisor.updated_at) : '—'}</p>
           </div>
           <div className="install-item">
             <div className="install-item__head"><strong>EOD watch</strong><Badge tone={supervisor?.watch ? 'success' : 'warning'}>{supervisor?.watch ? '运行中' : '未运行'}</Badge></div>
-            <p className="muted">PID {supervisor?.watch?.pid ?? '—'} · 重启 {supervisor?.watch?.restarts ?? 0} 次</p>
-            <p className="muted">按 Asia/Shanghai 交易日；复用原 eod-operator market watch，不新建调度或账本。</p>
+            <p className="muted">按 Asia/Shanghai 交易日，盘后 16:10–18:00 自动采集。</p>
           </div>
-          <div className="install-item">
+          <div className="install-item install-item--wide">
             <div className="install-item__head"><strong>版本</strong><span className="mono">v{status?.product_version ?? '—'}</span></div>
-            <p className="muted">安装目录：<span className="mono">{status?.app_dir ?? '—'}</span></p>
-            <p className="muted">数据目录：<span className="mono">{status?.data_root ?? '—'}</span></p>
+            <p className="muted">升级安装不会覆盖模拟账户、历史行情与研究记录。</p>
           </div>
         </div>
+        <details className="install-advanced">
+          <summary>技术详情</summary>
+          <dl className="install-meta">
+            <div><dt>服务实例</dt><dd className="mono">{status?.service.instance_id ?? '—'}</dd></div>
+            <div><dt>Supervisor</dt><dd className="mono">PID {supervisor?.pid ?? '—'} · {supervisor?.status ?? '—'}</dd></div>
+            <div><dt>EOD watch</dt><dd className="mono">PID {supervisor?.watch?.pid ?? '—'} · 重启 {supervisor?.watch?.restarts ?? 0} 次</dd></div>
+            <div><dt>安装目录</dt><dd className="mono">{status?.app_dir ?? '—'}</dd></div>
+            <div><dt>数据目录</dt><dd className="mono">{status?.data_root ?? '—'}</dd></div>
+            <div><dt>登录任务</dt><dd className="mono">{status?.autostart.task_name ?? 'Stratide'} · {status?.autostart.mechanism ?? '—'} · {status?.autostart.detail ?? '—'}</dd></div>
+          </dl>
+        </details>
       </section>
 
       <section className="install-section">
@@ -289,20 +298,11 @@ export function RuntimePanel() {
             onChange={(checked) => act('autostart', 'autostart', { enabled: checked }, checked ? '已启用登录自启' : '已停用登录自启')}
           />
         </div>
-        <p className="muted">
-          任务名 <span className="mono">{status?.autostart.task_name ?? 'Stratide'}</span> · 机制{' '}
-          {status?.autostart.mechanism === 'TASK_SCHEDULER'
-            ? 'Task Scheduler 登录触发'
-            : status?.autostart.mechanism === 'RUN_KEY'
-              ? '当前用户 Run 键（回退）'
-              : '未启用'}{' '}
-          · {status?.autostart.detail ?? '—'}
-        </p>
       </section>
 
       <section className="install-section">
         <h2 className="card__title">依赖与权限诊断</h2>
-        <p className="muted">缺少依赖时保持 BLOCKED；安装包不会静默下载模型或代替 Owner 授权。</p>
+        <p className="muted">缺少依赖时研究会暂停；安装包不会静默下载模型或代替你做授权。</p>
         <div className="install-grid">
           {DEPENDENCIES.map(([key, name]) => {
             const value = status?.dependencies[key];

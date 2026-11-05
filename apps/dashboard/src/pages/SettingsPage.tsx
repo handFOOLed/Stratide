@@ -145,6 +145,7 @@ export function SettingsPage({
               onChange={(checked) => setMotion(checked ? 'reduce' : 'system')}
             />
           </div>
+          <p className="settings-footnote">外观只保存在本机浏览器，不影响账户、研究或预算。</p>
         </CardBody>
       );
     }
@@ -245,8 +246,8 @@ export function SettingsPage({
             <SecurityRow icon="shield" title="Paper 模式">
               只读报告快照，未连接券商或实盘账户。
             </SecurityRow>
-            <SecurityRow icon="key" title="Owner 令牌仅内存">
-              用于解锁 Agent 管理；刷新后失效，不写入浏览器存储或 URL。
+            <SecurityRow icon="key" title="仅本机访问">
+              服务只监听 127.0.0.1，并校验同源请求；不向任何远端开放。
             </SecurityRow>
             <SecurityRow icon="database" title="可信本机配置">
               模型、费率、预算和云授权由本机维护；Web 不提供加额、清锁或密钥读取。

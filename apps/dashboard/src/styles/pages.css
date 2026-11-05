@@ -24,8 +24,8 @@
 }
 
 .overview-top {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 3fr);
-  align-items: start;
+  grid-template-columns: minmax(220px, 0.78fr) minmax(320px, 1.12fr) minmax(0, 2.1fr);
+  align-items: stretch;
 }
 
 .overview-bottom {
@@ -71,10 +71,13 @@
   min-width: 0;
 }
 
+.account-card { container-type: inline-size; }
+
 .account-value {
   margin-top: var(--space-2);
   color: var(--text);
-  font-size: clamp(28px, 2.2vw, 38px);
+  white-space: nowrap;
+  font-size: clamp(24px, 9.5cqi, 46px);
   font-weight: 600;
   letter-spacing: -0.04em;
   line-height: 1.02;
@@ -1212,6 +1215,23 @@
   min-width: 0;
 }
 
+/* A composed content column instead of edge-to-edge stretched panels. */
+.settings-panel > * {
+  max-width: 1060px;
+}
+
+.install-section > .card__title {
+  font-size: var(--fs-lg);
+  letter-spacing: var(--tracking-tight);
+}
+
+.settings-footnote {
+  margin-top: var(--space-4);
+  color: var(--text-faint);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+}
+
 .settings-group + .settings-group {
   margin-top: 6px;
   padding-top: 12px;
@@ -1773,24 +1793,15 @@
 
 /* Tall canvases get more air and larger type instead of hollow space. */
 @media (min-width: 1180px) and (min-height: 850px) {
-  .account-value {
-    font-size: 46px;
-  }
-
   .account-stat__value {
     font-size: 16px;
   }
 }
 
 @media (min-width: 1180px) and (min-height: 1000px) {
-  .account-value {
-    font-size: 54px;
-  }
-
   .account-stat__value {
     font-size: 17px;
   }
-
 }
 
 /* ---------- Responsive page rules ---------- */
@@ -2137,3 +2148,20 @@
 .install-advanced > summary::-webkit-details-marker { display: none; }
 .install-advanced > summary::before { content: '›'; display: inline-block; margin-right: 6px; transition: transform var(--motion-hover) var(--ease-out); }
 .install-advanced[open] > summary::before { transform: rotate(90deg); }
+.install-section { padding-top: var(--space-5); border-top: 1px solid var(--border-faint); }
+.install-section:first-of-type { padding-top: 0; border-top: 0; }
+.install-item--wide { grid-column: 1 / -1; }
+.install-item__detail { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.install-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-2) var(--space-6); margin: var(--space-3) 0 0; }
+.install-meta div { display: flex; gap: var(--space-3); align-items: baseline; min-width: 0; }
+.install-meta dt { flex: 0 0 auto; color: var(--text-muted); font-size: var(--fs-sm); }
+.install-meta dd { margin: 0; min-width: 0; color: var(--text-secondary); font-size: var(--fs-sm); overflow-wrap: anywhere; }
+.model-selected-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.model-selected-field .model-selected { flex: 1; }
+.overview-empty--chart { display: flex; align-items: center; justify-content: center; min-height: 220px; }
+.risk-card__note { margin: var(--space-4) 0 0; color: var(--text-muted); font-size: var(--fs-sm); line-height: 1.55; }
+.overview-guide { margin-top: 14px; }
+.guide-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); margin: var(--space-3) 0 0; padding: 0; list-style: none; counter-reset: step; }
+.guide-steps li { position: relative; padding-left: 34px; color: var(--text-secondary); font-size: var(--fs-sm); line-height: 1.55; }
+.guide-steps li::before { counter-increment: step; content: counter(step); position: absolute; left: 0; top: 0; display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-ink); font-size: 12.5px; font-weight: 600; }
+@media (max-width: 860px) { .guide-steps { grid-template-columns: minmax(0, 1fr); } }
