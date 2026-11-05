@@ -53,7 +53,18 @@ export interface Deployment {
   strategy_id: string;
 }
 
+export interface PaperPortfolioBatch {
+  decision_day: string; target_day: string | null; frozen_at: string; finalized_at: string | null;
+  label: string; reason: string; source_sha256: string; calendar_sha256: string; policy_sha256: string;
+  candidate: {task_id:string; candidate_sha256:string; registration_sha256:string; model_version:string} | null;
+  order_ids: string[]; rejections: Array<[Instrument,string]>; confirmation_source_sha256: string | null;
+}
+export interface PaperPortfolio {
+  automatic: boolean; policy_version: string; policy_sha256:string; target_value_fen:string;
+  max_positions: string; max_daily_orders: string; pending: string | null; batches: PaperPortfolioBatch[];
+}
 export interface AccountData {
+  portfolio?: PaperPortfolio | null;
   account_id: string;
   day: string | null;
   nav_fen: string | null;

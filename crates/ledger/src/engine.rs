@@ -3,6 +3,7 @@ use stratide_contracts::*;
 use stratide_risk::{RiskDecision, RiskKernel};
 mod cash_dividend;
 mod historical;
+mod portfolio;
 
 struct FillContext<'a> {
     rules: &'a TradingRules,
@@ -34,6 +35,7 @@ impl State {
             valuation_error: None,
             cash_dividends: None,
             paper_eod: None,
+            portfolio: None,
         })
     }
 
@@ -123,10 +125,27 @@ impl State {
     }
 
     pub(crate) fn apply(&mut self, cmd: &Command) -> Result<()> {
+        if let Some(book) = &self.portfolio {
+            let at = match cmd {
+                Command::ConfigurePortfolioV1 { now, .. }
+                | Command::PausePortfolioV1 { now, .. } => *now,
+                Command::FreezePortfolioV1 { decision } => decision.now,
+                Command::ConfirmPortfolioV1 { confirmation } => confirmation.now,
+                Command::Freeze { .. } => book.last_event_at,
+                _ => return Err("PORTFOLIO_SINGLE_EXECUTION_PATH_REQUIRED".into()),
+            };
+            if at < book.last_event_at {
+                return Err("PORTFOLIO_CLOCK_REGRESSION".into());
+            }
+        }
         // A no-price terminal event does not advance valuation time, but its
         // business time still fences all later commands against backdating.
         if let Some(receipt) = self.paper_eod.as_ref().and_then(|b| b.no_fills.last()) {
             let at = match cmd {
+                Command::ConfigurePortfolioV1 { now, .. }
+                | Command::PausePortfolioV1 { now, .. } => Some(*now),
+                Command::FreezePortfolioV1 { decision } => Some(decision.now),
+                Command::ConfirmPortfolioV1 { confirmation } => Some(confirmation.now),
                 Command::SubmitPaperIntentV1 { intent } => Some(intent.now),
                 Command::ExpirePaperIntentsV1 { now }
                 | Command::FreezePaperIntentsV1 { now, .. }
@@ -193,6 +212,16 @@ impl State {
             }
         }
         match cmd {
+            Command::ConfigurePortfolioV1 { now, policy } => {
+                self.configure_portfolio(*now, policy)?
+            }
+            Command::PausePortfolioV1 { now, automatic } => {
+                let book = self.portfolio.as_mut().ok_or("PORTFOLIO_NOT_CONFIGURED")?;
+                book.automatic = *automatic;
+                book.last_event_at = *now;
+            }
+            Command::FreezePortfolioV1 { decision } => self.freeze_portfolio(decision)?,
+            Command::ConfirmPortfolioV1 { confirmation } => self.confirm_portfolio(confirmation)?,
             Command::SubmitPaperIntentV1 { intent } => self.submit_paper_intent(intent)?,
             Command::ExpirePaperIntentsV1 { now } => self.expire_paper_intents(*now)?,
             Command::FreezePaperIntentsV1 {
@@ -273,52 +302,14 @@ impl State {
                 rules,
                 fees,
             } => {
-                // Same ID may only ever identify the identical immutable proposal.
-                if let Some(o) = self
+                let already_submitted = self
                     .orders
                     .iter()
-                    .find(|o| o.proposal.proposal_id == p.proposal_id)
-                {
-                    if o.proposal != *p {
-                        return Err("订单 ID 已绑定不同完整提案".into());
-                    }
-                    return Ok(()); // Identical order retry never re-reserves or re-fills.
-                }
-                self.advance(*now, *day)?;
-                let context = self.context(p, rules.clone(), fees.as_ref(), None);
-                let mut kernel = self.risk_kernel()?;
-                let decision = kernel.review(&self.snapshot, p, &context);
-                self.risk = kernel.state().clone();
-                self.snapshot.equity_basis.cash_flow_adjusted_peak = self.risk.peak();
-                let (status, reason, reserved_fee) = match decision {
-                    RiskDecision::Accepted(a) => {
-                        self.snapshot.pending_orders.push(PendingOrder {
-                            proposal_id: p.proposal_id,
-                            instrument: p.instrument.clone(),
-                            side: p.side,
-                            quantity: p.quantity,
-                            reserved_cash: a.maximum_cash_debit(),
-                        });
-                        (
-                            OrderStatus::Open,
-                            "最新权威状态通过风控并原子预留".into(),
-                            context.cost.as_ref().unwrap().maximum_fee,
-                        )
-                    }
-                    RiskDecision::Rejected { reason, .. } => {
-                        (OrderStatus::Rejected, reason.to_string(), Cny::ZERO)
-                    }
-                };
-                self.orders.push(PaperOrder {
-                    proposal: p.clone(),
-                    accepted_on: *day,
-                    remaining: p.quantity,
-                    status,
-                    reason,
-                    fee_schedule: fees.clone(),
-                    reserved_fee,
-                });
-                self.observe()?;
+                    .any(|o| o.proposal.proposal_id == p.proposal_id);
+                self.submit_order(p, *now, *day, rules, fees)?;
+                if already_submitted {
+                    return Ok(());
+                } // Preserve legacy replay revision/hash semantics.
             }
             Command::Match {
                 now,
@@ -367,6 +358,63 @@ impl State {
         }
         self.snapshot.revision = self.snapshot.revision.checked_add(1).ok_or("版本溢出")?;
         self.validate()
+    }
+
+    fn submit_order(
+        &mut self,
+        p: &OrderProposal,
+        now: Timestamp,
+        day: TradingDay,
+        rules: &Option<TradingRules>,
+        fees: &Option<FeeSchedule>,
+    ) -> Result<()> {
+        // Same ID may only ever identify the identical immutable proposal.
+        if let Some(o) = self
+            .orders
+            .iter()
+            .find(|o| o.proposal.proposal_id == p.proposal_id)
+        {
+            if o.proposal != *p {
+                return Err("订单 ID 已绑定不同完整提案".into());
+            }
+            return Ok(()); // Identical order retry never re-reserves or re-fills.
+        }
+        self.advance(now, day)?;
+        let context = self.context(p, rules.clone(), fees.as_ref(), None);
+        let mut kernel = self.risk_kernel()?;
+        let decision = kernel.review(&self.snapshot, p, &context);
+        self.risk = kernel.state().clone();
+        self.snapshot.equity_basis.cash_flow_adjusted_peak = self.risk.peak();
+        let (status, reason, reserved_fee) = match decision {
+            RiskDecision::Accepted(a) => {
+                self.snapshot.pending_orders.push(PendingOrder {
+                    proposal_id: p.proposal_id,
+                    instrument: p.instrument.clone(),
+                    side: p.side,
+                    quantity: p.quantity,
+                    reserved_cash: a.maximum_cash_debit(),
+                });
+                (
+                    OrderStatus::Open,
+                    "最新权威状态通过风控并原子预留".into(),
+                    context.cost.as_ref().unwrap().maximum_fee,
+                )
+            }
+            RiskDecision::Rejected { reason, .. } => {
+                (OrderStatus::Rejected, reason.to_string(), Cny::ZERO)
+            }
+        };
+        self.orders.push(PaperOrder {
+            proposal: p.clone(),
+            accepted_on: day,
+            remaining: p.quantity,
+            status,
+            reason,
+            fee_schedule: fees.clone(),
+            reserved_fee,
+        });
+        self.observe()?;
+        Ok(())
     }
 
     fn validate_bar(

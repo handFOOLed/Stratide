@@ -195,17 +195,18 @@ class Market(h.Warehouse):
 
     def calendar(self, db, download, today):
         receipts, values = [], {}
+        horizon = (h.day(today) + dt.timedelta(days=40)).strftime("%Y%m%d")
         for exchange in ("SSE", "SZSE"):
-            result = download.fetch("trade_cal", dict(exchange=exchange, start_date=download.start, end_date=today))
+            result = download.fetch("trade_cal", dict(exchange=exchange, start_date=download.start, end_date=horizon))
             require(result["status"] != "TRUNCATION_SUSPECTED", "CALENDAR_TRUNCATED")
             days = {r["cal_date"]: r["is_open"] for r in result["rows"]}
-            require(set(days) == set(h.dates(download.start, today)), "CALENDAR_GAP")
+            require(set(days) == set(h.dates(download.start, horizon)), "CALENDAR_GAP")
             receipts.append(result["id"])
             values[exchange] = days
             if not db.execute("SELECT 1 FROM objects WHERE attempt_id=?", (result["id"],)).fetchone():
                 self.publish_objects(db, "trade_cal", result["rows"], result["id"])
         require(values["SSE"] == values["SZSE"], "CALENDAR_CONFLICT")
-        return values["SSE"], receipts
+        return {day: opened for day, opened in values["SSE"].items() if day <= today}, receipts
 
     def catalog(self, db, download, today):
         old = db.execute("SELECT content,sha FROM market_catalogs WHERE source_day=?", (today,)).fetchone()
@@ -514,7 +515,7 @@ class Market(h.Warehouse):
             calendar = {r["cal_date"]: r["is_open"] for r in self.latest_objects(db, "trade_cal") if r["exchange"] == "SSE"}
             gaps = [dict(source_day=date, missing=len(by_date[date]["missing_symbols"]) if date in by_date else None,
                          blockers=by_date[date]["blockers"] if date in by_date else ["NO_FROZEN_MARKET_SNAPSHOT"])
-                    for date in sorted(calendar) if calendar[date] == "1" and
+                    for date in sorted(calendar) if calendar[date] == "1" and date <= instant(h.now()).astimezone(TZ).strftime("%Y%m%d") and
                     (date not in by_date or by_date[date]["state"] != "READY")]
             return dict(version=VERSION, state=run["status"] if run else "NOT_COLLECTED", enabled=enabled, **SAFE,
                         data_mode=config["data_mode"], config=config, last_run=dict(run) if run else None,
@@ -564,6 +565,10 @@ def cli(argv=None):
         elif args.action in ("once", "watch"):
             while True:
                 result = market.once(token_source=args.credential_source)
+                # Settle the prior frozen Paper batch before optional research;
+                # Agent faults cannot starve ledger expiry or future collection.
+                import paper_portfolio
+                result["paper_confirmation"] = paper_portfolio.optional_step(market, "confirm")
                 # Optional research is a separate failure boundary AFTER the
                 # collector committed its result. Even an unavailable Agent DB
                 # must not stop future EOD polls. Explicit stops still propagate.
@@ -575,6 +580,7 @@ def cli(argv=None):
                     # Do not depend on that same failed DB to report the fault,
                     # or expose exception text containing private paths/payloads.
                     result["research"] = dict(state="BLOCKED", reason="RESEARCH_UNAVAILABLE")
+                result["paper_decision"] = paper_portfolio.optional_step(market, "freeze")
                 if args.action == "once":
                     break
                 print(json.dumps(result, ensure_ascii=False), flush=True)

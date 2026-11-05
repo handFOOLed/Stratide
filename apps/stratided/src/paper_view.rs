@@ -37,7 +37,16 @@ pub fn load(path: &Path) -> Result<(Value, Value), String> {
             pnl(state).map(|n| (n * 10000 / i128::from(initial)).to_string())
         }
     };
-    let session = s.equity.map(|v| {
+    let previous_valued_day = by_day.keys().rev().nth(1).copied();
+    let missing_prior_session = s.portfolio.as_ref().is_some_and(|book| {
+        book.batches.iter().any(|b| {
+            b.target_day.is_some_and(|day| {
+                day <= s.snapshot.trading_day && previous_valued_day.is_some_and(|prev| day > prev)
+            }) && b.confirmation.as_ref().is_some_and(|c| c.quotes.is_empty())
+                && b.finalized_at.is_some()
+        })
+    });
+    let session = s.equity.filter(|_| !missing_prior_session).map(|v| {
         i128::from(v.fen())
             - i128::from(s.snapshot.equity_basis.net_external_flow_today_fen)
             - i128::from(s.snapshot.equity_basis.day_start_equity.fen())
@@ -65,12 +74,26 @@ pub fn load(path: &Path) -> Result<(Value, Value), String> {
             max_drawdown = None;
         }
     }
+    let portfolio_summary = s.portfolio.as_ref().map(|book|json!({
+            "automatic":book.automatic,"policy_version":book.policy.version,"policy_sha256":stratide_ledger::portfolio::digest(&book.policy),
+            "max_positions":book.policy.max_positions,"max_daily_orders":book.policy.max_daily_orders,
+            "target_value_fen":book.policy.target_value.fen(),"pending":book.pending,
+            "batches":book.batches.iter().rev().take(30).map(|b|json!({
+                "decision_day":b.decision.day,"target_day":b.target_day,"frozen_at":b.decision.now,"finalized_at":b.finalized_at,
+                "label":b.label,"reason":b.reason,"candidate":b.decision.research,"source_sha256":b.decision.source_sha256,
+                "calendar_sha256":b.decision.calendar_sha256,"policy_sha256":b.policy_sha256,
+                "order_ids":b.proposal_ids.iter().map(|i|i.0.to_string()).collect::<Vec<_>>(),"rejections":b.rejections,
+                "confirmation_source_sha256":b.confirmation.as_ref().map(|c|&c.source_sha256),
+                "execution_model":"EX_POST_OPEN_ASSUMPTION","opening_observed":"NOT_VERIFIED","historical_pit":"NOT_VERIFIED","real_tradability":"NOT_VERIFIED"
+            })).collect::<Vec<_>>()
+        }));
     let account = json!({"account_id":s.config.account_id,"day":s.snapshot.trading_day,"nav_fen":s.equity.map(|v|v.fen()),
         "cash_fen":s.snapshot.cash.fen(),"available_cash_fen":s.snapshot.cash.fen()-reserved,"reserved_cash_fen":reserved,
         "session_pnl_fen":session,"cumulative_pnl_fen":pnl(s),"total_return_bps":returns(s),"max_daily_observation_drawdown_bps":max_drawdown,
         "metrics_reason":"存在外部资金流时不输出简单累计收益率；估值缺失时不输出回撤。日回撤仅覆盖账本已记录日期，包含 Paper 假设，不是连续真实观察。",
         "total_fee_fen":fee,"initial_nav_fen":initial,"external_flow_total_fen":s.snapshot.equity_basis.net_external_flow_total_fen,
-        "valuation_error":s.valuation_error,"risk":s.risk,"deployment":s.config.deployment});
+        "valuation_error":s.valuation_error,"risk":s.risk,"deployment":s.config.deployment,
+        "portfolio":portfolio_summary});
     let equity=by_day.values().map(|v|json!({"day":v.snapshot.trading_day,"nav_fen":v.equity.map(|n|n.fen()),"cash_fen":v.snapshot.cash.fen(),
         "cumulative_pnl_fen":pnl(v),"return_bps":returns(v),"valuation_error":v.valuation_error})).collect::<Vec<_>>();
     let mut instruments = BTreeMap::new();
@@ -116,7 +139,7 @@ pub fn load(path: &Path) -> Result<(Value, Value), String> {
         "remaining":o.remaining,"limit_fen":o.proposal.limit_price.fen(),"status":o.status,"reason":o.reason,"deployment":o.proposal.deployment})).collect::<Vec<_>>();
     let day = s.snapshot.trading_day.0.to_string();
     let synthetic = s.provenance.source_version.contains("synthetic_test");
-    let gaps = s
+    let mut gaps = s
         .paper_eod
         .as_ref()
         .map(|b| {
@@ -132,13 +155,17 @@ pub fn load(path: &Path) -> Result<(Value, Value), String> {
                 .collect::<Vec<_>>()
         })
         .unwrap_or_default();
+    if let Some(book) = &s.portfolio {
+        gaps.extend(book.batches.iter().filter(|b|b.finalized_at.is_some() && b.confirmation.as_ref().is_some_and(|c|c.quotes.is_empty()))
+            .map(|b|json!({"day":b.target_day.map(|d|d.0.to_string()),"reason":"组合确认无报价终结；无新增估值，跨缺口的单日盈亏不可用","finalized_at":b.finalized_at})));
+    }
     let meta = json!({"mode":if synthetic {"synthetic_test"}else{"ex_post_paper_assumption"},"source":"Owner selected Paper Ledger","source_version":s.provenance.source_version,"as_of":day,
         "first_day":history[0].state.snapshot.trading_day.0.to_string(),"last_day":day,"last_valid_valuation_at":s.equity.map(|_|s.snapshot.as_of.0.to_string()),
         "timezone":"Asia/Shanghai","evidence_class":if synthetic {"engine_test_only"}else{"EX_POST_OPEN_ASSUMPTION"},"snapshot_id":ledger.head(),"report_sha256":ledger.head(),
         "input_sha256":s.provenance.dataset_hash,"ledger_head":ledger.head(),"publication":"authoritative_paper_ledger","refresh_policy":"read_only_latest_transaction",
         "validation":"ledger_replay_and_digest_verified","forward_account":"not_verified","market_freshness":"eod_assumption_not_live",
         "source_attestation":"OWNER_DECLARED_NOT_PROVIDER_VERIFIED",
-        "execution_model":"EX_POST_OPEN_ASSUMPTION","gaps":gaps,"paper_receipts":s.paper_eod});
+        "execution_model":"EX_POST_OPEN_ASSUMPTION","gaps":gaps,"paper_receipts":s.paper_eod,"portfolio_pending":s.portfolio.as_ref().and_then(|b|b.pending),"opening_observed":"NOT_VERIFIED","historical_pit":"NOT_VERIFIED","real_tradability":"NOT_VERIFIED"});
     Ok((
         meta,
         safe_json(

@@ -4,6 +4,7 @@ use std::process::Command as Process;
 mod dividends;
 mod historical;
 mod paper_eod;
+mod portfolio;
 mod r1;
 mod r2;
 use stratide_contracts::*;

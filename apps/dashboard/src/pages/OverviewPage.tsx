@@ -10,6 +10,7 @@ import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { Table } from '../components/ui/Table';
 import { EquityChart } from '../components/ui/Chart';
 import { Skeleton } from '../components/ui/Skeleton';
+import { PaperPortfolioPanel } from '../components/domain/PaperPortfolioPanel';
 import { FillDrawer } from '../components/domain/FillDrawer';
 import { PositionDrawer } from '../components/domain/PositionDrawer';
 import { PaperErrorPanel } from '../components/domain/PaperErrorPanel';
@@ -427,6 +428,7 @@ export function OverviewPage({ paper, titleRef }: { paper: PaperDataState; title
         </div>
       </div>
 
+      <PaperPortfolioPanel portfolio={account.portfolio === undefined ? null : account.portfolio} orders={bundle.orders}/>
       <PositionDrawer
         position={positions.item}
         open={positions.open}

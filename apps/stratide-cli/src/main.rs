@@ -2,6 +2,7 @@
 mod forward;
 mod paper;
 mod paper_eod;
+mod portfolio;
 mod replay;
 use std::{collections::BTreeMap, env, process::ExitCode};
 use stratide_contracts::*;
@@ -30,6 +31,7 @@ fn run(args: Vec<String>) -> Result<(), String> {
         | "paper-historical-dividend-replay" | "paper-historical-dividend-report" | "paper-historical-dividend-benchmark" | "paper-historical-dividend-cash-benchmark" => replay::run(&args)?,
         "paper-benchmark" => replay::benchmark::run(&args)?,
         "paper-eod-init" | "paper-eod-intent" | "paper-eod-confirm" | "paper-eod-expire" => paper_eod::run(&args)?,
+        "paper-portfolio" => portfolio::run(&args)?,
         command if command.starts_with("paper-") => paper::run(command, &args[1..])?,
         "help" | "--help" | "-h" => println!(
             "stratide-cli status\nstratide-cli risk-demo\n\
@@ -47,6 +49,8 @@ paper-match-synthetic <目录>
 paper-status <目录>
 \
 paper-apply <目录> <唯一事件ID> <可信命令JSON文件>
+paper-portfolio <原Paper账本> status|configure|pause|resume|freeze|confirm（JSON经stdin）
+\
 paper-eod-init <新账本目录> <Owner资金/风险/身份配置JSON> <来源版本ID>
 paper-eod-intent <原账本> <唯一事件ID> <前日盘后意图JSON>
 paper-eod-confirm <原账本> <唯一事件ID> <次日盘后来源JSON>
