@@ -231,3 +231,107 @@
     align-items: flex-start;
   }
 }
+
+/* ---------- 研究预算编辑（AI 研究页 / 设置页共用） ---------- */
+.budget-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.budget-editor__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.budget-input {
+  position: relative;
+}
+
+.budget-input__prefix {
+  position: absolute;
+  top: 50%;
+  left: 11px;
+  z-index: 1;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.budget-input .input {
+  padding-left: 30px;
+  font-variant-numeric: tabular-nums;
+}
+
+.budget-input--code .input {
+  padding-left: 58px;
+}
+
+.budget-editor__current {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+}
+
+.budget-editor__note {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-base);
+}
+
+.budget-editor__error {
+  margin: 0;
+  color: var(--danger);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-base);
+}
+
+.budget-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--warning-border);
+  border-radius: var(--radius-md);
+  background: var(--warning-soft);
+}
+
+.budget-confirm__label {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: var(--lh-base);
+  cursor: pointer;
+}
+
+.budget-confirm__checkbox {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  accent-color: var(--accent);
+}
+
+.budget-confirm__detail {
+  margin: 0 0 0 calc(16px + var(--space-2));
+  color: var(--text-secondary);
+  font-size: var(--fs-2xs);
+  line-height: var(--lh-base);
+}
+
+.budget-editor .diagnostics {
+  margin-top: var(--space-2);
+}
+
+@media (max-width: 640px) {
+  .budget-editor__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

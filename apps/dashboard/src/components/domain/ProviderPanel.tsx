@@ -5,6 +5,7 @@ import { Diagnostics } from '../ui/Diagnostics';
 import { Field, TextInput } from '../ui/Field';
 import { SegmentedControl } from '../ui/SegmentedControl';
 import { StatusBadge } from '../ui/StatusBadge';
+import { BudgetEditor } from './BudgetEditor';
 import { ApiError, agentFetch, friendlyError } from '../../lib/api';
 import { formatDateTime, formatMicroMoney } from '../../lib/format';
 import { statusView } from '../../lib/status';
@@ -199,10 +200,11 @@ export function ProviderPanel({ agent }: { agent: AgentState }) {
           </div>
         </div>
         <div className="provider-status__row">
-          <span>研究预算（只读）</span>
+          <span>研究预算</span>
           <div className="provider-status__value">
             <strong>{budgetText}</strong>
             <StatusBadge status={budgetView} size="sm" />
+            <BudgetEditor agent={agent} budget={agentBudget} />
           </div>
           {budgetView.reason === undefined ? null : <span>{budgetView.reason}</span>}
         </div>
@@ -290,7 +292,7 @@ export function ProviderPanel({ agent }: { agent: AgentState }) {
             </Button>
           ) : null}
         </div>
-        <p className="provider-note">研究模型配置由本机研究服务使用，配置一次即可。预算上限由本机配置维护，页面暂不支持修改。</p>
+        <p className="provider-note">研究模型配置由本机研究服务使用，配置一次即可。预算修改后立即生效，只影响之后开始的研究。</p>
       </div>
 
       {loading ? <p className="provider-note">正在读取 AI 服务配置…</p> : null}

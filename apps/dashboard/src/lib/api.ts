@@ -1,4 +1,7 @@
 import type {
+  AgentBudget,
+  AgentBudgetUpdateRequest,
+  AgentBudgetUpdateResult,
   AgentCreateResult,
   AgentStatus,
   AgentTaskDetail,
@@ -263,6 +266,16 @@ export async function agentFetch<T>(token: string, path: string, options: AgentR
 
 export function loadAgentStatus(token: string, signal?: AbortSignal): Promise<AgentStatus> {
   return agentFetch<AgentStatus>(token, 'status', { signal });
+}
+
+/** 保存研究预算上限；返回更新后的完整预算记录。 */
+export function updateAgentBudget(
+  token: string,
+  body: AgentBudgetUpdateRequest,
+): Promise<AgentBudget> {
+  return agentFetch<AgentBudgetUpdateResult>(token, 'budget', { method: 'POST', body }).then(
+    (result) => result.budget,
+  );
 }
 
 export function loadAgentTasks(

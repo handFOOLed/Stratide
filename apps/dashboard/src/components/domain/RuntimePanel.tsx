@@ -21,7 +21,7 @@ import {
   supervisorStatusView,
 } from '../../lib/status';
 import type { StatusView } from '../../lib/status';
-import { runtimeAction } from '../../lib/runtime';
+import { runtimeAction, setSetupComplete } from '../../lib/runtime';
 import type { DependencyStatus, RuntimeStatus, WslProbeResult } from '../../lib/runtime';
 import { ApiError } from '../../lib/api';
 import type { HealthState } from '../../state/useHealth';
@@ -209,7 +209,7 @@ function normalizeVersion(value: string): string {
 }
 
 /** 版本号 + 检查更新；系统与诊断、关于都复用这一块。 */
-export function VersionCheck({ version, uiVersion }: { version: string; uiVersion?: string }) {
+export function VersionCheck({ version, uiVersion, build }: { version: string; uiVersion?: string; build?: RuntimeStatus['build'] | null }) {
   const { push } = useToast();
   const [busy, setBusy] = useState(false);
   const [release, setRelease] = useState<{ tag: string; url: string | null; isLatest: boolean } | null>(null);
@@ -237,11 +237,19 @@ export function VersionCheck({ version, uiVersion }: { version: string; uiVersio
     }
   };
 
+  const buildLine =
+    build === null || build === undefined || build.commit === null
+      ? null
+      : '构建 ' + build.commit.slice(0, 8) + (build.built_at === null ? '' : ' · ' + formatDateTime(build.built_at));
+
   return (
     <div className="runtime-version" data-testid="version">
       <span className="runtime-version__current">
-        版本 v{version}
-        {uiVersion === undefined || uiVersion === version ? '' : ' · 界面 v' + uiVersion}
+        <span>
+          版本 v{version}
+          {uiVersion === undefined || uiVersion === version ? '' : ' · 界面 v' + uiVersion}
+        </span>
+        {buildLine === null ? null : <span className="runtime-version__build">{buildLine}</span>}
       </span>
       <Button size="sm" icon="refresh" loading={busy} onClick={() => void check()} data-testid="check-update">
         检查更新
@@ -284,7 +292,7 @@ export function RuntimePanel({
   });
   const [wslLoaded, setWslLoaded] = useState(false);
   const [wslProbe, setWslProbe] = useState<WslProbeResult | null>(null);
-  const [confirm, setConfirm] = useState<'backfill' | 'setup' | null>(null);
+  const [confirm, setConfirm] = useState<'backfill' | 'setup' | 'setup-undo' | null>(null);
 
   useEffect(() => {
     if (status === null || wslLoaded) return;
@@ -377,8 +385,33 @@ export function RuntimePanel({
     });
   };
 
+  /** 完成/撤销首次设置：后端只写运行目录标记，不动账户、研究、预算与行情数据。 */
+  const runSetup = async (completed: boolean | null, success: string, busyKey: string): Promise<boolean> => {
+    setBusy(busyKey);
+    setActionError(null);
+    try {
+      await setSetupComplete(completed);
+      push({ title: success, tone: 'success' });
+      runtime.refresh();
+      return true;
+    } catch (caught) {
+      const code = caught instanceof ApiError ? caught.code : 'RUNTIME_ACTION_FAILED';
+      setActionError(code);
+      push({ title: actionReasonText(code) ?? '失败，原因未记录', tone: 'danger' });
+      return false;
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const completeSetup = () => {
-    void act('setup', 'setup-complete', {}, '首次设置已完成').then((ok) => {
+    void runSetup(null, '首次设置已完成', 'setup').then((ok) => {
+      if (ok) setConfirm(null);
+    });
+  };
+
+  const undoSetup = () => {
+    void runSetup(false, '已撤销首次设置标记', 'setup-undo').then((ok) => {
       if (ok) setConfirm(null);
     });
   };
@@ -426,6 +459,9 @@ export function RuntimePanel({
         : {
             managed: status.managed,
             product_version: status.product_version,
+            build: status.build,
+            repo_url: status.repo_url,
+            issues_url: status.issues_url,
             port: status.port,
             setup_complete: status.setup_complete,
             config_error: status.config_error,
@@ -489,8 +525,10 @@ export function RuntimePanel({
             phase: agent.phase,
             paused: agent.status.paused,
             worker_error: agent.status.worker_error,
+            worker_error_text: agent.status.worker_error_text,
             default_model: agent.status.default_model,
             eod_enabled: agent.status.eod.enabled,
+            eod_latest_reason_text: agent.status.eod.latest === null ? null : agent.status.eod.latest.reason_text ?? null,
             budget: {
               state: agent.status.budget.state,
               currency: agent.status.budget.currency,
@@ -591,13 +629,23 @@ export function RuntimePanel({
             <strong>完成首次设置</strong>
             <p>{current.setup_complete ? '双击桌面图标会直接打开总览。' : '完成后，双击桌面图标会直接打开总览。'}</p>
             {current.setup_complete ? (
-              <p className="setup-note" data-testid="setup-undo-note">
-                当前版本不支持撤销标记；如需重新设置，请参考安装说明。
-              </p>
+              <p className="setup-note">撤销后，双击桌面图标会重新打开设置页；账户、研究、预算与行情数据不受影响。</p>
             ) : null}
           </div>
           {current.setup_complete ? (
-            <StatusBadge status={statusView('ok', '已完成')} />
+            <div className="setup-complete-actions">
+              <StatusBadge status={statusView('ok', '已完成')} />
+              <Button
+                size="sm"
+                variant="ghost"
+                disabled={busy !== null}
+                loading={busy === 'setup-undo'}
+                onClick={() => setConfirm('setup-undo')}
+                data-testid="setup-undo"
+              >
+                撤销完成标记
+              </Button>
+            </div>
           ) : (
             <Button
               variant="primary"
@@ -776,7 +824,7 @@ export function RuntimePanel({
             </div>
             <div className="runtime-row">
               <span className="runtime-row__label">版本与更新</span>
-              <VersionCheck version={current.product_version} />
+              <VersionCheck version={current.product_version} build={current.build} />
             </div>
           </div>
           <details className="runtime-advanced">
@@ -881,7 +929,7 @@ export function RuntimePanel({
         onClose={() => setConfirm(null)}
         eyebrow="首次设置"
         title="标记首次设置为已完成？"
-        description="标记后，双击桌面图标会直接打开总览。当前版本不支持撤销这项标记。"
+        description="标记后，双击桌面图标会直接打开总览；之后可在本页撤销。"
         footer={
           <>
             <Button onClick={() => setConfirm(null)}>取消</Button>
@@ -892,6 +940,24 @@ export function RuntimePanel({
         }
       >
         <p>请确认 Tushare 访问令牌与行情采集已经设置好；如果还有组件需要处理，之后仍可在本页处理。</p>
+      </Modal>
+
+      <Modal
+        open={confirm === 'setup-undo'}
+        onClose={() => setConfirm(null)}
+        eyebrow="首次设置"
+        title="撤销“首次设置已完成”？"
+        description="撤销后，双击桌面图标会重新打开设置页。"
+        footer={
+          <>
+            <Button onClick={() => setConfirm(null)}>取消</Button>
+            <Button variant="primary" loading={busy === 'setup-undo'} onClick={undoSetup}>
+              撤销完成标记
+            </Button>
+          </>
+        }
+      >
+        <p>只删除“已完成”标记；模拟账户、研究任务、预算和行情数据不会改变。</p>
       </Modal>
 
       <Modal

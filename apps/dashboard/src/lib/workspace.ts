@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ApiError, agentFetch, friendlyError } from './api';
+import type { AgentNotification } from './types';
 
 export interface Operation { id: string; label: string; kind: string; batch: string }
 export interface Approval {
@@ -7,8 +8,9 @@ export interface Approval {
   decided_at: string | null; started_at: string | null; finished_at: string | null; reason: string | null;
   action_sha256: string;
 }
-export interface Notice {id: string; status: string; reason: string | null; at: string; read: boolean}
-export interface Inbox {approvals: Approval[]; notifications: Notice[]; authority: string}
+/** 通知项与会话中的任务共用同一个 id（底层 task id）。 */
+export type Notice = AgentNotification;
+export interface Inbox {approvals: Approval[]; notifications: Notice[]; unread_count: number; authority: string}
 export interface Study {
   id: string; name: string; kind: string; state: string; mode?: string; task_id?: string;
   billing?: string; reason?: string | null; result_sha256?: string | null; summary?: unknown;

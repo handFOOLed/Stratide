@@ -17,6 +17,7 @@ import { Switch } from '../components/ui/Switch';
 import { Table } from '../components/ui/Table';
 import { useToast } from '../components/ui/Toast';
 import { TaskStatusBadge } from '../components/domain/Badges';
+import { BudgetEditor } from '../components/domain/BudgetEditor';
 import { WorkspaceStudies } from '../components/domain/WorkspaceStudies';
 import { Icon } from '../icons';
 import { COMMON, EMPTY, TERMS, UNITS } from '../lib/copy';
@@ -80,6 +81,22 @@ function taskCost(calls: AgentCall[]): string | null {
   return total.toString();
 }
 
+/** 后端已给出中文原因时直接使用；否则回退集中映射，再回退“原因未记录”。 */
+function reasonTextOf(code: string | null, text: string | null | undefined): string {
+  return text ?? failureReasonText(code);
+}
+
+/** 已持久化原因码的一句话：有中文用中文，没有就明确“原因未记录”，不直出原始码。 */
+function reasonTextOrNull(code: string | null, text: string | null | undefined): string | null {
+  if (text !== null && text !== undefined && text !== '') return text;
+  return humanReasonText(code);
+}
+
+function callReasonText(call: AgentCall): string {
+  if (call.reason === null && call.reason_text === null) return COMMON.notAvailable;
+  return call.reason_text ?? failureReasonText(call.reason);
+}
+
 function modelDisplayName(model: AgentModel): string {
   if (model.kind === 'fake') return '本地测试模型';
   return model.label;
@@ -87,7 +104,7 @@ function modelDisplayName(model: AgentModel): string {
 
 function modelStatusView(model: AgentModel): StatusView {
   if (model.authorization !== 'authorized') {
-    return statusView('attention', '需要处理', humanReasonText(model.authorization) ?? '研究模型授权配置不完整');
+    return statusView('attention', '需要处理', model.authorization_text ?? humanReasonText(model.authorization) ?? '研究模型授权配置不完整');
   }
   return availabilityView(model.availability);
 }
@@ -95,12 +112,12 @@ function modelStatusView(model: AgentModel): StatusView {
 /** 全市场研究未运行通知：不是付费研究任务，也不是失败任务。 */
 const RESEARCH_STATUS_PROVIDER = 'market-research-status';
 
-function isResearchStatusRecord(providerId: string): boolean {
-  return providerId === RESEARCH_STATUS_PROVIDER;
+function isResearchStatusRecord(kind: string | undefined, providerId: string): boolean {
+  return kind === 'research_blocked_notice' || providerId === RESEARCH_STATUS_PROVIDER;
 }
 
-function researchStatusRecordView(reason: string | null): StatusView {
-  return statusView('attention', '需要处理', humanReasonText(reason) ?? '原因未记录');
+function researchStatusRecordView(reason: string | null, text: string | null | undefined): StatusView {
+  return statusView('attention', '需要处理', text ?? humanReasonText(reason) ?? '原因未记录');
 }
 
 function researchStatusRecordName(name: string): string {
@@ -113,12 +130,12 @@ function researchStatusRecordName(name: string): string {
 }
 
 function researchTaskDisplayName(task: AgentTask): string {
-  if (isResearchStatusRecord(task.provider_id)) return researchStatusRecordName(task.name);
+  if (isResearchStatusRecord(task.kind, task.provider_id)) return researchStatusRecordName(task.name);
   return displayTaskName(task.created_at, task.name);
 }
 
 function taskDetailDisplayName(detail: AgentTaskDetail): string {
-  if (isResearchStatusRecord(detail.provider_id)) return researchStatusRecordName(detail.request.name);
+  if (isResearchStatusRecord(detail.kind, detail.provider_id)) return researchStatusRecordName(detail.request.name);
   return displayTaskName(detail.created_at, detail.request.name);
 }
 
@@ -150,13 +167,13 @@ function displayScope(scope: string): string {
 function taskOutcomeText(task: AgentTask): string {
   switch (task.status) {
     case 'completed':
-      return task.conclusion ?? humanReasonText(task.reason) ?? '已完成，结论未保存';
+      return task.conclusion ?? reasonTextOrNull(task.reason, task.reason_text) ?? '已完成，结论未保存';
     case 'failed': {
-      const reason = failureReasonText(task.reason);
+      const reason = reasonTextOf(task.reason, task.reason_text);
       return reason === '原因未记录' ? '失败，原因未记录' : reason;
     }
     case 'blocked': {
-      const reason = failureReasonText(task.reason);
+      const reason = reasonTextOf(task.reason, task.reason_text);
       return reason === '原因未记录' ? '已被阻止，原因未记录' : reason;
     }
     case 'outcome_uncertain':
@@ -171,7 +188,7 @@ function taskOutcomeText(task: AgentTask): string {
     case 'cancelled':
       return '任务已取消';
     case 'skipped':
-      return humanReasonText(task.reason) ?? '任务已跳过';
+      return reasonTextOrNull(task.reason, task.reason_text) ?? '任务已跳过';
     default:
       return '状态未知';
   }
@@ -179,12 +196,13 @@ function taskOutcomeText(task: AgentTask): string {
 
 function eodRecordedReason(status: AgentStatus): string | null {
   const latest = status.eod.latest;
+  if (latest !== null && latest.reason_text !== undefined && latest.reason_text !== null) return latest.reason_text;
   const raw = latest === null ? status.eod.reason : latest.reason ?? status.eod.reason;
   return humanReasonText(raw);
 }
 
 function runtimeSentence(status: AgentStatus, view: StatusView, runningTasks: number, queuedTasks: number): string {
-  if (status.worker_error !== null) return '研究服务出错：' + failureReasonText(status.worker_error);
+  if (status.worker_error !== null) return '研究服务出错：' + reasonTextOf(status.worker_error, status.worker_error_text);
   if (status.paused) return '研究已暂停，暂停期间不会开始新的研究。';
   if (runningTasks > 0) return countText(runningTasks, UNITS.task) + '任务正在研究。';
   if (queuedTasks > 0) return countText(queuedTasks, UNITS.task) + '任务排队中，开始后会自动调用 AI 服务。';
@@ -195,13 +213,13 @@ function detailSentence(detail: AgentTaskDetail): string {
   const conclusion = detail.result?.research.hypothesis ?? null;
   switch (detail.status) {
     case 'completed':
-      return conclusion ?? humanReasonText(detail.reason) ?? '研究已完成，结论未保存。';
+      return conclusion ?? reasonTextOrNull(detail.reason, detail.reason_text) ?? '研究已完成，结论未保存。';
     case 'failed': {
-      const reason = failureReasonText(detail.reason);
+      const reason = reasonTextOf(detail.reason, detail.reason_text);
       return reason === '原因未记录' ? '失败，原因未记录。' : '失败原因：' + reason + '。';
     }
     case 'blocked': {
-      const reason = failureReasonText(detail.reason);
+      const reason = reasonTextOf(detail.reason, detail.reason_text);
       return reason === '原因未记录' ? '已被阻止，原因未记录。' : '已被阻止：' + reason + '。';
     }
     case 'outcome_uncertain':
@@ -216,7 +234,7 @@ function detailSentence(detail: AgentTaskDetail): string {
     case 'cancelled':
       return '任务已取消。';
     case 'skipped':
-      return '已跳过：' + (humanReasonText(detail.reason) ?? '原因未记录') + '。';
+      return '已跳过：' + (reasonTextOrNull(detail.reason, detail.reason_text) ?? '原因未记录') + '。';
     default:
       return '状态未知。';
   }
@@ -289,14 +307,17 @@ export function AgentPage({ agent, workspace, titleRef }: { agent: AgentState; w
   const budget = status.budget;
   const budgetConfigured = budget.state === 'configured';
   const defaultModel = status.models.find((model) => model.id === status.default_model) ?? null;
+  const manualResearchAvailable = status.manual_research_available !== false;
   const attachedMode = status.dashboard_mode === 'attached_explicit_operations';
-  const createDisabledReason = attachedMode
-    ? '当前以只读方式启动，不能新建研究任务。'
-    : defaultModel === null
-      ? '尚未选择默认研究模型。'
-      : !budgetConfigured
-        ? '尚未设置研究预算。'
-        : '';
+  const createDisabledReason = !manualResearchAvailable
+    ? '安装版由后台自动研究执行任务，手动新建研究暂不可用。'
+    : attachedMode
+      ? '当前以只读方式启动，不能新建研究任务。'
+      : defaultModel === null
+        ? '尚未选择默认研究模型。'
+        : !budgetConfigured
+          ? '尚未设置研究预算。'
+          : '';
   const canCreate = createDisabledReason === '';
   const runningTasks = agent.tasks.filter((task) => task.status === 'running' || task.status === 'local_running').length;
   const queuedTasks = agent.tasks.filter((task) => task.status === 'queued').length;
@@ -341,6 +362,7 @@ export function AgentPage({ agent, workspace, titleRef }: { agent: AgentState; w
             runningTasks={runningTasks}
             queuedTasks={queuedTasks}
             canCreate={canCreate}
+            manualResearchAvailable={manualResearchAvailable}
             createDisabledReason={createDisabledReason}
             onCreate={() => setCreateOpen(true)}
           />
@@ -349,7 +371,7 @@ export function AgentPage({ agent, workspace, titleRef }: { agent: AgentState; w
           <TasksCard agent={agent} onRequestCancel={requestCancel} />
         </div>
         <div className="col-5">
-          <BudgetCard status={status} />
+          <BudgetCard status={status} agent={agent} />
         </div>
         <div className="col-7">
           <ModelsCard status={status} agent={agent} />
@@ -418,6 +440,7 @@ function RuntimeCard({
   runningTasks,
   queuedTasks,
   canCreate,
+  manualResearchAvailable,
   createDisabledReason,
   onCreate,
 }: {
@@ -427,6 +450,7 @@ function RuntimeCard({
   runningTasks: number;
   queuedTasks: number;
   canCreate: boolean;
+  manualResearchAvailable: boolean;
   createDisabledReason: string;
   onCreate: () => void;
 }) {
@@ -453,7 +477,14 @@ function RuntimeCard({
             )}
           </div>
           <div className="runtime-actions">
-            <Button variant="primary" icon="plus" onClick={onCreate} disabled={!canCreate} data-testid="agent-create">
+            <Button
+              variant="primary"
+              icon="plus"
+              onClick={onCreate}
+              disabled={!canCreate}
+              title={canCreate ? undefined : createDisabledReason}
+              data-testid="agent-create"
+            >
               新建研究
             </Button>
             {status.paused ? (
@@ -468,7 +499,13 @@ function RuntimeCard({
           </div>
         </div>
 
-        {canCreate ? null : (
+        {manualResearchAvailable ? null : (
+          <p className="runtime-lead runtime-lead--note" data-testid="agent-manual-unavailable">
+            安装版由后台自动研究执行任务，手动新建研究暂不可用。
+          </p>
+        )}
+
+        {canCreate || !manualResearchAvailable ? null : (
           <Callout tone="warning" title="当前不能新建研究" className="runtime-warning">
             {createDisabledReason}
           </Callout>
@@ -476,7 +513,7 @@ function RuntimeCard({
 
         {status.worker_error === null ? null : (
           <Callout tone="danger" title="研究服务出错" className="runtime-warning" role="alert">
-            {failureReasonText(status.worker_error)}
+            {reasonTextOf(status.worker_error, status.worker_error_text)}
             <Diagnostics items={[{ label: '原始错误', value: status.worker_error }]} />
           </Callout>
         )}
@@ -556,14 +593,14 @@ function TasksCard({ agent, onRequestCancel }: { agent: AgentState; onRequestCan
     return agent.tasks.filter((task) => {
       if (filter === 'active' && !['queued', 'running', 'local_running', 'cancel_requested'].includes(task.status)) return false;
       if (filter === 'completed' && task.status !== 'completed') return false;
-      if (filter === 'failed' && (!['failed', 'blocked', 'outcome_uncertain'].includes(task.status) || isResearchStatusRecord(task.provider_id))) return false;
+      if (filter === 'failed' && (!['failed', 'blocked', 'outcome_uncertain'].includes(task.status) || isResearchStatusRecord(task.kind, task.provider_id))) return false;
       if (filter === 'cancelled' && task.status !== 'cancelled') return false;
-      if (filter === 'not_run' && !isResearchStatusRecord(task.provider_id)) return false;
+      if (filter === 'not_run' && !isResearchStatusRecord(task.kind, task.provider_id)) return false;
       if (term === '') return true;
       return [
         researchTaskDisplayName(task),
         task.conclusion ?? '',
-        humanReasonText(task.reason) ?? '',
+        task.reason_text ?? humanReasonText(task.reason) ?? '',
         taskOutcomeText(task),
       ]
         .join(' ')
@@ -632,8 +669,8 @@ function TasksCard({ agent, onRequestCancel }: { agent: AgentState; onRequestCan
             <tbody>
               {filtered.map((task) => {
                 const display = researchTaskDisplayName(task);
-                const notRunRecord = isResearchStatusRecord(task.provider_id);
-                const outcome = notRunRecord ? researchStatusRecordView(task.reason).reason ?? '原因未记录' : taskOutcomeText(task);
+                const notRunRecord = isResearchStatusRecord(task.kind, task.provider_id);
+                const outcome = notRunRecord ? researchStatusRecordView(task.reason, task.reason_text).reason ?? '原因未记录' : taskOutcomeText(task);
                 const canCancel = ['queued', 'running', 'local_running'].includes(task.status);
                 return (
                   <tr key={task.id} data-testid="task-row" onClick={() => void agent.openTask(task.id)}>
@@ -652,7 +689,7 @@ function TasksCard({ agent, onRequestCancel }: { agent: AgentState; onRequestCan
                     </td>
                     <td>
                       {notRunRecord ? (
-                        <StatusBadge status={researchStatusRecordView(task.reason)} size="sm" />
+                        <StatusBadge status={researchStatusRecordView(task.reason, task.reason_text)} size="sm" />
                       ) : (
                         <TaskStatusBadge status={task.status} reason={task.reason} conclusion={task.conclusion} />
                       )}
@@ -737,7 +774,7 @@ function TasksCard({ agent, onRequestCancel }: { agent: AgentState; onRequestCan
   );
 }
 
-function BudgetCard({ status }: { status: AgentStatus }) {
+function BudgetCard({ status, agent }: { status: AgentStatus; agent: AgentState }) {
   const budget = status.budget;
   const configured = budget.state === 'configured';
   const dailyUsed = usedMicro(budget.daily_limit_micro, budget.daily_remaining_micro);
@@ -756,7 +793,12 @@ function BudgetCard({ status }: { status: AgentStatus }) {
             <InfoHint label="研究预算说明">达到日或月上限后只暂停付费研究，不影响行情采集与交易保护。</InfoHint>
           </span>
         }
-        actions={<StatusBadge status={configured ? statusView('ok', '正常') : statusView('attention', '需要处理')} />}
+        actions={
+          <>
+            <StatusBadge status={configured ? statusView('ok', '正常') : statusView('attention', '需要处理')} />
+            <BudgetEditor agent={agent} budget={budget} />
+          </>
+        }
       />
       <CardBody>
         {configured ? (
@@ -779,7 +821,6 @@ function BudgetCard({ status }: { status: AgentStatus }) {
               </div>
               <ProgressBar value={monthlyPct} tone={monthlyTone} label="本月研究预算使用" />
             </div>
-            <p className="budget-note">预算上限由本机配置维护，页面暂不支持修改。</p>
             <details className="disclosure budget-usage">
               <summary className="disclosure__summary">
                 <span>用量明细</span>
@@ -805,7 +846,7 @@ function BudgetCard({ status }: { status: AgentStatus }) {
         ) : (
           <>
             <Callout tone="warning" title="需要处理：尚未设置研究预算">
-              预算上限由本机配置维护，页面暂不支持修改。未设置预算时不会开始新的研究。
+              未设置预算时不会开始新的研究；点右上角「编辑预算」设置每日与每月上限。
             </Callout>
             <p className="budget-note">已有的研究任务、研究报告仍可查看。</p>
           </>
@@ -940,9 +981,9 @@ function TaskDrawer({
   const title = detail === null ? '研究任务' : taskDetailDisplayName(detail);
   const view = detail === null
     ? null
-    : isResearchStatusRecord(detail.provider_id)
-      ? researchStatusRecordView(detail.reason)
-      : taskStatusView(detail.status, detail.reason, detail.result?.research.hypothesis ?? null);
+    : isResearchStatusRecord(detail.kind, detail.provider_id)
+      ? researchStatusRecordView(detail.reason, detail.reason_text)
+      : taskStatusView(detail.status, detail.reason_text ?? detail.reason, detail.result?.research.hypothesis ?? null);
   const canCancel = detail !== null && ['queued', 'running', 'local_running'].includes(detail.status);
   const canRetry = detail !== null && detail.retryable;
 
@@ -1025,7 +1066,7 @@ function ResearchStatusRecordDetail({ detail }: { detail: AgentTaskDetail }) {
     <>
       <div className="drawer__section">
         <h3 className="drawer__section-title">结论与原因</h3>
-        <StatusLine status={researchStatusRecordView(detail.reason)} />
+        <StatusLine status={researchStatusRecordView(detail.reason, detail.reason_text)} />
         <p className="detail-sentence">这条记录只说明研究未能运行，没有执行详情。</p>
       </div>
 
@@ -1053,9 +1094,9 @@ function ResearchStatusRecordDetail({ detail }: { detail: AgentTaskDetail }) {
 }
 
 function TaskDetailBody({ detail, currency }: { detail: AgentTaskDetail; currency: string }) {
-  if (isResearchStatusRecord(detail.provider_id)) return <ResearchStatusRecordDetail detail={detail} />;
+  if (isResearchStatusRecord(detail.kind, detail.provider_id)) return <ResearchStatusRecordDetail detail={detail} />;
   const result = detail.result;
-  const view = taskStatusView(detail.status, detail.reason, result?.research.hypothesis ?? null);
+  const view = taskStatusView(detail.status, detail.reason_text ?? detail.reason, result?.research.hypothesis ?? null);
   const cost = taskCost(detail.calls);
 
   return (
@@ -1177,7 +1218,7 @@ function CallRecords({ calls, currency }: { calls: AgentCall[]; currency: string
               </td>
               <td>{call.day} / {call.month}</td>
               <td>{call.price_version}</td>
-              <td>{call.reason ?? COMMON.notAvailable}</td>
+              <td>{callReasonText(call)}</td>
             </tr>
           ))}
         </tbody>

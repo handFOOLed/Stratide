@@ -128,7 +128,7 @@ export function SettingsPage({
       return (
         <CardBody className="settings-ai">
           <ProviderPanel agent={agent} />
-          <p className="settings-note">研究预算不在这里修改，请到 AI 研究页查看与使用。</p>
+          <p className="settings-note">研究预算可在本页修改；保存后会同步到 AI 研究页与任务预算校验。</p>
           <Diagnostics
             title="AI 服务诊断信息"
             data={{
@@ -317,12 +317,13 @@ export function SettingsPage({
           <VersionCheck
             version={runtime.status === null ? __UI_VERSION__ : runtime.status.product_version}
             uiVersion={__UI_VERSION__}
+            build={runtime.status === null ? null : runtime.status.build}
           />
         </div>
         <div className="about-links">
           <a
             className="about-link"
-            href="https://github.com/handFOOLed/Stratide/issues"
+            href={runtime.status?.issues_url ?? 'https://github.com/handFOOLed/Stratide/issues'}
             target="_blank"
             rel="noreferrer"
             data-testid="feedback-link"
