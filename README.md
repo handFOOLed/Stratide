@@ -1,20 +1,16 @@
 **简体中文** | [English](README.en.md)
 
-**M3-PR03 / #84（本分支 Draft）：** [多证券共享 Paper](docs/M3_PR03.md) 接通原冻结研究 → Owner 固定目标金额政策 → 唯一 Risk/Ledger 原子批次 → T+1 盘后事后模拟或 NO_FILL → 当前账户 Dashboard。84 会话与及时来源门禁保留；模型权重不授予交易权限。真实源可在 Owner 单独批准的未核验公司行为假设与保守上限下模拟成交，异常证券仍 NO_FILL；缺价未知 NAV 支持不补成交的跨日估值恢复，PIT/真实开盘/可交易性均未验证。本次未开启 Owner 自动化或新增真实请求。
-
-**M3-PR02 / #83（Draft 交付）**：[全市场自动筛选与受控策略研究](docs/M3_PR02.md) 接通 READY 快照 → Top 8 本地 TimesFM → 独立字段授权/共享预算 → DeepSeek 冻结研究候选及设置 UI。自动化默认关闭，真实出网默认拒绝；日 ¥5/月 ¥100 不增加，无自动买卖单，真实市场云 E2E 未获授权未运行。
-
-**M3-PR01 / #82（Draft 交付）**：[全市场 A 股 EOD 与可信覆盖快照](docs/M3_PR01.md) 复用原 Operator、V1/V2 仓库与 source gate，提供日期证券池、按日批量增量、质量/覆盖双分母和只读报告。BSE 保留为不支持；真实全市场覆盖与当前接口权限尚未实测，不增加交易资格。
-
-**V1 收尾 B / #77（Draft 交付）**：[Windows 本地产品操作与恢复](docs/V1_COMPLETION.md) 集成当前 Paper/历史报告分离、原 TimesFM/Fusion/OOS/Registry、持久审批通知及 UI 精修。Paper 成交仅 `EX_POST_OPEN_ASSUMPTION`，PIT/开盘实收与交易资格仍未验证；N100 暂缓，不是 V1 门槛。
-
-**V1 收尾 A / #76（已由 PR #78 合并）**：[冻结风险评价、前向只读审计与 FusionResearcherV1](docs/V1_EVALUATION.md) 提供本地 CPU / Naive / EWMA 同目标比较和合成 Prompt 安全闭环。真实指标只留本机，PIT、前向 Paper 与真实数据外发不解锁。
-
 # Stratide
+
+> **项目现行状态｜2026-11-05**：V2/M3 **模块 A/B/C 软件工程已合并至 `main`**：[#82 / PR #86](https://github.com/handFOOLed/Stratide/pull/86) 全市场 EOD 数据层、[#83 / PR #87](https://github.com/handFOOLed/Stratide/pull/87) 受控 TimesFM + DeepSeek 自动研究、[#84 / PR #88](https://github.com/handFOOLed/Stratide/pull/88) 多证券共享 Paper 账户与 T+1 事后模拟。**当前唯一任务 [#85](https://github.com/handFOOLed/Stratide/issues/85)：Windows 11 安装包、用户登录后台自启、双击快捷方式启动服务并打开 Dashboard；Owner 指定 DeepSeek 完整负责。#85 尚未实现或合并。** [现行状态](docs/STATUS.md) · [V2 总路线图 #81](https://github.com/handFOOLed/Stratide/issues/81)。
+
+> **不能误解的能力边界**：目前是 Paper-only，不接券商/真钱；自动模拟采用冻结 T 日意图、T+1 盘后实收日线的 `EX_POST_OPEN_ASSUMPTION`。未核验公司行为假设必须 Owner 单独批准且受原 Risk 与保守额度约束，不能当作真实成交或策略有效性。真实全市场在线采集/自动模型/Windows 安装产品尚未做完整实机 E2E，84 个 READY 会话为研究暖机条件；真实数据云外发默认 DENIED，DeepSeek 内部硬预算仍是 CNY ¥5/日、¥100/月。N100 部署延期。
+
+
 
 本地优先、**仅模拟交易（Paper-only）** 的个人量化研究系统：Rust 风控/账本与历史回放、真实盘后数据观察、本地只读 Paper Dashboard 与受控研究 Agent。**不能用于真实资金交易，也不代表已验证盈利能力。**
 
-## 当前状态
+## 历史模块记录（以下“Draft/当前”均为原提交时状态）
 
 - **M2-PR20 真实历史本地风险（#74 / 本分支 Draft）：** 已有真实 V1/V2 数据与质量标签 → 前缀冻结 → TimesFM CPU → 原任务/Registry/report/verify 已实际通过三证券。真实因子变化/缺口拒绝，新行情请求、云调用及计费均为 0；真实风险结果禁止外发。PIT、样本外优势、Paper/Live 与 N100 资格仍未验证。见[操作](docs/M2_PR20.md)和[证据](docs/evidence/m2-pr20/README.md)。
 
@@ -42,7 +38,7 @@ Owner 首次使用：在既有真实 CNY Agent 的 `settings.json` 手动填日/
 - **当前顺序：** #74 交付真实历史 → 本地 TimesFM 核心闭环，单个 Draft 等待固定 HEAD 审查。后续预冻结样本外协议、积累前向 EOD；UI 在核心之后。见[当前状态](docs/STATUS.md)。
 - **PR #56 审查修复：** 新链路须显式绑定已有 Owner AgentDir/配置，与旧 Agent 共用同一费用库，不再初始化第二个预算。预算修复已获源码复审确认；原 PR52/54 三套盘后完整回归 **10+4+13 项均 exit 0**，PR #56 后续已合并，原开发证据保留；见 [R1 证据](docs/evidence/m2-pr11/r1/README.md)。
 
-## Windows 本地体验
+## 旧版开发态 Windows 启动示例（不是 #85 安装包）
 
 在仓库根目录运行（以下为**合成测试数据**，不是实际市场收益）：
 
@@ -57,7 +53,7 @@ pwsh -NoProfile -File scripts/start-dashboard.ps1 -ReportDir 'docs/evidence/m0-p
 
 ## 团队与文档
 
-- **Owner：** 范围与合并决定；**Sol：** 后端、Agent、接口和关键测试；**DeepSeek：** 信息架构、字体/组件、布局与平滑动效；**ChatGPT：** 固定 HEAD 审查、获授权后合并。
+- **Owner：** 范围、外发/费用许可和最终合并；**DeepSeek：** 当前 #85 的 Windows 安装、后台启动器、必要后端/脚本/首启配置/UI 全模块实施；**ChatGPT：** 固定 HEAD 审查和 Owner 授权后合并。此前 Sol/DeepSeek 的分工属于历史记录，见 [AGENTS.md](AGENTS.md)。
 - [DeepSeek UI 交接规范](docs/UI_HANDOFF_DEEPSEEK.md) · [编码规则](AGENTS.md) · [产品原则](docs/PRODUCT.md) · [风险规范](docs/RISK_POLICY.md) · [历史 ADR](docs/adr/)。
 
 **所有历史回放均不等于实时前向验证；不接入实盘券商。**
