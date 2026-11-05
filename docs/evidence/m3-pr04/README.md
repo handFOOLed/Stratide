@@ -51,7 +51,7 @@ pwsh -NoProfile -File scripts/test-windows-product.ps1 -Port 8794
 实际结果：**26/26 PASS**（R2 新增 4 项 WSL 入口检查），摘要：
 
 ```text
-PASS configure exit=0 home=...\state\issue85-test\e2e-20261105-125018
+PASS configure exit=0 home=F:\Desktop\Documents\Codex\Stratide\issue85-worktree\state\issue85-test\e2e-20261105-170936
 PASS config-bom-free
 PASS first-launch exit=0
 PASS health
@@ -63,7 +63,7 @@ PASS runtime-write-requires-token status=401
 PASS wsl-config-saved restart=True
 PASS wsl-unchanged-no-restart restart=False
 PASS wsl-config-persisted
-PASS wsl-probe-blocks-unknown-distro state=BLOCKED reason=TIMESFM_WSL_UNAVAILABLE（见 2.8 的宿主限制说明）
+PASS wsl-probe-blocks-unknown-distro state=BLOCKED reason=TIMESFM_WSL_UNAVAILABLE
 PASS stop exit=0
 PASS no-leftovers-after-stop
 PASS port-conflict-refused exit=2
@@ -80,8 +80,11 @@ PASS data-preserved
 RESULT PASS
 ```
 
+（最终复核以 `-Port 8795` 运行以避开残留端口，检查项与 `-Port 8794` 完全相同。）
+
 该脚本通过 `--configure` 建立隔离 home，使用内置 Python 与 release 二进制；
-它不创建 market 仓库、不读取凭据、不启动研究，因此不产生 Tushare/DeepSeek/TimesFM/Paper 事件。
+它不创建 market 仓库、不读取凭据、不启动研究。新增的 `wsl-probe` 只做前置探测（无模型前向、
+无云调用），因此不产生 Tushare/DeepSeek 请求、TimesFM 推理结果或 Paper 成交。
 “dashboard-auto-restart”在 dashboard 被强杀后等待 Supervisor 的 10 秒退避，确认只恢复 1 个实例。
 “job-kills-children”强杀 Supervisor，确认 Windows Job Object 连带结束 service，健康检查变为 down。
 
