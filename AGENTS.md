@@ -1,20 +1,19 @@
 # AGENTS.md — Stratide 工程与协作规则
 
-> **现行执行决定｜2026-11-05**：V2 模块 A/B/C 分别由 PR #86/#87/#88 合并，**当前唯一任务是 [#85 Windows 11 安装交付](https://github.com/handFOOLed/Stratide/issues/85)**；Owner 指定 **DeepSeek 负责整个 #85（安装包、Windows 后台 Supervisor/Launcher、登录自启、首启配置、必要 Python/Rust/PowerShell/React 联动和 UI）**，不是只负责 UI。原 #22/#23 的 Sol/DeepSeek 角色分配均为历史记录。基础安全规范不变：Paper-only、原唯一 Ledger、独立数据外发许可、原 Agent CNY ¥5/日与 ¥100/月硬预算、N100 延后。查看 [当前状态](docs/STATUS.md) 与 [总路线图 #81](https://github.com/handFOOLed/Stratide/issues/81)。
+> **现行基线｜2026-11-05**：Stratide V2 / Windows 0.3.0 已可安装使用，四个 M3 模块分别由 PR #86/#87/#88/#89 **全部合并至 `main`**。当前没有已授权的下一模块开发任务；未来先由 Owner 确认 Issue/范围，再创建独立 Draft PR。用户操作见 [使用教程](docs/USER_GUIDE.md)；工程现状见 [STATUS](docs/STATUS.md)；运行前提与验证边界见 [KNOWN_LIMITATIONS](docs/KNOWN_LIMITATIONS.md)。
 
-> 当前执行状态见 [STATUS](docs/STATUS.md)，已接受设计与金融安全依据见 [PRODUCT](docs/PRODUCT.md)、[RISK_POLICY](docs/RISK_POLICY.md) 和 [ADR](docs/adr/)。旧 M0-only 的“禁止 UI/研究 Agent”规则已过时：**Owner 已授权在 paper 阶段交付 Web 与研究 Agent，但未授权实盘。**
+> 原 #22/#23 的 UI/后端角色分工，以及 #85 “DeepSeek 正在实施 Windows 安装”均为**历史安排**。安全边界、独立审查、Owner 明确授权合并的原则仍有效；N100/实盘后续另行决策。
 
-## 角色、任务与接口
+## 工程协作
 
-| 角色 | 唯一主要职责 |
+| 角色 | 职责 |
 | --- | --- |
-| **Owner** | 产品范围、支出/外发许可、风险授权、是否合并 |
-| **Sol Max / Codex（历史模块）** | 已合并功能的历史开发实现者，不是本轮 #85 必需负责人 |
-| **DeepSeek (DS) — 当前 #85 实施者** | **Windows 产品完整交付**：打包、服务单实例、登录自启、双击 Dashboard、安装/升级/卸载、必要脚本/本地 API/前端配置与测试；不得放宽财务、预算和外发权限 |
-| **ChatGPT（小猫）** | 设计与代码审查、风险分级、核对固定 HEAD；经 Owner 明确批准后 SHA 锁定合并 |
-| **Terra / 其他独立审查者（按风险需要）** | 只在财务/凭据/研究付费等高风险改动中做**针对性独立反证**，不机械重跑全部开发者测试，也不自动合并 |
+| **Owner** | 确定产品目标、任务范围、费用/云外发/风险授权和最终合并 |
+| **实施者（Codex / DeepSeek 等）** | 根据 Owner 最新 Issue 完整实现选定模块，提交一个 Draft PR；不自行 Ready/merge |
+| **ChatGPT** | 审阅固定 HEAD、风险分级、在 Owner 明确授权后执行合并 |
+| **其他独立审查者** | 对凭据、费用、持久账本等高风险修改做定向反证（按需） |
 
-**当前唯一执行顺序**：基于最新 `main`（PR #88 merge `9a6a6ede`）实施 [#85](https://github.com/handFOOLed/Stratide/issues/85)，提交一个完整 Windows 安装产品 Draft PR，Owner 验收和批准合并。DeepSeek 不需等待旧 #22/#23 UI 移交；[UI_HANDOFF_DEEPSEEK](docs/UI_HANDOFF_DEEPSEEK.md) 是**历史视觉规范**，现行视觉基准以 #77 与已合并 Dashboard 为准，禁止不必要的全站重构。
+**当前交付**：V2 工程完结，进入使用、日常数据观察和 Owner 本机验收阶段。新功能不沿用旧 #85 开发指令；是否开展真实数据/PIT 前向评估、N100 或其他优化，由 Owner 另发任务。
 
 ## 不可突破的安全边界
 
@@ -27,7 +26,7 @@
 
 ## 工程流程（Owner 当前补充）
 
-- 从最新 `main` 创建独立分支/worktree；交付**完整可用的纵向功能包**，避免只交空壳或无关重构。尊重当前 #85 的变更范围；若执行环境安装了 Stop That Shit Skill 可用 `$stop-that-shit change hash=allow agents=0`，否则按相同的最小变更/证据纪律实现，不把另一工具的 Skill 当作 DeepSeek 必备依赖。
+- 从最新 `main` 创建独立分支/worktree；交付**完整可用的纵向功能包**，避免只交空壳或无关重构。尊重新任务的明确变更范围；若执行环境安装了 Stop That Shit Skill 可用 `$stop-that-shit change hash=allow agents=0`，否则按相同的最小变更/证据纪律实现，不把另一工具的 Skill 当作 DeepSeek 必备依赖。
 - **P0**：重复下单、资金/仓位或 Risk 破坏、密钥泄漏、未经授权云消费；**P1**：数据/研究真实性、持久化/恢复、安全边界；**P2**：一般 UI 视觉；**P3**：不会影响决策的罕见边缘情况。按真实风险强度设计测试，不付费跑 CI，不为普通 UI 编造大矩阵。
 - Sol/DS 必须给出实际 base/HEAD、变更范围、运行方式、通过和未运行的测试、关键财务/权限反证及已知限制；**Draft PR，不自合并**。
 - 普通 UI/只读展示：Sol 或 DS 自测 + ChatGPT 同 HEAD 审查；**涉及预算、云数据授权、风险/ledger 等高风险变更**：补少量针对性独立故障反证。不得把开发者自测写成独立验收或复制别人 PASS；Owner 仍须显式授权合并。
