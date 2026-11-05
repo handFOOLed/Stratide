@@ -6,7 +6,7 @@ export type PageKey = (typeof PAGE_KEYS)[number];
 export const HISTORY_TABS = ['fills', 'orders', 'daily', 'strategies', 'research'] as const;
 export type HistoryTab = (typeof HISTORY_TABS)[number];
 
-export const SETTINGS_SECTIONS = ['appearance', 'runtime', 'data', 'security', 'about'] as const;
+export const SETTINGS_SECTIONS = ['appearance', 'ai', 'data', 'runtime', 'about'] as const;
 export type SettingsSection = (typeof SETTINGS_SECTIONS)[number];
 
 export interface Route {
@@ -23,25 +23,25 @@ export interface RouteTarget {
 
 export const PAGE_LABELS: Record<PageKey, string> = {
   overview: '总览',
-  history: '历史报告',
-  agents: 'Agent 管理',
-  notifications: '通知审批',
+  history: '交易记录',
+  agents: 'AI 研究',
+  notifications: '通知',
   settings: '设置',
 };
 
 export const HISTORY_TAB_LABELS: Record<HistoryTab, string> = {
   fills: '成交',
   orders: '订单',
-  daily: '逐日核对',
-  strategies: '策略档案',
-  research: '研究档案',
+  daily: '每日账本',
+  strategies: '策略记录',
+  research: '研究报告',
 };
 
 export const SETTINGS_SECTION_LABELS: Record<SettingsSection, string> = {
   appearance: '外观',
-  runtime: '运行与安装',
-  data: '数据连接',
-  security: '权限与安全',
+  ai: 'AI 服务与预算',
+  runtime: '系统与诊断',
+  data: '数据与行情',
   about: '关于',
 };
 

@@ -1,23 +1,5 @@
 import { ApiError } from './api';
 
-/** The desktop launcher passes this per-install token in the URL fragment.
- *  It is kept in memory only, never in storage, and stripped from the URL. */
-let token = '';
-
-export function captureRuntimeToken(): void {
-  const hash = window.location.hash;
-  const query = hash.indexOf('?');
-  if (query < 0) return;
-  const params = new URLSearchParams(hash.slice(query + 1));
-  const value = params.get('rt');
-  if (value) token = value;
-  window.history.replaceState(null, '', hash.slice(0, query));
-}
-
-export function runtimeToken(): string {
-  return token;
-}
-
 export interface ChildStatus {
   pid: number;
   started_at: string;
@@ -26,9 +8,19 @@ export interface ChildStatus {
   last_exit?: { code: number | null; at: string } | null;
 }
 
+export interface BuildInfo {
+  version: string | null;
+  commit: string | null;
+  built_at: string | null;
+}
+
 export interface RuntimeStatus {
   managed: boolean;
   product_version: string;
+  /** 安装包 BUILD_INFO.json 的投影；源码树运行且无该文件时三个字段均为 null。 */
+  build: BuildInfo;
+  repo_url: string | null;
+  issues_url: string | null;
   home: string;
   app_dir: string;
   data_root: string;
@@ -117,7 +109,7 @@ export async function loadRuntimeStatus(signal?: AbortSignal): Promise<RuntimeSt
   return read<RuntimeStatus>('/api/runtime/status', {
     cache: 'no-store',
     credentials: 'omit',
-    headers: { Accept: 'application/json', 'X-Stratide-Runtime': token },
+    headers: { Accept: 'application/json' },
     signal,
   });
 }
@@ -129,10 +121,20 @@ export async function runtimeAction<T>(path: string, body: Record<string, unknow
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      'X-Stratide-Runtime': token,
     },
     body: JSON.stringify(body),
   });
+}
+
+export interface SetupCompleteResult {
+  state: 'COMPLETE' | 'INCOMPLETE' | string;
+  setup_complete: boolean;
+  completed_at: string | null;
+}
+
+/** 标记或撤销“首次设置完成”；撤销只删除运行目录标记，不影响账户/研究数据。 */
+export async function setSetupComplete(completed: boolean | null): Promise<SetupCompleteResult> {
+  return runtimeAction<SetupCompleteResult>('setup-complete', completed === null ? {} : { completed });
 }
 
 export function shanghaiToday(): string {

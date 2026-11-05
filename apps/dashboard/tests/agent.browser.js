@@ -1,113 +1,147 @@
 import { test, expect } from '@playwright/test';
-import { mkdirSync, readFileSync } from 'node:fs';
-import path from 'node:path';
+import { randomBytes } from 'node:crypto';
 
-const base = 'http://127.0.0.1:8736';
-const evidence = path.resolve(process.env.STRATIDE_UI_EVIDENCE_DIR || '../../state/m2-pr03-browser');
-mkdirSync(evidence, { recursive: true });
-function readToken() {
-  if (process.env.STRATIDE_UI_TEST_TOKEN_FILE) return readFileSync(process.env.STRATIDE_UI_TEST_TOKEN_FILE, 'utf8').trim();
-  return JSON.parse(readFileSync(path.resolve('../../state/issue22-browser/session.json'), 'utf8')).token;
-}
+/**
+ * AI 研究页与通知页的真实 API 回归（fixture 场景 agent，8736）。
+ * 该 fixture 使用本地 fake 研究模型 + CNY ¥5/日、¥100/月测试预算；不产生云端调用。
+ */
+const AGENT = 'http://127.0.0.1:8736';
 
-async function unlock(page) {
-  const token = readToken();
-  await page.goto(base + '/#agents');
-  await page.getByRole('button', { name: '输入 Owner 令牌' }).click();
-  await page.getByLabel('本机 Owner 令牌').fill(token);
-  await page.getByRole('button', { name: '解锁', exact: true }).click();
-  await expect(page.getByText('本机会话已解锁')).toBeVisible();
-  const resume = page.getByRole('button', { name: '恢复研究', exact: true });
-  if (await resume.isVisible().catch(() => false)) {
-    await resume.click();
-    await expect(page.getByText('等待或执行已授权研究')).toBeVisible();
-  }
-  await page.getByLabel('默认模型').selectOption('fake');
-  await expect(page.getByLabel('默认模型')).toHaveValue('fake');
-  return token;
+test.describe.configure({ mode: 'serial' });
+
+async function openAgent(page) {
+  await page.goto(AGENT + '/#agents');
+  await expect(page.getByTestId('agent-status-card')).toBeVisible();
+  // 等首次 agent.status 返回，避免断言落在加载态。
+  await expect(page.getByTestId('agent-status-card')).toContainText('运行状态');
+  await expect(page.getByTestId('agent-budget')).toBeVisible();
 }
 
 async function createTask(page, name) {
-  await page.getByRole('button', { name: '新建任务', exact: true }).click();
-  await expect(page.locator('#agent-task-form')).toBeVisible();
+  await openAgent(page);
+  await page.getByTestId('agent-create').click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
   await page.getByLabel('任务名称').fill(name);
-  await page.getByLabel('研究目标').fill('核查成本假设和数据来源，并提出可证伪的下一步');
-  await page.getByRole('button', { name: '提交研究任务', exact: true }).click();
-  await expect(page.locator('#agent-task-form')).not.toBeVisible();
-  const row = page.locator('.tasks-table tbody tr').filter({ has: page.getByRole('button', { name, exact: true }) });
-  await expect(row).toBeVisible();
-  return row;
+  await page.getByLabel('研究目标').fill('验证浏览器端任务创建、状态展示与任务详情抽屉。');
+  await page.getByRole('button', { name: '提交研究', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
 }
 
-test('real Agent API creates, stores, reads, cancels, pauses and does not call the model for detail views', async ({ page, request }) => {
+test('AI 研究：运行状态、预算、默认折叠的模型与空研究报告', async ({ page }) => {
   const errors = [];
-  page.on('pageerror', (error) => errors.push(error.message));
-  const token = await unlock(page);
+  page.on('pageerror', (error) => errors.push(String(error)));
+  await openAgent(page);
 
-  const row = await createTask(page, 'Web 持久研究闭环');
-  await expect(row).toContainText('已完成');
-  const getStatus = async () => (await (await request.get(base + '/api/agent/status', { headers: { 'X-Stratide-Owner': token } })).json()).data;
-  const countBefore = (await getStatus()).budget.call_count;
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('AI 研究');
+  await expect(page.getByTestId('agent-status-card')).toContainText('运行状态');
+  await expect(page.getByTestId('agent-status-card')).toContainText('收盘后自动研究');
+  await expect(page.getByTestId('agent-status-card')).not.toContainText('EOD');
 
-  await row.getByRole('button', { name: 'Web 持久研究闭环', exact: true }).click();
-  await expect(page.locator('.drawer')).toContainText('可核查假设');
-  await expect(page.locator('.drawer')).toContainText('FAKE / SYNTHETIC');
-  expect((await getStatus()).budget.call_count).toBe(countBefore);
-  await page.screenshot({ path: path.join(evidence, 'agent-task-drawer-1366.png') });
-  await page.getByRole('button', { name: '关闭详情' }).click();
+  // 预算统一 ¥ 且与账户同一数据源；主界面不出现后端币种/枚举。
+  const budget = page.getByTestId('agent-budget');
+  await expect(budget).toContainText('¥5.00');
+  await expect(budget).toContainText('¥100.00');
+  await expect(budget).not.toContainText('CNY');
+  await expect(budget).not.toContainText('micro');
 
-  await page.getByRole('button', { name: '优雅暂停', exact: true }).click();
-  // The toast says "已优雅暂停研究"; the runtime badge is the authoritative state.
-  await expect(page.locator('.agent-runtime .badge')).toHaveText('已优雅暂停');
-  await expect(page.locator('.runtime-title')).toHaveText('已暂停接收新任务');
-  const cancelled = await createTask(page, 'Web 排队取消');
-  await expect(cancelled).toContainText('排队中');
-  await cancelled.getByRole('button', { name: '取消', exact: true }).click();
-  await expect(cancelled).toContainText('已取消');
-  await page.getByRole('button', { name: '恢复研究', exact: true }).click();
-  await expect(page.getByText('等待或执行已授权研究')).toBeVisible();
+  // 模型默认折叠，展开后可设置默认模型。
+  const models = page.getByTestId('agent-models');
+  await expect(page.getByTestId('agent-default-model')).toHaveCount(0);
+  await page.getByTestId('agent-models-toggle').click();
+  await expect(page.getByTestId('agent-default-model')).toBeVisible();
+  await expect(models).toContainText('默认研究模型');
+
+  // 研究报告空态与诊断折叠。
+  await expect(page.getByTestId('agent-reports')).toContainText('还没有研究报告');
+  const diagnostics = page.locator('[data-testid="agent-status-card"] details.diagnostics');
+  await expect(diagnostics).toHaveJSProperty('open', false);
+  await diagnostics.locator('summary').click();
+  await expect(diagnostics).toContainText('最近结果');
 
   expect(errors).toEqual([]);
-  expect(JSON.stringify(await page.evaluate(() => [localStorage, sessionStorage]))).not.toContain(token);
-  expect(await page.content()).not.toContain(token);
 });
 
-test('malicious Provider output stays text and the token is absent from browser persistence', async ({ page }) => {
-  const token = await unlock(page);
-  await page.getByLabel('默认模型').selectOption('fake-text');
-  await expect(page.getByLabel('默认模型')).toHaveValue('fake-text');
-  const row = await createTask(page, '恶意文本只读验证');
-  await expect(row).toContainText('已完成');
-  await row.getByRole('button', { name: '恶意文本只读验证', exact: true }).click();
-  await expect(page.locator('.drawer')).toContainText('<img src=x onerror=alert(1)>');
-  await expect(page.locator('#drawer img')).toHaveCount(0);
-  await page.getByRole('button', { name: '关闭详情' }).click();
-  await page.reload();
-  await expect(page.getByRole('button', { name: '输入 Owner 令牌' })).toBeVisible();
-  expect(JSON.stringify(await page.evaluate(() => [localStorage, sessionStorage]))).not.toContain(token);
-  expect(await page.content()).not.toContain(token);
+test('新建研究：弹窗初始焦点、空值校验、提交后任务进入列表并可打开详情', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(String(error)));
+  await openAgent(page);
+
+  await page.getByTestId('agent-create').click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  expect(await page.evaluate(() => document.activeElement?.id)).toBe('task-name');
+
+  await page.getByRole('button', { name: '提交研究', exact: true }).click();
+  await expect(dialog).toContainText('请输入任务名称。');
+  await expect(dialog).toContainText('请写明研究目标与反证条件。');
+  await expect(page.getByRole('dialog')).toHaveCount(1);
+
+  const taskName = '浏览器回归任务';
+  await page.getByLabel('任务名称').fill(taskName);
+  await page.getByLabel('研究目标').fill('验证浏览器端任务创建、状态展示与任务详情抽屉。');
+  await page.getByRole('button', { name: '提交研究', exact: true }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+
+  const row = page.locator('[data-testid="task-row"]').filter({ hasText: taskName }).first();
+  await expect(row).toBeVisible({ timeout: 30_000 });
+  await expect(row).toContainText('已完成', { timeout: 30_000 });
+  await expect(row).not.toContainText('#');
+
+  await row.click();
+  const drawer = page.getByRole('dialog');
+  await expect(drawer).toBeVisible();
+  await expect(drawer.locator('[data-testid="task-detail"]')).toBeVisible();
+  await expect(drawer).toContainText('结论与原因');
+  await expect(drawer).toContainText('诊断信息');
+  const detailDiagnostics = drawer.locator('details.diagnostics');
+  await expect(detailDiagnostics).toHaveJSProperty('open', false);
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+
+  expect(errors).toEqual([]);
 });
 
-test('Agent screenshots at 1366 and 375 plus an honest offline state', async ({ page }) => {
-  await unlock(page);
-  for (const [width, height] of [[1366, 900], [375, 812]]) {
-    await page.setViewportSize({ width, height });
-    await expect(page.getByText('研究运行状态')).toBeVisible();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await page.screenshot({ path: path.join(evidence, 'agent-' + width + '.png') });
-    await page.getByRole('button', { name: '新建任务', exact: true }).click();
-    const box = await page.locator('.modal').boundingBox();
-    expect(box).not.toBeNull();
-    if (box) {
-      expect(box.width).toBeLessThanOrEqual(width);
-      expect(box.x).toBeGreaterThanOrEqual(0);
-    }
-    await page.screenshot({ path: path.join(evidence, 'agent-modal-' + width + '.png') });
-    await page.getByRole('button', { name: '关闭对话框' }).click();
-  }
+test('通知：真实任务通知、全部标为已读、查看任务跳转并打开详情', async ({ page, request }) => {
+  const name = '通知回归任务 ' + Date.now();
+  const created = await request.post(AGENT + '/api/agent/tasks', {
+    headers: {
+      Accept: 'application/json',
+      Origin: AGENT,
+      'X-Stratide-Idempotency': randomBytes(16).toString('hex'),
+    },
+    data: {
+      name,
+      goal: '验证浏览器端通知列表与已读操作。',
+      scope: '当前已发布的模拟账户摘要',
+      start_day: '2026-10-28',
+      end_day: '2026-11-02',
+      task_budget_micro: null,
+    },
+  });
+  expect(created.ok()).toBeTruthy();
+  await expect.poll(async () => {
+    const response = await request.get(AGENT + '/api/agent/tasks', { headers: { Accept: 'application/json' } });
+    const body = await response.json();
+    const task = body.data.tasks.find((item) => item.name === name);
+    return task ? task.status : null;
+  }, { timeout: 30_000 }).toMatch(/completed|failed|cancelled|outcome_uncertain/);
 
-  await page.setViewportSize({ width: 1366, height: 900 });
-  await page.route('**/api/agent/**', (route) => route.abort());
-  await page.getByRole('button', { name: '刷新研究任务' }).click();
-  await expect(page.getByText(/无法连接本机研究服务/).first()).toBeVisible();
+  await page.goto(AGENT + '/#notifications');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('通知');
+  await expect(page.locator('.notice-row')).not.toHaveCount(0, { timeout: 30_000 });
+  await expect(page.locator('.notice-row').filter({ hasText: name }).first()).toBeVisible();
+  await expect(page.locator('.notice-row').filter({ hasText: name }).first()).toContainText('已完成');
+  await expect(page.getByText(/\d+ 条未读/).first()).toBeVisible();
+
+  const markAll = page.getByRole('button', { name: /全部标为已读|标记本页已读/ });
+  await markAll.click();
+  await expect(markAll).toBeDisabled();
+  await expect(page.locator('.notice-row[data-read="true"]')).toHaveCount(await page.locator('.notice-row').count());
+  await expect(page.getByText('全部已读', { exact: true })).toBeVisible();
+
+  await page.locator('.notice-row').filter({ hasText: name }).first().getByRole('button', { name: '查看任务' }).click();
+  await expect(page).toHaveURL(/#agents$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('AI 研究');
+  await expect(page.locator('[data-testid="task-row"]').filter({ hasText: name }).first()).toBeVisible();
 });

@@ -200,6 +200,7 @@ fn test_deepseek_config(dir: &Path) -> crate::deepseek::Config {
     let now = chrono::Utc::now() - chrono::Duration::minutes(5);
     crate::deepseek::Config {
         version: 1,
+        credential_target: None,
         key_file,
         grant_version: "deepseek-synthetic-grant-v1".into(),
         synthetic_only: true,

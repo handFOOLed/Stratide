@@ -1,4 +1,7 @@
 import type {
+  AgentBudget,
+  AgentBudgetUpdateRequest,
+  AgentBudgetUpdateResult,
   AgentCreateResult,
   AgentStatus,
   AgentTaskDetail,
@@ -29,19 +32,12 @@ export interface EnvelopeResult<T> {
   envelope: Envelope<T>;
   status: number;
 }
-const ERROR_MESSAGES: Record<string,string> = {
-  REAL_MARKET_DATA_EGRESS_DENIED:'真实行情、TimesFM 风险及派生摘要尚未获云外发许可。',
-  OWNER_PAUSED:'Owner 已暂停研究。', OWNER_TOKEN_REQUIRED:'请先解锁本机研究控制。',
-  APPROVAL_EXPIRED:'本次许可已过期，请重新提交并核对。',APPROVAL_STATE_CONFLICT:'审批状态已变化，请重新读取原记录。',
-  DESKTOP_AGENT_AUTHORITY_MISMATCH:'研究工作区未绑定当前 Agent；已阻止执行。',
-  DESKTOP_BINDING_UNAVAILABLE:'原研究实例绑定不可用，未执行研究。',
-  DEEPSEEK_DISABLED_OR_ONCE_CONSUMED:'原云调用开关已关闭或本次许可已消费。',
-  LOCAL_CPU_DISABLED:'本地 CPU 研究已停用。', LOCAL_NO_BILLING:'本地研究，不计费。',
-};
+import { failureReasonText, humanReasonText } from './status';
+
+/** 后端原因码 → 一句人话；未知代码不展示原始枚举，只写“原因未记录”。 */
 export function humanReason(value: string | null): string {
   if (value === null || value === '') return '—';
-  if (Object.hasOwn(ERROR_MESSAGES,value)) return ERROR_MESSAGES[value];
-  return /^[A-Za-z][A-Za-z0-9_]*_[A-Za-z0-9_]+$/.test(value) ? '状态或原因见技术详情' : value;
+  return humanReasonText(value) ?? failureReasonText(value);
 }
 
 interface RequestOptions {
@@ -222,7 +218,6 @@ export async function agentFetch<T>(token: string, path: string, options: AgentR
       credentials: 'omit',
       headers: {
         Accept: 'application/json',
-        'X-Stratide-Owner': token,
         ...(options.idempotencyKey === undefined ? {} : {'X-Stratide-Idempotency':options.idempotencyKey}),
         ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
       },
@@ -271,6 +266,16 @@ export async function agentFetch<T>(token: string, path: string, options: AgentR
 
 export function loadAgentStatus(token: string, signal?: AbortSignal): Promise<AgentStatus> {
   return agentFetch<AgentStatus>(token, 'status', { signal });
+}
+
+/** 保存研究预算上限；返回更新后的完整预算记录。 */
+export function updateAgentBudget(
+  token: string,
+  body: AgentBudgetUpdateRequest,
+): Promise<AgentBudget> {
+  return agentFetch<AgentBudgetUpdateResult>(token, 'budget', { method: 'POST', body }).then(
+    (result) => result.budget,
+  );
 }
 
 export function loadAgentTasks(

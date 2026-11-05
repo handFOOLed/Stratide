@@ -197,7 +197,7 @@ def verify(name):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("command",choices=["descriptor","enable","disable","synthetic-freeze","once","status","report","verify","preflight","stop","bench","historical-preflight","historical-freeze"])
+    parser.add_argument("command",choices=["descriptor","enable","disable","synthetic-freeze","once","status","report","verify","preflight","detect","stop","bench","historical-preflight","historical-freeze"])
     parser.add_argument("--name",default="local-risk")
     parser.add_argument("--series",type=int,default=1)
     parser.add_argument("--max-context",type=int,choices=[256,512],default=256)
@@ -267,6 +267,9 @@ def main():
             if args.command in ("report","verify") and out["state"] == "completed" and read_plan(args.name).get("history"):
                 from history import archived
                 out["archive"] = archived(args.name)
+        elif args.command == "detect":
+            found = runtime.detect()
+            out = dict(state="READY", wsl=found) if found else dict(state="NOT_FOUND")
         elif args.command == "preflight":
             manifest = model_manifest()
             runtime.preflight(2)

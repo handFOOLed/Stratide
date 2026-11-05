@@ -647,7 +647,7 @@ pub fn prepare(m: &Model, input: &Value) -> Result<Prepared> {
     frozen_model(&ctx)?;
     let (plan, parent) = parent(&c, &ctx, true)?;
     let body = body(m, &ctx, &plan.frozen, &parent)?;
-    let key = ds::read_key_file(&cfg.key_file)?;
+    let key = ds::read_key(&cfg)?;
     ensure(
         !body.to_string().contains(key.as_str()),
         "DEEPSEEK_SECRET_IN_REQUEST_DENIED",

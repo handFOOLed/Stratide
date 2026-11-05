@@ -24,6 +24,112 @@ def binding_path():
     return m.common_root() / "state/paper-portfolio/binding.json"
 
 
+# Owner-approved default simulated policy for the Windows product. Paper-only:
+# no broker, no real money, no strategy-code execution. Every value is explicit
+# and visible in the ledger; automation may not raise them by itself.
+POLICY_VERSION = "fixed-ticket-paper-v1"
+ASSUMPTION_VERSION = "no-detected-action-mainboard-v1"
+DEFAULT_POLICY = dict(
+    target_value=2_000_000,          # CNY 20,000 per selected security
+    max_positions=2,
+    max_daily_orders=2,
+    max_candidates=8,
+    max_order_shares=100,
+    capacity_shares=100,
+    max_symbol_value=2_000_000,
+    max_daily_fees=50_000,           # CNY 500 per day
+    slippage_bps=100,
+    min_amount_thousand_yuan=10_000,
+    unverified_eod_max_exposure=4_000_000,
+    universe_limit=6000,
+)
+DEFAULT_TARIFF = dict(version="a-share-paper-tariff-v1",
+                      source="owner-default-a-share-tariff-assumption",
+                      commission_ppm=250, minimum_commission=500,
+                      transfer_ppm=10, sell_tax_ppm=500)
+
+
+def policy_instrument(code):
+    """Mainland A-share ts_code to the ledger Instrument contract."""
+    if len(code) != 9 or not code[:6].isdigit():
+        return None
+    if code.endswith(".SH"):
+        return dict(market="Shanghai", code=code[:6])
+    if code.endswith(".SZ"):
+        return dict(market="Shenzhen", code=code[:6])
+    return None
+
+
+def default_policy(market):
+    """Build the one-time Owner policy from the latest trusted READY snapshot."""
+    report = market.report()
+    latest = report.get("latest")
+    m.require(latest is not None, "PAPER_MARKET_SNAPSHOT_REQUIRED")
+    day = latest["source_day"]
+    with market.read(inspect_raw_paths=False) as db:
+        snapshot = market.load_snapshot(db, day)
+    m.require(snapshot is not None and snapshot["state"] == "READY", "PAPER_MARKET_SNAPSHOT_REQUIRED")
+    universe = []
+    for code in sorted(set(snapshot.get("eligible_symbols", []))):
+        item = policy_instrument(code)
+        if item is not None:
+            universe.append(item)
+    m.require(0 < len(universe) <= DEFAULT_POLICY["universe_limit"], "PAPER_UNIVERSE_UNAVAILABLE")
+    from_day = int(day)
+    fees = [dict(DEFAULT_TARIFF, instrument=item, valid_from=from_day, valid_through=20991231)
+            for item in universe]
+    policy = dict(
+        version=POLICY_VERSION,
+        universe=universe,
+        target_value=DEFAULT_POLICY["target_value"],
+        max_positions=DEFAULT_POLICY["max_positions"],
+        max_daily_orders=DEFAULT_POLICY["max_daily_orders"],
+        max_candidates=DEFAULT_POLICY["max_candidates"],
+        max_order_shares=DEFAULT_POLICY["max_order_shares"],
+        capacity_shares=DEFAULT_POLICY["capacity_shares"],
+        capacity_scope="Batch",
+        unverified_eod_assumption=dict(version=ASSUMPTION_VERSION,
+                                       max_exposure=DEFAULT_POLICY["unverified_eod_max_exposure"]),
+        max_symbol_value=DEFAULT_POLICY["max_symbol_value"],
+        max_daily_fees=DEFAULT_POLICY["max_daily_fees"],
+        slippage_bps=DEFAULT_POLICY["slippage_bps"],
+        min_amount_thousand_yuan=DEFAULT_POLICY["min_amount_thousand_yuan"],
+        fees=fees,
+        approve_fixed_baseline=True,
+        automatic=True,
+    )
+    return policy
+
+
+def ensure_policy(market):
+    """Idempotently enable the default simulated policy once data exists.
+
+    Returns a small status object; never raises when the ledger is not yet
+    configured. The policy is frozen in the trusted ledger and can only be
+    paused/resumed afterwards, so every value is printed for auditing.
+    """
+    path = binding_path()
+    if not path.is_file():
+        return dict(state="NOT_CONFIGURED")
+    b = json.loads(path.read_text(encoding="utf-8"))
+    ledger = Path(b["ledger"])
+    view = bridge(ledger, "status")
+    if view["state"].get("portfolio") is not None:
+        book = view["state"]["portfolio"]
+        return dict(state="EXISTS", ledger_head=view["ledger_head"],
+                    automatic=book.get("automatic"),
+                    policy=book.get("policy"))
+    policy = default_policy(market)
+    bridge(ledger, "configure", policy)
+    view = bridge(ledger, "status")
+    book = view["state"].get("portfolio")
+    m.require(book is not None, "PAPER_POLICY_CONFIGURE_REJECTED")
+    return dict(state="CONFIGURED", ledger_head=view["ledger_head"],
+                automatic=book.get("automatic"), universe=len(policy["universe"]),
+                target_value=DEFAULT_POLICY["target_value"],
+                policy=book.get("policy"))
+
+
 def bridge(ledger, action, value=None):
     exe = paths.executable("stratide-cli")
     result = subprocess.run([str(exe), "paper-portfolio", str(ledger), action],
@@ -102,7 +208,7 @@ def research(market, day, snapshot):
     with mr.database() as db:
         run = mr.get(db, mr.RUN + day)
     m.require(run is not None and run["state"] == "CANDIDATE_FROZEN", "RESEARCH_NOT_READY_84_SESSIONS_REQUIRED")
-    task = mr.bridge("task", dict(task_id=run["fusion_task_id"]))
+    task = mr.bridge("task", dict(task_id=int(run["fusion_task_id"])))
     m.require(task["status"] == "completed" and task["input"]["mode"] == "historical_research_only"
               and task["result"]["synthetic_provider"] is False, "REAL_ORIGINAL_MARKET_RESEARCH_REQUIRED")
     registration = mr.c.Registry("market-" + day).registration(run["registration_sha256"])
@@ -239,8 +345,11 @@ def optional_step(market, phase):
     # infer that an uncertain ledger commit failed; next poll reads it first.
     try:
         return once(market, phase)
-    except Exception:
-        return dict(state="BLOCKED", reason="PAPER_LOCAL_INPUT_OR_LEDGER_UNAVAILABLE")
+    except Exception as error:
+        import traceback
+        traceback.print_exc(file=sys.stderr)
+        return dict(state="BLOCKED", reason="PAPER_LOCAL_INPUT_OR_LEDGER_UNAVAILABLE",
+                    detail=dict(type=type(error).__name__, message=str(error)[:200]))
 
 
 def main(argv=None):
@@ -267,7 +376,10 @@ def main(argv=None):
             value = json.loads(args.input.read_text(encoding="utf-8")) if args.action == "configure" else None
             result = bridge(ledger, args.action, value)
         print(json.dumps(result, ensure_ascii=False))
-    except (m.Error, OSError, ValueError, subprocess.SubprocessError):
-        print(json.dumps(dict(state="BLOCKED", reason="PAPER_LOCAL_INPUT_OR_LEDGER_UNAVAILABLE")))
+    except (m.Error, OSError, ValueError, subprocess.SubprocessError) as error:
+        import traceback
+        traceback.print_exc(file=sys.stderr)
+        print(json.dumps(dict(state="BLOCKED", reason="PAPER_LOCAL_INPUT_OR_LEDGER_UNAVAILABLE",
+                              detail=dict(type=type(error).__name__, message=str(error)[:200]))))
         return 1
     return 0

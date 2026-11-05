@@ -131,8 +131,53 @@ pub fn bind_at(root: &Path, dir: &Path, config: Option<&Path>) -> Result<Binding
     )?;
     ensure(restricted == 0, "CLOUD_AGENT_SCOPE_RESTRICTED")?;
     drop(c);
-    crate::eod_snapshot::no_links(&root)?;
-    fs::create_dir_all(&root).map_err(|_| "CLOUD_STATE_ROOT")?;
+    let agent = Agent::open(
+        &dir,
+        Some(&config),
+        InputSummary {
+            version: "binding:no-input".into(),
+            source_day: String::new(),
+            mode: "no_input".into(),
+            scopes: vec!["owner_task".into()],
+            summary: json!({}),
+            eod_eligible: false,
+        },
+    )?;
+    finish(root, &dir, &config, agent.store())
+}
+
+/// Bind the already-open Owner Agent without taking the worker lock. The
+/// dashboard attaches without exclusivity, so a lock-free binding is the only
+/// way the running product can register the same authority once.
+pub fn bind_attached(agent: &Agent) -> Result<Binding> {
+    let root = rp::root()?;
+    let dir = canonical(
+        agent
+            .store()
+            .path
+            .parent()
+            .ok_or("EXISTING_OWNER_AGENT_REQUIRED")?,
+    )?;
+    let config = canonical(agent.settings_path())?;
+    finish(&root, &dir, &config, agent.store())
+}
+
+fn finish(root: &Path, dir: &Path, config: &Path, store: &crate::Store) -> Result<Binding> {
+    let c = store.connect()?;
+    ensure(
+        c.pragma_query_value(None, "application_id", |r| r.get::<_, i64>(0))? == 1397899569
+            && c.pragma_query_value(None, "user_version", |r| r.get::<_, i64>(0))? == 1,
+        "ORIGINAL_AGENT_SCHEMA_REQUIRED",
+    )?;
+    let restricted: i64 = c.query_row(
+        "SELECT COUNT(*) FROM meta WHERE key IN ('multimodal_agent_v1','eod_auto_binding')",
+        [],
+        |r| r.get(0),
+    )?;
+    ensure(restricted == 0, "CLOUD_AGENT_SCOPE_RESTRICTED")?;
+    drop(c);
+    crate::eod_snapshot::no_links(root)?;
+    fs::create_dir_all(root).map_err(|_| "CLOUD_STATE_ROOT")?;
     let lock = OpenOptions::new()
         .create(true)
         .truncate(false)
@@ -150,39 +195,22 @@ pub fn bind_at(root: &Path, dir: &Path, config: Option<&Path>) -> Result<Binding
         )?;
         return Ok(old);
     }
-    let agent = Agent::open(
-        &dir,
-        Some(&config),
-        InputSummary {
-            version: "binding:no-input".into(),
-            source_day: String::new(),
-            mode: "no_input".into(),
-            scopes: vec!["owner_task".into()],
-            summary: json!({}),
-            eod_eligible: false,
-        },
-    )?;
-    ensure(
-        agent.store().setting("multimodal_agent_v1")?.is_none()
-            && agent.store().setting("eod_auto_binding")?.is_none(),
-        "CLOUD_AGENT_SCOPE_RESTRICTED",
-    )?;
-    let id = if let Some(id) = agent.store().setting(ID_KEY)? {
+    let id = if let Some(id) = store.setting(ID_KEY)? {
         id
     } else {
         let id = crate::nonce()?;
-        agent.store().set(ID_KEY, &id)?;
+        store.set(ID_KEY, &id)?;
         id
     };
-    check_settings_path(agent.store(), &config)?;
-    agent.store().set(CONFIG_KEY, &config.to_string_lossy())?;
+    check_settings_path(store, config)?;
+    store.set(CONFIG_KEY, &config.to_string_lossy())?;
     let binding = Binding {
         schema_version: 1,
-        agent_dir: dir,
-        settings_path: config,
+        agent_dir: dir.to_path_buf(),
+        settings_path: config.to_path_buf(),
         authority_id: id,
     };
-    binding.verify(&agent.store().connect()?)?;
+    binding.verify(&store.connect()?)?;
     let mut file = OpenOptions::new()
         .create_new(true)
         .write(true)
@@ -193,7 +221,6 @@ pub fn bind_at(root: &Path, dir: &Path, config: Option<&Path>) -> Result<Binding
     file.sync_all().map_err(|_| "CLOUD_BINDING_WRITE")?;
     Ok(binding)
 }
-
 /// Explicit synthetic configuration, preserving the original budget and selection.
 pub fn add_recorded_models(binding: &Binding, models: Vec<crate::config::Model>) -> Result<()> {
     let mut settings = Settings::load(&binding.settings_path)?;

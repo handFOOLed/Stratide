@@ -230,6 +230,38 @@ def wsl_run(raw):
     return value
 
 
+# One bounded probe per WSL distribution; only a workspace that already has the
+# pinned venv and model qualifies. Nothing is downloaded or extracted.
+WSL_DETECT = (
+    'for d in "$HOME" "$HOME"/* "$HOME"/projects/*; do\n'
+    '  if [ -x "$d/.venv/bin/python" ] && [ -d "$d/models/timesfm-2.5" ]; then\n'
+    '    printf "%s\\n" "$d"\n'
+    '    exit 0\n'
+    '  fi\n'
+    'done\n'
+    'exit 3\n'
+)
+
+
+def detect():
+    """Return the first existing WSL venv+model workspace, or None."""
+    require(os.name == "nt", "TIMESFM_WSL_DETECT_UNSUPPORTED")
+    names = wsl_distros()
+    require(bool(names), "TIMESFM_WSL_DISTRO_MISSING")
+    for distribution in names:
+        try:
+            result = subprocess.run(
+                ["wsl.exe", "-d", distribution, "--", "bash", "-s"],
+                input=WSL_DETECT.encode(), capture_output=True, timeout=120)
+        except (OSError, subprocess.SubprocessError):
+            raise Rejected("TIMESFM_WSL_UNAVAILABLE") from None
+        lines = result.stdout.decode("utf-8", "replace").splitlines()
+        if result.returncode == 0 and lines and lines[0].startswith("/"):
+            return dict(distribution=distribution, workspace=lines[0].strip(),
+                        python=".venv/bin/python", model="models/timesfm-2.5")
+    return None
+
+
 def preflight(threads=2):
     if os.name == "nt":
         return wsl_preflight(threads)

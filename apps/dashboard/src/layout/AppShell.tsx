@@ -1,29 +1,22 @@
 import { useRef, useState } from 'react';
 import type { ReactNode, RefObject } from 'react';
 import { Overlay } from '../components/ui/Overlay';
-import type { ApiError } from '../lib/api';
 import type { Route } from '../lib/route';
-import type { SnapshotMeta } from '../lib/types';
 import type { HealthState } from '../state/useHealth';
+import type { RuntimeState } from '../state/useRuntime';
 import { SidebarContent } from './Sidebar';
 import { Topbar } from './Topbar';
 
 export function AppShell({
   route,
   health,
-  meta,
-  paperError,
-  onRefresh,
-  refreshing,
+  runtime,
   mainRef,
   children,
 }: {
   route: Route;
   health: HealthState;
-  meta: SnapshotMeta | null;
-  paperError: ApiError | null;
-  onRefresh: () => void;
-  refreshing: boolean;
+  runtime: RuntimeState;
   mainRef: RefObject<HTMLDivElement | null>;
   children: ReactNode;
 }) {
@@ -47,14 +40,7 @@ export function AppShell({
       </a>
       <SidebarContent route={route} />
       <div className="workspace" ref={mainRef}>
-        <Topbar
-          health={health}
-          meta={meta}
-          paperError={paperError}
-          onRefresh={onRefresh}
-          refreshing={refreshing}
-          onOpenNav={() => setNavOpen(true)}
-        />
+        <Topbar health={health} runtime={runtime} onOpenNav={() => setNavOpen(true)} />
         <main className="main-inner" id="main-content" tabIndex={-1} ref={contentRef}>
           {children}
         </main>

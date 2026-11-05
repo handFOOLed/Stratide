@@ -28,6 +28,10 @@ const PERMIT: &str = "structured_deepseek_once_v1";
 pub struct Config {
     pub version: u32,
     pub key_file: PathBuf,
+    /// Windows Credential Manager entry holding this key; when present the
+    /// key file is a documentation-only placeholder and is never read.
+    #[serde(default)]
+    pub credential_target: Option<String>,
     pub grant_version: String,
     pub synthetic_only: bool,
     pub provider_terms_reviewed: bool,
@@ -338,7 +342,13 @@ pub(crate) fn parse_key(raw: &str) -> Result<Zeroizing<String>> {
     found.ok_or("DEEPSEEK_KEY_FILE_REQUIRES_EXACTLY_ONE_KEY".into())
 }
 pub(crate) fn read_key(cfg: &Config) -> Result<Zeroizing<String>> {
-    read_key_file(&cfg.key_file)
+    match cfg.credential_target.as_deref() {
+        Some(target) => {
+            let secret = crate::credman::read(target)?;
+            parse_key(secret.as_str())
+        }
+        None => read_key_file(&cfg.key_file),
+    }
 }
 pub(crate) fn read_key_file(path: &Path) -> Result<Zeroizing<String>> {
     key_metadata(path)?;

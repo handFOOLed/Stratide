@@ -27,10 +27,10 @@ struct Supervisor {
     instance_id: String,
     started_at: String,
     port: u16,
-    token: String,
     previous: Option<SupervisorState>,
     dashboard: Option<Dashboard>,
     watch: Option<Watch>,
+    backfill: Option<Child>,
     dashboard_next: Instant,
     dashboard_failures: u32,
     dashboard_healthy: bool,
@@ -59,7 +59,7 @@ pub fn run() -> Result<i32, String> {
     }
     layout.clear_stop_request();
     let config = layout.config()?;
-    let token = layout.runtime_token()?;
+    let _ = std::fs::remove_file(layout.runtime.join(stratide_runtime::RUNTIME_TOKEN_FILE));
     let previous = SupervisorState::read(&layout.state_path());
     let job = win::Job::create().map_err(|error| format!("WINDOWS_JOB_UNAVAILABLE: {error}"))?;
     let started_at = stratide_runtime::timestamp();
@@ -69,10 +69,10 @@ pub fn run() -> Result<i32, String> {
         instance_id: stratide_runtime::random_hex(8)?,
         started_at,
         port: config.port,
-        token,
         previous,
         dashboard: None,
         watch: None,
+        backfill: None,
         dashboard_next: Instant::now(),
         dashboard_failures: 0,
         dashboard_healthy: false,
@@ -89,7 +89,79 @@ pub fn run() -> Result<i32, String> {
 }
 
 impl Supervisor {
+    /// First run creates a clean local research Agent (no provider, no synthetic
+    /// model) so the product works without any manual setup step.
+    fn bootstrap(&self) {
+        let agent = self.layout.agent_dir();
+        if agent.join("settings.json").is_file() {
+            return;
+        }
+        let exe = self.layout.app.join("stratided.exe");
+        if !exe.is_file() {
+            return;
+        }
+        let mut command = Command::new(&exe);
+        command
+            .arg("--agent-init-local")
+            .arg(&agent)
+            .env("STRATIDE_STATE_ROOT", &self.layout.data)
+            .current_dir(&self.layout.app)
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null());
+        win::hide_console(&mut command);
+        match command.status() {
+            Ok(status) if status.success() => log(&self.layout, "local research agent initialized"),
+            Ok(status) => log(
+                &self.layout,
+                &format!("local agent init failed code={:?}", status.code()),
+            ),
+            Err(error) => log(&self.layout, &format!("local agent init failed: {error}")),
+        }
+    }
+
+    /// Default simulated account. It is created once with the Owner-approved
+    /// paper principal and never overwrites an existing ledger or binding.
+    fn bootstrap_paper(&self) {
+        let binding = self
+            .layout
+            .data
+            .join("state")
+            .join("paper-portfolio")
+            .join("binding.json");
+        if binding.is_file() {
+            return;
+        }
+        let script = self.layout.app.join("scripts").join("first-run-portfolio.py");
+        let python = self.layout.python();
+        if !script.is_file() || !python.is_file() {
+            return;
+        }
+        let mut command = Command::new(python);
+        command
+            .args(["-B", "-X", "utf8"])
+            .arg(&script)
+            .env("STRATIDE_STATE_ROOT", &self.layout.data)
+            .env("STRATIDE_BIN_DIR", self.layout.app.join("bin"))
+            .env_remove("STRATIDE_TUSHARE_TOKEN")
+            .current_dir(&self.layout.app)
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null());
+        win::hide_console(&mut command);
+        match command.status() {
+            Ok(status) if status.success() => log(&self.layout, "default paper account created"),
+            Ok(status) => log(
+                &self.layout,
+                &format!("paper account init failed code={:?}", status.code()),
+            ),
+            Err(error) => log(&self.layout, &format!("paper account init failed: {error}")),
+        }
+    }
+
     fn run_loop(&mut self) -> Result<i32, String> {
+        self.bootstrap();
+        self.bootstrap_paper();
         let mut last_autostart_check = Instant::now();
         loop {
             if self.layout.read_stop_request() {
@@ -103,9 +175,91 @@ impl Supervisor {
             }
             self.ensure_dashboard()?;
             self.ensure_watch()?;
+            self.ensure_backfill()?;
             self.publish()?;
             std::thread::sleep(Duration::from_millis(750));
         }
+    }
+
+    /// Backfill runs under the supervisor, not under the dashboard: the job
+    /// object kills the dashboard's children on every restart, while a batch can
+    /// take tens of minutes at the provider rate limit.
+    fn ensure_backfill(&mut self) -> Result<(), String> {
+        if let Some(child) = self.backfill.as_mut() {
+            match child.try_wait() {
+                Ok(None) => return Ok(()),
+                Ok(Some(exit)) => {
+                    log(
+                        &self.layout,
+                        &format!("market backfill exited code={:?}", exit.code()),
+                    );
+                    let _ = std::fs::remove_file(self.backfill_request());
+                    self.backfill = None;
+                    return Ok(());
+                }
+                Err(_) => return Ok(()),
+            }
+        }
+        let request = self.backfill_request();
+        if !request.is_file() {
+            return Ok(());
+        }
+        let script = self.layout.app.join("scripts").join("eod-operator.py");
+        // Both processes take the warehouse writer lock; the watch resumes by
+        // itself after the batch because ensure_watch sees no live child.
+        if let Some(mut watch) = self.watch.take() {
+            if let Some(watch_child) = watch.child.as_mut() {
+                let _ = watch_child.kill();
+                let _ = watch_child.wait();
+            }
+        }
+        let mut command = Command::new(self.layout.python());
+        command
+            .args(["-B", "-X", "utf8"])
+            .arg(&script)
+            .args(["market", "backfill", "--sessions", "84", "--rounds", "6"])
+            .current_dir(&self.layout.app)
+            .env("STRATIDE_STATE_ROOT", &self.layout.data)
+            .env("STRATIDE_BIN_DIR", self.layout.app.join("bin"))
+            .env("PYTHONUTF8", "1")
+            .env("PYTHONIOENCODING", "utf-8")
+            .env_remove("STRATIDE_TUSHARE_TOKEN")
+            .stdin(Stdio::null());
+        let stdout = append_log(&self.layout.logs.join("market-backfill.out.log"))?;
+        let stderr = append_log(&self.layout.logs.join("market-backfill.err.log"))?;
+        command.stdout(stdout).stderr(stderr);
+        win::hide_console(&mut command);
+        let mut child = match command.spawn() {
+            Ok(child) => child,
+            Err(error) => {
+                log(
+                    &self.layout,
+                    &format!("market backfill spawn failed: {error}"),
+                );
+                let _ = std::fs::remove_file(&request);
+                return Ok(());
+            }
+        };
+        if let Err(error) = self.job.assign(&child) {
+            let _ = child.kill();
+            let _ = child.wait();
+            log(
+                &self.layout,
+                &format!("market backfill job assign failed: {error}"),
+            );
+            let _ = std::fs::remove_file(&request);
+            return Ok(());
+        }
+        log(
+            &self.layout,
+            &format!("market backfill started pid={:?}", child.id()),
+        );
+        self.backfill = Some(child);
+        Ok(())
+    }
+
+    fn backfill_request(&self) -> std::path::PathBuf {
+        self.layout.data.join("backfill.request")
     }
 
     fn ensure_dashboard(&mut self) -> Result<(), String> {
@@ -263,6 +417,10 @@ impl Supervisor {
             .arg(self.layout.app.join("dashboard"))
             .arg("--runtime-home")
             .arg(&self.layout.home)
+            // The supervised install always keeps the research worker in the
+            // background watch; the Dashboard only observes/controls and must
+            // not keep agent.lock while the watch's TimesFM/cloud research needs it.
+            .arg("--agent-observer")
             .env("STRATIDE_STATE_ROOT", &self.layout.data)
             .current_dir(&self.layout.app)
             .stdin(Stdio::null());
@@ -321,6 +479,10 @@ impl Supervisor {
     }
 
     fn ensure_watch(&mut self) -> Result<(), String> {
+        // A historical backfill owns the warehouse writer lock until it exits.
+        if self.backfill.is_some() {
+            return Ok(());
+        }
         if self.layout.watch_restart_path().is_file() {
             self.layout.clear_watch_restart();
             if let Some(watch) = self.watch.as_mut() {
@@ -401,10 +563,59 @@ impl Supervisor {
         }
     }
 
+    /// The market warehouse is created and enabled automatically: the product has
+    /// no manual collection schedule, and the owner agreement already covers data
+    /// use. Idempotent, so every watch start is safe.
+    fn prepare_market(&self) -> Result<(), String> {
+        let script = self.layout.app.join("scripts").join("eod-operator.py");
+        let warehouse = self
+            .layout
+            .data
+            .join("state/historical-warehouse/market-eod/warehouse.sqlite");
+        let actions: &[&str] = if warehouse.is_file() {
+            &["enable"]
+        } else {
+            &["init", "enable"]
+        };
+        for action in actions {
+            let mut command = Command::new(self.layout.python());
+            command
+                .args(["-B", "-X", "utf8"])
+                .arg(&script)
+                .args(["market", action])
+                .current_dir(&self.layout.app)
+                .env("STRATIDE_STATE_ROOT", &self.layout.data)
+                .env("STRATIDE_BIN_DIR", self.layout.app.join("bin"))
+                .env_remove("STRATIDE_TUSHARE_TOKEN")
+                .stdin(Stdio::null());
+            let outcome =
+                stratide_runtime::run_capture(command, Duration::from_secs(60))?;
+            if outcome.0 != Some(0) {
+                let stderr: String = String::from_utf8_lossy(&outcome.2)
+                    .chars()
+                    .take(200)
+                    .collect();
+                log(
+                    &self.layout,
+                    &format!("market {action} failed code={:?}: {stderr}", outcome.0),
+                );
+                return Err("EOD_PREPARE_FAILED".into());
+            }
+        }
+        Ok(())
+    }
+
     fn start_watch(&mut self) -> Result<(), String> {
         let script = self.layout.app.join("scripts").join("eod-operator.py");
         if !script.is_file() {
             self.reason = "EOD_OPERATOR_MISSING".into();
+            return Ok(());
+        }
+        if let Err(error) = self.prepare_market() {
+            self.reason = error;
+            if let Some(watch) = self.watch.as_mut() {
+                watch.next_start = Instant::now() + Duration::from_secs(120);
+            }
             return Ok(());
         }
         let mut command = Command::new(self.layout.python());
@@ -493,7 +704,7 @@ impl Supervisor {
         }
         let health = health::probe(self.port);
         if health.is_ok() {
-            let _ = health::request_shutdown(self.port, &self.token);
+            let _ = health::request_shutdown(self.port);
             let deadline = Instant::now() + Duration::from_secs(10);
             while Instant::now() < deadline {
                 if health::probe(self.port).is_err() {

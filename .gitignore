@@ -48,3 +48,4 @@ Thumbs.db
 /apps/dashboard/dist/
 /apps/dashboard/test-results/
 /apps/dashboard/playwright-report/
+apps/dashboard/scripts/ui-*.mjs

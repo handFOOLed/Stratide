@@ -373,6 +373,13 @@ export function useAgent(active: boolean): AgentState {
     }
   }, [detail, token]);
 
+  // Local single-Owner install: the page opens directly, no unlock step.
+  useEffect(() => {
+    if (active && phase === 'locked') {
+      void unlock('local');
+    }
+  }, [active, phase, unlock]);
+
   const wasActive = useRef(false);
   useEffect(() => {
     if (active && !wasActive.current && token && phase === 'ready') {

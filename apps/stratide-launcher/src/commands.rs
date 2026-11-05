@@ -9,7 +9,6 @@ const STOP_TIMEOUT: Duration = Duration::from_secs(45);
 
 pub fn launch(layout: &Layout, quiet: bool, no_browser: bool) -> Result<i32, String> {
     let config = layout.config()?;
-    let token = layout.runtime_token()?;
     log(layout, &format!("launch requested on port {}", config.port));
     match health::probe(config.port) {
         Ok(data) => {
@@ -18,7 +17,7 @@ pub fn launch(layout: &Layout, quiet: bool, no_browser: bool) -> Result<i32, Str
                 &format!("existing healthy instance {}", data.instance_id),
             );
             if !no_browser {
-                open_dashboard(layout, config.port, &token, &data)?;
+                open_dashboard(layout, config.port, &data)?;
             }
             Ok(0)
         }
@@ -47,7 +46,7 @@ pub fn launch(layout: &Layout, quiet: bool, no_browser: bool) -> Result<i32, Str
                             &format!("dashboard ready instance {}", data.instance_id),
                         );
                         if !no_browser {
-                            open_dashboard(layout, config.port, &token, &data)?;
+                            open_dashboard(layout, config.port, &data)?;
                         }
                         return Ok(0);
                     }
@@ -77,7 +76,6 @@ pub fn launch(layout: &Layout, quiet: bool, no_browser: bool) -> Result<i32, Str
 }
 
 pub fn stop(layout: &Layout, quiet: bool) -> Result<i32, String> {
-    let token = layout.runtime_token()?;
     let port = layout.config()?.port;
     let mut supervisor_running = supervisor_alive(layout);
     if supervisor_running {
@@ -103,7 +101,7 @@ pub fn stop(layout: &Layout, quiet: bool) -> Result<i32, String> {
         }
     }
     if health::probe(port).is_ok() {
-        health::request_shutdown(port, &token).map_err(|error| error.code().to_string())?;
+        health::request_shutdown(port).map_err(|error| error.code().to_string())?;
         let deadline = Instant::now() + Duration::from_secs(10);
         while Instant::now() < deadline {
             if health::probe(port).is_err() {
@@ -240,7 +238,6 @@ pub fn configure(port: &Option<u16>, data: Option<&Path>) -> Result<i32, String>
 fn open_dashboard(
     layout: &Layout,
     port: u16,
-    token: &str,
     health: &health::HealthData,
 ) -> Result<(), String> {
     let complete = layout.runtime.join("setup-complete").is_file();
@@ -249,7 +246,7 @@ fn open_dashboard(
     } else {
         "settings/runtime"
     };
-    let url = format!("http://127.0.0.1:{port}/#/{route}?rt={token}");
+    let url = format!("http://127.0.0.1:{port}/#/{route}");
     let mut command = Command::new("cmd.exe");
     command
         .args(["/d", "/c", "start", "", &url])

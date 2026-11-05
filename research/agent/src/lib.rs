@@ -1,5 +1,8 @@
 pub mod budget;
+pub mod budget_admin;
 pub mod config;
+pub mod consent;
+pub mod credman;
 pub mod deepseek;
 pub mod desktop;
 pub mod eod_snapshot;
@@ -10,6 +13,8 @@ mod local_fusion_tests;
 pub mod market_research;
 pub mod multimodal;
 pub mod provider;
+pub mod provider_setup;
+pub mod reasons;
 pub mod risk_binding;
 pub mod risk_cloud;
 pub mod risk_cpu;

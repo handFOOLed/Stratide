@@ -246,6 +246,20 @@ export interface AgentBudget {
   billing: string;
 }
 
+export interface AgentBudgetUpdateRequest {
+  daily_limit_micro: string;
+  monthly_limit_micro: string;
+  confirm_below_committed: boolean;
+  /** 仅首次配置时可指定；之后只能重复已锁定的币种。 */
+  currency?: string;
+  /** 仅首次配置时可指定；之后只能重复已锁定的时区。 */
+  timezone?: string;
+}
+
+export interface AgentBudgetUpdateResult {
+  budget: AgentBudget;
+}
+
 export interface AgentModel {
   id: string;
   label: string;
@@ -253,6 +267,8 @@ export interface AgentModel {
   model: string;
   endpoint: string | null;
   authorization: string;
+  /** 后端集中维护的授权原因中文；已授权时为 null。 */
+  authorization_text: string | null;
   availability: string;
   last_reason?: string | null;
   price_version: string;
@@ -271,6 +287,8 @@ export interface AgentEodLatest {
   source_day?: string | null;
   disposition?: string | null;
   reason?: string | null;
+  /** 后端集中维护的最近 EOD 任务原因中文；旧数据可能是 undefined。 */
+  reason_text?: string | null;
   task_id?: string | null;
   [key: string]: unknown;
 }
@@ -293,10 +311,14 @@ export interface AgentInput {
 
 export interface AgentStatus {
   dashboard_mode?: 'attached_explicit_operations' | 'worker';
+  /** 安装版后台模式下为 false：研究任务由后台自动执行，页面不提供手动新建。旧后端缺字段按 true 处理。 */
+  manual_research_available?: boolean;
   service: string;
   paused: boolean;
   worker_concurrency: string;
   worker_error: string | null;
+  /** 后端集中维护的 worker_error 中文；无错误时为 null。 */
+  worker_error_text: string | null;
   default_model: string | null;
   backup_model: string | null;
   models: AgentModel[];
@@ -319,15 +341,20 @@ export interface AgentCall {
   usage_micro: string;
   price_version: string;
   reason: string | null;
+  /** 后端集中维护的调用原因中文；无法识别时为 null。 */
+  reason_text: string | null;
   input_tokens: string;
   output_tokens: string;
 }
 
 export interface AgentTask {
   id: string;
+  /** research_task | research_blocked_notice（阻断通知不是付费研究任务）。 */
+  kind: string;
   name: string;
   status: string;
   reason: string | null;
+  reason_text: string | null;
   provider_id: string;
   created_at: string | null;
   started_at: string | null;
@@ -371,8 +398,10 @@ export interface AgentResult {
 export interface AgentTaskDetail {
   artifact?: unknown;
   id: string;
+  kind: string;
   status: string;
   reason: string | null;
+  reason_text: string | null;
   created_at: string | null;
   started_at: string | null;
   finished_at: string | null;
@@ -394,4 +423,18 @@ export interface AgentTaskList {
 export interface AgentCreateResult {
   id: string;
   status: string;
+}
+
+/** inbox.notifications[] 单项：id 就是底层 task id。 */
+export interface AgentNotification {
+  id: string;
+  status: string;
+  reason: string | null;
+  at: string;
+  read: boolean;
+  name: string | null;
+  conclusion: string | null;
+  provider_id: string;
+  /** research_task | research_blocked_notice */
+  kind: string;
 }

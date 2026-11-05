@@ -88,9 +88,9 @@ pub fn probe(port: u16) -> Result<HealthData, ProbeError> {
     Ok(envelope.data)
 }
 
-/// Ask a managed local service to exit through its authenticated runtime
+/// Ask a managed local service to exit through its loopback-only runtime
 /// endpoint. Used only after the supervisor has decided to stop.
-pub fn request_shutdown(port: u16, token: &str) -> Result<(), ProbeError> {
+pub fn request_shutdown(port: u16) -> Result<(), ProbeError> {
     let address = format!("127.0.0.1:{port}");
     let socket = address
         .to_socket_addrs()
@@ -103,9 +103,8 @@ pub fn request_shutdown(port: u16, token: &str) -> Result<(), ProbeError> {
     let _ = stream.set_write_timeout(Some(Duration::from_secs(3)));
     let body = b"{}";
     let request = format!(
-        "POST /api/runtime/shutdown HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nOrigin: http://127.0.0.1:{port}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nX-Stratide-Runtime: {}\r\nConnection: close\r\n\r\n",
-        body.len(),
-        token
+        "POST /api/runtime/shutdown HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nOrigin: http://127.0.0.1:{port}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
+        body.len()
     );
     stream
         .write_all(request.as_bytes())

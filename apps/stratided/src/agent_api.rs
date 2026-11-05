@@ -49,9 +49,8 @@ pub fn reply(app: &App, agent: Option<&Agent>, req: &mut Request, port: u16) -> 
     let Some(agent) = agent else {
         return error(503, "AGENT_NOT_CONFIGURED");
     };
-    if !single("X-Stratide-Owner").is_some_and(|v| agent.authorized(&v)) {
-        return error(401, "OWNER_TOKEN_REQUIRED");
-    }
+    // Local single-Owner install: Host/Origin/Sec-Fetch-Site above still bound
+    // the caller to this exact loopback origin; no separate page token is kept.
     let path = req.url().to_string();
     let request_key = single("X-Stratide-Idempotency");
     let body = if method == "POST" {
@@ -76,6 +75,12 @@ pub fn reply(app: &App, agent: Option<&Agent>, req: &mut Request, port: u16) -> 
     };
     let now = chrono::Utc::now();
     let result: stratide_research::Result<Value> = (|| {
+        if method == "GET" && path == "/api/agent/consent" {
+            return stratide_research::consent::status(agent);
+        }
+        if method == "POST" && path == "/api/agent/consent" && body == json!({}) {
+            return stratide_research::consent::accept(agent);
+        }
         if method == "GET" && path == "/api/agent/market-research" {
             return stratide_research::market_research::status(agent);
         }
@@ -92,6 +97,23 @@ pub fn reply(app: &App, agent: Option<&Agent>, req: &mut Request, port: u16) -> 
                     stratide_research::market_research::control(agent, action, body)
                 };
             }
+        }
+        if method == "GET" && path == "/api/agent/provider" {
+            return stratide_research::provider_setup::status(agent);
+        }
+        if method == "POST" {
+            if path == "/api/agent/provider" {
+                return stratide_research::provider_setup::configure(agent, &body);
+            }
+            if path == "/api/agent/provider/test" && body == json!({}) {
+                return stratide_research::provider_setup::test(agent);
+            }
+            if path == "/api/agent/provider/remove" && body == json!({}) {
+                return stratide_research::provider_setup::remove(agent);
+            }
+        }
+        if method == "POST" && path == "/api/agent/budget" {
+            return stratide_research::budget_admin::update(agent, &body, now);
         }
         if method == "GET" && path == "/api/agent/status" {
             return agent.status(now);
@@ -180,6 +202,13 @@ pub fn reply(app: &App, agent: Option<&Agent>, req: &mut Request, port: u16) -> 
             return agent.store().list(before);
         }
         if method == "POST" && path == "/api/agent/tasks" {
+            // Supervised installs run the one research worker in the background
+            // watch; an attached Dashboard must not queue a second manual task
+            // or take the worker lock. Reads/controls stay unaffected.
+            stratide_research::ensure(
+                agent.is_worker(),
+                "MANUAL_RESEARCH_UNAVAILABLE_IN_BACKGROUND_MODE",
+            )?;
             stratide_research::ensure(
                 app.desktop.is_none(),
                 "DASHBOARD_USE_REGISTERED_RESEARCH_OPERATION",
@@ -220,9 +249,13 @@ pub fn reply(app: &App, agent: Option<&Agent>, req: &mut Request, port: u16) -> 
     })();
     match result {
         Ok(data) => app.envelope(200, data, Value::Null),
+        // Budget request-shape errors are client errors (400); every other
+        // Agent rejection keeps the existing 409 contract.
         Err(e) => error(
             if e.0 == "AGENT_ROUTE_NOT_FOUND" || e.0 == "TASK_NOT_FOUND" {
                 404
+            } else if e.0 == "BUDGET_INPUT_INVALID" {
+                400
             } else {
                 409
             },

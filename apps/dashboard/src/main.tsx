@@ -4,13 +4,15 @@ import './styles/base.css';
 import './styles/shell.css';
 import './styles/components.css';
 import './styles/pages.css';
+import './styles/page-overview.css';
+import './styles/page-history.css';
+import './styles/page-agent.css';
+import './styles/page-settings.css';
+import './styles/page-notifications.css';
 import { App } from './App';
 import { ToastProvider } from './components/ui/Toast';
 import { ThemeProvider, applyStoredAppearance } from './state/ThemeProvider';
-import { captureRuntimeToken } from './lib/runtime';
-
 applyStoredAppearance();
-captureRuntimeToken();
 if (!window.location.hash) {
   window.history.replaceState(null, '', '#overview');
 }

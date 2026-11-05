@@ -6,7 +6,7 @@
 
 `GET /api/v1/workspace` 返回 `schema_version=1` 的原 CPU/Fusion/OOS/Registry、证据和备份状态，`paper_allowed/live_allowed=false`；读取不会推理、创建任务或调用 Provider。研究数值保持原报告的比值/计数单位；Paper 金额/股数仍按下节十进制字符串。操作、配置和恢复见 [V1_COMPLETION](V1_COMPLETION.md)。
 
-仅用于 127.0.0.1 本地 paper-only Dashboard，默认端口 8710。Owner 启动时选定一个已发布六报告目录。没有 HTTP 文件路径参数、账户切换或财务写入路由。M2-PR02 的研究任务写操作单独限定在经过 Owner 认证的 `/api/agent/…`，见 [Agent API](AGENT_API.md)；下文 Paper 账户路由仍只读。
+仅用于 127.0.0.1 本地 paper-only Dashboard，默认端口 8710。Owner 启动时选定一个已发布六报告目录。没有 HTTP 文件路径参数、账户切换或财务写入路由。M2-PR02 的研究任务写操作单独限定在经过本机同源校验的 `/api/agent/…`，见 [Agent API](AGENT_API.md)；下文 Paper 账户路由仍只读。
 
 ## 响应与数字
 
@@ -74,3 +74,32 @@ state 为 ready / no_input / invalid_snapshot；健康、研究和路由错误�
 | 404 | NOT_FOUND：未列出的精确路径，含查询参数、编码路径和目录穿越 |
 
 无宽松 CORS、无 cookie/远程登录、无任意磁盘静态目录。静态资源仅允许 `/`、`/assets/app.js`、`/assets/app.css`。响应 Cache-Control: no-store，并设置 CSP、禁止 frame 与 nosniff。API 来自启动时固定内存快照。远程访问、写权限和敏感配置需另立任务。
+
+## /api/runtime/status 与首次设置标记（Windows 安装包）
+
+安装态另有 `/api/runtime/*` 诊断/配置接口（见 [M3_PR04](M3_PR04.md)），只监听本机并由 Supervisor 注入的 `runtime.json` 提供布局。响应同为 `{api_version,state,snapshot,data,error}` 信封，但字段为安装态诊断而非 Paper 账本。
+
+`GET /api/runtime/status` 在 0.3.0 新增以下字段（既有字段语义不变）：
+
+| 字段 | 含义 |
+| --- | --- |
+| `build` | `{version, commit, built_at}`，读安装目录 `BUILD_INFO.json`；源码树运行没有该文件时三个字段均为 null，不伪造构建信息 |
+| `repo_url` | 固定 `https://github.com/handFOOLed/Stratide`，供“关于”页打开项目主页 |
+| `issues_url` | 固定 `https://github.com/handFOOLed/Stratide/issues`，供“反馈”入口 |
+| `setup_complete` | 首次设置完成标记是否存在；语义不变 |
+
+`POST /api/runtime/setup-complete`（本机同源 + JSON；0.3.0 原行为是只写标记）：
+
+- `{}` 或省略 `completed`：写入标记，返回 `{state:"COMPLETE", setup_complete:true, completed_at:"<RFC3339>"}`，向后兼容。
+- `{"completed":false}`：删除标记以撤销“已标记完成”，返回 `{state:"INCOMPLETE", setup_complete:false, completed_at:null}`；标记本就不存在时同样返回成功（目标状态已成立，幂等）。
+- `completed` 存在但不是布尔值：`400 SETUP_INPUT_INVALID`；写/删标记失败：`409 SETUP_MARKER_WRITE_FAILED` / `SETUP_MARKER_DELETE_FAILED`。
+- 写接口仍要求同源 `Origin`、`Content-Type: application/json` 与有界 Content-Length；读取 `/api/runtime/status` 不受影响。撤销只删除该标记文件，不动设置、账本、研究任务或预算。
+
+## 安装版观察者模式（2026-11-06）
+
+- Supervisor 启动 dashboard 时传 `--agent-observer`；dashboard 使用 `Agent::attach`，不持有 `data/agent/agent.lock`，
+  也不启动内置研究 worker。后台 `eod watch` 是唯一研究执行者（本地 TimesFM + 云端全市场研究 + Paper 模拟）。
+- `GET /api/agent/status` 新增 `dashboard_mode`（`worker` / `attached_explicit_operations`）与
+  `manual_research_available`（安装版为 false）。观察者模式仍可读取、暂停、撤销首次设置、编辑预算，
+  但 `POST /api/agent/tasks` 返回 409 `MANUAL_RESEARCH_UNAVAILABLE_IN_BACKGROUND_MODE`。
+- 开发/测试直接运行 `stratided`（不带 `--agent-observer`）保持原 worker 行为，便于手动研究联调。

@@ -57,7 +57,7 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
     let path = req.url().to_string();
     if method == "GET" {
         if path == "/api/runtime/status" {
-            return match status(&layout) {
+            return match status(app, &layout) {
                 Ok(value) => app.envelope(200, value, Value::Null),
                 Err(code) => error(503, code),
             };
@@ -66,14 +66,6 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
     }
     if origin.as_deref() != Some(&format!("http://{host}")) {
         return error(403, "EXPLICIT_ORIGIN_REQUIRED");
-    }
-    let token = match layout.runtime_token() {
-        Ok(token) => token,
-        Err(_) => return error(503, "RUNTIME_TOKEN_UNAVAILABLE"),
-    };
-    let presented = single("X-Stratide-Runtime").unwrap_or_default();
-    if !constant_time_eq(token.as_bytes(), presented.as_bytes()) {
-        return error(401, "RUNTIME_TOKEN_REQUIRED");
     }
     if single("Content-Type").as_deref() != Some("application/json") {
         return error(415, "JSON_REQUIRED");
@@ -98,9 +90,11 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
             "/api/runtime/tushare-token" => tushare_token(&layout, &body),
             "/api/runtime/market" => market(&layout, &body),
             "/api/runtime/wsl" => configure_wsl(&layout, &body),
+            "/api/runtime/wsl-detect" => detect_wsl(&layout),
             "/api/runtime/wsl-probe" => probe_wsl(&layout),
             "/api/runtime/open-folder" => open_folder(&layout, &body),
-            "/api/runtime/setup-complete" => setup_complete(&layout),
+            "/api/runtime/setup-complete" => setup_complete(&layout, &body),
+            "/api/runtime/update-check" => update_check(&layout),
             "/api/runtime/shutdown" => {
                 let mut reply = app.envelope(200, json!({"state": "STOPPING"}), Value::Null);
                 reply.exit_after = true;
@@ -116,14 +110,17 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
     }
 }
 
-fn status(layout: &Layout) -> Result<Value, &'static str> {
+fn status(app: &App, layout: &Layout) -> Result<Value, &'static str> {
     let mut cache = STATUS_CACHE.lock().map_err(|_| "RUNTIME_STATUS_BUSY")?;
     if let Some((at, value)) = cache.as_ref() {
         if at.elapsed() < Duration::from_secs(4) {
             return Ok(value.clone());
         }
     }
-    let value = stratide_runtime::diagnostics::collect(layout);
+    // This handler runs inside the service, so it is online by definition.
+    let service = json!({"healthy": true, "instance_id": app.instance_id(),
+        "pid": std::process::id().to_string()});
+    let value = stratide_runtime::diagnostics::collect(layout, service)?;
     *cache = Some((Instant::now(), value.clone()));
     Ok(value)
 }
@@ -194,8 +191,20 @@ fn market(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
         .get("action")
         .and_then(Value::as_str)
         .ok_or_else(|| layout_error(400, "MARKET_INPUT_INVALID"))?;
-    if !["init", "enable", "disable"].contains(&action) {
+    if !["init", "enable", "disable", "status", "backfill", "backfill-state"].contains(&action) {
         return Err(layout_error(400, "MARKET_INPUT_INVALID"));
+    }
+    if action == "backfill-state" {
+        let request = layout.data.join("backfill.request");
+        let running = request.is_file();
+        let progress: Value = std::fs::read(layout.data.join("backfill.progress.json"))
+            .ok()
+            .and_then(|raw| serde_json::from_slice(&raw).ok())
+            .unwrap_or(Value::Null);
+        return Ok(layout_envelope(
+            200,
+            json!({"running": running, "progress": progress}),
+        ));
     }
     let script = layout.app.join("scripts").join("eod-operator.py");
     if !script.is_file() {
@@ -225,7 +234,11 @@ fn market(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
         }
         command.arg("--start-date").arg(start_date);
     }
-    match stratide_runtime::run_capture(command, Duration::from_secs(180)) {
+    if action == "backfill" {
+        return backfill(layout, command);
+    }
+    let timeout = if action == "status" { 60 } else { 180 };
+    match stratide_runtime::run_capture(command, Duration::from_secs(timeout)) {
         Ok((Some(0), stdout, _)) => {
             let value: Value = serde_json::from_slice(&stdout)
                 .unwrap_or_else(|_| json!({"raw": String::from_utf8_lossy(&stdout).chars().take(4000).collect::<String>()}));
@@ -243,6 +256,43 @@ fn market(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
                 &format!("MARKET_COMMAND_FAILED_{}_{}", code.unwrap_or(-1), reason),
             ))
         }
+        Err(code) => Err(layout_error(504, &code)),
+    }
+}
+
+/// The collector may run for tens of minutes at the provider rate limit, so the
+/// dashboard only leaves a request file; the long-lived supervisor owns the
+/// process and clears the request when it exits.
+fn backfill(layout: &Layout, _command: Command) -> Result<Reply, Reply> {
+    let request = layout.data.join("backfill.request");
+    if request.is_file() {
+        return Err(layout_error(409, "BACKFILL_ALREADY_RUNNING"));
+    }
+    std::fs::write(&request, b"84").map_err(|_| layout_error(409, "BACKFILL_REQUEST_FAILED"))?;
+    Ok(layout_envelope(200, json!({"state": "STARTED", "sessions": 84})))
+}
+fn update_check(layout: &Layout) -> Result<Reply, Reply> {
+    let script = layout.app.join("scripts").join("update-check.py");
+    if !script.is_file() {
+        return Err(layout_error(409, "UPDATE_CHECK_MISSING"));
+    }
+    let mut command = Command::new(layout.python());
+    command
+        .args(["-B", "-X", "utf8"])
+        .arg(&script)
+        .current_dir(&layout.app)
+        .env("STRATIDE_STATE_ROOT", &layout.data)
+        .stdin(std::process::Stdio::null());
+    match stratide_runtime::run_capture(command, Duration::from_secs(30)) {
+        Ok((Some(0), stdout, _)) | Ok((Some(2), stdout, _)) => {
+            let value: Value = serde_json::from_slice(&stdout)
+                .unwrap_or_else(|_| json!({"state": "UNAVAILABLE"}));
+            Ok(layout_envelope(200, value))
+        }
+        Ok((code, _, _)) => Err(layout_error(
+            409,
+            &format!("UPDATE_CHECK_FAILED_{}", code.unwrap_or(-1)),
+        )),
         Err(code) => Err(layout_error(504, &code)),
     }
 }
@@ -298,12 +348,21 @@ fn configure_wsl(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
         python: optional_text(body, "python")?,
         model: optional_text(body, "model")?,
     };
+    let restart = store_wsl(layout, wsl.clone())?;
+    Ok(layout_envelope(
+        200,
+        json!({"state": "CONFIGURED", "watch_restart": restart, "wsl": wsl}),
+    ))
+}
+
+/// Persist one detected or Owner-entered WSL entry. Restarting the single watch
+/// interrupts an in-flight collection or CPU task, so unchanged settings are
+/// stored without disturbing the running chain.
+fn store_wsl(layout: &Layout, wsl: stratide_runtime::WslSettings) -> Result<bool, Reply> {
     stratide_runtime::config::validate_wsl(&wsl).map_err(|code| layout_error(400, &code))?;
     let mut config = layout
         .config()
         .map_err(|_| layout_error(409, "RUNTIME_CONFIG_INVALID"))?;
-    // Restarting the single watch interrupts an in-flight collection or CPU
-    // task, so saving unchanged settings must not disturb the running chain.
     let restart = config.wsl.as_ref() != Some(&wsl);
     if restart {
         // Written before the config so a failed request leaves the old entry
@@ -311,13 +370,70 @@ fn configure_wsl(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
         stratide_runtime::state::atomic_write(&layout.watch_restart_path(), b"{}".to_vec())
             .map_err(|_| layout_error(409, "WATCH_RESTART_REQUEST_FAILED"))?;
     }
-    config.wsl = Some(wsl.clone());
+    config.wsl = Some(wsl);
     config
         .save(&layout.config_path)
         .map_err(|_| layout_error(409, "RUNTIME_CONFIG_WRITE_FAILED"))?;
+    Ok(restart)
+}
+
+/// One-click local model discovery: find an existing WSL venv + TimesFM model
+/// and store it, so a new user never has to type a worktree path.
+fn detect_wsl(layout: &Layout) -> Result<Reply, Reply> {
+    let script = layout.app.join("scripts").join("timesfm-cpu.py");
+    if !script.is_file() {
+        return Err(layout_error(409, "TIMESFM_CLI_MISSING"));
+    }
+    let mut command = Command::new(layout.python());
+    command
+        .args(["-B", "-X", "utf8"])
+        .arg(&script)
+        .arg("detect")
+        .current_dir(&layout.app)
+        .env("STRATIDE_STATE_ROOT", &layout.data)
+        .env("STRATIDE_BIN_DIR", layout.app.join("bin"))
+        .env_remove("STRATIDE_TUSHARE_TOKEN")
+        .env_remove("STRATIDE_WSL_DISTRIBUTION")
+        .env_remove("STRATIDE_WSL_WORKSPACE")
+        .env_remove("STRATIDE_WSL_PYTHON")
+        .env_remove("STRATIDE_WSL_MODEL");
+    let value: Value = match stratide_runtime::run_capture(command, Duration::from_secs(180)) {
+        Ok((_, stdout, _)) => match serde_json::from_slice(&stdout) {
+            Ok(value) => value,
+            Err(_) => return Err(layout_error(409, "WSL_DETECT_OUTPUT_INVALID")),
+        },
+        Err(_) => return Err(layout_error(504, "WSL_DETECT_FAILED")),
+    };
+    let Some(detected) = value.get("wsl").filter(|entry| entry.is_object()) else {
+        return Ok(layout_envelope(
+            200,
+            json!({"state": "NOT_FOUND", "reason": "LOCAL_MODEL_NOT_FOUND"}),
+        ));
+    };
+    let wsl = stratide_runtime::WslSettings {
+        distribution: detected
+            .get("distribution")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_string(),
+        workspace: detected
+            .get("workspace")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_string(),
+        python: detected
+            .get("python")
+            .and_then(Value::as_str)
+            .map(str::to_string),
+        model: detected
+            .get("model")
+            .and_then(Value::as_str)
+            .map(str::to_string),
+    };
+    let restart = store_wsl(layout, wsl.clone())?;
     Ok(layout_envelope(
         200,
-        json!({"state": "CONFIGURED", "watch_restart": restart, "wsl": wsl}),
+        json!({"state": "FOUND", "watch_restart": restart, "wsl": wsl}),
     ))
 }
 
@@ -367,17 +483,43 @@ fn probe_wsl(layout: &Layout) -> Result<Reply, Reply> {
     ))
 }
 
-fn setup_complete(layout: &Layout) -> Result<Reply, Reply> {
+/// Absent `completed` keeps the 0.3.0 write behaviour; only a boolean may
+/// revoke, so an accidentally malformed body can never erase the marker.
+fn setup_completed(body: &Value) -> Result<bool, ()> {
+    match body.get("completed") {
+        None => Ok(true),
+        Some(Value::Bool(completed)) => Ok(*completed),
+        Some(_) => Err(()),
+    }
+}
+
+/// Write (default, or `{"completed":true}`) or revoke (`{"completed":false}`)
+/// the first-run marker. Rewriting an existing marker stays idempotent, and
+/// revoking an absent marker succeeds because the requested state already holds.
+fn setup_complete(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
     let marker = layout.runtime.join("setup-complete");
-    let body = json!({"completed_at": stratide_runtime::timestamp()});
+    let completed =
+        setup_completed(body).map_err(|()| layout_error(400, "SETUP_INPUT_INVALID"))?;
+    if !completed {
+        match std::fs::remove_file(&marker) {
+            Ok(()) => {}
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(_) => return Err(layout_error(409, "SETUP_MARKER_DELETE_FAILED")),
+        }
+        return Ok(layout_envelope(
+            200,
+            json!({"state": "INCOMPLETE", "setup_complete": false, "completed_at": Value::Null}),
+        ));
+    }
+    let marker_body = json!({"completed_at": stratide_runtime::timestamp()});
     stratide_runtime::state::atomic_write(
         &marker,
-        serde_json::to_vec_pretty(&body).expect("JSON value"),
+        serde_json::to_vec_pretty(&marker_body).expect("JSON value"),
     )
     .map_err(|_| layout_error(409, "SETUP_MARKER_WRITE_FAILED"))?;
     Ok(layout_envelope(
         200,
-        json!({"state": "COMPLETE", "completed_at": body["completed_at"]}),
+        json!({"state": "COMPLETE", "setup_complete": true, "completed_at": marker_body["completed_at"]}),
     ))
 }
 
@@ -403,13 +545,17 @@ fn layout_error(status: u16, code: &str) -> Reply {
     layout_envelope(status, json!({"code": code}))
 }
 
-fn constant_time_eq(expected: &[u8], presented: &[u8]) -> bool {
-    if expected.len() != presented.len() {
-        return false;
+#[cfg(test)]
+mod tests {
+    use super::setup_completed;
+    use serde_json::json;
+
+    #[test]
+    fn setup_body_defaults_to_complete_and_only_boolean_can_revoke() {
+        assert_eq!(setup_completed(&json!({})), Ok(true));
+        assert_eq!(setup_completed(&json!({"completed": true})), Ok(true));
+        assert_eq!(setup_completed(&json!({"completed": false})), Ok(false));
+        assert_eq!(setup_completed(&json!({"completed": "false"})), Err(()));
+        assert_eq!(setup_completed(&json!({"completed": null})), Err(()));
     }
-    let mut difference = 0u8;
-    for (left, right) in expected.iter().zip(presented.iter()) {
-        difference |= left ^ right;
-    }
-    difference == 0
 }
