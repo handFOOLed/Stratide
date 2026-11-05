@@ -1,4 +1,6 @@
-# DeepSeek — Stratide UI/UX 角色与交付任务
+# DeepSeek — Stratide UI/UX 历史交接规范
+
+> **2026-11-05 现行职责更新**：此文件记录 2026-10-29 的 **#23 UI/UX 历史交接**，下文“最新”“只改前端”“必须由 Sol 另行提供后端”已被 Owner 新决定取代。**当前 DeepSeek 负责 [#85](https://github.com/handFOOLed/Stratide/issues/85) 完整 Windows 安装交付**，包括安装器、后台/单实例启动器、登录自启、首启权限与依赖诊断及必要的 Rust/Python/PowerShell/React 集成（不能修改财务、模型授权或预算硬门禁）。**不要据本文件重新设计整个 Dashboard**；以已合并 #77 的视觉基准与 #85 产品验收为准。源事实见 [STATUS](STATUS.md) 与 [AGENTS](../AGENTS.md)。以下内容仅保留设计历史参考。
 
 > 本文件为 **Owner 2026-10-29 最新 UI 职责与验收要求**。执行入口：[Issue #23](https://github.com/handFOOLed/Stratide/issues/23)；需求讨论参考 [PR #15 Q01–Q69](https://github.com/handFOOLed/Stratide/pull/15)，若其早期开发顺序与本文件冲突，以本轮 Owner 明确决定为准。**先完成 #22 的 Agent 功能与接口，再开始正式 UI 实施。**
 
