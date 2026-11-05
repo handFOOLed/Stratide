@@ -1,5 +1,7 @@
 # Local development helpers
 
+> **现行产品化阶段｜2026-11-05**：#82/PR #86 全市场 EOD、#83/PR #87 受控 TimesFM + DeepSeek 研究、#84/PR #88 多证券共享 Paper 已合并。**#85 Windows 发行包、自启/Launcher 是 DeepSeek 当前唯一开发任务，尚无真实安装包**；下文旧脚本均为已存在的开发态/历史功能，不应被包装成已完成的一键安装。#85 需要将现有 `local-windows.ps1`、`eod-operator.py market watch`、`paper-portfolio.py`、Agent/WSL2 Worker 纳入**单实例**安全运行控制，不能新增第二个调度器、Ledger 或 Budget Gate。参见 [STATUS](../docs/STATUS.md)、[Issue #85](https://github.com/handFOOLed/Stratide/issues/85)、[M3_PR03](../docs/M3_PR03.md)。
+
 **V1 Windows 本地收尾 / #77：** `local-windows.ps1 start/status/stop` 管理单次本机 Dashboard；`dashboard-workspace.py` 为已配置原研究提供只读投影与固定审批操作；`local-backup.py create/verify/restore` 提供 manifest、SQLite integrity 和默认 dry-run 的全新目录恢复。配置样例在 `config/`，完整步骤、WSL 原 Worker 接线与恢复限制见 [V1_COMPLETION](../docs/V1_COMPLETION.md)。
 
 ## Time-Series + Fusion 本机研究
