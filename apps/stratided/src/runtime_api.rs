@@ -518,14 +518,3 @@ fn layout_error(status: u16, code: &str) -> Reply {
     let code: String = code.chars().take(320).collect();
     layout_envelope(status, json!({"code": code}))
 }
-
-fn constant_time_eq(expected: &[u8], presented: &[u8]) -> bool {
-    if expected.len() != presented.len() {
-        return false;
-    }
-    let mut difference = 0u8;
-    for (left, right) in expected.iter().zip(presented.iter()) {
-        difference |= left ^ right;
-    }
-    difference == 0
-}
