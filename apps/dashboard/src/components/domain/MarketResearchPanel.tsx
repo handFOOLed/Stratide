@@ -95,6 +95,8 @@ function UnlockedMarketResearch({ token }: { token: string }) {
   return <div className="market-research-settings">
     <h2 className="card__title">全市场自动研究</h2>
     <p>可信盘后快照 → 确定性筛选 → 限量本地 TimesFM CPU → DeepSeek 策略假说。候选仅供研究，PIT 未验证，不创建买卖单。</p>
+    <p className="muted">需连续 84 个交易会话的 READY 全市场快照；新安装从配置日起积累，暖机不足显示 BLOCKED，不用旧历史库补足。</p>
+    <p className="muted">源交易日和输入参考时点 as_of 都不证明候选已及时冻结，还须核对原任务完成时间。跨日补跑仅作延迟研究，不能直接作为 T+1 开市前已冻结的 T 日 Paper 决策。</p>
     {error !== null && <p role="alert">{error}</p>}
     <div className="settings-row"><span>自动 TimesFM CPU</span><Switch label="自动 TimesFM CPU" checked={current.automatic_timesfm}
       onChange={v => setConfig({ ...current, automatic_timesfm: v })} /></div>

@@ -2,6 +2,12 @@
 
 基线 `cf86668b0360f7bf7343d1bbbfc80ad0d6b813e5`，执行约束 `change hash=allow agents=0`。本目录只有开发者验证，无独立审查或 Owner 生产出网授权。
 
+## R1：研究故障与 EOD watch 隔离
+
+R1 基于 `31821172812809c4c0d53ff33978ed3c21aed1e7` 修复调用边界。新增 5 项回归在旧实现复现 4 项异常退出；修复后 [完整市场源回归 23/23 通过](r1-market-eod-tests.txt)，前端 `typecheck` 通过。定向场景包括：持久配置原为 OFF 但 Agent SQLite 不可读；启用研究后写库失败；Worker 异常；单次 `once` 保留已成功 EOD 结果；`KeyboardInterrupt/SystemExit` 仍退出。watch 场景实际经过合成 HTTP 采集与原 journal，核对两日 READY 快照和两次 daily 请求均保留；研究报 `BLOCKED/RESEARCH_UNAVAILABLE`，故障原文不外露，Provider 调用为 0。
+
+这次只改可选调用边界、相关回归和 P2 的暖机/时点说明，不改研究任务、预算、授权或未知结果重发规则。原下表验证是首版结果，R1 未重复执行 Rust、真实模型或云 E2E；旧证明文件保留。Agent DB 故障时的状态来自本轮 CLI JSON，不声称已经写入不可用的 DB；同步研究仍有原超时限制，不保证故障期间每隔精确 30 秒开始采集。
+
 | 检查 | 结果与边界 |
 | --- | --- |
 | 新研究链路 | [8 项通过](market-research-tests.txt)：记录式全市场源 → 8 证券 CPU 测试传输 → libtest loopback → 原 Registry；拒绝授权缺字段/错用途/撤销/过期、未知结果、共享预算耗尽、未来时点/缺样本、并发、部分 CPU 失败、派发后强杀恢复。非真实云调用。 |

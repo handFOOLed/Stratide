@@ -1,9 +1,12 @@
 """Issue #82 focused production-path tests; synthetic HTTP only, no credentials."""
 import datetime as dt
+import contextlib
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
+import sqlite3
 import subprocess
 import sys
 import tempfile
@@ -117,6 +120,118 @@ class MarketTests(unittest.TestCase):
 
     def once(self, **kwargs):
         return self.market.once(transport=self.http, clock=lambda: self.at, **kwargs)
+
+    def research_agent(self, enabled):
+        """Only a synthetic Agent schema, never the repository Owner binding."""
+        import market_research as research
+        common = self.market.root / "test-common"
+        binding_dir = common / "state/risk-portfolio"
+        agent = common / "agent"
+        binding_dir.mkdir(parents=True)
+        agent.mkdir()
+        settings = agent / "settings.json"
+        settings.write_text("{}", encoding="utf-8")
+        config = dict(automatic_timesfm=enabled, automatic_deepseek=enabled, candidate_count=8,
+                      daily_call_limit=1, trading_day_call_limit=1,
+                      model_version="DeepSeek-V4.1-Flash-1017_ALIAS_MUTABLE")
+        bound = dict(schema_version=1, agent_dir=str(agent), settings_path=str(settings), authority_id="a"*64)
+        (binding_dir / "agent-binding.json").write_text(json.dumps(bound), encoding="utf-8")
+        with contextlib.closing(sqlite3.connect(agent / "agent.sqlite")) as db, db:
+            db.executescript("PRAGMA application_id=1397899569; PRAGMA user_version=1; "
+                             "CREATE TABLE meta(key TEXT PRIMARY KEY,value TEXT NOT NULL);")
+            db.executemany("INSERT INTO meta VALUES(?,?)", [
+                ("risk_portfolio_authority_id", bound["authority_id"]),
+                ("risk_portfolio_settings_path", str(settings)), (research.CONFIG, json.dumps(config))])
+        mock.patch.object(m, "common_root", return_value=common).start()
+        mock.patch.object(research.rp, "root", return_value=binding_dir).start()
+        paid = mock.patch.object(research, "bridge", side_effect=AssertionError("unexpected cloud bridge")).start()
+        return research, agent, config, paid
+
+    def collect_via_cli(self, action):
+        """Exercise cli + real collector/journal, with synthetic HTTP and no waits."""
+        original = m.Market.once
+        def collect(market, **kwargs):
+            return original(market, transport=self.http, clock=lambda: self.at)
+        def next_poll(seconds):
+            self.assertEqual(seconds, 30)
+            if self.at.startswith("2026-11-04"):
+                self.at = "2026-11-05T08:10:00+00:00"
+            else:
+                raise KeyboardInterrupt
+        output = io.StringIO()
+        with mock.patch.object(m.Market, "once", collect), mock.patch.object(m.time, "sleep", next_poll), \
+                contextlib.redirect_stdout(output):
+            if action == "watch":
+                with self.assertRaises(KeyboardInterrupt):
+                    m.cli([action, "--root", str(self.market.root)])
+            else:
+                self.assertEqual(m.cli([action, "--root", str(self.market.root)]), 0)
+        results = [json.loads(line) for line in output.getvalue().splitlines()]
+        expected = [DAY, "20261105"] if action == "watch" else [DAY]
+        self.assertEqual(len(results), len(expected))
+        self.assertTrue(all(v["state"] == "READY" for v in results), results)
+        with self.market.read() as db:
+            for day in expected:
+                self.assertEqual(self.market.load_snapshot(db, day)["state"], "READY")
+        self.assertEqual([p["trade_date"] for a,p in self.http.calls if a == "daily"], expected)
+        return results
+
+    def test_watch_disabled_but_unreadable_agent_does_not_stop_collection(self):
+        research, agent, config, paid = self.research_agent(False)
+        # Last persisted config is OFF; unreadable SQLite fails before that can be read.
+        (agent / "agent.sqlite").write_bytes(b"unreadable synthetic Agent database")
+        results = self.collect_via_cli("watch")
+        for result in results:
+            self.assertEqual(result["research"]["state"], "BLOCKED")
+            self.assertEqual(result["research"]["reason"], "RESEARCH_UNAVAILABLE")
+        paid.assert_not_called()
+
+    def test_watch_enabled_agent_write_failure_does_not_stop_collection(self):
+        research, agent, config, paid = self.research_agent(True)
+        marker = "PRIVATE_AGENT_PATH_AND_KEY_NOT_FOR_OUTPUT"
+        with mock.patch.object(research, "save", side_effect=sqlite3.OperationalError(marker)) as save:
+            results = self.collect_via_cli("watch")
+        self.assertEqual(save.call_count, 2)
+        self.assertTrue(all(v["research"]["reason"] == "RESEARCH_UNAVAILABLE" for v in results))
+        self.assertNotIn(marker, json.dumps(results))
+        paid.assert_not_called()
+
+    def test_watch_worker_failure_does_not_stop_collection(self):
+        research, agent, config, paid = self.research_agent(True)
+        for day in (DAY, "20261105"):
+            run = dict(state="SCREENED", source_day=day, batch="market-"+day, config=config,
+                       plan_sha256="b"*64, events=["EOD_RECEIVED", "SCREENED"],
+                       screen=dict(selected=[dict(instrument=A)], rules_sha256=research.rp.digest(research.RULES),
+                                   implementation_sha256=m.sha(Path(research.__file__).read_bytes())))
+            research.save(day, run)
+        sys.path.insert(0, str(ROOT / "research/timesfm_cpu"))
+        import cli as cpu
+        with mock.patch.object(cpu, "bridge", return_value={}), \
+                mock.patch.object(cpu, "once", side_effect=RuntimeError("private worker details")) as worker:
+            results = self.collect_via_cli("watch")
+        self.assertEqual(worker.call_count, 2)
+        self.assertTrue(all(v["research"]["state"] == "BLOCKED" for v in results))
+        self.assertNotIn("private worker details", json.dumps(results))
+        paid.assert_not_called()
+
+    def test_once_research_failure_keeps_successful_eod_result(self):
+        research, agent, config, paid = self.research_agent(True)
+        with mock.patch.object(research, "save", side_effect=sqlite3.OperationalError("private details")):
+            result = self.collect_via_cli("once")[0]
+        self.assertEqual(result["research"]["state"], "BLOCKED")
+        self.assertEqual(result["research"]["reason"], "RESEARCH_UNAVAILABLE")
+        self.assertNotIn("cloud_egress", result["research"])
+        paid.assert_not_called()
+
+    def test_watch_explicit_stop_from_research_still_propagates(self):
+        research, agent, config, paid = self.research_agent(True)
+        for signal in (KeyboardInterrupt, SystemExit):
+            with self.subTest(signal=signal.__name__), \
+                    mock.patch.object(m.Market, "once", return_value=dict(state="ALREADY_FROZEN")), \
+                    mock.patch.object(research, "once", side_effect=signal):
+                with self.assertRaises(signal):
+                    m.cli(["watch", "--root", str(self.market.root)])
+        paid.assert_not_called()
 
     def test_coverage_denominators_native_reuse_and_readonly_gate(self):
         self.http.duplicates = True
