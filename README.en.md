@@ -38,7 +38,7 @@ First use by the Owner: manually set daily/monthly hard caps in the existing rea
 - **Current order:** #74 delivers the real-history → local TimesFM core loop in one Draft PR pending fixed-HEAD review. A separate frozen out-of-sample protocol and genuine forward EOD follow; UI integration follows the core. See [current status](docs/STATUS.md).
 - **PR #56 review repair:** cloud research requires an explicit binding to the existing Owner AgentDir/configuration and shares its cost database. Source review confirmed the budget repair. All three original PR52/54 suites passed after close: **10+4+13 tests, each suite exit 0**. PR #56 is now merged; the original developer evidence is preserved. See [R1 evidence](docs/evidence/m2-pr11/r1/README.md).
 
-## Try the dashboard on Windows
+## Legacy development-mode dashboard run (not the #85 installer)
 
 From the repository root, using a **synthetic test report**:
 
@@ -53,7 +53,7 @@ Open `http://127.0.0.1:8710`; stop with Ctrl+C. For your own published report an
 
 ## Roles and documentation
 
-**Owner:** scope/merge authority · **Sol:** backend, Agent, API and critical tests · **DeepSeek:** information architecture, typography, shared UI components, responsive layout and motion · **ChatGPT:** same-HEAD review and Owner-authorized merge.
+**Owner:** scope, data egress/paid permission and final merge authority · **DeepSeek:** complete active #85 Windows installer, background service, launcher, first-run setup and necessary Rust/Python/PowerShell/UI integration · **ChatGPT:** fixed-HEAD review and Owner-authorized merge. Past Sol/DS UI-only assignments are archived; see [AGENTS.md](AGENTS.md).
 
 [DeepSeek UI handoff](docs/UI_HANDOFF_DEEPSEEK.md) · [Coding guidance](AGENTS.md) · [Product principles](docs/PRODUCT.md) · [Financial risk policy](docs/RISK_POLICY.md) · [Accepted ADRs](docs/adr/).
 
