@@ -1,10 +1,12 @@
-# Stratide 本地 Web Dashboard V1
+# Stratide 本地 Web Dashboard（V2 工程已接入）
+
+> **2026-11-05 现行状态**：V1 的当前 Paper/历史报告双来源、审批通知和 UI 已合并；V2 模块 #82/#83/#84 经 PR #86/#87/#88 合并，全市场覆盖/TimesFM+受控 DeepSeek、多证券共享 Paper 只读投影均有工程实现。**#85 的 Windows 安装包、用户登录自动后台运行、双击快捷方式启动并打开浏览器尚未实现，Owner 已指定 DeepSeek 完整负责**。下面的 `start-dashboard.ps1` 和旧六报告 API 说明是**兼容的开发态/历史模式**，不是 V2 当前 Paper API 的唯一数据源；真实当前账户仍从 `--paper-ledger` 和 `/api/v1/*` 读取，历史实验不能冒充 NAV。请以 [STATUS](../../docs/STATUS.md)、[#85](https://github.com/handFOOLed/Stratide/issues/85)、[V1_COMPLETION](../../docs/V1_COMPLETION.md)、[M3_PR03](../../docs/M3_PR03.md) 为准。外发和 Paper 假设默认未获授权，不存在安装时默认真实请求。
 
 **V1 / Issue #77：** 现已支持当前 Paper 专用 v1 接口、原研究/OOS/Registry、持久审批通知与 Windows 启停/恢复，详见 [完整操作](../../docs/V1_COMPLETION.md)。总览读取显式 `--paper-ledger`，历史页保留 `--report-dir`；历史报告不能成为当前 NAV。下面原只读报告启动方式继续兼容。
 
-关联 [Issue #20](https://github.com/handFOOLed/Stratide/issues/20) 与 [Issue #22](https://github.com/handFOOLed/Stratide/issues/22)。本机 paper-only、同源；总览/历史展示启动时明确指定的一个完整六报告固定快照。Agent 管理已接入持久研究任务、预算、模型选择、取消/暂停和 EOD；操作见 [Agent V1](../../docs/M2_PR02.md)。通知仍为未接入状态，浅色/深色/系统主题与 reduced-motion 保留。UI 已按 M2-PR03 重构为 React 19 + TypeScript + 共享设计系统；信息归属、token 与动效规范见 [UI 设计系统](../../docs/UI_DESIGN_SYSTEM.md)。不提供财务写入或网页导出。
+关联 [Issue #20](https://github.com/handFOOLed/Stratide/issues/20) 与 [Issue #22](https://github.com/handFOOLed/Stratide/issues/22)。本机 paper-only、同源；总览/历史展示启动时明确指定的一个完整六报告固定快照。Agent 管理已接入持久研究任务、预算、模型选择、取消/暂停和 EOD；操作见 [Agent V1](../../docs/M2_PR02.md)。下述原 M2 开发快照中的通知状态为历史记录；#77 已接入持久通知和审批，浅色/深色/系统主题与 reduced-motion 保留。UI 已按 M2-PR03 重构为 React 19 + TypeScript + 共享设计系统；信息归属、token 与动效规范见 [UI 设计系统](../../docs/UI_DESIGN_SYSTEM.md)。不提供财务写入或网页导出。
 
-## Windows 启动
+## 旧版开发态 Windows 启动（不是可分发安装包）
 
 在本分支仓库根目录运行，需要已有 Rust、VS C++ Build Tools、Node.js 20.19+ / 22.12+ 或更新受支持版本、PowerShell 7。前端单元测试直接导入 TypeScript，建议使用 Node 24（或支持内置 type stripping 的 22.18+）；生产构建本身仍可在 Node 20.19+ 运行。无 Docker、数据库服务或云模型依赖。首次安装使用锁文件内的免费开发依赖。
 
@@ -32,7 +34,7 @@ npm --prefix apps/dashboard run build
 
 独立二进制可通过 `--assets-dir <dist目录>` 指定已构建前端。Node 仅用于构建/测试，运行时只需 Rust 二进制与 dist。
 
-## 数据与刷新契约
+## 旧六报告数据与刷新契约（历史兼容；现行 Paper 使用 /api/v1/*）
 
 - 只接收现有 `report_schema=1 / ledger_schema=3` 的完整六报告：report.json、events.json、daily.csv、orders.csv、fills.csv、positions.csv。不支持中断前缀、observe-only forward 报告或 SQLite 路径。
 - 启动时交叉校验 JSON/CSV、摘要与末日、持仓/预留、成交归属与费用，读完再次核对六文件未变化。失败时账户 API 返回 503，UI 显示不可用。缺估值是显式 null+reason，和坏文件分开。
@@ -78,4 +80,4 @@ npm --prefix apps/dashboard run test:browser
 python scripts/test-dashboard.py --historical-report $env:STRATIDE_HISTORICAL_REPORT --evaluation-file $env:STRATIDE_EVALUATION_FILE
 ```
 
-原 Dashboard Windows 自测、截图与只读证据见 [M2-PR01](../../docs/M2_PR01.md)。研究 Agent 的接口、可信本机设置、付费/数据授权见 [M2-PR02](../../docs/M2_PR02.md)；通知与审批尚未接入。M2-PR03 的改造前/后缺陷、jsdom 验收和 NOT VERIFIED 说明见 [UI 证据](../../docs/evidence/m2-pr03-ui/README.md)；本机 jsdom 验收脚本为 apps/dashboard/scripts/dom-e2e.mjs 与 dom-states.mjs。
+原 Dashboard Windows 自测、截图与只读证据见 [M2-PR01](../../docs/M2_PR01.md)。研究 Agent 的历史接口见 [M2-PR02](../../docs/M2_PR02.md)；现行通知与审批已由 #77 接入。M2-PR03 的改造前/后缺陷、jsdom 验收和 NOT VERIFIED 说明见 [UI 证据](../../docs/evidence/m2-pr03-ui/README.md)；本机 jsdom 验收脚本为 apps/dashboard/scripts/dom-e2e.mjs 与 dom-states.mjs。
