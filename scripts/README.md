@@ -1,6 +1,6 @@
 # Local development helpers
 
-## Windows product build / E2E (Issue #85)
+> **现行状态｜2026-11-05**：V2/Windows 0.3.0 已通过 PR #86/#87/#88/#89 合并并可安装使用。正常使用请查看 [使用教程](../docs/USER_GUIDE.md)；此目录主要用于工程开发、诊断和历史测试，不需要为启动软件手动运行 npm/cargo/python。旧“#85 正在开发”内容已过时。有关边界和测试见 [KNOWN_LIMITATIONS](../docs/KNOWN_LIMITATIONS.md)。
 
 `pwsh -NoProfile -File scripts/build-windows-installer.ps1 -Version 0.3.0` builds the release payload and `dist\installer\Stratide-Setup-0.3.0-x64.exe`; `pwsh -NoProfile -File scripts/test-windows-product.ps1 -Port 8794` runs the isolated single-instance/stop/port-conflict/crash/upgrade checks without credentials; `-InstallTest` also compiles the sandbox-compatible installer variant. `python -B scripts/test-stratide-paths.py` checks installed vs Git state-root selection. See [WINDOWS_INSTALL](../docs/WINDOWS_INSTALL.md) and [evidence](../docs/evidence/m3-pr04/README.md).
 
