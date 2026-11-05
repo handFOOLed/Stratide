@@ -254,10 +254,8 @@ def credential(source="auto"):
     # of its service or state. Never read the old plaintext token document.
     import ctypes as ct
     from ctypes import wintypes as w
-    import subprocess
-    result = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
-                            cwd=ROOT, capture_output=True, check=True)
-    common = Path(os.fsdecode(result.stdout).strip()).resolve().parent
+    import stratide_paths as paths
+    common = paths.common_root()
     target = "Stratide/" + sha(str(common).casefold().encode()) + "/tushare-daily-trade-cal-v1"
 
     class Entry(ct.Structure):

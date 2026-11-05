@@ -3,6 +3,7 @@
 Run only in a disposable standalone checkout with MARKET_TEST_DRIVER pointing to
 the compiled stratide-research libtest binary. No Owner state may be reused.
 """
+import contextlib
 import copy
 import datetime as dt
 import importlib.util
@@ -143,6 +144,17 @@ class Tests(unittest.TestCase):
             valid_until=(dt.datetime.now(dt.timezone.utc)+dt.timedelta(days=1)).isoformat())
         scope.update(changes);return r.bridge("grant",dict(confirmed=True,scope=scope))
 
+    @contextlib.contextmanager
+    def local_worker(self):
+        """Fixture model/manifest; the installed state, not this suite, picks WSL."""
+        expected=dict(manifest_sha256=model.digest(self.manifest),manifest=self.manifest,
+            model_revision=model.REVISION,weight_sha256=model.WEIGHT_SHA,source="TEST_FIXTURE")
+        with patch.object(cpu,"planning_manifest",return_value=expected),\
+                patch.object(cpu,"model_manifest",return_value=expected),\
+                patch.object(runtime,"uses_wsl",return_value=False),\
+                patch.object(runtime,"preflight",return_value=[]):
+            yield
+
     def prepare(self,fail_cpu=False):
         days,snapshots,sources=r.prefix(self.market,self.day,self.asof)
         screen=r.screen(days,snapshots,sources,self.asof,8)
@@ -150,11 +162,11 @@ class Tests(unittest.TestCase):
         run=dict(state="SCREENED",source_day=self.day,data_mode="synthetic_test",as_of=self.asof,
             config=CONFIG,config_sha256=rp.digest(CONFIG),batch="market-"+self.day,screen=screen,
             screen_sha256=rp.digest(screen),events=["EOD_RECEIVED","SCREENED"],**rp.SAFE)
-        with patch.object(model,"verify_model",return_value=self.manifest):
+        with self.local_worker():
             plan=r.freeze_cpu(self.market,days,snapshots,sources,screen["selected"],self.asof,run["batch"])
         run["plan_sha256"]=rp.digest(plan);r.save(self.day,run)
         cpu.bridge("enable")
-        with patch.object(cpu,"verify_model",return_value=self.manifest),patch.object(runtime,"command",return_value=[]):
+        with self.local_worker():
             def partial(raw):
                 response=fixture.fixture_response(raw);response["forecasts"].pop();return response
             local=cpu.once(run["batch"],partial if fail_cpu else fixture.fixture_response)
@@ -177,7 +189,7 @@ class Tests(unittest.TestCase):
             for secret_field in ("close_fen","raw_series","key_file","positions_ledger","cash_balance","api_key"):
                 self.assertNotIn(secret_field,json.dumps(body))
             self.assertEqual(value["result"]["research"]["risk_portfolio"]["receipt"]["grant_version"],1)
-        with patch.object(r,"bridge",side_effect=lambda a,v=None:value if a in ("once","task") else self.fail(a)),patch.object(cpu,"verify_model",return_value=self.manifest),patch.object(runtime,"command",return_value=[]):
+        with self.local_worker(),patch.object(r,"bridge",side_effect=lambda a,v=None:value if a in ("once","task") else self.fail(a)):
             # Restore latest date for the real Operator consumer, using this run.
             result=r.once(self.market)
         self.assertEqual(result["state"],"CANDIDATE_FROZEN",result)
@@ -265,6 +277,37 @@ class Tests(unittest.TestCase):
             self.assertEqual(value["status"],"outcome_uncertain",value)
             self.assertEqual(value["calls"][0]["state"],"outcome_uncertain")
             self.assertEqual(server.count,0)
+
+    def test_09_wsl_worker_block_is_bounded_and_never_reaches_cloud(self):
+        # The installed Windows chain reaches TimesFM through WSL; a missing or
+        # failed Worker must block research only, then be retried after a bounded
+        # cooldown without a second freeze or any paid dispatch. The original
+        # watch always follows the latest frozen market day, so this test does too.
+        day=self.market.report()["latest"]["source_day"]
+        as_of=m.h.day(day).isoformat()+"T08:11:00Z"
+        days,snapshots,sources=r.prefix(self.market,day,as_of)
+        screen=r.screen(days,snapshots,sources,as_of,8)
+        with r.database(True) as db:
+            db.execute("DELETE FROM meta WHERE key=?",(r.RUN+day,))
+        run=dict(state="SCREENED",source_day=day,data_mode="synthetic_test",as_of=as_of,
+            config=CONFIG,config_sha256=rp.digest(CONFIG),batch="market-"+day,screen=screen,
+            screen_sha256=rp.digest(screen),events=["EOD_RECEIVED","SCREENED"],**rp.SAFE)
+        r.save(day,run)
+        with patch.object(r,"freeze_cpu",side_effect=model.Rejected("TIMESFM_WSL_MODEL_MISSING")) as freeze,\
+                patch.object(r,"bridge",side_effect=AssertionError("no cloud dispatch")):
+            blocked=r.once(self.market)
+            self.assertEqual(blocked["state"],"BLOCKED",blocked)
+            self.assertEqual(blocked["reason"],"TIMESFM_WSL_MODEL_MISSING")
+            self.assertEqual(blocked["cloud_status"],"CLOUD_RESEARCH_BLOCKED")
+            self.assertIn("blocked_at",blocked)
+            self.assertEqual(r.once(self.market)["reason"],"TIMESFM_WSL_MODEL_MISSING")
+            self.assertEqual(freeze.call_count,1,"cooldown must not re-freeze the same day")
+            stale=dict(blocked,blocked_at="2000-01-01T00:00:00Z")
+            r.save(day,stale)
+            self.assertEqual(r.once(self.market)["reason"],"TIMESFM_WSL_MODEL_MISSING")
+            self.assertEqual(freeze.call_count,2,"an expired cooldown retries once")
+        # The frozen EOD snapshot is untouched and stays usable for research.
+        self.assertEqual(self.market.report()["latest"]["source_day"],day)
 
 
 if __name__=="__main__":unittest.main(verbosity=2)

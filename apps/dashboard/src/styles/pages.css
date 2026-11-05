@@ -2084,3 +2084,50 @@
 .market-research-checks label, .market-research-check { display: flex; align-items: baseline; gap: var(--space-2); }
 .market-research-run { display: grid; min-width: 0; gap: var(--space-3); padding: var(--space-4); background: var(--surface-subtle); border-radius: var(--radius-md); }
 .market-research-preview { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 480px; overflow: auto; font-size: var(--fs-sm); }
+
+/* Installed Windows runtime and setup (Issue #85) */
+.install-panel { display: flex; flex-direction: column; gap: var(--space-5); }
+.install-section { display: flex; flex-direction: column; gap: var(--space-3); }
+.install-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+.install-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3); }
+.install-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-subtle);
+  padding: var(--space-3);
+  min-width: 0;
+}
+.install-item__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); margin-bottom: var(--space-2); }
+.install-item p { margin: 0 0 var(--space-1); overflow-wrap: anywhere; }
+.install-item__detail:empty { display: none; }
+.install-setup { display: flex; flex-direction: column; gap: var(--space-4); }
+.install-setup__row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--border-faint);
+}
+.install-setup__row:first-child { border-top: 0; padding-top: 0; }
+.install-setup__row > div > p { margin: var(--space-1) 0 0; }
+.install-token-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-2); align-items: end; max-width: 560px; }
+.install-token-row .field { margin: 0; }
+.install-log {
+  margin: 0;
+  max-height: 240px;
+  overflow: auto;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-faint);
+  background: var(--surface-sunken);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 640px) {
+  .install-token-row { grid-template-columns: 1fr; }
+}
+.install-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3); }

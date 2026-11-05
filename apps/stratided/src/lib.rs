@@ -1,6 +1,7 @@
 pub mod agent_api;
 pub mod desktop;
 pub mod paper_view;
+pub mod runtime_api;
 pub mod snapshot;
 
 use serde_json::{json, Value};
@@ -25,6 +26,7 @@ pub struct Config {
     pub agent_eod_store: Option<String>,
     pub desktop_config: Option<PathBuf>,
     pub paper_ledger: Option<PathBuf>,
+    pub runtime_home: Option<PathBuf>,
 }
 
 impl Config {
@@ -39,6 +41,7 @@ impl Config {
             agent_eod_store: None,
             desktop_config: None,
             paper_ledger: None,
+            runtime_home: None,
         };
         let mut args = args.peekable();
         let mut seen = std::collections::BTreeSet::new();
@@ -53,6 +56,7 @@ impl Config {
                 "--agent-eod-store",
                 "--desktop-config",
                 "--paper-ledger",
+                "--runtime-home",
             ]
             .contains(&arg.as_str())
                 || !seen.insert(arg.clone())
@@ -69,6 +73,7 @@ impl Config {
                 "--agent-eod-store" => config.agent_eod_store = Some(value),
                 "--desktop-config" => config.desktop_config = Some(value.into()),
                 "--paper-ledger" => config.paper_ledger = Some(value.into()),
+                "--runtime-home" => config.runtime_home = Some(value.into()),
                 "--port" => {
                     config.port = value.parse::<u16>().map_err(|_| "端口必须为 1–65535")?;
                     if config.port == 0 {
@@ -123,12 +128,14 @@ pub struct App {
     research: Option<Result<Value, String>>,
     pub desktop: Option<desktop::Desktop>,
     pub paper_ledger: Option<PathBuf>,
+    pub runtime_home: Option<PathBuf>,
 }
 
 pub struct Reply {
     pub status: u16,
     pub mime: &'static str,
     pub body: Vec<u8>,
+    pub exit_after: bool,
 }
 
 impl App {
@@ -182,6 +189,7 @@ impl App {
             research: evaluation_file.map(snapshot::research),
             desktop: None,
             paper_ledger: None,
+            runtime_home: None,
         }
     }
 
@@ -194,7 +202,7 @@ impl App {
         };
         Reply { status, mime: "application/json; charset=utf-8", body: serde_json::to_vec(&json!({
             "api_version": 1, "state": state, "snapshot": snapshot.map(|s| &s.metadata), "data": data, "error": error,
-        })).expect("JSON response contains only serializable values") }
+        })).expect("JSON response contains only serializable values"), exit_after: false }
     }
 
     fn error(&self, status: u16, code: &str, message: &str) -> Reply {
@@ -230,6 +238,7 @@ impl App {
                 status: 200,
                 mime,
                 body: bytes.clone(),
+                exit_after: false,
             };
         }
         if path == "/api/health" {
@@ -284,7 +293,7 @@ impl App {
             .filter(|_| current_only || self.snapshot.is_none())
         {
             return match paper_view::load(path) {
-                Ok((meta,data))=>Reply{status:200,mime:"application/json; charset=utf-8",body:serde_json::to_vec(&json!({"api_version":1,"state":"ready","snapshot":meta,"data":data[route],"error":Value::Null})).expect("paper JSON")},
+                Ok((meta,data))=>Reply{status:200,mime:"application/json; charset=utf-8",body:serde_json::to_vec(&json!({"api_version":1,"state":"ready","snapshot":meta,"data":data[route],"error":Value::Null})).expect("paper JSON"),exit_after:false},
                 Err(e)=>self.error(503,"INVALID_CURRENT_LEDGER",&e),
             };
         }
@@ -332,6 +341,11 @@ pub fn handle_with_agent(
         respond(req, reply);
         return;
     }
+    if req.url().starts_with("/api/runtime/") {
+        let reply = runtime_api::reply(app, &mut req, port);
+        respond(req, reply);
+        return;
+    }
     let header = |name: &'static str| {
         req.headers()
             .iter()
@@ -367,6 +381,12 @@ fn respond(req: Request, reply: Reply) {
         response.add_header(Header::from_bytes("Allow", "GET").unwrap());
     }
     let _ = req.respond(response);
+    if reply.exit_after {
+        std::thread::spawn(|| {
+            std::thread::sleep(std::time::Duration::from_millis(250));
+            std::process::exit(0);
+        });
+    }
 }
 
 #[cfg(test)]

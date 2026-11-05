@@ -33,6 +33,10 @@ data/
 *.sqlite3
 *.parquet
 
+# Build output / local logs
+/dist/
+/*.log
+
 # Editor / OS
 .vscode/
 .idea/

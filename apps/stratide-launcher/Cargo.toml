@@ -1,0 +1,15 @@
+[package]
+name = "stratide-launcher"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[dependencies]
+stratide-runtime = { path = "../../crates/runtime" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", features = ["clock"] }
+
+[[bin]]
+name = "stratide-launcher"
+path = "src/main.rs"

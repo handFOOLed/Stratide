@@ -19,9 +19,11 @@ import type { WorkspaceState } from '../lib/workspace';
 import type { AgentState } from '../state/useAgent';
 import { formatMicro } from '../lib/format';
 import { MarketResearchPanel } from '../components/domain/MarketResearchPanel';
+import { RuntimePanel } from '../components/domain/RuntimePanel';
 
 const SECTION_ICONS: Record<SettingsSection, IconName> = {
   appearance: 'sun',
+  runtime: 'server',
   data: 'database',
   security: 'shield',
   about: 'info',
@@ -96,6 +98,10 @@ export function SettingsPage({
   };
 
   const panel = (() => {
+    if (section === 'runtime') {
+      return <RuntimePanel />;
+    }
+
     if (section === 'appearance') {
       return (
         <CardBody>

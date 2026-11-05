@@ -6,7 +6,7 @@ export type PageKey = (typeof PAGE_KEYS)[number];
 export const HISTORY_TABS = ['fills', 'orders', 'daily', 'strategies', 'research'] as const;
 export type HistoryTab = (typeof HISTORY_TABS)[number];
 
-export const SETTINGS_SECTIONS = ['appearance', 'data', 'security', 'about'] as const;
+export const SETTINGS_SECTIONS = ['appearance', 'runtime', 'data', 'security', 'about'] as const;
 export type SettingsSection = (typeof SETTINGS_SECTIONS)[number];
 
 export interface Route {
@@ -39,13 +39,14 @@ export const HISTORY_TAB_LABELS: Record<HistoryTab, string> = {
 
 export const SETTINGS_SECTION_LABELS: Record<SettingsSection, string> = {
   appearance: '外观',
+  runtime: '运行与安装',
   data: '数据连接',
   security: '权限与安全',
   about: '关于',
 };
 
 export function parseRoute(hash: string): Route {
-  const raw = hash.replace(/^#/, '').replace(/^\/+/, '');
+  const raw = hash.replace(/^#/, '').split('?')[0].replace(/^\/+/, '');
   const [pagePart, tabPart] = raw.split('/');
   const page = (PAGE_KEYS as readonly string[]).includes(pagePart) ? (pagePart as PageKey) : 'overview';
   let tab: HistoryTab = 'fills';

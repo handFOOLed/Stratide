@@ -20,10 +20,16 @@ import eod_journal as j
 import market_eod as m
 import portfolio_research as rp
 
+import stratide_paths as paths
+
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "research/timesfm_cpu"))
+import model as timesfm_model
+
 POLICY = "market-research-v1"
 CONFIG = "market_research_config_v1"
 RUN = "market_research_run:"
+WSL_BLOCK_COOLDOWN_SECONDS = 600
 # Frozen deterministic policy, independent of LLM output.
 RULES = dict(version="market-screen-v1", context=84, min_listing_days=180,
              min_amount_thousand_yuan="10000", max_amount_thousand_yuan="100000000",
@@ -31,7 +37,7 @@ RULES = dict(version="market-screen-v1", context=84, min_listing_days=180,
 
 
 def bridge(action, value=None):
-    exe = ROOT / "target/debug" / ("market-research-agent.exe" if os.name == "nt" else "market-research-agent")
+    exe = paths.executable("market-research-agent")
     p = subprocess.run([str(exe), action], input=json.dumps(value or {}, allow_nan=False).encode(),
                        cwd=ROOT, capture_output=True, timeout=150)
     v = j.loads(p.stdout)
@@ -172,7 +178,6 @@ def freeze_cpu(market, days, snapshots, sources, selected, as_of, batch):
     sys.path.insert(0, str(ROOT / "research/timesfm_cpu"))
     import cli as cpu
     import history
-    import model
     symbols = [r["instrument"] for r in selected]
     descriptor = cpu.bridge("descriptor")
     # Preserve the existing immutable historical CPU contract and labels.
@@ -198,7 +203,7 @@ def freeze_cpu(market, days, snapshots, sources, selected, as_of, batch):
     f, history_input = history.assemble(descriptor, symbols, as_of, days, catalog, daily, factor, susp,
         dict(market_snapshots=[s["snapshot_sha256"] for s in snapshots]), dict(source="MarketDaySnapshot"))
     plan = dict(batch=batch, frozen=f, history=history_input,
-                manifest_sha256=model.digest(model.verify_model(ROOT / "models/timesfm-2.5")),
+                manifest_sha256=cpu.planning_manifest()["manifest_sha256"],
                 code_sha256=descriptor["code_sha256"], max_context=256, batch_size=1, threads=2)
     cpu.bridge("project", plan)
     path = cpu.batch_path(batch) / "plan.json"
@@ -227,6 +232,16 @@ def once(market):
             run = get(db, RUN + day)
         if run and run["state"] in ("CANDIDATE_FROZEN", "REJECTED"):
             return run
+        if run and run.get("state") == "BLOCKED":
+            reason = run.get("reason")
+            blocked_at = run.get("blocked_at")
+            if isinstance(reason, str) and reason.startswith(("TIMESFM_WSL_", "WORKER_")) and blocked_at:
+                try:
+                    age = (m.instant(m.h.now()) - m.instant(blocked_at)).total_seconds()
+                except (TypeError, ValueError):
+                    age = WSL_BLOCK_COOLDOWN_SECONDS
+                if 0 <= age < WSL_BLOCK_COOLDOWN_SECONDS:
+                    return run
         if run is None:
             run = dict(state="EOD_RECEIVED", source_day=day, as_of=m.h.now(), events=["EOD_RECEIVED"],
                        data_mode=latest["data_mode"], config=config, config_sha256=rp.digest(config), batch="market-" + day, **rp.SAFE)
@@ -286,8 +301,8 @@ def once(market):
             run["events"].append("CANDIDATE_FROZEN")
             save(day, run)
             return run
-        except (j.Rejected, c.Rejected, m.Error, OSError, ValueError, subprocess.SubprocessError) as error:
-            code = str(error) if isinstance(error, (j.Rejected, c.Rejected, m.Error)) else "MARKET_RESEARCH_LOCAL_FAILURE"
+        except (j.Rejected, c.Rejected, m.Error, timesfm_model.Rejected, OSError, ValueError, subprocess.SubprocessError) as error:
+            code = str(error) if isinstance(error, (j.Rejected, c.Rejected, m.Error, timesfm_model.Rejected)) else "MARKET_RESEARCH_LOCAL_FAILURE"
             # A failed/unknown paid task is terminal. A readiness/grant block can
             # resume without replacing input or creating another daily task.
             if "fusion_task_id" in run:
@@ -297,6 +312,8 @@ def once(market):
             else:
                 run["state"] = "BLOCKED"
             run.update(reason=code, cloud_status="CLOUD_RESEARCH_BLOCKED")
+            if isinstance(code, str) and code.startswith(("TIMESFM_WSL_", "WORKER_")):
+                run["blocked_at"] = m.h.now()
             save(day, run)
             return run
 

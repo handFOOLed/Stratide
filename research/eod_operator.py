@@ -19,6 +19,7 @@ import time
 import data_snapshot as d
 import eod_journal as j
 import shadow as s
+import stratide_paths as paths
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -78,7 +79,7 @@ def spawn(stage, store, observer, reports, auto_name, token):
     env = dict(os.environ)
     env.pop("STRATIDE_TUSHARE_TOKEN", None)
     if stage == "collector":
-        exe = ROOT / "target/debug" / ("stratide-cli.exe" if os.name == "nt" else "stratide-cli")
+        exe = paths.executable("stratide-cli")
         j.no_links(exe)
         j.require(exe.is_file(), "FORWARD_CLI_NOT_BUILT")
         # Only the original collector receives the token, never argv/output.
@@ -204,8 +205,7 @@ class Operator:
                       snapshot_store=self.store.root.name, observer=str(source.resolve()),
                       auto_name=auto_name, credential_source=credential_source)
         self.root.parent.mkdir(parents=True, exist_ok=True)
-        j.require(subprocess.run(["git", "check-ignore", "--quiet", str(self.path)], cwd=s.common_root()).returncode == 0,
-                  "OPERATOR_MUST_BE_GITIGNORED")
+        j.require(paths.ignored(self.path), "OPERATOR_MUST_BE_GITIGNORED")
         self.root.mkdir(exist_ok=True)
         with d.writer(self.root / "writer.lock"):
             j.require(not self.path.exists(), "OPERATOR_ALREADY_INITIALIZED")

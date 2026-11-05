@@ -71,7 +71,12 @@ class Tests(unittest.TestCase):
 
     def run_once(self,p,runner=fixture_response):
         self.save(p)
-        with patch.object(cli,"verify_model",return_value=self.manifest),patch.object(runtime,"command",return_value=[]):
+        # The installed state, not this fixture, selects WSL or the native model;
+        # the manifest is injected so transport faults stay testable on Windows.
+        expected=dict(manifest_sha256=model.digest(self.manifest),manifest=self.manifest,
+                      model_revision=model.REVISION,weight_sha256=model.WEIGHT_SHA,source="TEST_FIXTURE")
+        with patch.object(cli,"model_manifest",return_value=expected),patch.object(runtime,"uses_wsl",return_value=False),\
+                patch.object(runtime,"preflight",return_value=[]):
             return cli.once(p["batch"],runner)
 
     def test_01_production_1_4_8_and_risk_result_v1(self):
