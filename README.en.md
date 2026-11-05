@@ -1,20 +1,16 @@
 [简体中文](README.md) | **English**
 
-**M3-PR03 / #84 (this branch, Draft):** [Multi-security shared Paper](docs/M3_PR03.md) connects original frozen research → an Owner-approved fixed-ticket policy → atomic batches in the single Risk/Ledger → next-session post-close ex-post fills or NO_FILL → the current-account Dashboard. The 84-session and timely-source gates remain; model weights grant no authority. Real EOD may simulate fills under a separately Owner-approved unverified-action assumption and conservative cap; anomalous securities still NO_FILL. Unknown NAV supports audited cross-day valuation recovery without backfilling trades. PIT, observed openings and tradability remain unverified; no Owner automation was enabled or real request made.
-
-**M3-PR02 / #83 (Draft delivery)**: [Market screening and controlled strategy research](docs/M3_PR02.md) connect READY snapshots → bounded Top 8 local TimesFM → independent field authorization/shared budget → frozen DeepSeek research candidates and settings UI. Automation defaults off and real-data egress defaults denied. The CNY ¥5/day and ¥100/month caps remain; no automated orders. Real-market cloud E2E is not authorized and was not run.
-
-**M3-PR01 / #82 (Draft delivery)**: [Market-wide A-share EOD and trusted coverage snapshots](docs/M3_PR01.md) reuse the Operator, V1/V2 warehouse and source gate for dated catalogs, daily batch increments, separate market/research denominators and read-only reports. BSE remains visible as unsupported. Real market-wide coverage and current API permissions are unverified; trading eligibility is unchanged.
-
-**V1 closeout B / #77 (Draft delivery)**: [Windows local product operation and recovery](docs/V1_COMPLETION.md) integrate separate current Paper and historical views, original TimesFM/Fusion/OOS/Registry, persistent approvals/notifications, and UI polish. Paper fills are `EX_POST_OPEN_ASSUMPTION` only; PIT, observed opening data and trading eligibility remain unverified. N100 is deferred and is not a V1 gate.
-
-**V1 closeout A / #76 (merged via PR #78)**: [Frozen risk evaluation, read-only forward audit and FusionResearcherV1](docs/V1_EVALUATION.md) compare local CPU / Naive / EWMA on the same RMS target and test the prompt using synthetic evidence. Real metrics remain local; PIT, forward-paper eligibility and real-data cloud egress stay blocked.
-
 # Stratide
+
+> **Current status (2026-11-05):** V2/M3 engineering modules **A/B/C are merged to `main`**: [#82 / PR #86](https://github.com/handFOOLed/Stratide/pull/86) market-wide EOD ingestion, [#83 / PR #87](https://github.com/handFOOLed/Stratide/pull/87) controlled TimesFM and DeepSeek automated research, and [#84 / PR #88](https://github.com/handFOOLed/Stratide/pull/88) one shared multi-security Paper ledger with ex-post T+1 assumptions. **The sole current task is [#85](https://github.com/handFOOLed/Stratide/issues/85): a real Windows 11 installer, optional user-logon background startup, a single-instance desktop launcher and automatic Dashboard opening. The Owner assigned the complete #85 delivery to DeepSeek; it is not yet built or merged.** See [current status](docs/STATUS.md) and [V2 roadmap #81](https://github.com/handFOOLed/Stratide/issues/81).
+
+> **Critical limits:** Paper-only, no broker or real-money orders. Ex-post opening assumptions are not observed opening fills, PIT verification or evidence of an edge. Unverified corporate-action simulation requires separate Owner authorization and independent conservative caps. Real full-market production E2E and Windows distribution are not verified; research requires 84 READY sessions. Real-market egress to DeepSeek is DENIED by default, with one Agent budget of CNY ¥5/day and ¥100/month. N100 deployment is deferred.
+
+
 
 A local-first, **paper-only** personal quantitative research system: Rust risk/ledger and replay, genuine EOD observation, a local read-only Paper Dashboard and controlled research Agent. **Not authorized for real-money trading; no proven trading edge.**
 
-## Status
+## Archived module-by-module status (Draft/current meant at that time)
 
 - **M2-PR20 local risk from real history (#74 / this branch, Draft):** existing V1/V2 data and quality tags → prefix freeze → TimesFM CPU → original tasks/Registry/report/verify have passed a real three-security run. Factor changes and gaps reject; no new market requests, cloud calls or billing. Real risk results cannot leave the host. Historical PIT, out-of-sample advantage, Paper/Live eligibility and physical N100 acceptance remain unverified. See [operation](docs/M2_PR20.md) and [evidence](docs/evidence/m2-pr20/README.md).
 
