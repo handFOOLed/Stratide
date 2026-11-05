@@ -141,7 +141,9 @@ export function RuntimePanel() {
           progress?: { sessions_ready?: number; remaining?: number } | null;
         };
         setBackfillRunning(state.running === true);
-        if (state.running && state.progress?.sessions_ready !== undefined) {
+        if (state.progress?.sessions_ready !== undefined) {
+          // The batch file is the only readable progress while the writer lock
+          // is held; after completion it still carries the last good count.
           setHistory({
             last: null,
             missing: state.progress.remaining ?? 0,
@@ -369,7 +371,9 @@ export function RuntimePanel() {
                   <strong>{name}</strong>
                   <Badge tone={value ? tone(value.state) : 'neutral'}>{value ? label(value) : '—'}</Badge>
                 </div>
-                <p className="muted install-item__detail">{value ? explain(value) : '—'}</p>
+                {value && tone(value.state) !== 'success' ? (
+                  <p className="muted install-item__detail">{explain(value)}</p>
+                ) : null}
               </div>
             );
           })}
@@ -475,7 +479,6 @@ export function RuntimePanel() {
           <div className="install-setup__row">
             <div>
               <strong>Tushare Token</strong>
-              <p className="muted">只写入当前 Windows 用户凭据管理器，不回显、不写日志、不放进安装包。</p>
             </div>
             <div className="install-token-row">
               <Field label="Token" htmlFor="runtime-tushare-token">
