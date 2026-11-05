@@ -139,6 +139,11 @@ pub struct Reply {
 }
 
 impl App {
+    /// Stable identity of this running service instance (never a secret).
+    pub fn instance_id(&self) -> &str {
+        &self.instance_id
+    }
+
     /// A bounded projection, never raw reports, identities, lots or account cash.
     pub fn agent_summary(&self) -> stratide_research::InputSummary {
         let mut summary = stratide_research::InputSummary {

@@ -42,11 +42,11 @@
   --space-14: 56px;
   --space-16: 64px;
 
-  --radius-xs: 6px;
-  --radius-sm: 8px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-xs: 7px;
+  --radius-sm: 9px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
   --radius-pill: 999px;
 
   /* Neutral surface ladder: page -> sidebar -> card -> raised overlay. */
@@ -70,11 +70,12 @@
   --text-faint: #6e747a;
   --text-inverse: #fbfbfc;
 
-  --accent: #2f6fed;
-  --accent-hover: #2359cd;
-  --accent-soft: #eef3fe;
-  --accent-border: #cddcfb;
-  --accent-ink: #1c4bb4;
+  /* Apple system blue; one accent, used sparingly. */
+  --accent: #0071e3;
+  --accent-hover: #0068d1;
+  --accent-soft: #eef6ff;
+  --accent-border: #cfe6fb;
+  --accent-ink: #0062c4;
 
   /* A-share convention: gains are red, losses are green. Keep Stratide's own hues. */
   --gain: #b3352c;
@@ -168,8 +169,8 @@
   --text-faint: #838993;
   --text-inverse: #111113;
 
-  --accent: #7ba5ff;
-  --accent-hover: #a1c0ff;
+  --accent: #0a84ff;
+  --accent-hover: #409cff;
   --accent-soft: #16233c;
   --accent-border: #2b4068;
   --accent-ink: #b6cdff;

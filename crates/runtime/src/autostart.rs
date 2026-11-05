@@ -211,10 +211,10 @@ fn trigger_enabled(xml: &str) -> Option<bool> {
     let trigger = &xml[start..end];
     if trigger.contains("<Enabled>false</Enabled>") {
         Some(false)
-    } else if trigger.contains("<Enabled>true</Enabled>") {
-        Some(true)
     } else {
-        None
+        // Task Scheduler omits <Enabled> when the trigger is enabled; an
+        // exported task that keeps the element but is enabled also lands here.
+        Some(true)
     }
 }
 
@@ -298,6 +298,10 @@ mod autostart_tests {
         assert_eq!(trigger_enabled(enabled), Some(true));
         let disabled = "<Triggers><LogonTrigger><Enabled>false</Enabled></LogonTrigger></Triggers><Settings><Enabled>true</Enabled></Settings>";
         assert_eq!(trigger_enabled(disabled), Some(false));
+        // schtasks /Query /XML omits the element for a normal enabled trigger.
+        let normalized =
+            "<Triggers><LogonTrigger><Delay>PT30S</Delay></LogonTrigger></Triggers><Settings><Enabled>true</Enabled></Settings>";
+        assert_eq!(trigger_enabled(normalized), Some(true));
         assert_eq!(trigger_enabled("<Task></Task>"), None);
     }
 

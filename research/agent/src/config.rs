@@ -228,6 +228,20 @@ impl Settings {
         }
         Ok(())
     }
+    /// Clean local Agent for a new install: CNY budget, no provider, no model
+    /// and no synthetic task. Provider setup stays an explicit Owner action.
+    pub fn local_default() -> Self {
+        Self {
+            budget: Some(Budget {
+                currency: "CNY".into(),
+                timezone: "Asia/Shanghai".into(),
+                daily_limit_micro: 5_000_000,
+                monthly_limit_micro: 100_000_000,
+            }),
+            ..Self::default()
+        }
+    }
+
     pub fn fake() -> Self {
         let mut result = Self {
             budget: Some(Budget {

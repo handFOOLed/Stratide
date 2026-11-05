@@ -4,7 +4,10 @@ use stratided::{bind_local, handle_with_agent, App, Assets, Config};
 
 fn run() -> Result<(), String> {
     let args: Vec<_> = std::env::args().skip(1).collect();
-    if args.first().is_some_and(|s| s == "--agent-init-fake") && args.len() == 2 {
+    if (args.first().is_some_and(|s| s == "--agent-init-fake" || s == "--agent-init-local"))
+        && args.len() == 2
+    {
+        let synthetic = args[0] == "--agent-init-fake";
         let dir = PathBuf::from(&args[1]);
         std::fs::create_dir_all(&dir).map_err(|_| "无法创建 Agent 目录")?;
         let mut file = OpenOptions::new()
@@ -12,12 +15,21 @@ fn run() -> Result<(), String> {
             .write(true)
             .open(dir.join("settings.json"))
             .map_err(|_| "配置已存在或无法写入；不会覆盖 Owner 设置")?;
-        file.write_all(&serde_json::to_vec_pretty(&Settings::fake()).unwrap())
-            .map_err(|_| "无法写入 fake 配置")?;
-        file.sync_all().map_err(|_| "无法保存 fake 配置")?;
+        let settings = if synthetic {
+            Settings::fake()
+        } else {
+            Settings::local_default()
+        };
+        file.write_all(&serde_json::to_vec_pretty(&settings).unwrap())
+            .map_err(|_| "无法写入 Agent 配置")?;
+        file.sync_all().map_err(|_| "无法保存 Agent 配置")?;
         let _agent =
             Agent::open(&dir, None, App::load(None, None).agent_summary()).map_err(|e| e.0)?;
-        println!("已创建本地 fake / synthetic_test 配置与 owner-token；没有云端调用。使用 --agent-dir 指定此目录启动。");
+        if synthetic {
+            println!("已创建本地 fake / synthetic_test 配置与 owner-token；没有云端调用。使用 --agent-dir 指定此目录启动。");
+        } else {
+            println!("已创建本机 Agent（尚无 AI 服务与模型）并在该目录生成 owner-token；不会发起任何云调用。");
+        }
         return Ok(());
     }
     if args.first().is_some_and(|s| s == "--agent-settle") && args.len() == 5 {

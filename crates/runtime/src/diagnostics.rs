@@ -1,14 +1,16 @@
 //! Read-only product diagnostics used by the local Dashboard setup page.
-use crate::{health, Layout};
+use crate::Layout;
 use serde_json::{json, Value};
 use std::path::Path;
 use std::process::Command;
 
-pub fn collect(layout: &Layout) -> Value {
+/// `service` is supplied by the process answering this read-only request.
+/// Probing our own single-threaded port from inside a handler would block and
+/// report a healthy service as unavailable.
+pub fn collect(layout: &Layout, service: Value) -> Value {
     let config = layout.config();
     let state = crate::state::SupervisorState::read(&layout.state_path());
     let autostart = crate::autostart::status();
-    let live = health::probe(config.as_ref().map(|config| config.port).unwrap_or(0));
     let python = python_status(layout);
     let wsl = wsl_status(config.as_ref().ok().and_then(|config| config.wsl.as_ref()));
     let credential = credential_status(layout);
@@ -41,10 +43,7 @@ pub fn collect(layout: &Layout) -> Value {
             "dashboard": state.as_ref().and_then(|state| state.dashboard.clone()),
             "watch": state.as_ref().and_then(|state| state.watch.clone()),
         },
-        "service": match live {
-            Ok(value) => json!({"healthy": true, "instance_id": value.instance_id, "pid": value.process_id, "agent": value.agent}),
-            Err(error) => json!({"healthy": false, "code": error.code()}),
-        },
+        "service": service,
         "dependencies": {
             "python": python,
             "wsl": wsl,

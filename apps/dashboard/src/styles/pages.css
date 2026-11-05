@@ -2131,3 +2131,9 @@
   .install-token-row { grid-template-columns: 1fr; }
 }
 .install-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3); }
+.install-status { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+.install-advanced { margin-top: var(--space-4); border-top: 1px solid var(--border-faint); padding-top: var(--space-3); }
+.install-advanced > summary { cursor: pointer; color: var(--text-secondary); font-size: var(--fs-sm); list-style: none; }
+.install-advanced > summary::-webkit-details-marker { display: none; }
+.install-advanced > summary::before { content: '›'; display: inline-block; margin-right: 6px; transition: transform var(--motion-hover) var(--ease-out); }
+.install-advanced[open] > summary::before { transform: rotate(90deg); }

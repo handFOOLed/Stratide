@@ -57,7 +57,7 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
     let path = req.url().to_string();
     if method == "GET" {
         if path == "/api/runtime/status" {
-            return match status(&layout) {
+            return match status(app, &layout) {
                 Ok(value) => app.envelope(200, value, Value::Null),
                 Err(code) => error(503, code),
             };
@@ -98,6 +98,7 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
             "/api/runtime/tushare-token" => tushare_token(&layout, &body),
             "/api/runtime/market" => market(&layout, &body),
             "/api/runtime/wsl" => configure_wsl(&layout, &body),
+            "/api/runtime/wsl-detect" => detect_wsl(&layout),
             "/api/runtime/wsl-probe" => probe_wsl(&layout),
             "/api/runtime/open-folder" => open_folder(&layout, &body),
             "/api/runtime/setup-complete" => setup_complete(&layout),
@@ -116,14 +117,17 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
     }
 }
 
-fn status(layout: &Layout) -> Result<Value, &'static str> {
+fn status(app: &App, layout: &Layout) -> Result<Value, &'static str> {
     let mut cache = STATUS_CACHE.lock().map_err(|_| "RUNTIME_STATUS_BUSY")?;
     if let Some((at, value)) = cache.as_ref() {
         if at.elapsed() < Duration::from_secs(4) {
             return Ok(value.clone());
         }
     }
-    let value = stratide_runtime::diagnostics::collect(layout);
+    // This handler runs inside the service, so it is online by definition.
+    let service = json!({"healthy": true, "instance_id": app.instance_id(),
+        "pid": std::process::id().to_string()});
+    let value = stratide_runtime::diagnostics::collect(layout, service);
     *cache = Some((Instant::now(), value.clone()));
     Ok(value)
 }
@@ -298,12 +302,21 @@ fn configure_wsl(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
         python: optional_text(body, "python")?,
         model: optional_text(body, "model")?,
     };
+    let restart = store_wsl(layout, wsl.clone())?;
+    Ok(layout_envelope(
+        200,
+        json!({"state": "CONFIGURED", "watch_restart": restart, "wsl": wsl}),
+    ))
+}
+
+/// Persist one detected or Owner-entered WSL entry. Restarting the single watch
+/// interrupts an in-flight collection or CPU task, so unchanged settings are
+/// stored without disturbing the running chain.
+fn store_wsl(layout: &Layout, wsl: stratide_runtime::WslSettings) -> Result<bool, Reply> {
     stratide_runtime::config::validate_wsl(&wsl).map_err(|code| layout_error(400, &code))?;
     let mut config = layout
         .config()
         .map_err(|_| layout_error(409, "RUNTIME_CONFIG_INVALID"))?;
-    // Restarting the single watch interrupts an in-flight collection or CPU
-    // task, so saving unchanged settings must not disturb the running chain.
     let restart = config.wsl.as_ref() != Some(&wsl);
     if restart {
         // Written before the config so a failed request leaves the old entry
@@ -311,13 +324,70 @@ fn configure_wsl(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
         stratide_runtime::state::atomic_write(&layout.watch_restart_path(), b"{}".to_vec())
             .map_err(|_| layout_error(409, "WATCH_RESTART_REQUEST_FAILED"))?;
     }
-    config.wsl = Some(wsl.clone());
+    config.wsl = Some(wsl);
     config
         .save(&layout.config_path)
         .map_err(|_| layout_error(409, "RUNTIME_CONFIG_WRITE_FAILED"))?;
+    Ok(restart)
+}
+
+/// One-click local model discovery: find an existing WSL venv + TimesFM model
+/// and store it, so a new user never has to type a worktree path.
+fn detect_wsl(layout: &Layout) -> Result<Reply, Reply> {
+    let script = layout.app.join("scripts").join("timesfm-cpu.py");
+    if !script.is_file() {
+        return Err(layout_error(409, "TIMESFM_CLI_MISSING"));
+    }
+    let mut command = Command::new(layout.python());
+    command
+        .args(["-B", "-X", "utf8"])
+        .arg(&script)
+        .arg("detect")
+        .current_dir(&layout.app)
+        .env("STRATIDE_STATE_ROOT", &layout.data)
+        .env("STRATIDE_BIN_DIR", layout.app.join("bin"))
+        .env_remove("STRATIDE_TUSHARE_TOKEN")
+        .env_remove("STRATIDE_WSL_DISTRIBUTION")
+        .env_remove("STRATIDE_WSL_WORKSPACE")
+        .env_remove("STRATIDE_WSL_PYTHON")
+        .env_remove("STRATIDE_WSL_MODEL");
+    let value: Value = match stratide_runtime::run_capture(command, Duration::from_secs(180)) {
+        Ok((_, stdout, _)) => match serde_json::from_slice(&stdout) {
+            Ok(value) => value,
+            Err(_) => return Err(layout_error(409, "WSL_DETECT_OUTPUT_INVALID")),
+        },
+        Err(_) => return Err(layout_error(504, "WSL_DETECT_FAILED")),
+    };
+    let Some(detected) = value.get("wsl").filter(|entry| entry.is_object()) else {
+        return Ok(layout_envelope(
+            200,
+            json!({"state": "NOT_FOUND", "reason": "LOCAL_MODEL_NOT_FOUND"}),
+        ));
+    };
+    let wsl = stratide_runtime::WslSettings {
+        distribution: detected
+            .get("distribution")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_string(),
+        workspace: detected
+            .get("workspace")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_string(),
+        python: detected
+            .get("python")
+            .and_then(Value::as_str)
+            .map(str::to_string),
+        model: detected
+            .get("model")
+            .and_then(Value::as_str)
+            .map(str::to_string),
+    };
+    let restart = store_wsl(layout, wsl.clone())?;
     Ok(layout_envelope(
         200,
-        json!({"state": "CONFIGURED", "watch_restart": restart, "wsl": wsl}),
+        json!({"state": "FOUND", "watch_restart": restart, "wsl": wsl}),
     ))
 }
 

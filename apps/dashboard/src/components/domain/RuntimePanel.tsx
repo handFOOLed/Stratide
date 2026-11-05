@@ -166,6 +166,27 @@ export function RuntimePanel() {
     }
   };
 
+  const detectWsl = async () => {
+    setBusy('detect');
+    setError(null);
+    try {
+      const result = await runtimeAction<{ state: string; watch_restart?: boolean }>('wsl-detect');
+      if (result.state === 'FOUND') {
+        setWslLoaded(false);
+        push({ title: '已找到本机模型', description: '已自动保存，不需要填写任何路径。', tone: 'success' });
+        refresh(true);
+      } else {
+        push({ title: '没有找到本机模型', description: '没有它也能正常采集行情；需要时可在高级设置里手动指定。', tone: 'warning' });
+      }
+    } catch (caught) {
+      const code = caught instanceof ApiError ? caught.code : 'WSL_DETECT_FAILED';
+      setError(code);
+      push({ title: '自动检测未完成', description: code, tone: 'danger' });
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const probeWsl = async () => {
     setBusy('probe');
     setError(null);
@@ -302,11 +323,44 @@ export function RuntimePanel() {
       </section>
 
       <section className="install-section">
-        <h2 className="card__title">WSL2 TimesFM 桥接</h2>
+        <h2 className="card__title">本机 AI 模型</h2>
         <p className="muted">
-          复用 Owner 已有的 WSL2/ext4 venv 和模型，不下载、不打包权重。保存后后台会重启 EOD watch；
-          真实推理只在 WSL 本地执行，云研究仍走原授权与预算。未通过时研究 BLOCKED，但 EOD 采集继续。
+          可选。模型只在本机运行，不会把行情数据发给外部；没有它也能照常采集行情、查看模拟账户。
         </p>
+        <div className="install-status">
+          <Badge tone={status?.dependencies.wsl.configured ? 'success' : 'neutral'}>
+            {status?.dependencies.wsl.configured ? '已连接' : '未检测到'}
+          </Badge>
+          <span className="muted">
+            {status?.dependencies.wsl.configured
+              ? `${status.dependencies.wsl.distribution ?? ''}`
+              : '点“自动检测”即可，不需要填写任何路径。'}
+          </span>
+        </div>
+        <div className="install-actions">
+          {status?.dependencies.wsl.configured ? null : (
+            <Button
+              variant="primary"
+              disabled={!token || busy !== null}
+              loading={busy === 'detect'}
+              onClick={detectWsl}
+            >
+              自动检测
+            </Button>
+          )}
+          {status?.dependencies.wsl.configured ? (
+            <Button
+              variant="secondary"
+              disabled={!token || busy !== null}
+              loading={busy === 'probe'}
+              onClick={probeWsl}
+            >
+              检查是否可用
+            </Button>
+          ) : null}
+        </div>
+        <details className="install-advanced">
+          <summary>高级设置</summary>
         <div className="install-form">
           <Field label="WSL 发行版" htmlFor="wsl-distribution">
             <TextInput
@@ -345,29 +399,23 @@ export function RuntimePanel() {
             />
           </Field>
         </div>
-        <div className="install-actions">
-          <Button
-            variant="primary"
-            disabled={!token || busy !== null}
-            loading={busy === 'wsl'}
-            onClick={() => act('wsl', 'wsl', { ...wslForm }, 'WSL 配置已保存；EOD watch 将重启')}
-          >
-            保存 WSL 配置
-          </Button>
-          <Button
-            variant="secondary"
-            disabled={!token || busy !== null}
-            loading={busy === 'probe'}
-            onClick={probeWsl}
-          >
-            检测 WSL Worker
-          </Button>
-        </div>
-        {wslProbe ? <pre className="install-log">{JSON.stringify(wslProbe, null, 2)}</pre> : null}
-        <Callout tone="warning" title="不伪造成功">
-          缺少 WSL、模型或 Worker 隔离时，研究/Paper 阶段明确 BLOCKED；不会停止下一交易日的 EOD 采集，
-          也不会用 mock 推理代替真实 CPU 结果。保存/检测不会发起 DeepSeek 或行情请求。
-        </Callout>
+          <div className="install-actions">
+            <Button
+              variant="secondary"
+              disabled={!token || busy !== null}
+              loading={busy === 'wsl'}
+              onClick={() => act('wsl', 'wsl', { ...wslForm }, '本机模型设置已保存')}
+            >
+              保存
+            </Button>
+          </div>
+        </details>
+        {wslProbe ? (
+          <details className="install-advanced">
+            <summary>检测详情</summary>
+            <pre className="install-log">{JSON.stringify(wslProbe, null, 2)}</pre>
+          </details>
+        ) : null}
       </section>
 
       <section className="install-section">

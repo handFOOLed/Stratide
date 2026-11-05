@@ -89,7 +89,39 @@ pub fn run() -> Result<i32, String> {
 }
 
 impl Supervisor {
+    /// First run creates a clean local research Agent (no provider, no synthetic
+    /// model) so the product works without any manual setup step.
+    fn bootstrap(&self) {
+        let agent = self.layout.agent_dir();
+        if agent.join("settings.json").is_file() {
+            return;
+        }
+        let exe = self.layout.app.join("stratided.exe");
+        if !exe.is_file() {
+            return;
+        }
+        let mut command = Command::new(&exe);
+        command
+            .arg("--agent-init-local")
+            .arg(&agent)
+            .env("STRATIDE_STATE_ROOT", &self.layout.data)
+            .current_dir(&self.layout.app)
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null());
+        win::hide_console(&mut command);
+        match command.status() {
+            Ok(status) if status.success() => log(&self.layout, "local research agent initialized"),
+            Ok(status) => log(
+                &self.layout,
+                &format!("local agent init failed code={:?}", status.code()),
+            ),
+            Err(error) => log(&self.layout, &format!("local agent init failed: {error}")),
+        }
+    }
+
     fn run_loop(&mut self) -> Result<i32, String> {
+        self.bootstrap();
         let mut last_autostart_check = Instant::now();
         loop {
             if self.layout.read_stop_request() {
