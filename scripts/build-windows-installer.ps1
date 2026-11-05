@@ -115,16 +115,6 @@ foreach ($doc in @('WINDOWS_INSTALL.md', 'M3_PR04.md')) {
   $source = Join-Path $root "docs\$doc"
   if (Test-Path -LiteralPath $source) { Copy-Item -LiteralPath $source -Destination (Join-Path $payload 'docs') }
 }
-# The EOD snapshot records hashes of the exact rule sources it was built against.
-# Ship those reference files at the same relative paths so an installed copy can
-# publish a normal snapshot without a repository checkout.
-foreach ($relative in @('crates\contracts\src\paper.rs', 'research\timesfm_cpu\history.py')) {
-  $source = Join-Path $root $relative
-  if (-not (Test-Path -LiteralPath $source)) { throw "MISSING_RULE_SOURCE: $relative" }
-  $target = Join-Path $payload $relative
-  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $target) | Out-Null
-  Copy-Item -LiteralPath $source -Destination $target
-}
 
 & tar.exe -xf $pythonZip -C (Join-Path $payload 'runtime\python')
 if ($LASTEXITCODE -ne 0) { throw 'PYTHON_EMBED_EXTRACT_FAILED' }
@@ -140,9 +130,8 @@ if (Test-Path -LiteralPath $notices) { Copy-Item -LiteralPath $notices -Destinat
 
 $pythonVersion = (& (Join-Path $payload 'runtime\python\python.exe') -c "import sys;print(sys.version.split()[0])").Trim()
 if ($LASTEXITCODE -ne 0) { throw 'BUNDLED_PYTHON_SMOKE_FAILED' }
-$commit = (git -C $root rev-parse HEAD | Out-String).Trim()
-# A clean tree prints nothing; Out-String keeps the later Trim() valid.
-$dirty = if ((git -C $root status --porcelain | Out-String).Trim()) { '-dirty' } else { '' }
+$commit = (git -C $root rev-parse HEAD).Trim()
+$dirty = if ((git -C $root status --porcelain).Trim()) { '-dirty' } else { '' }
 $buildInfo = [ordered]@{
   product = 'Stratide'
   version = $Version

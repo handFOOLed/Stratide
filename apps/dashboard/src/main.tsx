@@ -12,7 +12,6 @@ import './styles/page-notifications.css';
 import { App } from './App';
 import { ToastProvider } from './components/ui/Toast';
 import { ThemeProvider, applyStoredAppearance } from './state/ThemeProvider';
-
 applyStoredAppearance();
 if (!window.location.hash) {
   window.history.replaceState(null, '', '#overview');

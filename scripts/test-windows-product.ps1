@@ -59,17 +59,18 @@ $health2 = Read-Health
 Check 'second-launch-same-instance' ($second.ExitCode -eq 0 -and $health2.data.instance_id -eq $health.data.instance_id) ''
 Check 'single-dashboard' ((@(Get-Process stratided -ErrorAction SilentlyContinue)).Count -eq 1) ''
 
+$token = (Get-Content (Join-Path $RootHome 'runtime\runtime-token') -Raw).Trim()
 $status = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/runtime/status" -TimeoutSec 20
 Check 'runtime-status' ($status.data.managed -eq $true -and $status.data.product_version -ne '') "version=$($status.data.product_version) python=$($status.data.dependencies.python.state)"
-Check 'runtime-token-removed' (-not (Test-Path (Join-Path $RootHome 'runtime\runtime-token'))) ''
+Check 'token-length' ($token.Length -ge 32) ''
 try {
-  $noOrigin = Invoke-WebRequest -Uri "http://127.0.0.1:$Port/api/runtime/setup-complete" -Method Post -Headers @{'Content-Type'='application/json'} -Body '{}' -TimeoutSec 10
-  Check 'runtime-write-requires-origin' $false "status=$($noOrigin.StatusCode)"
+  $unauthorized = Invoke-WebRequest -Uri "http://127.0.0.1:$Port/api/runtime/setup-complete" -Method Post -Headers @{'Origin'="http://127.0.0.1:$Port"; 'Content-Type'='application/json'; 'X-Stratide-Runtime'='wrong'} -Body '{}' -TimeoutSec 10
+  Check 'runtime-write-requires-token' $false "status=$($unauthorized.StatusCode)"
 } catch {
-  Check 'runtime-write-requires-origin' ($_.Exception.Response.StatusCode.value__ -eq 403) "status=$($_.Exception.Response.StatusCode.value__)"
+  Check 'runtime-write-requires-token' ($_.Exception.Response.StatusCode.value__ -eq 401) "status=$($_.Exception.Response.StatusCode.value__)"
 }
 
-$writeHeaders = @{'Origin'="http://127.0.0.1:$Port"; 'Content-Type'='application/json'}
+$writeHeaders = @{'Origin'="http://127.0.0.1:$Port"; 'Content-Type'='application/json'; 'X-Stratide-Runtime'=$token}
 $wslBody = '{"distribution":"Stratide-NoSuchDistro","workspace":"/tmp/stratide-none","python":".venv/bin/python","model":"models/timesfm-2.5"}'
 $wslFirst = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/runtime/wsl" -Method Post -Headers $writeHeaders -Body $wslBody -TimeoutSec 20
 Check 'wsl-config-saved' ($wslFirst.data.state -eq 'CONFIGURED' -and $wslFirst.data.watch_restart -eq $true -and $wslFirst.data.wsl.distribution -eq 'Stratide-NoSuchDistro') "restart=$($wslFirst.data.watch_restart)"

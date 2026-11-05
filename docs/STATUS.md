@@ -1,15 +1,30 @@
-# Stratide 当前状态｜2026-11-05
+# Stratide 当前状态｜Windows V2 / 0.3.0
 
-## 现行实施状态（优先于下方历史快照）
+> **产品状态（2026-11-05）**：Stratide V2 已可作为 **Windows 11 本地 Paper 模拟交易与研究软件**安装、打开和配置。用户入口：[使用教程](USER_GUIDE.md) · [Windows 安装手册](WINDOWS_INSTALL.md) · [故障排查与已知限制](KNOWN_LIMITATIONS.md)。
 
-- **V1 已工程收尾**：PR [#78](https://github.com/handFOOLed/Stratide/pull/78)、[#80](https://github.com/handFOOLed/Stratide/pull/80) 已合并；`V1_ENGINEERING_COMPLETE` 仅说明软件工程，不代表策略或实盘资格。
-- **V2/M3 A 数据层**：[#82 / PR #86](https://github.com/handFOOLed/Stratide/pull/86) 已合并 `cf86668b`；全市场 Tushare EOD、证券池、覆盖/质量门禁工程已接入，真实生产全市场覆盖仍未实测。
-- **V2/M3 B 研究层**：[#83 / PR #87](https://github.com/handFOOLed/Stratide/pull/87) 已合并 `1677bed3`；84 个 READY 连续交易日暖机、Top 8 本地 TimesFM CPU 与原预算/授权门禁、受控 DeepSeek Fusion。真实数据外发 `REAL_MARKET_DATA_EGRESS_DENIED` 默认保持；生产 E2E 未完成。
-- **V2/M3 C 自动 Paper 层**：[#84 / PR #88](https://github.com/handFOOLed/Stratide/pull/88) 已合并 `9a6a6ede`。Owner 冻结 fixed-ticket 政策、多证券**唯一共享** Risk→Execution→Ledger，T+1 盘后 `EX_POST_OPEN_ASSUMPTION` / NO_FILL，未知 NAV `NO_TRADE_REBASE`，整批最多 100 股（新策略）。真实 EOD 的未核验公司行为假设只有 Owner **单独显式批准**后才能使用，始终标 `CORPORATE_ACTIONS=UNVERIFIED`。当前支持成熟普通沪深主板，不等于全 A 股可撮合。
-- **V2/M3 D Windows 产品（Issue #85，本分支 Draft）**：已构建真实 `Stratide-Setup-0.3.0-x64.exe`（Inno Setup 6.7.4、按用户安装、无管理员、内置 CPython 3.12.10）及单实例 Supervisor/Launcher、登录自启（Task Scheduler，必要时当前用户 Run 键回退）、双击打开 Dashboard、运行/依赖诊断页、升级/卸载数据保全。开发者 E2E 覆盖单实例/端口冲突/异常退出/Job 清理/升级/中文与空格路径/内置 Python BLOCKED 空态；**真实桌面快捷方式、登录自启、卸载注册表项和浏览器打开因本机沙箱 ACL/进程限制为 `NOT_RUN`**。TimesFM/WSL 研究自动链路仍未接入安装器，未配置时明确 BLOCKED。未 Ready/未合并，见 [WINDOWS_INSTALL](WINDOWS_INSTALL.md)、[M3_PR04](M3_PR04.md)、[证据](evidence/m3-pr04/README.md)。
-- **共同限制**：仅 Paper、不连接券商或真实账户；源端 84 会话暖机/有效数据/云外发范围授权/预算和真实 Windows 本地实测仍需满足；N100/Linux 独立主机延期。#10 开盘实收、#17 公司行为/PIT 证据 `NOT_VERIFIED`，不应由工程绿测替代。
+## V2 模块交付
 
-**实施依据**：[Issue #85](https://github.com/handFOOLed/Stratide/issues/85) > [V2 总路线图 #81](https://github.com/handFOOLed/Stratide/issues/81) > [AGENTS.md](../AGENTS.md)；以下各段是按发生时间写入的**原始工作快照**，其中“本分支 Draft”“当前 #74/#77/#84”“尚无自动 Paper”等在当时成立，但**不再描述最新 main**，保留供历史追溯，不要照旧启动任务或改写原测试报告。
+| 模块 | 已合并交付 | 主要能力 |
+| --- | --- | --- |
+| A / #82 | [PR #86](https://github.com/handFOOLed/Stratide/pull/86) · `cf86668b` | 市场证券池、增量 EOD、来源与覆盖质量 |
+| B / #83 | [PR #87](https://github.com/handFOOLed/Stratide/pull/87) · `1677bed3` | TimesFM/Naive/EWMA、受控 DeepSeek 研究、冻结候选与统一预算 |
+| C / #84 | [PR #88](https://github.com/handFOOLed/Stratide/pull/88) · `9a6a6ede` | 多证券共享 Paper 风控/现金/账本、T+1 事后假设成交与恢复 |
+| D / #85 | [PR #89](https://github.com/handFOOLed/Stratide/pull/89) · `a736bf0d` | Windows 安装包、单实例后台、可选登录自启、桌面双击 Dashboard、WSL2 TimesFM 自动桥接 |
+
+**以上四个工程模块均已合入 `main`。** 原 #85 的 Draft 开发状态已经结束；下一项工程任务须经 Owner 另行确定，不沿用旧文档中的“当前实施 #74/#84/#85”指令。
+
+## 使用与能力边界
+
+- **可以使用**：下载安装包、双击打开 Dashboard、在设置页配置行情与已有 WSL2 TimesFM、按授权运行已有研究/模拟交易链。个人用户日常操作入口为 [完整使用教程](USER_GUIDE.md)。
+- **始终 Paper-only**：无实盘券商报单。模拟账户通过原 Owner 配置建立/绑定；T 日固定意图和 T+1 日线的 `EX_POST_OPEN_ASSUMPTION` 不是实时开盘成交。
+- **默认安全配置**：真实行情及派生摘要外发 DeepSeek 需单独授权；原 Agent 费用上限 CNY ¥5/日、¥100/月；研究和 Paper 均受数据质量、风险与交易日时点门禁限制。
+- **验证层级**：PR #89 开发者报告已实现真实 WSL2 CPU 模型推理/安装态 payload 验证；原开发沙箱中，部分 Windows 普通会话安装、登录自启、卸载与完整真实行情/云付费/Paper 长期 E2E 仍标 `NOT_RUN`。产品可使用不等于这些功能都已完成独立现场验收。所有技术前提和验证范围单独列于 [已知限制](KNOWN_LIMITATIONS.md)，原证据见 [M3-PR04 Evidence](evidence/m3-pr04/README.md)。
+
+## 工程与历史文档
+
+[文档中心](README.md) · [产品原则](PRODUCT.md) · [工程规则](../AGENTS.md) · [M3-PR04](M3_PR04.md) · [优化清单](OPTIMIZATION_BACKLOG.md)
+
+以下内容为早期研发记录，按照当时的日期保留原始“Draft / 当前”叙述，**不再作为 V2 现行状态或开发任务依据**。历史验收/财务证据不做追溯性修改。
 
 ---
 
