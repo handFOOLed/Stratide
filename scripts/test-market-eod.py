@@ -358,16 +358,19 @@ class MarketTests(unittest.TestCase):
         with self.market.read() as db:
             self.assertEqual(db.execute("SELECT COUNT(*) FROM daily_rows WHERE ts_code=?", (A,)).fetchone()[0], 0)
 
-    def test_calendar_holiday_and_window_do_not_fetch_daily(self):
-        self.at = "2026-11-04T07:59:00+00:00"
-        self.assertEqual(self.once()["state"], "WAITING_FOR_COLLECTION_WINDOW")
-        self.assertEqual(self.http.calls, [])
-        self.at = "2026-11-04T08:10:00+00:00"
+    def test_calendar_holiday_and_close_time_do_not_fetch_daily(self):
+        daily = {"daily", "adj_factor", "suspend_d", "daily_basic"}
+        # No fixed clock window: today is simply not requested before the close.
+        self.at = "2026-11-04T06:00:00+00:00"
+        self.assertEqual(self.once()["state"], "WAITING_FOR_MARKET_CLOSE")
+        self.assertFalse(daily & {a for a, _ in self.http.calls})
+        # A holiday is reported as closed and never fetches a daily bar either.
+        holiday = m.Market(self.market.root / "holiday")
+        holiday.initialize(DAY, data_mode="synthetic_test")
+        holiday.control(True)
         self.http.closed.add(DAY)
-        self.assertEqual(self.once()["state"], "MARKET_CLOSED")
-        self.assertEqual({a for a,p in self.http.calls}, {"trade_cal"})
-        self.at = "2026-11-04T10:01:00+00:00"
-        self.assertEqual(self.once()["state"], "DEADLINE_REACHED")
+        self.assertEqual(holiday.once(transport=self.http, clock=lambda: self.at)["state"], "MARKET_CLOSED")
+        self.assertFalse(daily & {a for a, _ in self.http.calls})
 
     def test_network_429_restart_and_bound_on_retries(self):
         self.http.failures["daily"] = TimeoutError()

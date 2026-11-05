@@ -474,14 +474,14 @@ class Market(h.Warehouse):
                     return dict(state="MARKET_CLOSED", **SAFE)
                 catalog = self.catalog(db, download, today)
                 state = "READY"
+                published = 0
+                waiting = None
                 for date, opened in sorted(calendar.items()):
                     if opened == "0":
                         continue
                     if date == today:
                         if local.time() < dt.time(15, 5):
-                            continue
-                        if old and old["state"] == "BLOCKED" and (
-                                instant(local.isoformat()) - instant(old["received_at"])) < dt.timedelta(minutes=10):
+                            waiting = "WAITING_FOR_MARKET_CLOSE"
                             continue
                     previous = self.load_snapshot(db, date)
                     if previous and previous["state"] == "READY":
@@ -500,9 +500,12 @@ class Market(h.Warehouse):
                     fault("before_snapshot")
                     snapshot = self.publish(db, date, config, catalog, cal_refs, data, refs, states)
                     fault("after_snapshot")
+                    published += 1
                     if snapshot["state"] == "BLOCKED":
                         state = "BLOCKED"
                 download.finish(state)
+                if published == 0 and waiting is not None:
+                    return dict(state=waiting, requests_this_run=download.calls, **SAFE)
                 return dict(state=state, requests_this_run=download.calls, **SAFE)
             except Error as error:
                 download.finish(str(error))
@@ -643,7 +646,8 @@ def cli(argv=None):
                 if args.action == "once":
                     break
                 print(json.dumps(result, ensure_ascii=False), flush=True)
-                time.sleep(30)
+                # A blocked or incomplete attempt is retried, not hammered.
+                time.sleep(300 if result.get("state") in ("BLOCKED", "NETWORK_OUTCOME_UNKNOWN") else 30)
         else:
             result = market.report()
             if args.action == "verify":
