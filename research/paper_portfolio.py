@@ -15,6 +15,8 @@ import subprocess
 import market_eod as m
 import market_research as mr
 
+import stratide_paths as paths
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -23,7 +25,7 @@ def binding_path():
 
 
 def bridge(ledger, action, value=None):
-    exe = ROOT / "target/debug" / ("stratide-cli.exe" if os.name == "nt" else "stratide-cli")
+    exe = paths.executable("stratide-cli")
     result = subprocess.run([str(exe), "paper-portfolio", str(ledger), action],
                             input=m.canonical(value or {}), capture_output=True, timeout=60)
     m.require(result.returncode == 0, "PAPER_LEDGER_COMMAND_REJECTED")

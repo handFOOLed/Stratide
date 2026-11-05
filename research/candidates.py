@@ -22,6 +22,8 @@ if __package__:
 else:
     import data_snapshot
 
+import stratide_paths as paths
+
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = "m2-pr04-candidate-v1"
 TEMPLATE_ID = "sma5-20-cross-fixed100-v1"
@@ -40,7 +42,7 @@ SYNTHETIC_TEMPLATE = dict(template_id=SYNTHETIC_ID, parameters={},
                           evaluation_protocol="synthetic-pipeline-v1")
 TEMPLATES = {TEMPLATE_ID: TEMPLATE, SYNTHETIC_ID: SYNTHETIC_TEMPLATE}
 RAW_NAMES = ("calendar.json", "daily.json", "limits.json", "suspensions.json", "extraction.json")
-EXE = ROOT / "target/debug" / ("stratide-cli.exe" if os.name == "nt" else "stratide-cli")
+EXE = paths.executable("stratide-cli")
 EVALUATOR = ROOT / "scripts/research-evaluate.py"
 
 
@@ -205,11 +207,10 @@ def owner_template(owner):
 class Registry:
     def __init__(self, name, create=False):
         require(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}", name), "REGISTRY_NAME_INVALID")
-        self.root = ROOT / "state/candidates" / name
+        self.root = paths.local_root() / "state/candidates" / name
         no_links(self.root)
         if create:
-            require(subprocess.run(["git", "check-ignore", "--quiet", str(self.root / "candidate.json")],
-                                   cwd=ROOT).returncode == 0, "REGISTRY_MUST_BE_GITIGNORED")
+            require(paths.ignored(self.root / "candidate.json"), "REGISTRY_MUST_BE_GITIGNORED")
             self.root.mkdir(parents=True, exist_ok=True)
         require(self.root.is_dir(), "REGISTRY_NOT_FOUND")
 

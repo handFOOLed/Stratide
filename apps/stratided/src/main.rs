@@ -36,7 +36,7 @@ fn run() -> Result<(), String> {
         return Ok(());
     }
     if args == ["--help"] || args == ["-h"] {
-        println!("Stratide 本地 Paper Dashboard + 研究 Agent\nstratided [--report-dir <六报告目录>] [--evaluation-file <独立 evaluation.json>] [--port 8710] [--assets-dir <构建目录>] [--agent-dir <独立 Agent 目录>] [--agent-config <本机可信 JSON>] [--agent-eod-store <名称，仅本地fake、显式课题>]\nstratided --agent-init-fake <新目录>\nstratided --agent-settle <目录> <call-id> <actual-micro> <invoice-reference>\n账户快照固定；Agent 没有交易权限。未配置预算/授权时禁止付费调用。");
+        println!("Stratide 本地 Paper Dashboard + 研究 Agent\nstratided [--report-dir <六报告目录>] [--evaluation-file <独立 evaluation.json>] [--port 8710] [--assets-dir <构建目录>] [--agent-dir <独立 Agent 目录>] [--agent-config <本机可信 JSON>] [--agent-eod-store <名称，仅本地fake、显式课题>] [--runtime-home <安装运行目录>]\nstratided --agent-init-fake <新目录>\nstratided --agent-settle <目录> <call-id> <actual-micro> <invoice-reference>\n账户快照固定；Agent 没有交易权限。未配置预算/授权时禁止付费调用。");
         return Ok(());
     }
     let config = Config::parse(args.into_iter())?;
@@ -52,6 +52,7 @@ fn run() -> Result<(), String> {
         .transpose()
         .map_err(|e| e.0)?;
     app.paper_ledger = config.paper_ledger.clone();
+    app.runtime_home = config.runtime_home.clone();
     let server = bind_local(config.port)?;
     let report_source = config.report_dir.clone();
     let evaluation_source = config.evaluation_file.clone();

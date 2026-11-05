@@ -22,18 +22,17 @@ import data_snapshot as d
 import eod_journal as j
 import shadow as s
 
+import stratide_paths as paths
+
 ROOT = Path(__file__).resolve().parents[1]
-EXE = ROOT / "target/debug" / ("risk-portfolio-agent.exe" if os.name == "nt" else "risk-portfolio-agent")
+EXE = paths.executable("risk-portfolio-agent")
 SCOPE, POLICY = "risk_portfolio_v1", "risk-portfolio-v1"
 SAFE = dict(restriction="RESEARCH_ONLY", eligibility="ELIGIBILITY_DENIED",
             can_execute_forward_paper=False, live_allowed=False, orders=0, fills=0, nav=None)
 
 
 def root():
-    env = {k: v for k, v in os.environ.items() if k.upper() not in ("GIT_DIR", "GIT_WORK_TREE", "GIT_COMMON_DIR")}
-    output = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"], cwd=ROOT,
-                            env=env, capture_output=True, check=True)
-    return Path(os.fsdecode(output.stdout).strip()).resolve().parent / "state/risk-portfolio"
+    return paths.common_root() / "state/risk-portfolio"
 
 
 def digest(value):

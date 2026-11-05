@@ -21,6 +21,8 @@ else:
     import data_snapshot as d
     import eod_journal as j
 
+import stratide_paths as paths
+
 ROOT = Path(__file__).resolve().parents[1]
 RULE = dict(version="sma5-20-shadow-v1", indicator_version="sma5-20-cross-fixed100-v1",
             fast=5, slow=20, relation="fast_sum*4>slow_sum", warmup=21,
@@ -37,9 +39,7 @@ def clock_ms():
 
 
 def common_root():
-    result = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
-                            cwd=ROOT, capture_output=True, check=True)
-    return Path(os.fsdecode(result.stdout).strip()).resolve().parent
+    return paths.common_root()
 
 
 def sidecars(path):
@@ -300,8 +300,7 @@ class Shadow:
     def init(self):
         self.src = source(self.store)
         j.require(not self.root.exists(), "SHADOW_ALREADY_INITIALIZED")
-        j.require(subprocess.run(["git", "check-ignore", "--quiet", str(self.path)],
-                                cwd=common_root()).returncode == 0, "SHADOW_MUST_BE_GITIGNORED")
+        j.require(paths.ignored(self.path), "SHADOW_MUST_BE_GITIGNORED")
         self.root.mkdir(parents=True, exist_ok=False)
         with d.writer(self.root / "writer.lock"), self.write() as db:
             db.execute("CREATE TABLE events(seq INTEGER PRIMARY KEY,event_key TEXT UNIQUE,payload TEXT NOT NULL,digest TEXT NOT NULL,previous TEXT NOT NULL)")

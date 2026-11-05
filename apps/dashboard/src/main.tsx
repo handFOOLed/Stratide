@@ -7,8 +7,10 @@ import './styles/pages.css';
 import { App } from './App';
 import { ToastProvider } from './components/ui/Toast';
 import { ThemeProvider, applyStoredAppearance } from './state/ThemeProvider';
+import { captureRuntimeToken } from './lib/runtime';
 
 applyStoredAppearance();
+captureRuntimeToken();
 if (!window.location.hash) {
   window.history.replaceState(null, '', '#overview');
 }

@@ -14,14 +14,15 @@ import sys
 from model import Rejected, digest, loads, require, sha_file, verify_model
 import runtime
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import stratide_paths as paths
+
 ROOT = runtime.ROOT
-EXE = ROOT / "target/debug" / ("timesfm-risk-agent.exe" if os.name == "nt" else "timesfm-risk-agent")
+EXE = paths.executable("timesfm-risk-agent")
 
 
 def common_root():
-    p = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"], cwd=ROOT,
-                       env={k:v for k,v in os.environ.items() if k.upper() not in ("GIT_DIR","GIT_WORK_TREE","GIT_COMMON_DIR")}, capture_output=True, check=True)
-    return Path(os.fsdecode(p.stdout).strip()).resolve().parent
+    return paths.common_root()
 
 
 def state_root():

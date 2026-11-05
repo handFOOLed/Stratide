@@ -3,7 +3,9 @@ resolver = "2"
 members = [
   "apps/stratided",
   "apps/stratide-cli",
+  "apps/stratide-launcher",
   "crates/contracts",
+  "crates/runtime",
   "crates/risk",
   "crates/ledger",
   "crates/forward",

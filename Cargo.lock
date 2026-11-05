@@ -1168,6 +1168,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "stratide-launcher"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "serde",
+ "serde_json",
+ "stratide-runtime",
+]
+
+[[package]]
 name = "stratide-ledger"
 version = "0.0.1"
 dependencies = [
@@ -1208,6 +1218,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "stratide-runtime"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "getrandom 0.3.4",
+ "serde",
+ "serde_json",
+ "tempfile",
+]
+
+[[package]]
 name = "stratided"
 version = "0.0.1"
 dependencies = [
@@ -1220,6 +1241,7 @@ dependencies = [
  "stratide-contracts",
  "stratide-ledger",
  "stratide-research",
+ "stratide-runtime",
  "tempfile",
  "tiny_http",
 ]

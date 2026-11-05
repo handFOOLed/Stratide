@@ -2,9 +2,9 @@
 
 # Stratide
 
-> **项目现行状态｜2026-11-05**：V2/M3 **模块 A/B/C 软件工程已合并至 `main`**：[#82 / PR #86](https://github.com/handFOOLed/Stratide/pull/86) 全市场 EOD 数据层、[#83 / PR #87](https://github.com/handFOOLed/Stratide/pull/87) 受控 TimesFM + DeepSeek 自动研究、[#84 / PR #88](https://github.com/handFOOLed/Stratide/pull/88) 多证券共享 Paper 账户与 T+1 事后模拟。**当前唯一任务 [#85](https://github.com/handFOOLed/Stratide/issues/85)：Windows 11 安装包、用户登录后台自启、双击快捷方式启动服务并打开 Dashboard；Owner 指定 DeepSeek 完整负责。#85 尚未实现或合并。** [现行状态](docs/STATUS.md) · [V2 总路线图 #81](https://github.com/handFOOLed/Stratide/issues/81)。
+> **项目现行状态｜2026-11-05**：V2/M3 **模块 A/B/C 软件工程已合并至 `main`**：[#82 / PR #86](https://github.com/handFOOLed/Stratide/pull/86) 全市场 EOD 数据层、[#83 / PR #87](https://github.com/handFOOLed/Stratide/pull/87) 受控 TimesFM + DeepSeek 自动研究、[#84 / PR #88](https://github.com/handFOOLed/Stratide/pull/88) 多证券共享 Paper 账户与 T+1 事后模拟。**#85 / M3-PR04 已提交 Draft 开发交付（未合并）：** 可构建的 Windows 11 安装包、用户登录后台自启、单实例 Supervisor/Launcher、双击打开 Dashboard、运行诊断页、升级/卸载数据保全。安装与首启步骤见 [WINDOWS_INSTALL](docs/WINDOWS_INSTALL.md)，设计与已知限制见 [M3_PR04](docs/M3_PR04.md)、[证据](docs/evidence/m3-pr04/README.md)。**未 Ready/未合并；研究/WSL 自动链路仍未接入。** [现行状态](docs/STATUS.md) · [V2 总路线图 #81](https://github.com/handFOOLed/Stratide/issues/81)。
 
-> **不能误解的能力边界**：目前是 Paper-only，不接券商/真钱；自动模拟采用冻结 T 日意图、T+1 盘后实收日线的 `EX_POST_OPEN_ASSUMPTION`。未核验公司行为假设必须 Owner 单独批准且受原 Risk 与保守额度约束，不能当作真实成交或策略有效性。真实全市场在线采集/自动模型/Windows 安装产品尚未做完整实机 E2E，84 个 READY 会话为研究暖机条件；真实数据云外发默认 DENIED，DeepSeek 内部硬预算仍是 CNY ¥5/日、¥100/月。N100 部署延期。
+> **不能误解的能力边界**：目前是 Paper-only，不接券商/真钱；自动模拟采用冻结 T 日意图、T+1 盘后实收日线的 `EX_POST_OPEN_ASSUMPTION`。未核验公司行为假设必须 Owner 单独批准且受原 Risk 与保守额度约束，不能当作真实成交或策略有效性。真实全市场在线采集/自动模型/Windows 安装产品尚未完成全部实机 E2E（本机沙箱无法执行快捷方式/自启/卸载注册表，见证据），84 个 READY 会话为研究暖机条件；真实数据云外发默认 DENIED，DeepSeek 内部硬预算仍是 CNY ¥5/日、¥100/月。N100 部署延期。
 
 
 
@@ -38,7 +38,15 @@ Owner 首次使用：在既有真实 CNY Agent 的 `settings.json` 手动填日/
 - **当前顺序：** #74 交付真实历史 → 本地 TimesFM 核心闭环，单个 Draft 等待固定 HEAD 审查。后续预冻结样本外协议、积累前向 EOD；UI 在核心之后。见[当前状态](docs/STATUS.md)。
 - **PR #56 审查修复：** 新链路须显式绑定已有 Owner AgentDir/配置，与旧 Agent 共用同一费用库，不再初始化第二个预算。预算修复已获源码复审确认；原 PR52/54 三套盘后完整回归 **10+4+13 项均 exit 0**，PR #56 后续已合并，原开发证据保留；见 [R1 证据](docs/evidence/m2-pr11/r1/README.md)。
 
-## 旧版开发态 Windows 启动示例（不是 #85 安装包）
+## Windows 安装包（#85 Draft）
+
+运行 `dist\installer\Stratide-Setup-0.3.0-x64.exe`（按用户安装，无需管理员）；详细步骤、升级/卸载和构建方式见 [WINDOWS_INSTALL](docs/WINDOWS_INSTALL.md)。安装包与 SHA256 的生成：
+
+```powershell
+pwsh -NoProfile -File scripts/build-windows-installer.ps1 -Version 0.3.0
+```
+
+以下为**旧版开发态启动示例**，需要源码、PowerShell 7、Node 与 Rust，不是安装产品。
 
 在仓库根目录运行（以下为**合成测试数据**，不是实际市场收益）：
 

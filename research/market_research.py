@@ -20,6 +20,8 @@ import eod_journal as j
 import market_eod as m
 import portfolio_research as rp
 
+import stratide_paths as paths
+
 ROOT = Path(__file__).resolve().parents[1]
 POLICY = "market-research-v1"
 CONFIG = "market_research_config_v1"
@@ -31,7 +33,7 @@ RULES = dict(version="market-screen-v1", context=84, min_listing_days=180,
 
 
 def bridge(action, value=None):
-    exe = ROOT / "target/debug" / ("market-research-agent.exe" if os.name == "nt" else "market-research-agent")
+    exe = paths.executable("market-research-agent")
     p = subprocess.run([str(exe), action], input=json.dumps(value or {}, allow_nan=False).encode(),
                        cwd=ROOT, capture_output=True, timeout=150)
     v = j.loads(p.stdout)
