@@ -1,5 +1,19 @@
-# Stratide 当前状态
+# Stratide 当前状态｜2026-11-05
 
+## 现行实施状态（优先于下方历史快照）
+
+- **V1 已工程收尾**：PR [#78](https://github.com/handFOOLed/Stratide/pull/78)、[#80](https://github.com/handFOOLed/Stratide/pull/80) 已合并；`V1_ENGINEERING_COMPLETE` 仅说明软件工程，不代表策略或实盘资格。
+- **V2/M3 A 数据层**：[#82 / PR #86](https://github.com/handFOOLed/Stratide/pull/86) 已合并 `cf86668b`；全市场 Tushare EOD、证券池、覆盖/质量门禁工程已接入，真实生产全市场覆盖仍未实测。
+- **V2/M3 B 研究层**：[#83 / PR #87](https://github.com/handFOOLed/Stratide/pull/87) 已合并 `1677bed3`；84 个 READY 连续交易日暖机、Top 8 本地 TimesFM CPU 与原预算/授权门禁、受控 DeepSeek Fusion。真实数据外发 `REAL_MARKET_DATA_EGRESS_DENIED` 默认保持；生产 E2E 未完成。
+- **V2/M3 C 自动 Paper 层**：[#84 / PR #88](https://github.com/handFOOLed/Stratide/pull/88) 已合并 `9a6a6ede`。Owner 冻结 fixed-ticket 政策、多证券**唯一共享** Risk→Execution→Ledger，T+1 盘后 `EX_POST_OPEN_ASSUMPTION` / NO_FILL，未知 NAV `NO_TRADE_REBASE`，整批最多 100 股（新策略）。真实 EOD 的未核验公司行为假设只有 Owner **单独显式批准**后才能使用，始终标 `CORPORATE_ACTIONS=UNVERIFIED`。当前支持成熟普通沪深主板，不等于全 A 股可撮合。
+- **V2/M3 D 当前唯一任务**：[#85](https://github.com/handFOOLed/Stratide/issues/85) Windows 11 实际安装包、登录后自动后台运行、单实例桌面 Launcher/双击打开本地 Dashboard、向导、升级卸载/依赖检测。**Owner 指定 DeepSeek 完整实施（不再仅限 UI）**；该模块尚未开发完成、未发布可用安装产物。下一步一个 Draft PR，ChatGPT 复审，Owner 明确决定合并。
+- **共同限制**：仅 Paper、不连接券商或真实账户；源端 84 会话暖机/有效数据/云外发范围授权/预算和真实 Windows 本地实测仍需满足；N100/Linux 独立主机延期。#10 开盘实收、#17 公司行为/PIT 证据 `NOT_VERIFIED`，不应由工程绿测替代。
+
+**实施依据**：[Issue #85](https://github.com/handFOOLed/Stratide/issues/85) > [V2 总路线图 #81](https://github.com/handFOOLed/Stratide/issues/81) > [AGENTS.md](../AGENTS.md)；以下各段是按发生时间写入的**原始工作快照**，其中“本分支 Draft”“当前 #74/#77/#84”“尚无自动 Paper”等在当时成立，但**不再描述最新 main**，保留供历史追溯，不要照旧启动任务或改写原测试报告。
+
+---
+
+## 历史工程记录（按原时间保留）
 **2026-11-05 / PR #88 R1 修复：** 新增 Owner 单独批准的未核验公司行为 Paper 假设路径，真实 EOD schema 可经原 Runner/CLI/唯一 Ledger 产生模拟成交；昨收/因子异常仍 NO_FILL。新增无交易估值恢复事件，未知 NAV 可跨日恢复且保留亏损/回撤/人工锁；容量明确为整批共享，可选 Paper 导入异常不终止 EOD watch。开发者定向回归，未改 Owner 设置/未新增真实行情调用，仍 Draft 未合并。[R1 证据](evidence/m3-pr03/R1.md)。
 
 **2026-11-05 / #84（本分支 Draft 开发交付）：** [M3-PR03](M3_PR03.md) 基于 main `1677bed3`，新增原 Ledger 内多证券原子批次、Owner 冻结固定金额 Paper 假设政策、T+1 日历/实收确认、NO_FILL/到期与 Dashboard 溯源。研究旧资格不变，真实源缺公司行为/精确规则仍 NO_FILL；仅合成工程验证，不是独立验收，未开启 Owner 自动化、未新增真实行情/付费调用，不自行合并。
@@ -65,7 +79,9 @@
 - **真实公司行为处理和历史 PIT 认证**：未完成；隔离模型通过不能开放真实历史长窗口。真实券商、实盘资金、公共 Web、无人值守策略自动部署均未获授权。
 - [PR #15](https://github.com/handFOOLed/Stratide/pull/15) 是尚未合并的 Q01–Q69 访谈**设计参考**，其中“Web/Agent 推迟到 paper 之后”的旧排序已被 Owner [Issue #19](https://github.com/handFOOLed/Stratide/issues/19) 取代。
 
-## 当前执行顺序
+## 历史执行顺序（2026-11-03，当时有效，现已被 #85 替代）
+
+
 
 1. **Sol / #74：** 真实历史数据与质量 → 本地 TimesFM 核心闭环，单个 Draft PR；开发者验证已完成，等待固定 HEAD 审查与 Owner 明确合并授权。
 2. **后续独立 Issue：** 预冻结样本外协议并比较 Naive/EWMA；继续真实前向 EOD。历史 PIT、公司行为、开盘与 N100 真机限制保留。
