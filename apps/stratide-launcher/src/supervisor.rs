@@ -263,6 +263,7 @@ impl Supervisor {
             .arg(self.layout.app.join("dashboard"))
             .arg("--runtime-home")
             .arg(&self.layout.home)
+            .env("STRATIDE_STATE_ROOT", &self.layout.data)
             .current_dir(&self.layout.app)
             .stdin(Stdio::null());
         let agent_dir = self.layout.agent_dir();
@@ -320,6 +321,18 @@ impl Supervisor {
     }
 
     fn ensure_watch(&mut self) -> Result<(), String> {
+        if self.layout.watch_restart_path().is_file() {
+            self.layout.clear_watch_restart();
+            if let Some(watch) = self.watch.as_mut() {
+                if let Some(child) = watch.child.as_mut() {
+                    let _ = child.kill();
+                    let _ = child.wait();
+                }
+            }
+            self.watch = None;
+            self.reason = "WATCH_RESTARTING".into();
+            log(&self.layout, "eod watch restart requested");
+        }
         let exited = self.poll_watch_exit();
         if let Some(exit) = exited {
             let watch = self.watch.as_mut().expect("watch exists after poll");
@@ -406,6 +419,26 @@ impl Supervisor {
             .env("PYTHONIOENCODING", "utf-8")
             .env_remove("STRATIDE_TUSHARE_TOKEN")
             .stdin(Stdio::null());
+        let config = match self.layout.config() {
+            Ok(config) => config,
+            Err(_) => {
+                self.reason = "RUNTIME_CONFIG_INVALID".into();
+                return Ok(());
+            }
+        };
+        if let Some(wsl) = &config.wsl {
+            command
+                .env("STRATIDE_WSL_DISTRIBUTION", &wsl.distribution)
+                .env("STRATIDE_WSL_WORKSPACE", &wsl.workspace)
+                .env("STRATIDE_WSL_PYTHON", wsl.python_path())
+                .env("STRATIDE_WSL_MODEL", wsl.model_path());
+        } else {
+            command
+                .env_remove("STRATIDE_WSL_DISTRIBUTION")
+                .env_remove("STRATIDE_WSL_WORKSPACE")
+                .env_remove("STRATIDE_WSL_PYTHON")
+                .env_remove("STRATIDE_WSL_MODEL");
+        }
         let stdout = append_log(&self.layout.logs.join("eod-watch.out.log"))?;
         let stderr = append_log(&self.layout.logs.join("eod-watch.err.log"))?;
         command.stdout(stdout).stderr(stderr);

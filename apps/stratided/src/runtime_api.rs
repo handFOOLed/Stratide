@@ -97,6 +97,8 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
             "/api/runtime/autostart" => autostart(app, &layout, &body),
             "/api/runtime/tushare-token" => tushare_token(&layout, &body),
             "/api/runtime/market" => market(&layout, &body),
+            "/api/runtime/wsl" => configure_wsl(&layout, &body),
+            "/api/runtime/wsl-probe" => probe_wsl(&layout),
             "/api/runtime/open-folder" => open_folder(&layout, &body),
             "/api/runtime/setup-complete" => setup_complete(&layout),
             "/api/runtime/shutdown" => {
@@ -262,6 +264,107 @@ fn open_folder(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
         .spawn()
         .map_err(|_| layout_error(409, "FOLDER_OPEN_FAILED"))?;
     Ok(layout_envelope(200, json!({"state": "OPENED"})))
+}
+
+fn optional_text(body: &Value, key: &str) -> Result<Option<String>, Reply> {
+    let Some(value) = body.get(key) else {
+        return Ok(None);
+    };
+    let Some(text) = value.as_str() else {
+        return Err(layout_error(400, "WSL_PATH_INVALID"));
+    };
+    let text = text.trim();
+    if text.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(text.to_string()))
+    }
+}
+
+fn configure_wsl(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
+    let distribution = body
+        .get("distribution")
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .ok_or_else(|| layout_error(400, "WSL_DISTRIBUTION_INVALID"))?;
+    let workspace = body
+        .get("workspace")
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .ok_or_else(|| layout_error(400, "WSL_WORKSPACE_INVALID"))?;
+    let wsl = stratide_runtime::WslSettings {
+        distribution: distribution.to_string(),
+        workspace: workspace.to_string(),
+        python: optional_text(body, "python")?,
+        model: optional_text(body, "model")?,
+    };
+    stratide_runtime::config::validate_wsl(&wsl).map_err(|code| layout_error(400, &code))?;
+    let mut config = layout
+        .config()
+        .map_err(|_| layout_error(409, "RUNTIME_CONFIG_INVALID"))?;
+    // Restarting the single watch interrupts an in-flight collection or CPU
+    // task, so saving unchanged settings must not disturb the running chain.
+    let restart = config.wsl.as_ref() != Some(&wsl);
+    if restart {
+        // Written before the config so a failed request leaves the old entry
+        // intact; a restart with the old entry only restarts the same watch.
+        stratide_runtime::state::atomic_write(&layout.watch_restart_path(), b"{}".to_vec())
+            .map_err(|_| layout_error(409, "WATCH_RESTART_REQUEST_FAILED"))?;
+    }
+    config.wsl = Some(wsl.clone());
+    config
+        .save(&layout.config_path)
+        .map_err(|_| layout_error(409, "RUNTIME_CONFIG_WRITE_FAILED"))?;
+    Ok(layout_envelope(
+        200,
+        json!({"state": "CONFIGURED", "watch_restart": restart, "wsl": wsl}),
+    ))
+}
+
+fn probe_wsl(layout: &Layout) -> Result<Reply, Reply> {
+    let config = layout
+        .config()
+        .map_err(|_| layout_error(409, "RUNTIME_CONFIG_INVALID"))?;
+    let Some(wsl) = config.wsl else {
+        return Err(layout_error(409, "WSL_NOT_CONFIGURED"));
+    };
+    let script = layout.app.join("scripts").join("timesfm-cpu.py");
+    if !script.is_file() {
+        return Err(layout_error(409, "TIMESFM_CLI_MISSING"));
+    }
+    let mut command = Command::new(layout.python());
+    command
+        .args(["-B", "-X", "utf8"])
+        .arg(&script)
+        .arg("preflight")
+        .current_dir(&layout.app)
+        .env("STRATIDE_STATE_ROOT", &layout.data)
+        .env("STRATIDE_BIN_DIR", layout.app.join("bin"))
+        .env("STRATIDE_WSL_DISTRIBUTION", &wsl.distribution)
+        .env("STRATIDE_WSL_WORKSPACE", &wsl.workspace)
+        .env("STRATIDE_WSL_PYTHON", wsl.python_path())
+        .env("STRATIDE_WSL_MODEL", wsl.model_path())
+        .env_remove("STRATIDE_TUSHARE_TOKEN");
+    let value = match stratide_runtime::run_capture(command, Duration::from_secs(300)) {
+        Ok((code, stdout, _)) => {
+            let mut value: Value = serde_json::from_slice(&stdout)
+                .unwrap_or_else(|_| json!({"error_code": "WSL_PROBE_OUTPUT_INVALID"}));
+            if code != Some(0) {
+                value["state"] = json!("BLOCKED");
+            }
+            value
+        }
+        Err(_) => json!({"state": "BLOCKED", "error_code": "WSL_PROBE_FAILED"}),
+    };
+    let ready = value.get("state").and_then(Value::as_str) == Some("READY");
+    Ok(layout_envelope(
+        200,
+        json!({
+            "state": if ready { "READY" } else { "BLOCKED" },
+            "reason": if ready { Value::Null } else { value.get("error_code").cloned().unwrap_or_else(|| json!("WSL_PROBE_FAILED")) },
+            "probe": value,
+        }),
+    ))
 }
 
 fn setup_complete(layout: &Layout) -> Result<Reply, Reply> {

@@ -2130,3 +2130,4 @@
 @media (max-width: 640px) {
   .install-token-row { grid-template-columns: 1fr; }
 }
+.install-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3); }

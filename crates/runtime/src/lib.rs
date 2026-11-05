@@ -12,7 +12,7 @@ pub mod log;
 pub mod state;
 pub mod win;
 
-pub use config::RuntimeConfig;
+pub use config::{RuntimeConfig, WslSettings};
 pub use health::{HealthData, ProbeError};
 
 pub const SUPERVISOR_TASK: &str = "Stratide";
@@ -129,6 +129,14 @@ impl Layout {
 
     pub fn clear_stop_request(&self) {
         let _ = std::fs::remove_file(self.stop_path());
+    }
+
+    pub fn watch_restart_path(&self) -> PathBuf {
+        self.runtime.join("watch-restart.request")
+    }
+
+    pub fn clear_watch_restart(&self) {
+        let _ = std::fs::remove_file(self.watch_restart_path());
     }
 
     /// A per-install secret used only by local runtime control endpoints and

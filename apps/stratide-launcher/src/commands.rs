@@ -226,6 +226,7 @@ pub fn configure(port: &Option<u16>, data: Option<&Path>) -> Result<i32, String>
         port,
         data_root: data_root.clone(),
         python: None,
+        wsl: None,
     };
     std::fs::create_dir_all(&home).map_err(|error| format!("RUNTIME_HOME_UNAVAILABLE: {error}"))?;
     for path in [&data_root, &home.join("logs"), &home.join("runtime")] {

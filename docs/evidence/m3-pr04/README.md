@@ -11,8 +11,8 @@ CPython 3.12.10（构建机），Inno Setup 6.7.4。**开发沙箱为 workspace-
 | 文件 | 值 |
 | --- | --- |
 | 安装包 | `dist\installer\Stratide-Setup-0.3.0-x64.exe` |
-| SHA256 | `956FC31D0817ADEA173338601D079D8231DB55334FB242ABC75A5B09093CDC71` |
-| 大小 | 23,852,742 bytes（约 22.7 MiB） |
+| SHA256 | `43D9E1F8847D34673773FB196BA1E5AAD87BFA3363A159BA5A8A730E7857FD28` |
+| 大小 | 23,884,329 bytes（约 22.8 MiB） |
 | 版本 | `0.3.0` |
 | 签名 | 无（unsigned） |
 | 组件清单 | `dist\installer\SHA256SUMS.txt`、`dist\app\BUILD_INFO.json` |
@@ -31,13 +31,14 @@ pwsh -NoProfile -File scripts/build-windows-installer.ps1 -Version 0.3.0
 ### 2.1 Rust 单元/集成
 
 ```text
-cargo test -p stratide-runtime                 7 passed, 0 failed
+cargo check --workspace --all-targets          Finished（无错误/无警告）
+cargo test -p stratide-runtime                 9 passed, 0 failed
 cargo test -p stratided                        2 lib + 2 agent + 7 dashboard, 0 failed
 ```
 
-覆盖：配置文件读取/写回、runtime.json 无 BOM、端口占用探测、状态文件原子替换、
-Autostart XML 单一 LogonTrigger/LeastPrivilege/转义、诊断 JSON 契约、既有 Dashboard
-只读/账本回归（未修改其语义）。
+覆盖：配置文件读取/写回、WSL 入口校验与默认路径、runtime.json 无 BOM、端口占用探测、
+状态文件原子替换、Autostart XML 单一 LogonTrigger/LeastPrivilege/转义、诊断 JSON 契约、
+既有 Dashboard 只读/账本回归（未修改其语义）。
 
 ### 2.2 产品 E2E（无凭据、无行情/云/成交）
 
@@ -47,7 +48,7 @@ Autostart XML 单一 LogonTrigger/LeastPrivilege/转义、诊断 JSON 契约、�
 pwsh -NoProfile -File scripts/test-windows-product.ps1 -Port 8794
 ```
 
-实际结果：**22/22 PASS**，摘要：
+实际结果：**26/26 PASS**（R2 新增 4 项 WSL 入口检查），摘要：
 
 ```text
 PASS configure exit=0 home=...\state\issue85-test\e2e-20261105-125018
@@ -59,6 +60,10 @@ PASS single-dashboard
 PASS runtime-status version=0.3.0 python=READY
 PASS token-length
 PASS runtime-write-requires-token status=401
+PASS wsl-config-saved restart=True
+PASS wsl-unchanged-no-restart restart=False
+PASS wsl-config-persisted
+PASS wsl-probe-blocks-unknown-distro state=BLOCKED reason=TIMESFM_WSL_UNAVAILABLE（见 2.8 的宿主限制说明）
 PASS stop exit=0
 PASS no-leftovers-after-stop
 PASS port-conflict-refused exit=2
@@ -147,6 +152,87 @@ npm --prefix apps/dashboard run build       PASS（v0.3.0，app.js 413.9 KiB / a
 `chromium.launch({channel:'msedge'})` 和 headless 直接启动时均被本沙箱以
 `spawn EPERM`/无输出阻止；因此不宣称做过浏览器实测。
 
+### 2.7 R2：安装态 WSL2 TimesFM 桥接（真实 CPU 推理）
+
+环境：Windows 开发机 + 已存在的 WSL2 `Ubuntu-24.04`；WSL 内已有 venv
+`/home/wsj20/projects/Stratide-pr70/.venv`（timesfm 2.0.2 / torch 2.8.0+cpu / numpy 2.2.6 /
+huggingface-hub 0.34.4 / safetensors 0.6.2，CPython 3.12）和模型
+`/home/wsj20/projects/Stratide-pr70/models/timesfm-2.5`（`model.safetensors` 925,181,104 bytes）。
+安装包未捆绑权重，也没有下载。
+
+真实推理（release 二进制 + 隔离 `STRATIDE_STATE_ROOT`，`scripts/test-wsl-timesfm-agent.py`）：
+
+```text
+{"state":"PASS","first_state":"completed","first_seconds":5.563,
+ "second_state":"completed","same_task":true,"second_seconds":1.265,
+ "agent_tasks":1,"paid_calls":0,"verified":true,
+ "model_revision":"1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+ "manifest_sha256":"d5e54a40…9f2597","weight_sha256":"2f776efe…6ce8",
+ "source":"WSL2_TIMESFM_CPU",
+ "receipt":{"billing":"LOCAL_NO_BILLING","request_sha256":"3d60859b…5ca5", …},
+ "isolation":{"mechanism":"systemd-cgroup-v2+bubblewrap","memory_max_bytes":6442450944,"memory_swap_max_bytes":0},
+ "metrics":{"load_seconds":1.18,"wall_seconds":2.37,"cgroup_cpu_seconds":2.60,
+            "peak_rss_bytes":2077655040,"cgroup_memory_peak_bytes":1099878400,"failures":0},
+ "paper_allowed":false,"live_allowed":false}
+```
+
+要点：WSL 内真实 CPU 前向；结果中的 request SHA、模型版本与权重 SHA 与前置清单一致；重复执行复用
+同一 Agent 任务（`agent_tasks=1`），没有新增计费调用（`paid_calls=0`），仍然 `paper_allowed=false`、
+`live_allowed=false`。
+
+真实 BLOCKED 路径（真实 `wsl.exe`，非 mock）：
+
+```text
+STRATIDE_WSL_MODEL=models/does-not-exist → {"error_code":"TIMESFM_WSL_MODEL_MISSING"} exit=2
+STRATIDE_WSL_DISTRIBUTION=NoSuchDistro  → {"error_code":"TIMESFM_WSL_DISTRO_MISSING"} exit=2
+未设置 STRATIDE_WSL_*                    → {"error_code":"TIMESFM_WSL_NOT_CONFIGURED"} exit=2
+```
+
+契约/异常测试 `scripts/test-timesfm-wsl.py`（9 项；fake `wsl.exe` transcript，不触 WSL、模型或云）：
+
+```text
+test_01_unconfigured_state_blocks_without_spawning_wsl ... ok
+test_02_incomplete_or_malformed_settings_are_rejected ... ok
+test_03_distro_listing_is_decoded_and_bounded ... ok
+test_04_missing_distro_or_venv_blocks_before_the_worker ... ok
+test_05_worker_error_codes_and_protocol_errors_are_propagated ... ok
+test_06_timeout_and_launch_failure_stay_blocked ... ok
+test_07_code_and_model_identity_must_match ... ok
+test_08_worker_response_must_prove_request_and_model ... ok
+test_09_windows_paths_are_converted_for_wsl ... ok
+Ran 9 tests ... OK
+```
+
+研究链异常恢复（`scripts/test-market-research.py` 共 9 项，含新增 `test_09`）：
+WSL Worker 阻断后当日 run 为 `BLOCKED`（`TIMESFM_WSL_MODEL_MISSING`、写入 `blocked_at`、
+`cloud_status=CLOUD_RESEARCH_BLOCKED`），600 秒冷却内的后续 watch 不重新冻结、不发云调用；
+把 `blocked_at` 改到过期后只重试一次；EOD 快照保持不变。
+
+### 2.8 已安装 payload（dist\app）真实推理与宿主限制说明
+
+把构建产物 `dist\app` 原样复制到工作区外（等价于 `%LOCALAPPDATA%\Programs\Stratide`），改用其
+自带的 embedded CPython 直接运行同一检查（Agent 用 payload 的 `stratided.exe --agent-init-fake`
+初始化，二进制取自 payload 的 `bin\`）：
+
+```text
+{"state":"PASS","first_state":"completed","first_seconds":5.828,
+ "second_state":"completed","same_task":true,"second_seconds":1.140,
+ "agent_tasks":1,"paid_calls":0,"verified":true,"source":"WSL2_TIMESFM_CPU",
+ "receipt":{"billing":"LOCAL_NO_BILLING","request_sha256":"3d60859b…5ca5",
+            "model_revision":"1d952420…0e3","weight_sha256":"2f776efe…6ce8"},
+ "metrics":{"load_seconds":1.06,"wall_seconds":2.85,"cgroup_cpu_seconds":2.69,
+            "peak_rss_bytes":2076884992,"cgroup_memory_peak_bytes":1410469888,"failures":0},
+ "paper_allowed":false,"live_allowed":false}
+```
+
+即：**安装态 payload（不是源码树）通过现有 WSL2 venv/模型完成真实 CPU 前向并回到原 Agent 链**。
+
+宿主限制：本开发沙箱会让**位于工作区目录内**的 `dist\app` 子进程访问 WSL 服务被拒绝
+（`wsl.exe` 直接返回 `Wsl/E_ACCESSDENIED`；同一份 exe 复制到 `%TEMP%` 或安装目录后正常）。
+因此上面的产品 E2E 里 `wsl-probe` 在工作区路径下显示 `TIMESFM_WSL_UNAVAILABLE`；同一 payload
+在安装路径下运行前置探针得到真实结果（把发行版写成不存在的值时返回 `TIMESFM_WSL_DISTRO_MISSING`）。
+这是开发宿主限制，不是安装态逻辑，也不影响 Owner 正常安装目录。
+
 ## 3. NOT_RUN（明确未执行）
 
 | 项目 | 原因 |
@@ -158,7 +244,8 @@ npm --prefix apps/dashboard run build       PASS（v0.3.0，app.js 413.9 KiB / a
 | Windows 真实重启、休眠/唤醒 | 环境不允许；只验证进程崩溃/重启、Job 清理 |
 | 真实 Tushare 全市场 EOD | 未提供凭据，未授权；不发行情请求 |
 | DeepSeek 实际外发/计费 | 未授权；保持默认 DENIED、¥5/日 ¥100/月 |
-| TimesFM/WSL 真实推理与 Paper 成交 | 无 WSL 访问（`wsl.exe` 被沙箱拒绝）；安装态研究显式 BLOCKED，不伪造 |
+| Paper 成交 / 真实 DeepSeek 外发 | WSL 真实 CPU 推理已在 R2 实测（见 2.7），但未授权真实付费云研究，Paper 仍为无成交空态 |
+| 真实安装包在本沙箱内创建快捷方式/自启 | 见上方沙箱 ACL 说明；Owner 正常会话复测 |
 | N100/Linux 服务化 | 不在本期范围 |
 
 真实安装包失败摘录（**这是沙箱 ACL，而不是安装脚本编译/文件复制失败**）：
@@ -177,8 +264,11 @@ RegCreateKeyEx failed; code 5. Access is denied.                 （HKCU Uninsta
 
 ## 4. 限制与诚实声明
 
-- 本模块**没有**把 Windows 上的 research 阶段自动转发到 WSL TimesFM Worker。安装包只做检测；
-  未配置 WSL 时研究/Paper 明确 BLOCKED。完整 EOD→研究→Paper 自动链路仍待后续设计/实测。
+- R2 已把 Windows 安装态的 research 阶段接到 Owner 现有 WSL2 TimesFM Worker（见 2.7），并实测了
+  真实 CPU 推理与 BLOCKED 路径；但 **没有**验证真实 Tushare EOD、真实 DeepSeek 外发/计费或 Paper 成交，
+  这些仍需 Owner 授权后单独实测，不能由本文件的 PASS 推断。
+- 保存 WSL 配置会重启唯一 watch；若恰好打断进行中的 TimesFM/采集，当日研究按既有“未知本地结果不重发”
+  规则变为 BLOCKED（不重复付费/成交）。保存相同配置不会触发重启。
 - 安装包未签名。
 - 未执行任何真实行情、云模型、Paper 成交或真实 Tushare 账户操作；本文中的任何 PASS 都不代表
   策略收益、PIT、可交易性或实盘资格。

@@ -10,7 +10,7 @@ pub fn collect(layout: &Layout) -> Value {
     let autostart = crate::autostart::status();
     let live = health::probe(config.as_ref().map(|config| config.port).unwrap_or(0));
     let python = python_status(layout);
-    let wsl = wsl_status();
+    let wsl = wsl_status(config.as_ref().ok().and_then(|config| config.wsl.as_ref()));
     let credential = credential_status(layout);
     let market = market_status(layout);
     let paper = paper_status(layout);
@@ -86,10 +86,10 @@ fn python_status(layout: &Layout) -> Value {
     }
 }
 
-fn wsl_status() -> Value {
+fn wsl_status(configured: Option<&crate::WslSettings>) -> Value {
     let mut command = Command::new("wsl.exe");
     command.args(["--list", "--quiet"]);
-    match crate::run_capture(command, std::time::Duration::from_secs(8)) {
+    let mut value = match crate::run_capture(command, std::time::Duration::from_secs(8)) {
         Ok((Some(0), stdout, _)) => {
             let text = crate::win::decode_output(&stdout);
             let distros: Vec<String> = text
@@ -112,7 +112,27 @@ fn wsl_status() -> Value {
         Err(error) => {
             json!({"state":"UNAVAILABLE","reason":format!("WSL_NOT_INSTALLED_OR_BLOCKED:{error}")})
         }
+    };
+    if let Some(object) = value.as_object_mut() {
+        object.insert("configured".into(), json!(configured.is_some()));
+        object.insert(
+            "distribution".into(),
+            json!(configured.map(|settings| settings.distribution.as_str())),
+        );
+        object.insert(
+            "workspace".into(),
+            json!(configured.map(|settings| settings.workspace.as_str())),
+        );
+        object.insert(
+            "python".into(),
+            json!(configured.map(|settings| settings.python_path())),
+        );
+        object.insert(
+            "model".into(),
+            json!(configured.map(|settings| settings.model_path())),
+        );
     }
+    value
 }
 
 fn timesfm_status(layout: &Layout, wsl: &Value) -> Value {
@@ -123,13 +143,15 @@ fn timesfm_status(layout: &Layout, wsl: &Value) -> Value {
         .join("risk-portfolio")
         .join("agent-binding.json");
     let wsl_ready = wsl.get("state").and_then(Value::as_str) == Some("READY");
+    let configured = wsl.get("configured").and_then(Value::as_bool) == Some(true);
     json!({
-        "state": if wsl_ready { "EXTERNAL_WSL_WORKSPACE_REQUIRED" } else { "BLOCKED_MISSING_RUNTIME" },
+        "state": if configured { "CONFIGURED" } else if wsl_ready { "EXTERNAL_WSL_WORKSPACE_REQUIRED" } else { "BLOCKED_MISSING_RUNTIME" },
         "wsl_ready": wsl_ready,
+        "configured": configured,
         "worker_state_present": worker_state.is_dir(),
         "agent_binding_present": binding.is_file(),
-        "reason": "TIMESFM_CPU_REQUIRES_THE_EXISTING_LINUX_WORKSPACE_ISOLATION",
-        "note": "本安装包不自动安装 GB 级模型或 WSL2 推理环境；未配置时研究保持 BLOCKED，不伪造成功。",
+        "reason": if configured { "WSL_PROBE_REQUIRED" } else { "TIMESFM_CPU_REQUIRES_THE_EXISTING_LINUX_WORKSPACE_ISOLATION" },
+        "note": if configured { "已保存 WSL 入口；使用“检测 WSL Worker”执行真实前置/模型/隔离探针。未通过时研究保持 BLOCKED，EOD 采集继续。" } else { "未配置 WSL 时研究保持 BLOCKED；不会下载或打包模型。" },
         "billing": "LOCAL_NO_BILLING",
     })
 }

@@ -78,6 +78,10 @@ export interface DependencyStatus {
   distributions?: string[];
   database?: string;
   modified_at?: string | null;
+  distribution?: string | null;
+  workspace?: string | null;
+  python?: string | null;
+  model?: string | null;
 }
 
 interface EnvelopeShape<T> {
@@ -133,4 +137,10 @@ export async function runtimeAction<T>(path: string, body: Record<string, unknow
 
 export function shanghaiToday(): string {
   return new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString().slice(0, 10).replaceAll('-', '');
+}
+
+export interface WslProbeResult {
+  state: 'READY' | 'BLOCKED';
+  reason: string | null;
+  probe: Record<string, unknown>;
 }

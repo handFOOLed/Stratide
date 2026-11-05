@@ -154,11 +154,14 @@ if ($LASTEXITCODE -ne 0) { throw "INNO_COMPILE_FAILED exit=$LASTEXITCODE" }
 $setup = Join-Path $installerOut ("Stratide-Setup-$Version-x64.exe")
 if (-not (Test-Path -LiteralPath $setup)) { throw 'INSTALLER_NOT_PRODUCED' }
 $setupHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $setup).Hash
+$serverHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $payload 'stratided.exe')).Hash
+$launcherHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $payload 'stratide-launcher.exe')).Hash
+$pythonHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $payload 'runtime\python\python.exe')).Hash
 $lines = @(
   "$setupHash  $(Split-Path -Leaf $setup)",
-  "$(Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $payload 'stratided.exe')).Hash  stratided.exe",
-  "$(Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $payload 'stratide-launcher.exe')).Hash  stratide-launcher.exe",
-  "$(Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $payload 'runtime\python\python.exe')).Hash  runtime/python/python.exe"
+  "$serverHash  stratided.exe",
+  "$launcherHash  stratide-launcher.exe",
+  "$pythonHash  runtime/python/python.exe"
 )
 $lines | Set-Content -LiteralPath (Join-Path $installerOut 'SHA256SUMS.txt') -Encoding Ascii
 Copy-Item -LiteralPath (Join-Path $installerOut 'SHA256SUMS.txt') -Destination (Join-Path $payload 'SHA256SUMS.txt')

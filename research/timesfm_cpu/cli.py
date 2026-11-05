@@ -2,6 +2,7 @@
 import argparse
 import contextlib
 import datetime as dt
+import hashlib
 import json
 import math
 import os
@@ -11,6 +12,7 @@ import sqlite3
 import subprocess
 import sys
 
+import model as timesfm_model
 from model import Rejected, digest, loads, require, sha_file, verify_model
 import runtime
 
@@ -27,6 +29,41 @@ def common_root():
 
 def state_root():
     return common_root() / "state/timesfm-cpu"
+
+
+def _manifest_result(manifest):
+    return dict(manifest_sha256=digest(manifest), manifest=manifest,
+                model_revision=manifest["revision"],
+                weight_sha256=manifest["files"]["model.safetensors"],
+                source="LINUX_NATIVE")
+
+
+def model_manifest():
+    """Manifest used by the state chain; the WSL path is real CPU-only."""
+    if runtime.uses_wsl():
+        return runtime.wsl_manifest()
+    if os.name == "nt":
+        raise Rejected("TIMESFM_WSL_NOT_CONFIGURED")
+    return _manifest_result(verify_model(ROOT / "models/timesfm-2.5"))
+
+
+def planning_manifest():
+    """Manifest used when freezing a plan; preserves the native test patch point."""
+    if runtime.uses_wsl():
+        return runtime.wsl_manifest()
+    if os.name == "nt":
+        raise Rejected("TIMESFM_WSL_NOT_CONFIGURED")
+    return _manifest_result(timesfm_model.verify_model(ROOT / "models/timesfm-2.5"))
+
+
+def require_wsl_identity(raw, expected, response):
+    """The WSL Worker must prove it answered this exact request with this model."""
+    require(response.get("request_sha256") == hashlib.sha256(raw).hexdigest(),
+            "TIMESFM_WSL_REQUEST_IDENTITY_MISMATCH")
+    require(response.get("model_revision") == expected["model_revision"],
+            "TIMESFM_WSL_MODEL_IDENTITY_MISMATCH")
+    require(response.get("weight_sha256") == expected["weight_sha256"],
+            "TIMESFM_WSL_MODEL_IDENTITY_MISMATCH")
 
 
 def bridge(action, value=None):
@@ -116,17 +153,21 @@ def task(name, detailed=False):
 
 def once(name, runner=runtime.run):
     plan = read_plan(name)
-    require(plan["manifest_sha256"] == digest(verify_model(ROOT / "models/timesfm-2.5")),"LOCAL_MODEL_CHANGED_NEW_TASK_REQUIRED")
+    expected = model_manifest()
+    require(plan["manifest_sha256"] == expected["manifest_sha256"],"LOCAL_MODEL_CHANGED_NEW_TASK_REQUIRED")
     projection = bridge("project",plan)
-    runtime.command(plan["threads"])  # Reject unsupported hosts before creating a task.
+    runtime.preflight(plan["threads"])  # Reject unsupported hosts before creating a task.
     with runtime.lock(state_root()/"worker.lock"), runtime.lock(Path(binding()["agent_dir"])/"agent.lock"):
         prior = bridge("begin",plan)
         if prior["status"] != "local_running":
             return task(name)
         receipt = dict(id=int(prior["id"]),plan=plan)
         try:
-            response = runner(projection["worker_request_json"].encode())
-            require(read_plan(name) == plan and digest(verify_model(ROOT/"models/timesfm-2.5")) == plan["manifest_sha256"],"LOCAL_INPUT_CHANGED")
+            raw = projection["worker_request_json"].encode()
+            response = runner(raw)
+            if runtime.uses_wsl():
+                require_wsl_identity(raw, expected, response)
+            require(read_plan(name) == plan and model_manifest()["manifest_sha256"] == plan["manifest_sha256"],"LOCAL_INPUT_CHANGED")
             bridge("complete",dict(receipt,response=response))
         except BaseException as e:
             code = str(e) if isinstance(e,Rejected) and re.fullmatch("[A-Z_]{1,80}",str(e)) else "WORKER_FAILED"
@@ -140,7 +181,7 @@ def verify(name):
     out = task(name)
     require(out["state"] == "completed","LOCAL_TASK_INCOMPLETE")
     plan = read_plan(name)
-    require(digest(verify_model(ROOT/"models/timesfm-2.5")) == plan["manifest_sha256"],"LOCAL_MODEL_CHANGED_NEW_TASK_REQUIRED")
+    require(model_manifest()["manifest_sha256"] == plan["manifest_sha256"],"LOCAL_MODEL_CHANGED_NEW_TASK_REQUIRED")
     bundle = out["result"]["research"]["risk_portfolio"]
     require(bundle["receipt"]["code_sha256"] == plan["code_sha256"]
             and bundle["receipt"]["manifest_sha256"] == plan["manifest_sha256"]
@@ -175,8 +216,8 @@ def main():
                     "HISTORY_EXPLICIT_SOURCE_SYMBOLS_AS_OF_REQUIRED")
             descriptor = bridge("descriptor")
             f, history = read(descriptor,args.v1_root,args.v2_root,args.symbols.split(","),args.as_of,args.context)
-            manifest = verify_model(ROOT/"models/timesfm-2.5")
-            plan = dict(batch=args.name,frozen=f,history=history,manifest_sha256=digest(manifest),
+            manifest = model_manifest()
+            plan = dict(batch=args.name,frozen=f,history=history,manifest_sha256=manifest["manifest_sha256"],
                         code_sha256=descriptor["code_sha256"],max_context=args.max_context,
                         batch_size=args.batch_size,threads=2)
             bridge("project",plan)
@@ -206,7 +247,8 @@ def main():
             out = bridge(args.command)
         elif args.command == "synthetic-freeze":
             descriptor = bridge("descriptor")
-            plan = dict(batch=args.name,frozen=frozen(descriptor,args.series),manifest_sha256=digest(verify_model(ROOT/"models/timesfm-2.5")),
+            manifest = model_manifest()
+            plan = dict(batch=args.name,frozen=frozen(descriptor,args.series),manifest_sha256=manifest["manifest_sha256"],
                         code_sha256=descriptor["code_sha256"],max_context=args.max_context,batch_size=args.batch_size,threads=2)
             bridge("project",plan)
             path = batch_path(args.name)
@@ -226,9 +268,15 @@ def main():
                 from history import archived
                 out["archive"] = archived(args.name)
         elif args.command == "preflight":
-            manifest = verify_model(ROOT/"models/timesfm-2.5")
+            manifest = model_manifest()
+            runtime.preflight(2)
             with runtime.lock(state_root()/"worker.lock"):
-                out = dict(model_manifest_sha256=digest(manifest),**runtime.run(b"probe"))
+                probe = runtime.run(b"probe")
+            out = dict(state="READY", manifest_sha256=manifest["manifest_sha256"],
+                       model_revision=manifest["model_revision"],
+                       weight_sha256=manifest["weight_sha256"], source=manifest["source"],
+                       wsl=runtime.wsl_settings(), isolation=probe.get("isolation"), probe=probe,
+                       billing="LOCAL_NO_BILLING", cloud_egress="REAL_MARKET_DATA_EGRESS_DENIED")
         elif args.command == "stop":
             if (common_root()/"state/risk-portfolio/agent-binding.json").is_file():
                 bridge("disable")

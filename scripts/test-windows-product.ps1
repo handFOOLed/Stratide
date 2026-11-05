@@ -70,6 +70,17 @@ try {
   Check 'runtime-write-requires-token' ($_.Exception.Response.StatusCode.value__ -eq 401) "status=$($_.Exception.Response.StatusCode.value__)"
 }
 
+$writeHeaders = @{'Origin'="http://127.0.0.1:$Port"; 'Content-Type'='application/json'; 'X-Stratide-Runtime'=$token}
+$wslBody = '{"distribution":"Stratide-NoSuchDistro","workspace":"/tmp/stratide-none","python":".venv/bin/python","model":"models/timesfm-2.5"}'
+$wslFirst = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/runtime/wsl" -Method Post -Headers $writeHeaders -Body $wslBody -TimeoutSec 20
+Check 'wsl-config-saved' ($wslFirst.data.state -eq 'CONFIGURED' -and $wslFirst.data.watch_restart -eq $true -and $wslFirst.data.wsl.distribution -eq 'Stratide-NoSuchDistro') "restart=$($wslFirst.data.watch_restart)"
+$wslSecond = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/runtime/wsl" -Method Post -Headers $writeHeaders -Body $wslBody -TimeoutSec 20
+Check 'wsl-unchanged-no-restart' ($wslSecond.data.watch_restart -eq $false) "restart=$($wslSecond.data.watch_restart)"
+$wslStored = (Get-Content (Join-Path $RootHome 'runtime.json') -Raw | ConvertFrom-Json).wsl
+Check 'wsl-config-persisted' ($wslStored.distribution -eq 'Stratide-NoSuchDistro' -and $wslStored.workspace -eq '/tmp/stratide-none') ''
+$probe = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/runtime/wsl-probe" -Method Post -Headers $writeHeaders -Body '{}' -TimeoutSec 120
+Check 'wsl-probe-blocks-unknown-distro' ($probe.data.state -eq 'BLOCKED') "state=$($probe.data.state) reason=$($probe.data.reason)"
+
 $stop = Run-Launcher @('--stop','--quiet') 60000
 Check 'stop' ($stop.ExitCode -eq 0 -and $null -eq (Read-Health)) "exit=$($stop.ExitCode)"
 Check 'no-leftovers-after-stop' ((@(Get-Process | Where-Object { $_.ProcessName -like 'stratide*' })).Count -eq 0) ''

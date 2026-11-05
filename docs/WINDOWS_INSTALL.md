@@ -39,6 +39,7 @@
 - **Tushare Token**：只写入当前 Windows 用户凭据管理器，不回显、不入日志、不进入安装包。
 - **EOD 行情采集**：显式初始化数据仓库并启用/安全停用采集。未初始化/未启用时不会发行情请求。
 - **依赖诊断**：内置 Python、WSL2、TimesFM、Tushare 凭据、EOD 仓库、Paper 账户、研究 Agent 的真实状态；缺失时显示 `BLOCKED`。
+- **WSL2 TimesFM 桥接**（可选）：填写已有 WSL 发行版、工作树、venv Python 与模型目录，保存后点“检测 WSL Worker”做一次真实前置探针。详见 §4.1。
 - **首次设置完成**：标记后，双击默认打开总览。
 
 研究自动开关、DeepSeek 预算（¥5/日、¥100/月）和真实行情云外发授权仍由既有 Owner 流程（设置 → 权限与安全）维护；安装向导不会提升预算、授予外发或代填 Paper 本金/风险限额。
@@ -52,7 +53,34 @@
 - **删除本地数据…**（显式确认）。
 - **安装与升级说明**、**卸载 Stratide**。
 
-## 4. 日常运行与故障
+## 4.1 接入已有的 WSL2 TimesFM（可选，不重新下载模型）
+
+安装包**不包含** TimesFM 权重，也不会自动下载 GB 级模型。若 Owner 已有 WSL2/ext4 上的 TimesFM 2.5 venv 与模型，可在“运行与安装 → WSL2 TimesFM 桥接”填入：
+
+| 字段 | 示例 | 说明 |
+| --- | --- | --- |
+| WSL 发行版 | `Ubuntu-24.04` | 必须是 `wsl.exe -l -q` 列出的发行版 |
+| 工作树 | `/home/owner/projects/Stratide` | WSL 内绝对路径；用来解析下面的相对路径 |
+| venv Python | `.venv/bin/python` | 可写相对工作树或绝对路径；需含原锁定的 timesfm/torch/numpy 版本 |
+| 模型目录 | `models/timesfm-2.5` | 含 `manifest.json`、`model.safetensors` 等；以硬链接方式复用，不复制、不修改 |
+
+保存后 Supervisor 会重启唯一 `market watch` 使其生效（保存相同值不重启）。点“检测 WSL Worker”会实际运行一次：
+
+- 发行版 / venv / 依赖版本 / 模型 manifest 校验；
+- systemd-cgroup v2 + bubblewrap 隔离是否可用；
+- 安装包里的 TimesFM 代码 SHA256 是否与 WSL 实际运行的代码一致。
+
+检测结果只反映当时状态，`READY` 也不代表已完成真实研究或产生成交。未配置或检测失败时，研究/Paper 保持 `BLOCKED` 并显示具体原因（`TIMESFM_WSL_*`、`MODEL_NOT_PROVISIONED` 等），**EOD 采集继续**；不会伪造推理结果、不会发起替代云调用。
+
+如需手工排查，可在装有安装版的机器上直接运行：
+
+```powershell
+$env:STRATIDE_STATE_ROOT = "$env:LOCALAPPDATA\Stratide\data"
+& "$env:LOCALAPPDATA\Programs\Stratide\runtime\python\python.exe" -B -X utf8 `
+  "$env:LOCALAPPDATA\Programs\Stratide\scripts\timesfm-cpu.py" preflight
+```
+
+## 4.2 日常运行与故障
 
 - **登录自启**：后台 Supervisor 启动 `stratided` 和现有 `eod-operator.py market watch`；按 `Asia/Shanghai` 交易日和既有 16:10–18:00 窗口调度。登录自启不会自动打开浏览器。
 - **停止**：开始菜单“停止 Stratide 后台”，或 `stratide-launcher.exe --stop`。停止先请求 Supervisor 退出，再由 Supervisor 结束自己的 service/watch；不会结束未知 PID。EOD 正在进行时立即停止可能留下未知云结果；重启后沿用既有 journal/预算/任务恢复规则，不盲目重发。

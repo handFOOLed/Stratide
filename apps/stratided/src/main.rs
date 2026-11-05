@@ -40,6 +40,12 @@ fn run() -> Result<(), String> {
         return Ok(());
     }
     let config = Config::parse(args.into_iter())?;
+    if let Some(home) = &config.runtime_home {
+        if std::env::var_os("STRATIDE_STATE_ROOT").is_none() {
+            let layout = stratide_runtime::Layout::from_home(home.clone())?;
+            std::env::set_var("STRATIDE_STATE_ROOT", &layout.data);
+        }
+    }
     let assets = Assets::load(&config.assets_dir)?;
     let mut app = App::load(
         config.report_dir.as_deref(),

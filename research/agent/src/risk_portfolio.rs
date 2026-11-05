@@ -26,6 +26,9 @@ pub fn prompt_sha() -> String {
 }
 
 pub fn root() -> Result<PathBuf> {
+    if let Some(root) = std::env::var_os("STRATIDE_STATE_ROOT").filter(|value| !value.is_empty()) {
+        return Ok(PathBuf::from(root).join("state/risk-portfolio"));
+    }
     let out = std::process::Command::new("git")
         .args(["rev-parse", "--path-format=absolute", "--git-common-dir"])
         .env_remove("GIT_DIR")

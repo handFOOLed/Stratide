@@ -14,7 +14,7 @@ import {
   runtimeToken,
   shanghaiToday,
 } from '../../lib/runtime';
-import type { DependencyStatus, RuntimeStatus } from '../../lib/runtime';
+import type { DependencyStatus, RuntimeStatus, WslProbeResult } from '../../lib/runtime';
 import { ApiError } from '../../lib/api';
 
 const REASONS: Record<string, string> = {
@@ -31,6 +31,19 @@ const REASONS: Record<string, string> = {
   DASHBOARD_BINARY_MISSING: '安装目录缺少 stratided.exe。',
   STOPPED_BY_OWNER: '后台服务已由 Owner 停止。',
   STOPPED_WITH_UNMANAGED_SERVICE: '后台已停止，但检测到未受管理的实例仍在运行。',
+  WATCH_RESTARTING: '正在按新配置重启 EOD watch。',
+  WSL_PROBE_REQUIRED: '已保存 WSL 入口；请运行“检测 WSL Worker”确认真实前置、模型与隔离。',
+  TIMESFM_WSL_NOT_CONFIGURED: '未配置 WSL2 TimesFM 入口，研究保持 BLOCKED；EOD 采集不受影响。',
+  TIMESFM_WSL_CONFIG_INCOMPLETE: 'WSL 发行版与工作树必须同时填写。',
+  TIMESFM_WSL_UNAVAILABLE: '无法调用 wsl.exe；研究保持 BLOCKED，EOD 采集继续。',
+  TIMESFM_WSL_DISTRO_MISSING: '配置的 WSL 发行版不存在；研究保持 BLOCKED。',
+  TIMESFM_WSL_VENV_MISSING: 'WSL 工作树缺少可执行的 venv Python；研究保持 BLOCKED。',
+  TIMESFM_WSL_MODEL_MISSING: 'WSL 模型目录不存在；研究保持 BLOCKED。',
+  TIMESFM_WSL_TIMEOUT: 'WSL TimesFM Worker 超时；本机研究安全阻断，等待人工检查。',
+  TIMESFM_WSL_CODE_MISMATCH: 'WSL 实际运行的 TimesFM 代码与安装包不一致；研究保持 BLOCKED。',
+  TIMESFM_WSL_PROTOCOL_INVALID: 'WSL Worker 返回身份/请求校验失败；研究保持 BLOCKED。',
+  TIMESFM_WSL_MODEL_LINK_UNSUPPORTED: '模型与 WSL 缓存不在同一文件系统，无法安全硬链接；研究保持 BLOCKED。',
+  MODEL_NOT_PROVISIONED: 'WSL 模型权重/manifest 校验失败；研究保持 BLOCKED。',
 };
 
 const DEPENDENCIES: Array<[keyof RuntimeStatus['dependencies'], string]> = [
@@ -87,6 +100,14 @@ export function RuntimePanel() {
   const [busy, setBusy] = useState<string | null>(null);
   const [secret, setSecret] = useState('');
   const [startDate, setStartDate] = useState(shanghaiToday);
+  const [wslForm, setWslForm] = useState({
+    distribution: '',
+    workspace: '',
+    python: '.venv/bin/python',
+    model: 'models/timesfm-2.5',
+  });
+  const [wslLoaded, setWslLoaded] = useState(false);
+  const [wslProbe, setWslProbe] = useState<WslProbeResult | null>(null);
   const controller = useRef<AbortController | null>(null);
 
   const refresh = useCallback((silent = false) => {
@@ -117,6 +138,18 @@ export function RuntimePanel() {
     };
   }, [refresh]);
 
+  useEffect(() => {
+    if (!status || wslLoaded) return;
+    const wsl = status.dependencies.wsl;
+    setWslForm({
+      distribution: wsl.distribution ?? '',
+      workspace: wsl.workspace ?? '',
+      python: wsl.python ?? '.venv/bin/python',
+      model: wsl.model ?? 'models/timesfm-2.5',
+    });
+    setWslLoaded(true);
+  }, [status, wslLoaded]);
+
   const act = async (name: string, path: string, body: Record<string, unknown>, success: string) => {
     setBusy(name);
     setError(null);
@@ -128,6 +161,27 @@ export function RuntimePanel() {
       const code = caught instanceof ApiError ? caught.code : 'RUNTIME_ACTION_FAILED';
       setError(code);
       push({ title: '操作未完成', description: code, tone: 'danger' });
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const probeWsl = async () => {
+    setBusy('probe');
+    setError(null);
+    try {
+      const result = await runtimeAction<WslProbeResult>('wsl-probe');
+      setWslProbe(result);
+      push({
+        title: result.state === 'READY' ? 'WSL Worker 可用' : 'WSL Worker 未通过',
+        description: result.reason ?? undefined,
+        tone: result.state === 'READY' ? 'success' : 'danger',
+      });
+      refresh(true);
+    } catch (caught) {
+      const code = caught instanceof ApiError ? caught.code : 'WSL_PROBE_FAILED';
+      setError(code);
+      push({ title: 'WSL 检测未完成', description: code, tone: 'danger' });
     } finally {
       setBusy(null);
     }
@@ -244,6 +298,75 @@ export function RuntimePanel() {
         </div>
         <Callout tone="info" title="已存在的 Owner 设置仍是权威">
           DeepSeek 预算（¥5/日、¥100/月）、研究自动开关与真实行情外发授权，继续在“设置 → 权限与安全”的既有 Owner 流程中维护；此安装页不提升预算、不授予外发、不写入 Paper 本金或风险限额。
+        </Callout>
+      </section>
+
+      <section className="install-section">
+        <h2 className="card__title">WSL2 TimesFM 桥接</h2>
+        <p className="muted">
+          复用 Owner 已有的 WSL2/ext4 venv 和模型，不下载、不打包权重。保存后后台会重启 EOD watch；
+          真实推理只在 WSL 本地执行，云研究仍走原授权与预算。未通过时研究 BLOCKED，但 EOD 采集继续。
+        </p>
+        <div className="install-form">
+          <Field label="WSL 发行版" htmlFor="wsl-distribution">
+            <TextInput
+              id="wsl-distribution"
+              value={wslForm.distribution}
+              placeholder="Ubuntu-24.04"
+              disabled={!token}
+              onChange={(event) => setWslForm({ ...wslForm, distribution: event.target.value })}
+            />
+          </Field>
+          <Field label="工作树（WSL 绝对路径）" htmlFor="wsl-workspace">
+            <TextInput
+              id="wsl-workspace"
+              value={wslForm.workspace}
+              placeholder="/home/owner/projects/Stratide"
+              disabled={!token}
+              onChange={(event) => setWslForm({ ...wslForm, workspace: event.target.value })}
+            />
+          </Field>
+          <Field label="venv Python（相对工作树或绝对路径）" htmlFor="wsl-python">
+            <TextInput
+              id="wsl-python"
+              value={wslForm.python}
+              placeholder=".venv/bin/python"
+              disabled={!token}
+              onChange={(event) => setWslForm({ ...wslForm, python: event.target.value })}
+            />
+          </Field>
+          <Field label="模型目录（相对工作树或绝对路径）" htmlFor="wsl-model">
+            <TextInput
+              id="wsl-model"
+              value={wslForm.model}
+              placeholder="models/timesfm-2.5"
+              disabled={!token}
+              onChange={(event) => setWslForm({ ...wslForm, model: event.target.value })}
+            />
+          </Field>
+        </div>
+        <div className="install-actions">
+          <Button
+            variant="primary"
+            disabled={!token || busy !== null}
+            loading={busy === 'wsl'}
+            onClick={() => act('wsl', 'wsl', { ...wslForm }, 'WSL 配置已保存；EOD watch 将重启')}
+          >
+            保存 WSL 配置
+          </Button>
+          <Button
+            variant="secondary"
+            disabled={!token || busy !== null}
+            loading={busy === 'probe'}
+            onClick={probeWsl}
+          >
+            检测 WSL Worker
+          </Button>
+        </div>
+        {wslProbe ? <pre className="install-log">{JSON.stringify(wslProbe, null, 2)}</pre> : null}
+        <Callout tone="warning" title="不伪造成功">
+          缺少 WSL、模型或 Worker 隔离时，研究/Paper 阶段明确 BLOCKED；不会停止下一交易日的 EOD 采集，
+          也不会用 mock 推理代替真实 CPU 结果。保存/检测不会发起 DeepSeek 或行情请求。
         </Callout>
       </section>
 
