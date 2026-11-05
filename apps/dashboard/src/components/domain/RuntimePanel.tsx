@@ -52,9 +52,9 @@ const DEPENDENCY_OK: Record<DependencyKey, string> = {
   wsl: 'WSL 环境可用',
   timesfm: '本地预测引擎可用',
   tushare_credential: '访问令牌已设置',
-  market_eod: '行情数据已初始化',
+  market_eod: '行情自动采集正常',
   paper_account: '模拟账户已设置',
-  agent: 'AI 研究服务已配置',
+  agent: 'AI 研究服务正常',
 };
 
 const DEPENDENCY_NEXT_STEP: Record<DependencyKey, string> = {

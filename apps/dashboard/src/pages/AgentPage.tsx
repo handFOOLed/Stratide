@@ -128,7 +128,7 @@ function autoTaskName(name: string): string {
     const day = daily[1];
     return '收盘后自动研究 · ' + day.slice(0, 4) + '-' + day.slice(4, 6) + '-' + day.slice(6, 8);
   }
-  return name.trim().replace(/^EOD 日常研究/, '收盘后自动研究');
+  return name.trim().replace(/EOD\s*日常研究/g, '收盘后自动研究').replace(/EOD/g, '收盘后');
 }
 
 function displayTaskName(createdAt: string | null, name: string): string {

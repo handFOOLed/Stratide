@@ -180,7 +180,7 @@ export function ProviderPanel({ agent }: { agent: AgentState }) {
         <div className="provider-status__row">
           <span>当前服务</span>
           <div className="provider-status__value">
-            <strong>{savedProvider === null ? '未连接' : PROVIDER_LABELS[savedProvider] ?? '已连接'}</strong>
+            {savedProvider === null ? null : <strong>{PROVIDER_LABELS[savedProvider] ?? ''}</strong>}
             <StatusBadge status={providerView} size="sm" />
           </div>
         </div>
@@ -195,7 +195,6 @@ export function ProviderPanel({ agent }: { agent: AgentState }) {
         <div className="provider-status__row">
           <span>研究模型配置</span>
           <div className="provider-status__value">
-            <strong>{modelInstalled ? '已配置' : '未配置'}</strong>
             <StatusBadge status={modelView} size="sm" />
           </div>
         </div>
