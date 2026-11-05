@@ -4,10 +4,13 @@ use serde_json::{json, Value};
 use std::path::Path;
 use std::process::Command;
 
+pub const REPO_URL: &str = "https://github.com/handFOOLed/Stratide";
+pub const ISSUES_URL: &str = "https://github.com/handFOOLed/Stratide/issues";
+
 /// `service` is supplied by the process answering this read-only request.
 /// Probing our own single-threaded port from inside a handler would block and
 /// report a healthy service as unavailable.
-pub fn collect(layout: &Layout, service: Value) -> Value {
+pub fn collect(layout: &Layout, service: Value) -> Result<Value, &'static str> {
     let config = layout.config();
     let state = crate::state::SupervisorState::read(&layout.state_path());
     let autostart = crate::autostart::status();
@@ -21,9 +24,12 @@ pub fn collect(layout: &Layout, service: Value) -> Value {
     let supervisor_running = state
         .as_ref()
         .is_some_and(|state| state.status != "STOPPED" && state.status != "FAILED");
-    json!({
+    Ok(json!({
         "managed": true,
         "product_version": layout.version,
+        "repo_url": REPO_URL,
+        "issues_url": ISSUES_URL,
+        "build": build_info(layout)?,
         "home": layout.home.to_string_lossy(),
         "app_dir": layout.app.to_string_lossy(),
         "data_root": layout.data.to_string_lossy(),
@@ -54,7 +60,23 @@ pub fn collect(layout: &Layout, service: Value) -> Value {
             "agent": agent,
         },
         "log_tail": crate::log::tail(&layout.supervisor_log(), 25),
-    })
+    }))
+}
+
+/// Installer metadata lives next to the executables. Source-tree runs have no
+/// BUILD_INFO.json, so the three fields stay null rather than being invented.
+fn build_info(layout: &Layout) -> Result<Value, &'static str> {
+    let path = layout.app.join("BUILD_INFO.json");
+    if !path.is_file() {
+        return Ok(json!({"version": null, "commit": null, "built_at": null}));
+    }
+    let bytes = std::fs::read(&path).map_err(|_| "BUILD_INFO_UNREADABLE")?;
+    let info: Value = serde_json::from_slice(&bytes).map_err(|_| "BUILD_INFO_INVALID")?;
+    Ok(json!({
+        "version": info.get("version").cloned().unwrap_or(Value::Null),
+        "commit": info.get("commit").cloned().unwrap_or(Value::Null),
+        "built_at": info.get("built_at").cloned().unwrap_or(Value::Null),
+    }))
 }
 
 fn python_status(layout: &Layout) -> Value {
@@ -241,4 +263,57 @@ fn agent_status(layout: &Layout) -> Value {
         "role_binding": binding.is_file(),
         "note": "本地研究/预算 Gate 由既有 Agent 配置控制；未配置时不发起任何云调用。",
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::build_info;
+    use crate::Layout;
+    use serde_json::json;
+
+    fn layout(root: &std::path::Path) -> Layout {
+        Layout {
+            home: root.to_path_buf(),
+            app: root.join("app"),
+            data: root.join("data"),
+            runtime: root.join("runtime"),
+            logs: root.join("logs"),
+            config_path: root.join("runtime.json"),
+            version: "0.0.0-test".into(),
+        }
+    }
+
+    #[test]
+    fn missing_build_info_is_null_not_invented() {
+        let tmp = tempfile::tempdir().unwrap();
+        assert_eq!(
+            build_info(&layout(tmp.path())).unwrap(),
+            json!({"version": null, "commit": null, "built_at": null})
+        );
+    }
+
+    #[test]
+    fn installer_build_info_is_projected() {
+        let tmp = tempfile::tempdir().unwrap();
+        let layout = layout(tmp.path());
+        std::fs::create_dir_all(&layout.app).unwrap();
+        std::fs::write(
+            layout.app.join("BUILD_INFO.json"),
+            br#"{"product":"Stratide","version":"0.3.0","commit":"abc123-dirty","built_at":"2026-11-05T00:00:00Z","paper_only":true}"#,
+        )
+        .unwrap();
+        let build = build_info(&layout).unwrap();
+        assert_eq!(build["version"], "0.3.0");
+        assert_eq!(build["commit"], "abc123-dirty");
+        assert_eq!(build["built_at"], "2026-11-05T00:00:00Z");
+    }
+
+    #[test]
+    fn corrupt_build_info_fails_loudly() {
+        let tmp = tempfile::tempdir().unwrap();
+        let layout = layout(tmp.path());
+        std::fs::create_dir_all(&layout.app).unwrap();
+        std::fs::write(layout.app.join("BUILD_INFO.json"), b"{broken").unwrap();
+        assert_eq!(build_info(&layout), Err("BUILD_INFO_INVALID"));
+    }
 }

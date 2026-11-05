@@ -437,7 +437,8 @@ fn parent(c: &Connection, ctx: &Context) -> Result<(cpu::Plan, Value)> {
             && ctx.screen_sha256 == r["screen_sha256"]
             && ctx.config_sha256 == r["config_sha256"]
             && hash(encoded.as_bytes()) == ctx.parent_result_sha256
-            && plan.frozen.as_of == r["as_of"]
+            && plan.frozen.as_of.parse::<DateTime<Utc>>().ok()
+                == r["as_of"].as_str().and_then(|value| value.parse::<DateTime<Utc>>().ok())
             && plan.history.is_some()
             && plan.frozen.input_mode == "historical_research_only",
         "MARKET_PARENT_BINDING",
@@ -757,12 +758,20 @@ fn decode(m: &Model, ctx: &Context, body: &Value, bytes: &[u8]) -> Result<(Value
             && v["usage"]["total_tokens"] == u64::from(input) + u64::from(output),
         "DEEPSEEK_USAGE_BOUND",
     )?;
-    let response: crate::fusion_researcher::Response = serde_json::from_str(
-        choices[0]["message"]["content"]
-            .as_str()
-            .ok_or("PORTFOLIO_SCHEMA")?,
-    )
-    .map_err(|_| "PORTFOLIO_SCHEMA")?;
+    let content = choices[0]["message"]["content"]
+        .as_str()
+        .ok_or("PORTFOLIO_SCHEMA")?;
+    let mut parsed: Value = serde_json::from_str(content).map_err(|_| "PORTFOLIO_SCHEMA")?;
+    // The provider echoes the JSON-mode request hint as a top-level `type` field
+    // in the assistant content. It is transport metadata, not portfolio content,
+    // so remove exactly that echo before the strict contract parse.
+    if let Some(object) = parsed.as_object_mut() {
+        if object.get("type").and_then(Value::as_str) == Some("json_object") {
+            object.remove("type");
+        }
+    }
+    let response: crate::fusion_researcher::Response =
+        serde_json::from_value(parsed).map_err(|_| "PORTFOLIO_SCHEMA")?;
     let p = &response.portfolio;
     p.validate()?;
     let user: Value =
@@ -842,7 +851,14 @@ pub fn call(p: Prepared) -> crate::provider::Outcome {
             input_tokens,
             output_tokens,
         },
-        Err(_) => Outcome::Uncertain("MARKET_PROVIDER_RESPONSE_REJECTED_NO_RETRY"),
+        Err(error) => {
+            // Local-only diagnostic: the provider body is never re-sent or exposed
+            // through the API. It explains a schema/contract rejection without
+            // silently retrying an already charged uncertain outcome.
+            eprintln!("MARKET_PROVIDER_DECODE_ERROR {error}");
+            eprintln!("MARKET_PROVIDER_BODY {}", String::from_utf8_lossy(&bytes));
+            Outcome::Uncertain("MARKET_PROVIDER_RESPONSE_REJECTED_NO_RETRY")
+        }
     }
 }
 

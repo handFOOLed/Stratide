@@ -157,6 +157,12 @@ impl Agent {
     pub fn settings_path(&self) -> &std::path::Path {
         &self.0.config_path
     }
+    /// True only while this process owns the Agent worker lock. An attached
+    /// Dashboard is an observer: the supervised background watch executes
+    /// research, so manual task creation must be rejected there.
+    pub fn is_worker(&self) -> bool {
+        self.0._lock.is_some()
+    }
     pub fn authorized(&self, candidate: &str) -> bool {
         let expected = self.0.owner_token.as_bytes();
         let actual = candidate.as_bytes();
@@ -226,7 +232,11 @@ impl Agent {
         } else {
             "attached_explicit_operations"
         });
-        result["worker_error"] = json!(self.0.fault.lock().ok().and_then(|f| f.clone()));
+        let worker_error = self.0.fault.lock().ok().and_then(|f| f.clone());
+        let worker_error_text = worker_error.as_deref().and_then(crate::reasons::text);
+        result["worker_error"] = json!(worker_error);
+        result["worker_error_text"] = json!(worker_error_text);
+        result["manual_research_available"] = json!(self.is_worker());
         result["input"] = serde_json::to_value(
             &self
                 .0
@@ -241,11 +251,14 @@ impl Agent {
         if let Some(models) = result["models"].as_array_mut() {
             let c = self.store().connect()?;
             for (view, model) in models.iter_mut().zip(&settings.models) {
-                view["authorization"] = json!(model
+                let authorization = model
                     .authorize(&scopes, settings.budget.as_ref())
                     .err()
                     .map(|e| e.0)
-                    .unwrap_or("authorized".into()));
+                    .unwrap_or("authorized".into());
+                let authorization_text = crate::reasons::text(&authorization);
+                view["authorization"] = json!(authorization);
+                view["authorization_text"] = json!(authorization_text);
                 // Local policy/input/budget rejections, pre-send cancellation and
                 // confirmed-not-sent retries are not Provider observations. Keep
                 // prior Provider health; task.reason/authorization/budget expose

@@ -1,4 +1,4 @@
-use crate::{budget, config::Settings, ensure, InputSummary, Result, TaskRequest};
+use crate::{budget, config::Settings, ensure, reasons, InputSummary, Result, TaskRequest};
 use chrono::{DateTime, Utc};
 use rusqlite::{params, Connection, OptionalExtension, TransactionBehavior};
 use serde_json::{json, Value};
@@ -9,6 +9,17 @@ use std::{
 };
 
 const APPLICATION_ID: i64 = 0x53524131;
+
+/// Rows written by the market-research status bridge are blocking notices, not
+/// research attempts; the dedicated provider id is their only durable marker.
+pub(crate) fn task_kind(provider_id: &str) -> &'static str {
+    if provider_id == "market-research-status" {
+        "research_blocked_notice"
+    } else {
+        "research_task"
+    }
+}
+
 #[derive(Clone)]
 pub struct Store {
     pub path: PathBuf,
@@ -317,16 +328,23 @@ impl Store {
         let c = self.connect()?;
         let mut value=c.query_row("SELECT id,request,input,provider_id,provider_hash,status,reason,result,created_at,started_at,finished_at,cancel_requested_at FROM tasks WHERE id=?1",[id],|r| {
             let request:String=r.get(1)?; let input:String=r.get(2)?; let result:Option<String>=r.get(7)?;
-            Ok(json!({"id":r.get::<_,i64>(0)?.to_string(),"request":serde_json::from_str::<Value>(&request).unwrap_or(Value::Null),
-                "input":serde_json::from_str::<Value>(&input).unwrap_or(Value::Null),"provider_id":r.get::<_,String>(3)?,"provider_hash":r.get::<_,String>(4)?,
-                "status":r.get::<_,String>(5)?,"reason":r.get::<_,Option<String>>(6)?,"result":result.and_then(|s|serde_json::from_str::<Value>(&s).ok()),
+            let provider_id:String=r.get(3)?; let reason:Option<String>=r.get(6)?;
+            let reason_text=reason.as_deref().and_then(reasons::text);
+            Ok(json!({"id":r.get::<_,i64>(0)?.to_string(),"kind":task_kind(&provider_id),
+                "request":serde_json::from_str::<Value>(&request).unwrap_or(Value::Null),
+                "input":serde_json::from_str::<Value>(&input).unwrap_or(Value::Null),"provider_id":provider_id,"provider_hash":r.get::<_,String>(4)?,
+                "status":r.get::<_,String>(5)?,"reason":reason,"reason_text":reason_text,"result":result.and_then(|s|serde_json::from_str::<Value>(&s).ok()),
                 "created_at":r.get::<_,String>(8)?,"started_at":r.get::<_,Option<String>>(9)?,"finished_at":r.get::<_,Option<String>>(10)?,"cancel_requested_at":r.get::<_,Option<String>>(11)?}))
         }).optional()?.ok_or("TASK_NOT_FOUND")?;
         let mut q=c.prepare("SELECT id,state,maximum_micro,settled_micro,usage_micro,input_tokens,output_tokens,price_version,reason,day,month FROM calls WHERE task_id=?1 ORDER BY id")?;
-        let calls=q.query_map([id],|r| Ok(json!({"id":r.get::<_,i64>(0)?.to_string(),"state":r.get::<_,String>(1)?,"maximum_micro":r.get::<_,i64>(2)?.to_string(),
-            "settled_micro":r.get::<_,i64>(3)?.to_string(),"usage_micro":r.get::<_,Option<i64>>(4)?.map(|v|v.to_string()),
-            "input_tokens":r.get::<_,Option<i64>>(5)?.map(|v|v.to_string()),"output_tokens":r.get::<_,Option<i64>>(6)?.map(|v|v.to_string()),
-            "price_version":r.get::<_,String>(7)?,"reason":r.get::<_,Option<String>>(8)?,"day":r.get::<_,String>(9)?,"month":r.get::<_,String>(10)?})))?
+        let calls=q.query_map([id],|r| {
+            let reason:Option<String>=r.get(8)?;
+            let reason_text=reason.as_deref().and_then(reasons::text);
+            Ok(json!({"id":r.get::<_,i64>(0)?.to_string(),"state":r.get::<_,String>(1)?,"maximum_micro":r.get::<_,i64>(2)?.to_string(),
+                "settled_micro":r.get::<_,i64>(3)?.to_string(),"usage_micro":r.get::<_,Option<i64>>(4)?.map(|v|v.to_string()),
+                "input_tokens":r.get::<_,Option<i64>>(5)?.map(|v|v.to_string()),"output_tokens":r.get::<_,Option<i64>>(6)?.map(|v|v.to_string()),
+                "price_version":r.get::<_,String>(7)?,"reason":reason,"reason_text":reason_text,"day":r.get::<_,String>(9)?,"month":r.get::<_,String>(10)?}))
+        })?
             .collect::<std::result::Result<Vec<_>,_>>()?;
         let retryable = value["status"] == "failed"
             && value["provider_id"] != "local-timesfm-2.5-cpu"
@@ -350,9 +368,9 @@ impl Store {
         let mut tasks = vec![];
         for id in ids.into_iter().take(20) {
             let t = self.task(id)?;
-            tasks.push(json!({"id":t["id"],"name":t["request"]["name"],"status":t["status"],"reason":t["reason"],
-                "created_at":t["created_at"],"started_at":t["started_at"],"finished_at":t["finished_at"],"provider_id":t["provider_id"],
-                "conclusion":t.pointer("/result/research/hypothesis"),"calls":t["calls"],"retryable":t["retryable"]}));
+            tasks.push(json!({"id":t["id"],"kind":t["kind"],"name":t["request"]["name"],"status":t["status"],"reason":t["reason"],
+                "reason_text":t["reason_text"],"created_at":t["created_at"],"started_at":t["started_at"],"finished_at":t["finished_at"],
+                "provider_id":t["provider_id"],"conclusion":t.pointer("/result/research/hypothesis"),"calls":t["calls"],"retryable":t["retryable"]}));
         }
         Ok(json!({"tasks":tasks,"next_before":next}))
     }
@@ -369,18 +387,19 @@ impl Store {
     }
     pub fn status(&self, settings: &Settings, now: DateTime<Utc>) -> Result<Value> {
         let c = self.connect()?;
-        let recent: Option<(String, String)> = c
+        let recent: Option<(String, String, Option<String>)> = c
             .query_row(
                 // EOD rows record scheduling/deduplication decisions. Task state
                 // is authoritative for execution, including existing queued
                 // markers written before an earlier process completed/crashed.
                 "SELECT e.source_day,
                     CASE WHEN t.reason='EOD_SUPERSEDED_SKIPPED' THEN 'skipped_superseded'
-                         ELSE COALESCE(t.status,e.disposition) END
+                         ELSE COALESCE(t.status,e.disposition) END,
+                    t.reason
                  FROM eod e LEFT JOIN tasks t ON t.trigger_key='eod-v1:'||e.source_day
                  ORDER BY e.source_day DESC LIMIT 1",
                 [],
-                |r| Ok((r.get(0)?, r.get(1)?)),
+                |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
             )
             .optional()?;
         let skipped: i64 = c.query_row(
@@ -388,16 +407,20 @@ impl Store {
             [],
             |r| r.get(0),
         )?;
-        let models=settings.models.iter().map(|m|json!({"id":m.id,"label":m.label,"kind":m.kind,"model":m.model,"endpoint":m.endpoint,
-            "authorization":m.authorize(&["owner_task".into()],settings.budget.as_ref()).err().map(|e|e.0).unwrap_or("authorized".into()),
-            "price_version":crate::risk_cloud::price_version(m).ok(),"verification":if m.kind=="fake"{"FAKE_SYNTHETIC_ONLY"}else if crate::risk_cloud::recorded(m)||crate::structured::recorded(m){"RECORDED_ADAPTER_NOT_CLOUD"}else{"REAL_PROVIDER_NOT_VERIFIED"}})).collect::<Vec<_>>();
+        let models=settings.models.iter().map(|m|{
+            let authorization=m.authorize(&["owner_task".into()],settings.budget.as_ref()).err().map(|e|e.0).unwrap_or("authorized".into());
+            let authorization_text=reasons::text(&authorization);
+            json!({"id":m.id,"label":m.label,"kind":m.kind,"model":m.model,"endpoint":m.endpoint,
+                "authorization":authorization,"authorization_text":authorization_text,
+                "price_version":crate::risk_cloud::price_version(m).ok(),"verification":if m.kind=="fake"{"FAKE_SYNTHETIC_ONLY"}else if crate::risk_cloud::recorded(m)||crate::structured::recorded(m){"RECORDED_ADAPTER_NOT_CLOUD"}else{"REAL_PROVIDER_NOT_VERIFIED"}})
+        }).collect::<Vec<_>>();
         let mut q=c.prepare("SELECT provider_id,COUNT(*),COALESCE(SUM(input_tokens),0),COALESCE(SUM(output_tokens),0),COALESCE(SUM(usage_micro),0) FROM calls JOIN tasks ON tasks.id=calls.task_id GROUP BY provider_id")?;
         let usage=q.query_map([],|r|Ok(json!({"provider_id":r.get::<_,String>(0)?,"calls":r.get::<_,i64>(1)?.to_string(),"input_tokens":r.get::<_,i64>(2)?.to_string(),"output_tokens":r.get::<_,i64>(3)?.to_string(),"usage_micro":r.get::<_,i64>(4)?.to_string()})))?.collect::<std::result::Result<Vec<_>,_>>()?;
         Ok(
             json!({"service":"local_research","paused":self.setting("paused")?.as_deref()==Some("true"),"worker_concurrency":"1",
             "default_model":self.setting("default_model")?,"backup_model":self.setting("backup_model")?,"automatic_fallback":"disabled_explicit_owner_switch_required",
             "models":models,"budget":budget::view(&c,settings.budget.as_ref(),now)?,"usage_by_model":usage,
-            "eod":{"enabled":self.setting("eod_enabled")?.as_deref()==Some("true"),"latest":recent.map(|(d,s)|json!({"source_day":d,"disposition":s})),"skipped":skipped.to_string(),"reason":self.setting("eod_reason")?},
+            "eod":{"enabled":self.setting("eod_enabled")?.as_deref()==Some("true"),"latest":recent.map(|(d,s,r)|json!({"source_day":d,"disposition":s,"reason_text":r.as_deref().and_then(reasons::text)})),"skipped":skipped.to_string(),"reason":self.setting("eod_reason")?},
             "qualification":"EXPLORATORY_NOT_INDEPENDENT","budget_settings":"local_owner_configuration_only"}),
         )
     }

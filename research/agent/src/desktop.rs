@@ -48,14 +48,29 @@ impl Store {
                 item["status"] = json!("expired");
             }
         }
-        let mut q = c.prepare("SELECT t.id,t.status,t.reason,t.finished_at,m.key IS NOT NULL FROM tasks t LEFT JOIN meta m ON m.key='desktop-notice-read:'||t.id WHERE t.finished_at IS NOT NULL ORDER BY t.finished_at DESC,t.id DESC LIMIT 50")?;
+        // The newest 50 cards stay bounded, but unread_count is authoritative
+        // over the whole notification set, not just the returned page.
+        let mut q = c.prepare("SELECT t.id,t.status,t.reason,t.finished_at,m.key IS NOT NULL,
+                json_extract(t.request,'$.name'),json_extract(t.result,'$.research.hypothesis'),t.provider_id
+            FROM tasks t LEFT JOIN meta m ON m.key='desktop-notice-read:'||t.id
+            WHERE t.finished_at IS NOT NULL ORDER BY t.finished_at DESC,t.id DESC LIMIT 50")?;
         let notifications = q.query_map([], |r| {
             let id = r.get::<_, i64>(0)?.to_string();
+            let provider_id = r.get::<_, String>(7)?;
+            let conclusion: Option<String> = r.get(6)?;
             Ok(json!({"id":id,"status":r.get::<_,String>(1)?,"reason":r.get::<_,Option<String>>(2)?,
-                "at":r.get::<_,String>(3)?,"read":r.get::<_,bool>(4)?}))
+                "at":r.get::<_,String>(3)?,"read":r.get::<_,bool>(4)?,"name":r.get::<_,Option<String>>(5)?,
+                "conclusion":conclusion.map(|text| text.chars().take(500).collect::<String>()),
+                "kind":crate::store::task_kind(&provider_id),"provider_id":provider_id}))
         })?.collect::<std::result::Result<Vec<_>,_>>()?;
+        let unread: i64 = c.query_row(
+            "SELECT COUNT(*) FROM tasks t LEFT JOIN meta m ON m.key='desktop-notice-read:'||t.id
+             WHERE t.finished_at IS NOT NULL AND m.key IS NULL",
+            [],
+            |r| r.get(0),
+        )?;
         Ok(
-            json!({"approvals":approvals,"notifications":notifications,"authority":"LOCAL_RESEARCH_ONLY"}),
+            json!({"approvals":approvals,"notifications":notifications,"unread_count":unread,"authority":"LOCAL_RESEARCH_ONLY"}),
         )
     }
 

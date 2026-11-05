@@ -48,10 +48,14 @@ fn run() -> Result<(), String> {
         return Ok(());
     }
     if args == ["--help"] || args == ["-h"] {
-        println!("Stratide 本地 Paper Dashboard + 研究 Agent\nstratided [--report-dir <六报告目录>] [--evaluation-file <独立 evaluation.json>] [--port 8710] [--assets-dir <构建目录>] [--agent-dir <独立 Agent 目录>] [--agent-config <本机可信 JSON>] [--agent-eod-store <名称，仅本地fake、显式课题>] [--runtime-home <安装运行目录>]\nstratided --agent-init-fake <新目录>\nstratided --agent-settle <目录> <call-id> <actual-micro> <invoice-reference>\n账户快照固定；Agent 没有交易权限。未配置预算/授权时禁止付费调用。");
+        println!("Stratide 本地 Paper Dashboard + 研究 Agent\nstratided [--report-dir <六报告目录>] [--evaluation-file <独立 evaluation.json>] [--port 8710] [--assets-dir <构建目录>] [--agent-dir <独立 Agent 目录>] [--agent-config <本机可信 JSON>] [--agent-eod-store <名称，仅本地fake、显式课题>] [--runtime-home <安装运行目录>] [--agent-observer]\nstratided --agent-init-fake <新目录>\nstratided --agent-settle <目录> <call-id> <actual-micro> <invoice-reference>\n账户快照固定；Agent 没有交易权限。未配置预算/授权时禁止付费调用。");
         return Ok(());
     }
     let config = Config::parse(args.into_iter())?;
+    // The supervised background watch is the only research worker. In this mode
+    // the Dashboard must attach without taking agent.lock and must never start
+    // an in-process worker thread of its own.
+    let attach_only = config.desktop_config.is_some() || config.agent_observer;
     if let Some(home) = &config.runtime_home {
         if std::env::var_os("STRATIDE_STATE_ROOT").is_none() {
             let layout = stratide_runtime::Layout::from_home(home.clone())?;
@@ -84,13 +88,18 @@ fn run() -> Result<(), String> {
             if let Some(name) = &config.agent_eod_store {
                 let source = stratide_research::eod_snapshot::SnapshotSource::named(name)?;
                 let initial = source.read(chrono::Utc::now().timestamp_millis())?;
-                return Agent::open(dir, config.agent_config.as_deref(), initial).map(|a| {
+                let attached = if attach_only {
+                    Agent::attach(dir, config.agent_config.as_deref(), initial)
+                } else {
+                    Agent::open(dir, config.agent_config.as_deref(), initial)
+                };
+                return attached.map(|a| {
                     a.with_summary_source(move || {
                         source.read(chrono::Utc::now().timestamp_millis())
                     })
                 });
             }
-            let a = if config.desktop_config.is_some() {
+            let a = if attach_only {
                 Agent::attach(dir, config.agent_config.as_deref(), app.agent_summary())
             } else {
                 Agent::open(dir, config.agent_config.as_deref(), app.agent_summary())
@@ -106,7 +115,7 @@ fn run() -> Result<(), String> {
         })
         .transpose();
     let agent = match agent_result {
-        Ok(Some(agent)) => match if config.desktop_config.is_some() {
+        Ok(Some(agent)) => match if attach_only {
             Ok(())
         } else {
             agent.start()

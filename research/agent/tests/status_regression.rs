@@ -135,6 +135,14 @@ fn eod_failure_and_uncertainty_follow_actual_task_without_releasing_holds() {
         assert_eq!(agent.store().task(id).unwrap()["status"], expected);
         let status = agent.status(now()).unwrap();
         assert_eq!(status["eod"]["latest"]["disposition"], expected);
+        assert_eq!(
+            status["eod"]["latest"]["reason_text"],
+            if uncertain {
+                "本地测试模拟超时，可能已计费"
+            } else {
+                "今日研究预算已用完"
+            }
+        );
         let held = status["budget"]["reserved_micro"].clone();
         if uncertain {
             assert_ne!(held, "0");
@@ -322,6 +330,8 @@ fn safe_not_sent_attempt_then_lower_owner_budget_preserves_prior_provider_health
     assert_eq!(task["calls"].as_array().unwrap().len(), 1);
     assert_eq!(task["calls"][0]["state"], "no_charge");
     assert_eq!(task["calls"][0]["reason"], "FAKE_CONFIRMED_NOT_SENT");
+    assert_eq!(task["calls"][0]["reason_text"], "本地测试未真实发送");
+    assert_eq!(task["reason_text"], "今日研究预算已用完");
     let status = agent.status(now()).unwrap();
     assert_eq!(status["budget"]["call_count"], before["call_count"]);
     assert_eq!(status["budget"]["reserved_micro"], before["reserved_micro"]);
@@ -420,4 +430,35 @@ fn verification_preserves_fake_pr56_recorded_and_nonrecorded_projection() {
             }
         );
     }
+}
+
+#[test]
+fn persisted_reason_codes_expose_central_chinese_text() {
+    let mut settings = Settings::fake();
+    settings.budget.as_mut().unwrap().daily_limit_micro = 1;
+    let (_dir, agent) = setup(&settings);
+    let id = agent.create(&request(), now()).unwrap();
+    agent.tick(now()).unwrap();
+    let task = agent.store().task(id).unwrap();
+    assert_eq!(task["reason"], "DAILY_BUDGET_EXHAUSTED");
+    assert_eq!(task["reason_text"], "今日研究预算已用完");
+    assert_eq!(task["kind"], "research_task");
+    let list = agent.store().list(None).unwrap();
+    assert_eq!(list["tasks"][0]["reason_text"], "今日研究预算已用完");
+    assert_eq!(list["tasks"][0]["kind"], "research_task");
+}
+
+#[test]
+fn authorization_text_is_null_when_authorized_and_mapped_when_blocked() {
+    let (_dir, agent) = setup(&Settings::fake());
+    let authorized = model(&agent, "fake");
+    assert_eq!(authorized["authorization"], "authorized");
+    assert!(authorized["authorization_text"].is_null());
+
+    let mut blocked = Settings::fake();
+    blocked.models[0].grant = None;
+    let (_dir, blocked_agent) = setup(&blocked);
+    let view = model(&blocked_agent, "fake");
+    assert_eq!(view["authorization"], "AUTHORIZATION_REQUIRED");
+    assert_eq!(view["authorization_text"], "研究模型尚未获得授权");
 }

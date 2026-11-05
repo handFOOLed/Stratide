@@ -27,6 +27,10 @@ pub struct Config {
     pub desktop_config: Option<PathBuf>,
     pub paper_ledger: Option<PathBuf>,
     pub runtime_home: Option<PathBuf>,
+    /// Attached observation mode for a supervised install: the background watch
+    /// owns the research worker lock and executes tasks; the Dashboard only reads
+    /// and controls. Never starts an in-process worker thread.
+    pub agent_observer: bool,
 }
 
 impl Config {
@@ -42,10 +46,20 @@ impl Config {
             desktop_config: None,
             paper_ledger: None,
             runtime_home: None,
+            agent_observer: false,
         };
         let mut args = args.peekable();
         let mut seen = std::collections::BTreeSet::new();
         while let Some(arg) = args.next() {
+            // Boolean switch without a value: only the supervised background
+            // watch may own the Agent worker lock.
+            if arg == "--agent-observer" {
+                if !seen.insert(arg.clone()) {
+                    return Err(format!("未知或重复参数：{arg}"));
+                }
+                config.agent_observer = true;
+                continue;
+            }
             if ![
                 "--report-dir",
                 "--evaluation-file",

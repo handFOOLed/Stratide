@@ -93,7 +93,7 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
             "/api/runtime/wsl-detect" => detect_wsl(&layout),
             "/api/runtime/wsl-probe" => probe_wsl(&layout),
             "/api/runtime/open-folder" => open_folder(&layout, &body),
-            "/api/runtime/setup-complete" => setup_complete(&layout),
+            "/api/runtime/setup-complete" => setup_complete(&layout, &body),
             "/api/runtime/update-check" => update_check(&layout),
             "/api/runtime/shutdown" => {
                 let mut reply = app.envelope(200, json!({"state": "STOPPING"}), Value::Null);
@@ -120,7 +120,7 @@ fn status(app: &App, layout: &Layout) -> Result<Value, &'static str> {
     // This handler runs inside the service, so it is online by definition.
     let service = json!({"healthy": true, "instance_id": app.instance_id(),
         "pid": std::process::id().to_string()});
-    let value = stratide_runtime::diagnostics::collect(layout, service);
+    let value = stratide_runtime::diagnostics::collect(layout, service)?;
     *cache = Some((Instant::now(), value.clone()));
     Ok(value)
 }
@@ -483,17 +483,43 @@ fn probe_wsl(layout: &Layout) -> Result<Reply, Reply> {
     ))
 }
 
-fn setup_complete(layout: &Layout) -> Result<Reply, Reply> {
+/// Absent `completed` keeps the 0.3.0 write behaviour; only a boolean may
+/// revoke, so an accidentally malformed body can never erase the marker.
+fn setup_completed(body: &Value) -> Result<bool, ()> {
+    match body.get("completed") {
+        None => Ok(true),
+        Some(Value::Bool(completed)) => Ok(*completed),
+        Some(_) => Err(()),
+    }
+}
+
+/// Write (default, or `{"completed":true}`) or revoke (`{"completed":false}`)
+/// the first-run marker. Rewriting an existing marker stays idempotent, and
+/// revoking an absent marker succeeds because the requested state already holds.
+fn setup_complete(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
     let marker = layout.runtime.join("setup-complete");
-    let body = json!({"completed_at": stratide_runtime::timestamp()});
+    let completed =
+        setup_completed(body).map_err(|()| layout_error(400, "SETUP_INPUT_INVALID"))?;
+    if !completed {
+        match std::fs::remove_file(&marker) {
+            Ok(()) => {}
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(_) => return Err(layout_error(409, "SETUP_MARKER_DELETE_FAILED")),
+        }
+        return Ok(layout_envelope(
+            200,
+            json!({"state": "INCOMPLETE", "setup_complete": false, "completed_at": Value::Null}),
+        ));
+    }
+    let marker_body = json!({"completed_at": stratide_runtime::timestamp()});
     stratide_runtime::state::atomic_write(
         &marker,
-        serde_json::to_vec_pretty(&body).expect("JSON value"),
+        serde_json::to_vec_pretty(&marker_body).expect("JSON value"),
     )
     .map_err(|_| layout_error(409, "SETUP_MARKER_WRITE_FAILED"))?;
     Ok(layout_envelope(
         200,
-        json!({"state": "COMPLETE", "completed_at": body["completed_at"]}),
+        json!({"state": "COMPLETE", "setup_complete": true, "completed_at": marker_body["completed_at"]}),
     ))
 }
 
@@ -517,4 +543,19 @@ fn layout_envelope(status: u16, data: Value) -> Reply {
 fn layout_error(status: u16, code: &str) -> Reply {
     let code: String = code.chars().take(320).collect();
     layout_envelope(status, json!({"code": code}))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::setup_completed;
+    use serde_json::json;
+
+    #[test]
+    fn setup_body_defaults_to_complete_and_only_boolean_can_revoke() {
+        assert_eq!(setup_completed(&json!({})), Ok(true));
+        assert_eq!(setup_completed(&json!({"completed": true})), Ok(true));
+        assert_eq!(setup_completed(&json!({"completed": false})), Ok(false));
+        assert_eq!(setup_completed(&json!({"completed": "false"})), Err(()));
+        assert_eq!(setup_completed(&json!({"completed": null})), Err(()));
+    }
 }

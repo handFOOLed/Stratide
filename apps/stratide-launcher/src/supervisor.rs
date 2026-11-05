@@ -417,6 +417,10 @@ impl Supervisor {
             .arg(self.layout.app.join("dashboard"))
             .arg("--runtime-home")
             .arg(&self.layout.home)
+            // The supervised install always keeps the research worker in the
+            // background watch; the Dashboard only observes/controls and must
+            // not keep agent.lock while the watch's TimesFM/cloud research needs it.
+            .arg("--agent-observer")
             .env("STRATIDE_STATE_ROOT", &self.layout.data)
             .current_dir(&self.layout.app)
             .stdin(Stdio::null());

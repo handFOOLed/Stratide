@@ -250,16 +250,29 @@ pub fn begin(plan: &Plan) -> Result<Value> {
     gate(&tx)?;
     let trigger = format!("{POLICY}:{}", plan.batch);
     let input = serde_json::to_string(&plan.input()).unwrap();
-    let prior: Option<(i64, String, String)> = tx
+    let prior: Option<(i64, String, String, String, i64)> = tx
         .query_row(
-            "SELECT id,input,status FROM tasks WHERE trigger_key=?1",
+            "SELECT t.id,t.input,t.status,t.provider_id,(SELECT COUNT(*) FROM calls WHERE task_id=t.id) FROM tasks t WHERE trigger_key=?1",
             [&trigger],
-            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?)),
         )
         .optional()?;
-    let id = if let Some((id, old, status)) = prior {
-        ensure(old == input, "LOCAL_PIN_CHANGED_NEW_TASK_REQUIRED")?;
-        if status == "local_running" {
+    let id = if let Some((id, old, status, provider_id, call_count)) = prior {
+        if old != input {
+            // A local TimesFM task is pre-cloud, non-billable evidence. A product
+            // or model-code update legitimately changes its frozen input; retrying
+            // must not deadlock automatic research forever. Audited replacement is
+            // only allowed when this local task never produced a billable call.
+            ensure(provider_id == "local-timesfm-2.5-cpu" && call_count == 0,
+                   "LOCAL_PIN_CHANGED_NEW_TASK_REQUIRED")?;
+            let now = Utc::now().to_rfc3339();
+            let audit = serde_json::json!({"at":now,"old_input_sha256":crate::hash(old.as_bytes()),
+                "new_provider_hash":plan.pin(),"source":"local_pin_refresh"});
+            tx.execute("INSERT OR REPLACE INTO meta(key,value) VALUES(?1,?2)",
+                params![format!("timesfm_cpu_superseded:{id}:{now}"), audit.to_string()])?;
+            tx.execute("UPDATE tasks SET input=?1,provider_hash=?2,status='local_running',started_at=?3,finished_at=NULL,reason=NULL,result=NULL WHERE id=?4",
+                params![input, plan.pin(), now, id])?;
+        } else if status == "local_running" {
             // Caller holds the original Agent and singleton Worker lifetime locks.
             tx.execute("UPDATE tasks SET status='failed',reason='WORKER_INTERRUPTED_NO_RETRY',finished_at=?1 WHERE id=?2",params![Utc::now().to_rfc3339(),id])?;
         }
