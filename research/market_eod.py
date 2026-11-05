@@ -534,18 +534,29 @@ class Market(h.Warehouse):
         report = self.report()
         return dict(outcome, target_start=floor, sessions=sessions,
                     remaining=len(report["gaps"]),
+                    sessions_ready=report["sessions_ready"],
                     last_successful_date=report["last_successful_date"])
 
     def backfill_rounds(self, sessions=84, rounds=6, *, transport=None, clock=h.now,
                         token_source="auto"):
         require(1 <= rounds <= 12, "INVALID_BACKFILL_ROUNDS")
         history, outcome = [], None
+        progress = self.root.parents[2] / "backfill.progress.json"
         for _ in range(rounds):
             outcome = self.backfill(sessions, transport=transport, clock=clock,
                                     token_source=token_source)
             history.append(dict(state=outcome["state"],
                                 requests=outcome.get("requests_this_run", 0),
                                 remaining=outcome["remaining"]))
+            # The collector holds the warehouse writer lock for a whole batch, so
+            # the dashboard reads this small file instead of the database.
+            progress.write_text(json.dumps(dict(
+                sessions=sessions,
+                sessions_ready=outcome["sessions_ready"],
+                remaining=outcome["remaining"],
+                state=outcome["state"],
+                updated_at=instant(h.now()).astimezone(TZ).isoformat(),
+            )), encoding="utf-8")
             if outcome["remaining"] == 0 or history[-1]["requests"] == 0:
                 break
         return dict(state="COMPLETE" if outcome["remaining"] == 0 else "PARTIAL",
@@ -566,7 +577,11 @@ class Market(h.Warehouse):
                          blockers=by_date[date]["blockers"] if date in by_date else ["NO_FROZEN_MARKET_SNAPSHOT"])
                     for date in sorted(calendar) if calendar[date] == "1" and date <= instant(h.now()).astimezone(TZ).strftime("%Y%m%d") and
                     (date not in by_date or by_date[date]["state"] != "READY")]
-            return dict(version=VERSION, state=run["status"] if run else "NOT_COLLECTED", enabled=enabled, **SAFE,
+            ready_sessions = sum(
+                1 for date in dates
+                if self.load_snapshot(db, date)["state"] == "READY")
+            return dict(version=VERSION, state=run["status"] if run else "NOT_COLLECTED", enabled=enabled,
+                        sessions_ready=ready_sessions, **SAFE,
                         data_mode=config["data_mode"], config=config, last_run=dict(run) if run else None,
                         last_successful_date=max((s["source_day"] for s in snapshots if s["state"] == "READY"), default=None),
                         latest=latest, gaps=gaps,

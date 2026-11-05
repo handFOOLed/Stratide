@@ -27,7 +27,6 @@ struct Supervisor {
     instance_id: String,
     started_at: String,
     port: u16,
-    token: String,
     previous: Option<SupervisorState>,
     dashboard: Option<Dashboard>,
     watch: Option<Watch>,
@@ -60,7 +59,7 @@ pub fn run() -> Result<i32, String> {
     }
     layout.clear_stop_request();
     let config = layout.config()?;
-    let token = layout.runtime_token()?;
+    let _ = std::fs::remove_file(layout.runtime.join(stratide_runtime::RUNTIME_TOKEN_FILE));
     let previous = SupervisorState::read(&layout.state_path());
     let job = win::Job::create().map_err(|error| format!("WINDOWS_JOB_UNAVAILABLE: {error}"))?;
     let started_at = stratide_runtime::timestamp();
@@ -70,7 +69,6 @@ pub fn run() -> Result<i32, String> {
         instance_id: stratide_runtime::random_hex(8)?,
         started_at,
         port: config.port,
-        token,
         previous,
         dashboard: None,
         watch: None,
@@ -702,7 +700,7 @@ impl Supervisor {
         }
         let health = health::probe(self.port);
         if health.is_ok() {
-            let _ = health::request_shutdown(self.port, &self.token);
+            let _ = health::request_shutdown(self.port);
             let deadline = Instant::now() + Duration::from_secs(10);
             while Instant::now() < deadline {
                 if health::probe(self.port).is_err() {

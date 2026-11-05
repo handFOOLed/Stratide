@@ -1,23 +1,5 @@
 import { ApiError } from './api';
 
-/** The desktop launcher passes this per-install token in the URL fragment.
- *  It is kept in memory only, never in storage, and stripped from the URL. */
-let token = '';
-
-export function captureRuntimeToken(): void {
-  const hash = window.location.hash;
-  const query = hash.indexOf('?');
-  if (query < 0) return;
-  const params = new URLSearchParams(hash.slice(query + 1));
-  const value = params.get('rt');
-  if (value) token = value;
-  window.history.replaceState(null, '', hash.slice(0, query));
-}
-
-export function runtimeToken(): string {
-  return token;
-}
-
 export interface ChildStatus {
   pid: number;
   started_at: string;
@@ -117,7 +99,7 @@ export async function loadRuntimeStatus(signal?: AbortSignal): Promise<RuntimeSt
   return read<RuntimeStatus>('/api/runtime/status', {
     cache: 'no-store',
     credentials: 'omit',
-    headers: { Accept: 'application/json', 'X-Stratide-Runtime': token },
+    headers: { Accept: 'application/json' },
     signal,
   });
 }
@@ -129,7 +111,6 @@ export async function runtimeAction<T>(path: string, body: Record<string, unknow
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      'X-Stratide-Runtime': token,
     },
     body: JSON.stringify(body),
   });

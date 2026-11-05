@@ -38,6 +38,14 @@ fn valid_key(key: &str) -> bool {
             .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
 }
 
+fn mask(key: &str) -> String {
+    format!(
+        "{}••••{}",
+        &key[..3],
+        &key[key.len() - 4..]
+    )
+}
+
 pub fn target(agent: &Agent, provider: &str) -> String {
     let digest = hash(agent.settings_path().to_string_lossy().as_bytes());
     format!("Stratide/{digest}/research-{provider}-v1")
@@ -65,10 +73,14 @@ pub fn configure(agent: &Agent, body: &Value) -> Result<Value> {
     let target = target(agent, provider);
     credman::write(&target, &format!("Stratide {}", label(provider)), key)?;
     let now = Utc::now();
+    // A masked fingerprint is enough to recognise the saved key later; the
+    // secret itself is never returned to the page.
+    let key_hint = mask(key);
     let record = json!({
         "provider": provider,
         "target": target,
         "configured_at": now.to_rfc3339(),
+        "key_hint": key_hint,
     });
     agent
         .store()
@@ -120,9 +132,23 @@ pub fn status(agent: &Agent) -> Result<Value> {
             "monthly_limit_micro": b.monthly_limit_micro,
         })
     });
+    let key_hint = match profile
+        .as_ref()
+        .and_then(|value| value["key_hint"].as_str())
+    {
+        Some(hint) => Some(hint.to_string()),
+        // Profiles written before the hint existed still show a masked key.
+        None if key_present => provider.as_deref().map(|name| {
+            credman::read(&target(agent, name))
+                .map(|secret| mask(secret.as_str()))
+                .unwrap_or_default()
+        }),
+        None => None,
+    };
     Ok(json!({
         "provider": provider,
         "configured_at": profile.as_ref().and_then(|p| p["configured_at"].as_str()),
+        "key_hint": key_hint,
         "key_present": key_present,
         "model_installed": model_installed,
         "budget": budget,

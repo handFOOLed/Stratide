@@ -149,7 +149,6 @@ export function SettingsPage({
               onChange={(checked) => setMotion(checked ? 'reduce' : 'system')}
             />
           </div>
-          <p className="settings-footnote">外观只保存在本机浏览器，不影响账户、研究或预算。</p>
         </CardBody>
       );
     }

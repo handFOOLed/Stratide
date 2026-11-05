@@ -180,11 +180,6 @@ export function AgentPage({ agent, workspace, titleRef }: { agent: AgentState; w
               <div className="runtime-head">
                 <div>
                   <h3 className="runtime-title">{status.paused ? '已暂停接收新任务' : '等待研究任务'}</h3>
-                  <p className="runtime-desc">
-                    {status.paused
-                      ? '暂停接收新任务，已提交的调用可完成。'
-                      : '任务串行执行，详情只读取已保存记录。'}
-                  </p>
                 </div>
                 <div className="runtime-actions">
                   <Button
@@ -217,7 +212,6 @@ export function AgentPage({ agent, workspace, titleRef }: { agent: AgentState; w
                 <div className="eod-head">
                   <div>
                     <h3 className="eod-title">EOD 自动研究</h3>
-                    <p className="eod-desc">默认关闭；只为最新有效源日派发，同源日不重复。最终状态以服务端持久记录为准。</p>
                   </div>
                   <div className="eod-switch">
                     <span className="eod-switch-label">{status.eod.enabled ? '已启用' : '已停用'}</span>
@@ -356,9 +350,6 @@ function BudgetCard({ status, agent }: { status: AgentStatus; agent: AgentState 
               <div><dt>输入 / 输出 Token</dt><dd className="numeric">{formatShares(budget.input_tokens)} / {formatShares(budget.output_tokens)}</dd></div>
               <div><dt>收到用量估算</dt><dd className="numeric">{formatMicro(budget.usage_estimate_micro, { currency: budget.currency })}</dd></div>
             </dl>
-            <div className="budget-note">
-              {budget.currency} · {budget.timezone} · {budget.day} / {budget.month}。未核定费用按最大预留计。
-            </div>
           </>
         )}
         {agent.busy === 'control:eod' ? <span className="sr-only">正在更新 EOD 设置</span> : null}
@@ -375,7 +366,6 @@ function ModelsCard({ status, agent }: { status: AgentStatus; agent: AgentState 
     <Card className="agent-models">
       <CardHead
         title="模型与自动研究"
-        subtitle="模型选择仅影响新任务"
         actions={<Badge tone="outline">{status.automatic_fallback.startsWith('disabled') ? '备用模型仅保存' : '备用仅保存'}</Badge>}
       />
       <CardBody>

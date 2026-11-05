@@ -6,12 +6,12 @@ import { Callout } from '../ui/Callout';
 import { CardBody } from '../ui/Card';
 import { Field, TextInput } from '../ui/Field';
 import { Switch } from '../ui/Switch';
+import { ProgressBar } from '../ui/ProgressBar';
 import { useToast } from '../ui/Toast';
 import { formatDateTime } from '../../lib/format';
 import {
   loadRuntimeStatus,
   runtimeAction,
-  runtimeToken,
   shanghaiToday,
 } from '../../lib/runtime';
 import type { DependencyStatus, RuntimeStatus, WslProbeResult } from '../../lib/runtime';
@@ -95,7 +95,6 @@ function explain(value: DependencyStatus): string {
 
 export function RuntimePanel() {
   const { push } = useToast();
-  const token = runtimeToken();
   const [status, setStatus] = useState<RuntimeStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -110,7 +109,8 @@ export function RuntimePanel() {
   });
   const [wslLoaded, setWslLoaded] = useState(false);
   const [wslProbe, setWslProbe] = useState<WslProbeResult | null>(null);
-  const [history, setHistory] = useState<{ last: string | null; missing: number; start: string | null } | null>(null);
+  const [history, setHistory] = useState<{ last: string | null; missing: number; sessions: number } | null>(null);
+  const [release, setRelease] = useState<{ tag: string; url?: string } | null>(null);
   const [backfillRunning, setBackfillRunning] = useState(false);
   const controller = useRef<AbortController | null>(null);
 
@@ -136,8 +136,18 @@ export function RuntimePanel() {
   const loadHistory = useCallback(() => {
     runtimeAction('market', { action: 'backfill-state' })
       .then((value) => {
-        const state = value as { running?: boolean };
+        const state = value as {
+          running?: boolean;
+          progress?: { sessions_ready?: number; remaining?: number } | null;
+        };
         setBackfillRunning(state.running === true);
+        if (state.running && state.progress?.sessions_ready !== undefined) {
+          setHistory({
+            last: null,
+            missing: state.progress.remaining ?? 0,
+            sessions: state.progress.sessions_ready,
+          });
+        }
       })
       .catch(() => setBackfillRunning(false));
     runtimeAction('market', { action: 'status' })
@@ -145,15 +155,17 @@ export function RuntimePanel() {
         const report = value as {
           gaps?: unknown[];
           last_successful_date?: string | null;
-          config?: { start_date?: string };
+          sessions_ready?: number;
         };
         setHistory({
           last: report.last_successful_date ?? null,
           missing: report.gaps?.length ?? 0,
-          start: report.config?.start_date ?? null,
+          sessions: report.sessions_ready ?? 0,
         });
       })
-      .catch(() => setHistory(null));
+      .catch(() => {
+        // The warehouse writer holds the database lock during a batch.
+      });
   }, []);
 
   useEffect(() => {
@@ -245,11 +257,6 @@ export function RuntimePanel() {
 
   return (
     <CardBody className="install-panel">
-      {!token ? (
-        <Callout tone="warning" title="只读诊断">
-          本页的本机设置操作需要桌面临时令牌。双击桌面 Stratide 图标重新打开即可解锁；令牌只保存在本次页面内存。
-        </Callout>
-      ) : null}
       {error ? (
         <Callout tone="danger" title="运行状态不可读">
           <span className="mono">{error}</span>
@@ -261,7 +268,7 @@ export function RuntimePanel() {
         <Button
           size="sm"
           icon="database"
-          disabled={!token}
+          disabled={false}
           onClick={() => act('data', 'open-folder', { target: 'data' }, '已打开数据目录')}
         >
           打开数据目录
@@ -269,7 +276,7 @@ export function RuntimePanel() {
         <Button
           size="sm"
           icon="file"
-          disabled={!token}
+          disabled={false}
           onClick={() => act('logs', 'open-folder', { target: 'logs' }, '已打开日志目录')}
         >
           打开日志目录
@@ -292,8 +299,34 @@ export function RuntimePanel() {
             <p className="muted">{backfillRunning ? '历史补录占用数据仓，结束后自动恢复。' : '按 Asia/Shanghai 交易日，收盘后自动采集。'}</p>
           </div>
           <div className="install-item install-item--wide">
-            <div className="install-item__head"><strong>版本</strong><span className="mono">v{status?.product_version ?? '—'}</span></div>
-            <p className="muted">升级安装不会覆盖模拟账户、历史行情与研究记录。</p>
+            <div className="install-item__head">
+              <strong>版本</strong>
+              <span className="mono">v{status?.product_version ?? '—'}{release ? ' · GitHub Release ' + release.tag : ''}</span>
+            </div>
+            <div className="install-actions">
+              <Button
+                size="sm"
+                loading={busy === 'update'}
+                onClick={async () => {
+                  setBusy('update');
+                  try {
+                    const result = await runtimeAction<{ state: string; tag?: string; url?: string }>('update-check');
+                    if (result.state === 'OK' && result.tag) {
+                      setRelease({ tag: result.tag, url: result.url });
+                      push({ title: '最新 Release ' + result.tag, tone: 'success' });
+                    } else {
+                      push({ title: '暂时无法读取 Release', tone: 'info' });
+                    }
+                  } catch (caught) {
+                    push({ title: caught instanceof ApiError ? caught.code : 'UPDATE_CHECK_FAILED', tone: 'danger' });
+                  } finally {
+                    setBusy(null);
+                  }
+                }}
+              >
+                检查更新
+              </Button>
+            </div>
           </div>
         </div>
         <details className="install-advanced">
@@ -314,13 +347,12 @@ export function RuntimePanel() {
         <div className="settings-row">
           <div className="settings-row__main">
             <div className="settings-row__label">Windows 用户登录后启动后台</div>
-            <p className="muted">当前用户任务，非管理员服务；延迟 30 秒，不自动打开浏览器。关闭后不会再自启。</p>
           </div>
           <Switch
             label="登录自启"
             checked={status?.autostart.enabled ?? false}
             busy={busy === 'autostart'}
-            disabled={!token || busy !== null}
+            disabled={busy !== null}
             onChange={(checked) => act('autostart', 'autostart', { enabled: checked }, checked ? '已启用登录自启' : '已停用登录自启')}
           />
         </div>
@@ -328,7 +360,6 @@ export function RuntimePanel() {
 
       <section className="install-section">
         <h2 className="card__title">依赖与权限诊断</h2>
-        <p className="muted">缺少依赖时研究会暂停；安装包不会静默下载模型或代替你做授权。</p>
         <div className="install-grid">
           {DEPENDENCIES.map(([key, name]) => {
             const value = status?.dependencies[key];
@@ -347,9 +378,6 @@ export function RuntimePanel() {
 
       <section className="install-section">
         <h2 className="card__title">本机 AI 模型</h2>
-        <p className="muted">
-          可选。模型只在本机运行，不会把行情数据发给外部；没有它也能照常采集行情、查看模拟账户。
-        </p>
         <div className="install-status">
           <Badge tone={status?.dependencies.wsl.configured ? 'success' : 'neutral'}>
             {status?.dependencies.wsl.configured ? '已连接' : '未检测到'}
@@ -364,7 +392,7 @@ export function RuntimePanel() {
           {status?.dependencies.wsl.configured ? null : (
             <Button
               variant="primary"
-              disabled={!token || busy !== null}
+              disabled={busy !== null}
               loading={busy === 'detect'}
               onClick={detectWsl}
             >
@@ -374,7 +402,7 @@ export function RuntimePanel() {
           {status?.dependencies.wsl.configured ? (
             <Button
               variant="secondary"
-              disabled={!token || busy !== null}
+              disabled={busy !== null}
               loading={busy === 'probe'}
               onClick={probeWsl}
             >
@@ -390,7 +418,7 @@ export function RuntimePanel() {
               id="wsl-distribution"
               value={wslForm.distribution}
               placeholder="Ubuntu-24.04"
-              disabled={!token}
+              disabled={false}
               onChange={(event) => setWslForm({ ...wslForm, distribution: event.target.value })}
             />
           </Field>
@@ -399,7 +427,7 @@ export function RuntimePanel() {
               id="wsl-workspace"
               value={wslForm.workspace}
               placeholder="/home/owner/projects/Stratide"
-              disabled={!token}
+              disabled={false}
               onChange={(event) => setWslForm({ ...wslForm, workspace: event.target.value })}
             />
           </Field>
@@ -408,7 +436,7 @@ export function RuntimePanel() {
               id="wsl-python"
               value={wslForm.python}
               placeholder=".venv/bin/python"
-              disabled={!token}
+              disabled={false}
               onChange={(event) => setWslForm({ ...wslForm, python: event.target.value })}
             />
           </Field>
@@ -417,7 +445,7 @@ export function RuntimePanel() {
               id="wsl-model"
               value={wslForm.model}
               placeholder="models/timesfm-2.5"
-              disabled={!token}
+              disabled={false}
               onChange={(event) => setWslForm({ ...wslForm, model: event.target.value })}
             />
           </Field>
@@ -425,7 +453,7 @@ export function RuntimePanel() {
           <div className="install-actions">
             <Button
               variant="secondary"
-              disabled={!token || busy !== null}
+              disabled={busy !== null}
               loading={busy === 'wsl'}
               onClick={() => act('wsl', 'wsl', { ...wslForm }, '本机模型设置已保存')}
             >
@@ -458,13 +486,13 @@ export function RuntimePanel() {
                   spellCheck={false}
                   value={secret}
                   placeholder={status?.dependencies.tushare_credential.state === 'CONFIGURED' ? '已配置；输入可覆盖' : '粘贴 Tushare Token'}
-                  disabled={!token}
+                  disabled={false}
                   onChange={(event) => setSecret(event.target.value)}
                 />
               </Field>
               <Button
                 variant="primary"
-                disabled={!token || secret.length === 0 || busy !== null}
+                disabled={secret.length === 0 || busy !== null}
                 loading={busy === 'tushare'}
                 onClick={() => act('tushare', 'tushare-token', { token: secret }, 'Tushare Token 已保存').then(() => setSecret(''))}
               >
@@ -476,9 +504,6 @@ export function RuntimePanel() {
           <div className="install-setup__row">
             <div>
               <strong>行情采集</strong>
-              <p className="muted">
-                自动运行。启动时检测最新交易日，收盘后采集；已初始化 {status?.dependencies.market_eod.state === 'INITIALIZED' ? '的数据仓库' : '状态读取中'}。
-              </p>
             </div>
             <Badge tone={status?.dependencies.market_eod.state === 'INITIALIZED' ? 'success' : 'warning'}>
               {status?.dependencies.market_eod.state === 'INITIALIZED' ? '自动' : '等待初始化'}
@@ -486,31 +511,27 @@ export function RuntimePanel() {
           </div>
 
           <div className="install-setup__row">
-            <div>
-              <strong>历史补录</strong>
-              <p className="muted">
-                {backfillRunning
-                  ? '补录正在后台运行；行情库写入期间进度稍后可见，完成后会自动停止。'
-                  : '研究需要最近 84 个交易日。补录在后台按数据源限额运行，通常 30–60 分钟；期间可关闭页面。'}
-                {!backfillRunning && history
-                  ? ` 已就绪 ${history.last ?? '—'}，还缺 ${history.missing} 个交易日。`
-                  : ''}
-              </p>
+            <div className="install-progress">
+              <strong>历史补录 {history ? Math.min(history.sessions, 84) + ' / 84' : ''}</strong>
+              <ProgressBar
+                value={history ? Math.min(100, (history.sessions / 84) * 100) : 0}
+                label="历史补录进度"
+              />
             </div>
             <div className="install-actions">
               <Button
                 size="sm"
                 variant="secondary"
-                disabled={!token || busy !== null || backfillRunning || status?.dependencies.market_eod.state !== 'INITIALIZED'}
+                disabled={busy !== null || backfillRunning || status?.dependencies.market_eod.state !== 'INITIALIZED'}
                 loading={busy === 'backfill'}
                 onClick={() =>
                   act('backfill', 'market', { action: 'backfill', sessions: 84 }, '补录已在后台开始').then(loadHistory)
                 }
               >
-                {backfillRunning ? '补录进行中' : '补录 84 个交易日'}
+                {backfillRunning ? '补录进行中' : '开始补录'}
               </Button>
-              <Button size="sm" variant="ghost" disabled={!token} onClick={loadHistory}>
-                刷新进度
+              <Button size="sm" variant="ghost" onClick={loadHistory}>
+                刷新
               </Button>
             </div>
           </div>
@@ -518,11 +539,11 @@ export function RuntimePanel() {
           <div className="install-setup__row">
             <div>
               <strong>完成安装引导</strong>
-              <p className="muted">标记后，双击桌面图标会直接打开总览。Paper 本金/风险限额与真实行情外发仍需 Owner 按既有流程单独授权。</p>
+              <p className="muted">标记后，双击桌面图标会直接打开总览。</p>
             </div>
             <Button
               variant={status?.setup_complete ? 'secondary' : 'primary'}
-              disabled={!token || busy !== null}
+              disabled={busy !== null}
               loading={busy === 'setup'}
               onClick={() => act('setup', 'setup-complete', {}, '首次设置已标记完成')}
             >

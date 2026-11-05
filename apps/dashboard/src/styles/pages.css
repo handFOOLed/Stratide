@@ -2337,3 +2337,24 @@
 .guide-steps li { position: relative; padding-left: 34px; color: var(--text-secondary); font-size: var(--fs-sm); line-height: 1.55; }
 .guide-steps li::before { counter-increment: step; content: counter(step); position: absolute; left: 0; top: 0; display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-ink); font-size: 12.5px; font-weight: 600; }
 @media (max-width: 860px) { .guide-steps { grid-template-columns: minmax(0, 1fr); } }
+
+.agent-grid {
+  align-items: stretch;
+}
+
+.agent-grid > .col-7 > .card,
+.agent-grid > .col-5 > .card {
+  height: 100%;
+}
+
+.install-progress {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.install-progress .progress {
+  max-width: 420px;
+}

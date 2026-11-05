@@ -5,7 +5,6 @@ import { Field, TextInput } from '../ui/Field';
 import { SegmentedControl } from '../ui/SegmentedControl';
 import { agentFetch, friendlyError } from '../../lib/api';
 import { formatMicro } from '../../lib/format';
-import { navigate } from '../../lib/route';
 
 interface Budget {
   currency: string;
@@ -18,21 +17,19 @@ interface ProviderStatus {
   provider: string | null;
   configured_at: string | null;
   key_present: boolean;
+  key_hint: string | null;
   model_installed: boolean;
   budget: Budget | null;
   endpoint: string | null;
 }
 
 const LABELS: Record<string, string> = { deepseek: 'DeepSeek 官方', openai: 'OpenAI 官方' };
-const ENDPOINTS: Record<string, string> = {
-  deepseek: 'https://api.deepseek.com',
-  openai: 'https://api.openai.com/v1',
-};
 
 export function ProviderPanel() {
   const [status, setStatus] = useState<ProviderStatus | null>(null);
   const [provider, setProvider] = useState('deepseek');
   const [key, setKey] = useState('');
+  const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -62,6 +59,7 @@ export function ProviderPanel() {
       });
       setStatus(next);
       setKey('');
+      setEditing(false);
       setNotice('密钥已保存到 Windows 凭据管理器。');
     } catch (caught) {
       setError(friendlyError(caught).message);
@@ -106,54 +104,46 @@ export function ProviderPanel() {
     }
   };
 
+  const saved = status?.key_present === true;
+  const showInput = !saved || editing;
+
   return (
     <div className="provider-panel">
       <h2 className="card__title">AI 服务</h2>
-      <p className="provider-intro">
-        连接云端研究模型。密钥只保存在 Windows 凭据管理器，不会写入文件、日志或页面源码。
-      </p>
 
       {error ? (
         <Callout tone="danger" title="未能完成" role="alert">
           {error}
         </Callout>
       ) : null}
-      {notice ? (
-        <Callout tone="success" title="已完成">
-          {notice}
-        </Callout>
-      ) : null}
+      {notice ? <Callout tone="success" title="已完成">{notice}</Callout> : null}
 
-      {status === null ? (
-        <p className="muted">正在读取 AI 服务状态…</p>
-      ) : (
-        <div className="provider-status">
-          <div className="provider-status__row">
-            <span>当前服务</span>
-            <strong>{status.provider ? LABELS[status.provider] ?? status.provider : '未配置'}</strong>
-          </div>
-          <div className="provider-status__row">
-            <span>密钥</span>
-            <strong>{status.key_present ? '已保存（凭据管理器）' : '未保存'}</strong>
-          </div>
-          <div className="provider-status__row">
-            <span>研究模型</span>
-            <strong>{status.model_installed ? '已安装' : '未安装'}</strong>
-          </div>
-          <div className="provider-status__row">
-            <span>预算</span>
-            <strong>
-              {status.budget
-                ? '¥' + formatMicro(status.budget.daily_limit_micro) + ' / 日 · ¥' +
-                  formatMicro(status.budget.monthly_limit_micro) + ' / 月'
-                : '未配置'}
-            </strong>
-          </div>
+      <div className="provider-status">
+        <div className="provider-status__row">
+          <span>当前服务</span>
+          <strong>{status?.provider ? LABELS[status.provider] ?? status.provider : '未配置'}</strong>
         </div>
-      )}
+        <div className="provider-status__row">
+          <span>API Key</span>
+          <strong>{saved ? status?.key_hint ?? '已保存' : '未保存'}</strong>
+        </div>
+        <div className="provider-status__row">
+          <span>研究模型</span>
+          <strong>{status?.model_installed ? '已安装' : '未安装'}</strong>
+        </div>
+        <div className="provider-status__row">
+          <span>预算</span>
+          <strong>
+            {status?.budget
+              ? '¥' + formatMicro(status.budget.daily_limit_micro) + ' / 日 · ¥' +
+                formatMicro(status.budget.monthly_limit_micro) + ' / 月'
+              : '未配置'}
+          </strong>
+        </div>
+      </div>
 
       <div className="provider-form">
-        <Field label="服务商" htmlFor="provider-name" hint="只接受官方 HTTPS 端点。">
+        <Field label="服务商" htmlFor="provider-name">
           <SegmentedControl
             label="服务商"
             options={[
@@ -164,53 +154,74 @@ export function ProviderPanel() {
             onChange={setProvider}
           />
         </Field>
-        <Field
-          label="API Key"
-          htmlFor="provider-key"
-          hint={ENDPOINTS[provider] + ' · 保存后不再回显'}
-        >
-          <TextInput
-            id="provider-key"
-            type="password"
-            autoComplete="off"
-            spellCheck={false}
-            placeholder="sk-…"
-            value={key}
-            onChange={(event) => setKey(event.target.value)}
-          />
-        </Field>
+
+        {showInput ? (
+          <Field label="API Key" htmlFor="provider-key">
+            <TextInput
+              id="provider-key"
+              type="password"
+              autoComplete="off"
+              spellCheck={false}
+              placeholder="sk-…"
+              value={key}
+              onChange={(event) => setKey(event.target.value)}
+            />
+          </Field>
+        ) : (
+          <Field label="API Key" htmlFor="provider-key-saved">
+            <TextInput id="provider-key-saved" value={status?.key_hint ?? ''} readOnly disabled />
+          </Field>
+        )}
+
         <div className="provider-actions">
-          <Button variant="primary" loading={busy === 'save'} disabled={key.trim() === ''} onClick={() => void save()}>
-            保存密钥
-          </Button>
-          <Button loading={busy === 'test'} disabled={!status?.key_present} onClick={() => void test()}>
-            测试连接
-          </Button>
+          {showInput ? (
+            <>
+              <Button
+                variant="primary"
+                loading={busy === 'save'}
+                disabled={key.trim() === ''}
+                onClick={() => void save()}
+              >
+                保存密钥
+              </Button>
+              {saved ? (
+                <Button
+                  variant="ghost"
+                  disabled={busy !== null}
+                  onClick={() => {
+                    setEditing(false);
+                    setKey('');
+                  }}
+                >
+                  取消
+                </Button>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <Button loading={busy === 'test'} onClick={() => void test()}>
+                测试连接
+              </Button>
+              <Button variant="secondary" onClick={() => setEditing(true)}>
+                替换密钥
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
-      {status?.key_present ? (
+      {saved ? (
         <div className="provider-steps">
           <div className="provider-step">
             <div>
-              <strong>1. 安装研究模型</strong>
-              <p className="muted">把已保存的服务商配置接入研究运行时；可重复执行。</p>
+              <strong>研究模型</strong>
             </div>
             <Button size="sm" loading={busy === 'model'} onClick={() => void installModel()}>
-              {status.model_installed ? '重新安装' : '安装'}
+              {status?.model_installed ? '重新安装' : '安装'}
             </Button>
           </div>
         </div>
       ) : null}
-
-      {provider === 'openai' ? (
-        <p className="provider-note">
-          OpenAI 密钥可保存并测试连接；当前版本的自动市场研究固定使用 DeepSeek 融合模型。
-        </p>
-      ) : null}
-      <p className="provider-note">
-        研究需要行情累计满 84 个交易日；首次使用已一次性同意数据外发，本页不再询问。
-      </p>
     </div>
   );
 }

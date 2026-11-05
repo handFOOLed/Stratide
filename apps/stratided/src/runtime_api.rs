@@ -67,14 +67,6 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
     if origin.as_deref() != Some(&format!("http://{host}")) {
         return error(403, "EXPLICIT_ORIGIN_REQUIRED");
     }
-    let token = match layout.runtime_token() {
-        Ok(token) => token,
-        Err(_) => return error(503, "RUNTIME_TOKEN_UNAVAILABLE"),
-    };
-    let presented = single("X-Stratide-Runtime").unwrap_or_default();
-    if !constant_time_eq(token.as_bytes(), presented.as_bytes()) {
-        return error(401, "RUNTIME_TOKEN_REQUIRED");
-    }
     if single("Content-Type").as_deref() != Some("application/json") {
         return error(415, "JSON_REQUIRED");
     }
@@ -102,6 +94,7 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
             "/api/runtime/wsl-probe" => probe_wsl(&layout),
             "/api/runtime/open-folder" => open_folder(&layout, &body),
             "/api/runtime/setup-complete" => setup_complete(&layout),
+            "/api/runtime/update-check" => update_check(&layout),
             "/api/runtime/shutdown" => {
                 let mut reply = app.envelope(200, json!({"state": "STOPPING"}), Value::Null);
                 reply.exit_after = true;
@@ -203,7 +196,15 @@ fn market(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
     }
     if action == "backfill-state" {
         let request = layout.data.join("backfill.request");
-        return Ok(layout_envelope(200, json!({"running": request.is_file()})));
+        let running = request.is_file();
+        let progress: Value = std::fs::read(layout.data.join("backfill.progress.json"))
+            .ok()
+            .and_then(|raw| serde_json::from_slice(&raw).ok())
+            .unwrap_or(Value::Null);
+        return Ok(layout_envelope(
+            200,
+            json!({"running": running, "progress": progress}),
+        ));
     }
     let script = layout.app.join("scripts").join("eod-operator.py");
     if !script.is_file() {
@@ -270,6 +271,32 @@ fn backfill(layout: &Layout, _command: Command) -> Result<Reply, Reply> {
     std::fs::write(&request, b"84").map_err(|_| layout_error(409, "BACKFILL_REQUEST_FAILED"))?;
     Ok(layout_envelope(200, json!({"state": "STARTED", "sessions": 84})))
 }
+fn update_check(layout: &Layout) -> Result<Reply, Reply> {
+    let script = layout.app.join("scripts").join("update-check.py");
+    if !script.is_file() {
+        return Err(layout_error(409, "UPDATE_CHECK_MISSING"));
+    }
+    let mut command = Command::new(layout.python());
+    command
+        .args(["-B", "-X", "utf8"])
+        .arg(&script)
+        .current_dir(&layout.app)
+        .env("STRATIDE_STATE_ROOT", &layout.data)
+        .stdin(std::process::Stdio::null());
+    match stratide_runtime::run_capture(command, Duration::from_secs(30)) {
+        Ok((Some(0), stdout, _)) | Ok((Some(2), stdout, _)) => {
+            let value: Value = serde_json::from_slice(&stdout)
+                .unwrap_or_else(|_| json!({"state": "UNAVAILABLE"}));
+            Ok(layout_envelope(200, value))
+        }
+        Ok((code, _, _)) => Err(layout_error(
+            409,
+            &format!("UPDATE_CHECK_FAILED_{}", code.unwrap_or(-1)),
+        )),
+        Err(code) => Err(layout_error(504, &code)),
+    }
+}
+
 fn open_folder(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
     let target = body
         .get("target")
