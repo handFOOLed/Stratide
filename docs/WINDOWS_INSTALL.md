@@ -1,6 +1,6 @@
 # Stratide Windows 安装、升级与卸载
 
-> **Windows 11 现行安装版：Stratide 0.3.0**。首次使用建议先看 [图文流程式使用教程](USER_GUIDE.md)；常见问题和运行边界集中在 [故障排查与已知限制](KNOWN_LIMITATIONS.md)。软件已由 [PR #89](https://github.com/handFOOLed/Stratide/pull/89) 合入 `main`，不再是 Draft。
+> **Windows 11 现行安装版：Stratide 0.3.0**。首次使用建议先看 [分步使用教程](USER_GUIDE.md)；常见问题和运行边界集中在 [故障排查与已知限制](KNOWN_LIMITATIONS.md)。软件已由 [PR #89](https://github.com/handFOOLed/Stratide/pull/89) 合入 `main`，不再是 Draft。
 
 **快速安装**：从 [GitHub Releases](https://github.com/handFOOLed/Stratide/releases) 获取 `Stratide-Setup-0.3.0-x64.exe` → 运行安装向导 → 双击桌面 Stratide → 在「设置 → 运行与安装」完成初始配置。日常使用无需编译源码。
 
@@ -134,7 +134,7 @@ pwsh -NoProfile -File scripts/test-windows-product.ps1 -InstallTest
 
 安装包版本 `0.3.0`；SHA256 见同目录 `SHA256SUMS.txt`，并记录在 PR 说明与 `docs/evidence/m3-pr04/README.md`。安装包未签名。
 
-## 7. 进阶运行边界与测试记录
+## 7. 进阶运行边界与测试记录（汇总见 [KNOWN_LIMITATIONS](KNOWN_LIMITATIONS.md)）
 
 - **研究链路**：配置 §4.1 的 WSL 入口后，原唯一 `market watch` 会自动走 EOD → WSL2 TimesFM CPU → 原 Agent/受控研究 → 原 Paper 判定；安装包不下载/打包模型，也不新增第二个调度器、预算或账本。WSL/模型/Worker 不可用时研究/Paper 明确 `BLOCKED`，**EOD 采集继续**，不伪造完成。
 - **真实付费链路仍未实测**：真实 Tushare 全市场采集、真实 DeepSeek 外发/计费与 Paper 成交需要 Owner 授权后单独执行，相关实测为 `NOT_RUN`；TimesFM CPU 推理本身已用 Owner 现有 WSL2 环境实测（见 `docs/evidence/m3-pr04/README.md` 2.7/2.8）。
