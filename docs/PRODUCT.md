@@ -1,10 +1,12 @@
-# Product Definition — current agreements
+# Product Definition — agreed principles and historical decisions
+
+> **Current product scope (2026-11-05):** V2/M3 engineering A/B/C is merged via PR #86/#87/#88; the sole current delivery is [#85](https://github.com/handFOOLed/Stratide/issues/85), assigned in full to **DeepSeek** (Windows packaging, user-logon background service, single-instance launcher, dashboard opening and first-run setup). The older Sol=backend/DS=UI-only allocation and the “N100 next” plan below are historical. The product remains **Paper-only**, with one Risk→Execution→Ledger, an Owner-specific conservative ex-post assumption, separately scoped real-data egress authorization, and a shared Agent cap of CNY ¥5/day and ¥100/month. The real Windows-installed and live-market end-to-end workflows are not yet verified. Read [current STATUS](STATUS.md), [#85](https://github.com/handFOOLed/Stratide/issues/85), and [AGENTS](../AGENTS.md) before implementing. Accepted ADRs stay untouched.
 
 Status: **agreed product principles**, not a profitability claim.
 
 **2026-11-04 Owner decision / #77:** V1 closes with the Windows local product and existing WSL2 CPU Worker integration. N100 hardware, Linux server operation and hardware-specific tuning are deferred, not V1 acceptance gates. Current Paper and historical research remain separate; only explicitly labelled EOD `EX_POST_OPEN_ASSUMPTION` fills are added. See [V1 completion](V1_COMPLETION.md).
 
-## Current phase and responsibility
+## Historical phase and role decisions (superseded where inconsistent with #85)
 
 **2026-11-03 Owner decision / Issue #69:** TimesFM 2.5 forecasting has a specific local CPU-only exception: an offline on-demand Python Worker, targeting an N100 Linux mini host. This is not local LLM inference. Cloud LLM research remains separately authorized; no CUDA, cloud TimesFM, desktop remote fallback, EOD scheduling or trading admission is introduced by [M2-PR18](M2_PR18.md).
 
