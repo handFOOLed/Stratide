@@ -1,7 +1,7 @@
 //! Local trusted runner boundary. Never accepts a caller-supplied wall clock.
 use std::io::{self, Read};
 use stratide_contracts::Timestamp;
-use stratide_ledger::{portfolio::*, Command, Ledger};
+use stratide_ledger::{portfolio::*, Command, Genesis, Ledger};
 
 pub fn run(args: &[String]) -> Result<(), String> {
     let now = Timestamp(
@@ -21,6 +21,26 @@ fn run_at(args: &[String], now: Timestamp) -> Result<(), String> {
         return Err("paper-portfolio <原Paper账本> status|configure|pause|resume|freeze|confirm|recover；JSON经stdin".into());
     }
     let action = args[2].as_str();
+    if action == "init" {
+        let mut raw = String::new();
+        io::stdin()
+            .take(4 * 1024 * 1024 + 1)
+            .read_to_string(&mut raw)
+            .map_err(|e| e.to_string())?;
+        if raw.len() > 4 * 1024 * 1024 {
+            return Err("PORTFOLIO_INPUT_SIZE".into());
+        }
+        let genesis: Genesis = serde_json::from_str(&raw).map_err(|e| e.to_string())?;
+        let ledger = Ledger::create(&args[1], genesis)?;
+        println!(
+            "{}",
+            serde_json::to_string(&serde_json::json!({"ledger_head":ledger.head(),"state":ledger.state(),
+                "opening_observed":"NOT_VERIFIED","historical_pit":"NOT_VERIFIED",
+                "real_tradability":"NOT_VERIFIED","live_allowed":false}))
+                .map_err(|e| e.to_string())?
+        );
+        return Ok(());
+    }
     let mut ledger = if action == "status" {
         Ledger::read(&args[1])?
     } else {

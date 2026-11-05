@@ -120,8 +120,48 @@ impl Supervisor {
         }
     }
 
+    /// Default simulated account. It is created once with the Owner-approved
+    /// paper principal and never overwrites an existing ledger or binding.
+    fn bootstrap_paper(&self) {
+        let binding = self
+            .layout
+            .data
+            .join("state")
+            .join("paper-portfolio")
+            .join("binding.json");
+        if binding.is_file() {
+            return;
+        }
+        let script = self.layout.app.join("scripts").join("first-run-portfolio.py");
+        let python = self.layout.python();
+        if !script.is_file() || !python.is_file() {
+            return;
+        }
+        let mut command = Command::new(python);
+        command
+            .args(["-B", "-X", "utf8"])
+            .arg(&script)
+            .env("STRATIDE_STATE_ROOT", &self.layout.data)
+            .env("STRATIDE_BIN_DIR", self.layout.app.join("bin"))
+            .env_remove("STRATIDE_TUSHARE_TOKEN")
+            .current_dir(&self.layout.app)
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null());
+        win::hide_console(&mut command);
+        match command.status() {
+            Ok(status) if status.success() => log(&self.layout, "default paper account created"),
+            Ok(status) => log(
+                &self.layout,
+                &format!("paper account init failed code={:?}", status.code()),
+            ),
+            Err(error) => log(&self.layout, &format!("paper account init failed: {error}")),
+        }
+    }
+
     fn run_loop(&mut self) -> Result<i32, String> {
         self.bootstrap();
+        self.bootstrap_paper();
         let mut last_autostart_check = Instant::now();
         loop {
             if self.layout.read_stop_request() {
