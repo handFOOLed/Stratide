@@ -284,7 +284,7 @@ export function RuntimePanel() {
             <p className="muted">127.0.0.1:{status?.port ?? '—'} · 仅本机 · Paper-only</p>
           </div>
           <div className="install-item">
-            <div className="install-item__head"><strong>后台 Supervisor</strong><Badge tone={tone(supervisor?.status ?? 'UNKNOWN')}>{supervisor?.status ?? '—'}</Badge></div>
+            <div className="install-item__head"><strong>后台 Supervisor</strong><Badge tone={backfillRunning ? 'warning' : tone(supervisor?.status ?? 'UNKNOWN')}>{backfillRunning ? '补录中' : supervisor?.status === 'RUNNING' || supervisor?.status === 'DEGRADED' ? '运行中' : supervisor?.status ?? '—'}</Badge></div>
             <p className="muted">{reasonText}</p>
           </div>
           <div className="install-item">
