@@ -40,6 +40,11 @@ def bridge(action, value=None):
     exe = paths.executable("market-research-agent")
     p = subprocess.run([str(exe), action], input=json.dumps(value or {}, allow_nan=False).encode(),
                        cwd=ROOT, capture_output=True, timeout=150)
+    if p.stderr:
+        # Local bridge diagnostics (sanitized by the bridge) stay on stderr so a
+        # rejected provider response can be investigated without re-sending it.
+        sys.stderr.write(p.stderr.decode("utf-8", errors="replace"))
+        sys.stderr.flush()
     v = j.loads(p.stdout)
     j.require(p.returncode == 0, v.get("error_code", "MARKET_RESEARCH_BRIDGE_FAILED"))
     return v
@@ -174,7 +179,7 @@ def screen(days, snapshots, sources, as_of, count):
                 historical_pit_status="NOT_VERIFIED", corporate_actions="EX_POST_NO_DETECTED_ACTION_NOT_VERIFIED")
 
 
-def freeze_cpu(market, days, snapshots, sources, selected, as_of, batch):
+def freeze_cpu(market, days, snapshots, sources, selected, as_of, batch, replace=False):
     sys.path.insert(0, str(ROOT / "research/timesfm_cpu"))
     import cli as cpu
     import history
@@ -208,7 +213,7 @@ def freeze_cpu(market, days, snapshots, sources, selected, as_of, batch):
     cpu.bridge("project", plan)
     path = cpu.batch_path(batch) / "plan.json"
     path.parent.mkdir(parents=True, exist_ok=True)
-    if path.exists():
+    if path.exists() and not replace:
         j.require(cpu.read_plan(batch) == plan, "MARKET_RESEARCH_PLAN_CHANGED")
     else:
         c.write(path, plan)
@@ -235,7 +240,9 @@ def once(market):
         if run and run.get("state") == "BLOCKED":
             reason = run.get("reason")
             blocked_at = run.get("blocked_at")
-            if isinstance(reason, str) and reason.startswith(("TIMESFM_WSL_", "WORKER_")) and blocked_at:
+            if isinstance(reason, str) and reason.startswith(
+                    ("TIMESFM_WSL_", "WORKER_", "MARKET_RESEARCH_LOCAL_FAILURE",
+                     "MARKET_RESEARCH_BRIDGE_FAILED", "RESEARCH_UNAVAILABLE")) and blocked_at:
                 try:
                     age = (m.instant(m.h.now()) - m.instant(blocked_at)).total_seconds()
                 except (TypeError, ValueError):
@@ -248,7 +255,26 @@ def once(market):
             save(day, run)
         try:
             # Config changes affect future days; pause/revocation still gate dispatch.
-            if "screen" not in run:
+            recovering = ("fusion_task_id" not in run
+                          and run.get("state") in ("BLOCKED", "TIMESFM_DONE", "SCREENED", "EOD_RECEIVED"))
+            refresh = "screen" not in run
+            if not refresh:
+                current = (run["screen"]["rules_sha256"], run["screen"]["implementation_sha256"])
+                expected = (rp.digest(RULES), j.sha(Path(__file__).read_bytes()))
+                if current != expected:
+                    # A code/rule update must not deadlock automation forever: a blocked
+                    # run that never froze a plan or cloud task may be re-screened with
+                    # the new implementation at the current time.
+                    j.require("fusion_task_id" not in run,
+                              "SCREEN_IMPLEMENTATION_CHANGED_NEW_RUN_REQUIRED")
+                    run.pop("screen", None)
+                    run.pop("screen_sha256", None)
+                    run.pop("plan_sha256", None)
+                    run["state"] = "EOD_RECEIVED"
+                    run["events"] = ["EOD_RECEIVED"]
+                    save(day, run)
+                    refresh = True
+            if refresh:
                 # A blocked collection has not made a research decision yet.
                 # Freeze the decision time only when the source is admitted.
                 run["as_of"] = m.h.now()
@@ -259,14 +285,12 @@ def once(market):
                 run["events"].append("SCREENED")
                 save(day, run)
             j.require(run["screen"]["selected"], "NO_QUALIFIED_RESEARCH_CANDIDATES")
-            j.require(run["screen"]["rules_sha256"] == rp.digest(RULES)
-                      and run["screen"]["implementation_sha256"] == j.sha(Path(__file__).read_bytes()),
-                      "SCREEN_IMPLEMENTATION_CHANGED_NEW_RUN_REQUIRED")
+            sys.path.insert(0, str(ROOT / "research/timesfm_cpu"))
             sys.path.insert(0, str(ROOT / "research/timesfm_cpu"))
             import cli as cpu
             if "plan_sha256" not in run:
                 days, snapshots, sources = prefix(market, day, run["as_of"])
-                plan = freeze_cpu(market, days, snapshots, sources, run["screen"]["selected"], run["as_of"], run["batch"])
+                plan = freeze_cpu(market, days, snapshots, sources, run["screen"]["selected"], run["as_of"], run["batch"], replace=recovering)
                 run["plan_sha256"] = rp.digest(plan)
                 save(day, run)
             with database() as db:
@@ -301,8 +325,11 @@ def once(market):
             run["events"].append("CANDIDATE_FROZEN")
             save(day, run)
             return run
-        except (j.Rejected, c.Rejected, m.Error, timesfm_model.Rejected, OSError, ValueError, subprocess.SubprocessError) as error:
-            code = str(error) if isinstance(error, (j.Rejected, c.Rejected, m.Error, timesfm_model.Rejected)) else "MARKET_RESEARCH_LOCAL_FAILURE"
+        except Exception as error:
+            import traceback
+            traceback.print_exc(file=sys.stderr)
+            known = isinstance(error, (j.Rejected, c.Rejected, m.Error, timesfm_model.Rejected))
+            code = str(error) if known else "MARKET_RESEARCH_LOCAL_FAILURE"
             # A failed/unknown paid task is terminal. A readiness/grant block can
             # resume without replacing input or creating another daily task.
             if "fusion_task_id" in run:
@@ -312,7 +339,12 @@ def once(market):
             else:
                 run["state"] = "BLOCKED"
             run.update(reason=code, cloud_status="CLOUD_RESEARCH_BLOCKED")
-            if isinstance(code, str) and code.startswith(("TIMESFM_WSL_", "WORKER_")):
+            if not known:
+                # Bounded local diagnostic for the dashboard; the raw exception text
+                # stays local and is never sent to a cloud provider.
+                run["local_error"] = dict(type=type(error).__name__, message=str(error)[:300])
+            if isinstance(code, str) and code.startswith(
+                    ("TIMESFM_WSL_", "WORKER_", "MARKET_RESEARCH_LOCAL_FAILURE")):
                 run["blocked_at"] = m.h.now()
             save(day, run)
             return run

@@ -614,8 +614,11 @@ def optional_paper_step(market, phase):
     try:
         import paper_portfolio
         return paper_portfolio.optional_step(market, phase)
-    except Exception:
-        return dict(state="BLOCKED", reason="PAPER_MODULE_UNAVAILABLE")
+    except Exception as error:
+        import traceback
+        traceback.print_exc(file=sys.stderr)
+        return dict(state="BLOCKED", reason="PAPER_MODULE_UNAVAILABLE",
+                    detail=dict(type=type(error).__name__, message=str(error)[:200]))
 
 
 def cli(argv=None):
@@ -643,6 +646,19 @@ def cli(argv=None):
         elif args.action in ("once", "watch"):
             while True:
                 result = market.once(token_source=args.credential_source)
+                # First successful collection enables the default simulated policy
+                # once; later cycles only read the frozen policy. A policy fault is
+                # isolated so it cannot stop market collection.
+                try:
+                    import paper_portfolio
+                    if paper_portfolio.binding_path().is_file():
+                        result["paper_policy"] = paper_portfolio.ensure_policy(market)
+                except Exception as error:
+                    import traceback
+                    traceback.print_exc(file=sys.stderr)
+                    result["paper_policy"] = dict(
+                        state="BLOCKED", reason="PAPER_POLICY_ENSURE_FAILED",
+                        detail=dict(type=type(error).__name__, message=str(error)[:200]))
                 # Settle the prior frozen Paper batch before optional research;
                 # Agent faults cannot starve ledger expiry or future collection.
                 result["paper_confirmation"] = optional_paper_step(market, "confirm")
