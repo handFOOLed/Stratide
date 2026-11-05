@@ -11,8 +11,8 @@ CPython 3.12.10（构建机），Inno Setup 6.7.4。**开发沙箱为 workspace-
 | 文件 | 值 |
 | --- | --- |
 | 安装包 | `dist\installer\Stratide-Setup-0.3.0-x64.exe` |
-| SHA256 | `E9EC3032AF315A38DEE6C4E4ABFAC7094EB7A96171C2EC96E8652E203920CA83` |
-| 大小 | 23,853,684 bytes（约 22.7 MiB） |
+| SHA256 | `956FC31D0817ADEA173338601D079D8231DB55334FB242ABC75A5B09093CDC71` |
+| 大小 | 23,852,742 bytes（约 22.7 MiB） |
 | 版本 | `0.3.0` |
 | 签名 | 无（unsigned） |
 | 组件清单 | `dist\installer\SHA256SUMS.txt`、`dist\app\BUILD_INFO.json` |
