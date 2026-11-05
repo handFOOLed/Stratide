@@ -130,7 +130,8 @@ pwsh -NoProfile -File scripts/test-windows-product.ps1 -InstallTest
 
 ## 7. 已知限制
 
-- **研究/Paper 全自动链路**：安装包在 Windows 上运行既有 `market watch`；EOD 采集、Dashboard 和既有 Agent 配置可用。TimesFM CPU 推理仍要求 Linux/WSL 隔离环境，本安装包只做检测并报告 `BLOCKED`，**不会**自动执行 WSL Worker；因此未配置 WSL 时研究/Paper 阶段保持 BLOCKED，不伪造完成。复用既有 WSL 工作树运行研究仍是 M3-PR02 的既有流程，不在本安装包自动调度范围内。
-- 真实 Tushare 全市场采集、DeepSeek 外发、TimesFM 结果和 Paper 成交均未在本次开发环境授权/执行；相关实测为 `NOT_RUN`。
+- **研究链路**：配置 §4.1 的 WSL 入口后，原唯一 `market watch` 会自动走 EOD → WSL2 TimesFM CPU → 原 Agent/受控研究 → 原 Paper 判定；安装包不下载/打包模型，也不新增第二个调度器、预算或账本。WSL/模型/Worker 不可用时研究/Paper 明确 `BLOCKED`，**EOD 采集继续**，不伪造完成。
+- **真实付费链路仍未实测**：真实 Tushare 全市场采集、真实 DeepSeek 外发/计费与 Paper 成交需要 Owner 授权后单独执行，相关实测为 `NOT_RUN`；TimesFM CPU 推理本身已用 Owner 现有 WSL2 环境实测（见 `docs/evidence/m3-pr04/README.md` 2.7/2.8）。
+- 保存 WSL 配置会重启唯一 watch；若恰好打断进行中的 TimesFM/采集，当日研究按既有“未知本地结果不重发”规则变为 `BLOCKED`（不会重复付费或成交）。保存相同配置不会重启。
 - 登录/注销自启、真实 Windows 重启、休眠唤醒、浏览器自动打开和真实卸载注册表项在本开发沙箱中 `NOT_RUN`（详见证据文档）。
 - 未做代码签名；未做 N100/Linux 服务器化；未新增第二套调度器、账本或预算库。
