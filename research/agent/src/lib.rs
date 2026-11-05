@@ -7,6 +7,7 @@ pub mod fusion_researcher;
 pub mod local_fusion;
 #[cfg(test)]
 mod local_fusion_tests;
+pub mod market_research;
 pub mod multimodal;
 pub mod provider;
 pub mod risk_binding;

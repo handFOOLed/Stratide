@@ -1,5 +1,7 @@
 **简体中文** | [English](README.en.md)
 
+**M3-PR02 / #83（Draft 交付）**：[全市场自动筛选与受控策略研究](docs/M3_PR02.md) 接通 READY 快照 → Top 8 本地 TimesFM → 独立字段授权/共享预算 → DeepSeek 冻结研究候选及设置 UI。自动化默认关闭，真实出网默认拒绝；日 ¥5/月 ¥100 不增加，无自动买卖单，真实市场云 E2E 未获授权未运行。
+
 **M3-PR01 / #82（Draft 交付）**：[全市场 A 股 EOD 与可信覆盖快照](docs/M3_PR01.md) 复用原 Operator、V1/V2 仓库与 source gate，提供日期证券池、按日批量增量、质量/覆盖双分母和只读报告。BSE 保留为不支持；真实全市场覆盖与当前接口权限尚未实测，不增加交易资格。
 
 **V1 收尾 B / #77（Draft 交付）**：[Windows 本地产品操作与恢复](docs/V1_COMPLETION.md) 集成当前 Paper/历史报告分离、原 TimesFM/Fusion/OOS/Registry、持久审批通知及 UI 精修。Paper 成交仅 `EX_POST_OPEN_ASSUMPTION`，PIT/开盘实收与交易资格仍未验证；N100 暂缓，不是 V1 门槛。

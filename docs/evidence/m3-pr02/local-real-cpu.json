@@ -1,0 +1,47 @@
+{
+  "state": "LOCAL_REAL_CPU_REPLAY_PASS",
+  "source": "EXISTING_FROZEN_AUTHORIZED_HISTORICAL_INPUT",
+  "sample_count": 3,
+  "context": 84,
+  "new_agent_tasks": 0,
+  "new_cloud_calls": 0,
+  "new_market_requests": 0,
+  "model_revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+  "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+  "request_sha256": "24c29a0a9bcfe9137377842af6cf226a5244d60f8cef5020303b0541a21bc82c",
+  "response_sha256": "36b7cd7abe90010496fa670131128a4f9009661f14cce29172b113ce9992982f",
+  "metrics": {
+    "load_seconds": 1.050815107,
+    "wall_seconds": 3.278313415,
+    "cpu_seconds": 3.147311091,
+    "batch_timings": [
+      {
+        "seconds": 0.10221695099999994,
+        "series": 1
+      },
+      {
+        "seconds": 0.05625319999999956,
+        "series": 1
+      },
+      {
+        "seconds": 0.05607858599999993,
+        "series": 1
+      }
+    ],
+    "failures": 0,
+    "peak_rss_bytes": 2077024256,
+    "cgroup_memory_peak_bytes": 2338512896,
+    "cgroup_cpu_seconds": 3.185753,
+    "resource_scope": "WHOLE_WORKER_CGROUP"
+  },
+  "isolation": {
+    "mechanism": "systemd-cgroup-v2+bubblewrap",
+    "memory_max_bytes": 6442450944,
+    "memory_swap_max_bytes": 0,
+    "memory_oom_group": true
+  },
+  "historical_pit_status": "NOT_VERIFIED",
+  "market_day_ready_acceptance": "NOT_RUN_NEW_MARKET_CONTEXT_UNAVAILABLE",
+  "paper_allowed": false,
+  "live_allowed": false
+}

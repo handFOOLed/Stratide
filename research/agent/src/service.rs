@@ -192,7 +192,9 @@ impl Agent {
         now: DateTime<Utc>,
         settings: &Settings,
     ) -> Result<()> {
-        if crate::local_fusion::is_input(input) {
+        if crate::market_research::is_input(input) {
+            crate::market_research::gate(c, trigger, input, settings)
+        } else if crate::local_fusion::is_input(input) {
             crate::local_fusion::gate(c, trigger, input, settings)
         } else {
             crate::risk_portfolio::gate(c, trigger, input, now, settings)

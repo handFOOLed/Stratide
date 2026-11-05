@@ -76,6 +76,23 @@ pub fn reply(app: &App, agent: Option<&Agent>, req: &mut Request, port: u16) -> 
     };
     let now = chrono::Utc::now();
     let result: stratide_research::Result<Value> = (|| {
+        if method == "GET" && path == "/api/agent/market-research" {
+            return stratide_research::market_research::status(agent);
+        }
+        if method == "GET" {
+            if let Some(day) = path.strip_prefix("/api/agent/market-research/preview?day=") {
+                return stratide_research::market_research::preview(agent, day);
+            }
+        }
+        if method == "POST" {
+            if let Some(action) = path.strip_prefix("/api/agent/market-research/") {
+                return if action == "install-model" && body == json!({}) {
+                    stratide_research::market_research::install_model(agent)
+                } else {
+                    stratide_research::market_research::control(agent, action, body)
+                };
+            }
+        }
         if method == "GET" && path == "/api/agent/status" {
             return agent.status(now);
         }

@@ -564,6 +564,10 @@ def cli(argv=None):
         elif args.action in ("once", "watch"):
             while True:
                 result = market.once(token_source=args.credential_source)
+                # Same foreground Operator loop; no second scheduler/service.
+                import market_research
+                if (common_root() / "state/risk-portfolio/agent-binding.json").is_file():
+                    result["research"] = market_research.once(market)
                 if args.action == "once":
                     break
                 print(json.dumps(result, ensure_ascii=False), flush=True)

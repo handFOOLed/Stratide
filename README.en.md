@@ -1,5 +1,7 @@
 [简体中文](README.md) | **English**
 
+**M3-PR02 / #83 (Draft delivery)**: [Market screening and controlled strategy research](docs/M3_PR02.md) connect READY snapshots → bounded Top 8 local TimesFM → independent field authorization/shared budget → frozen DeepSeek research candidates and settings UI. Automation defaults off and real-data egress defaults denied. The CNY ¥5/day and ¥100/month caps remain; no automated orders. Real-market cloud E2E is not authorized and was not run.
+
 **M3-PR01 / #82 (Draft delivery)**: [Market-wide A-share EOD and trusted coverage snapshots](docs/M3_PR01.md) reuse the Operator, V1/V2 warehouse and source gate for dated catalogs, daily batch increments, separate market/research denominators and read-only reports. BSE remains visible as unsupported. Real market-wide coverage and current API permissions are unverified; trading eligibility is unchanged.
 
 **V1 closeout B / #77 (Draft delivery)**: [Windows local product operation and recovery](docs/V1_COMPLETION.md) integrate separate current Paper and historical views, original TimesFM/Fusion/OOS/Registry, persistent approvals/notifications, and UI polish. Paper fills are `EX_POST_OPEN_ASSUMPTION` only; PIT, observed opening data and trading eligibility remain unverified. N100 is deferred and is not a V1 gate.
