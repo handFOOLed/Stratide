@@ -1,6 +1,10 @@
-# Stratide 本地 Web Dashboard（V2 工程已接入）
+# Stratide Dashboard｜Windows V2
 
-> **2026-11-05 现行状态**：V1 的当前 Paper/历史报告双来源、审批通知和 UI 已合并；V2 模块 #82/#83/#84 经 PR #86/#87/#88 合并，全市场覆盖/TimesFM+受控 DeepSeek、多证券共享 Paper 只读投影均有工程实现。**#85 的 Windows 安装包、用户登录自动后台运行、双击快捷方式启动并打开浏览器尚未实现，Owner 已指定 DeepSeek 完整负责**。下面的 `start-dashboard.ps1` 和旧六报告 API 说明是**兼容的开发态/历史模式**，不是 V2 当前 Paper API 的唯一数据源；真实当前账户仍从 `--paper-ledger` 和 `/api/v1/*` 读取，历史实验不能冒充 NAV。请以 [STATUS](../../docs/STATUS.md)、[#85](https://github.com/handFOOLed/Stratide/issues/85)、[V1_COMPLETION](../../docs/V1_COMPLETION.md)、[M3_PR03](../../docs/M3_PR03.md) 为准。外发和 Paper 假设默认未获授权，不存在安装时默认真实请求。
+> **当前可用版本：Windows 0.3.0**。安装版通过桌面 Stratide 快捷方式启动或复用本地服务，并自动在默认浏览器打开 Dashboard；支持 EOD 市场状态、研究/预算、共享 Paper 组合、通知与运行诊断。**首次使用**：[用户教程](../../docs/USER_GUIDE.md) · [Windows 安装](../../docs/WINDOWS_INSTALL.md)；服务故障/模型配置：[已知限制](../../docs/KNOWN_LIMITATIONS.md)。
+
+本篇下面是 **Dashboard 开发/兼容模式**的历史说明：`scripts/start-dashboard.ps1` 仍用于源码调试，并非普通用户启动安装版的必需步骤。Windows V2 四个模块已合并（#86–#89），旧“#85 尚未实现”已过时。
+
+## 历史 Dashboard 开发资料
 
 **V1 / Issue #77：** 现已支持当前 Paper 专用 v1 接口、原研究/OOS/Registry、持久审批通知与 Windows 启停/恢复，详见 [完整操作](../../docs/V1_COMPLETION.md)。总览读取显式 `--paper-ledger`，历史页保留 `--report-dir`；历史报告不能成为当前 NAV。下面原只读报告启动方式继续兼容。
 
