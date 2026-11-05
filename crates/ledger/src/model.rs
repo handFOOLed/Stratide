@@ -199,11 +199,30 @@ pub struct State {
     pub cash_dividends: Option<crate::cash_dividend::CashDividendBook>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub paper_eod: Option<crate::paper_eod::PaperEodBook>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub portfolio: Option<crate::portfolio::Book>,
 }
 
 /// Trusted-core commands. No Worker/control-network API is exposed by this crate.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Command {
+    ConfigurePortfolioV1 {
+        now: Timestamp,
+        policy: crate::portfolio::Policy,
+    },
+    PausePortfolioV1 {
+        now: Timestamp,
+        automatic: bool,
+    },
+    FreezePortfolioV1 {
+        decision: crate::portfolio::Decision,
+    },
+    RecoverPortfolioValuationV1 {
+        valuation: crate::portfolio::Confirmation,
+    },
+    ConfirmPortfolioV1 {
+        confirmation: crate::portfolio::Confirmation,
+    },
     SubmitPaperIntentV1 {
         intent: crate::paper_eod::PaperIntent,
     },
