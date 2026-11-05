@@ -69,6 +69,41 @@ export function formatCount(value: unknown): string {
   return n === null ? '—' : groupDigits(n.toString());
 }
 
+/** 统一数量写法：“2 笔”“0 只”“— 条”。禁止再手写“共 0 笔 / 0 条 / 0 只”混用。 */
+export function countText(value: unknown, unit: string): string {
+  const n = parseInteger(value);
+  return n === null ? '— ' + unit : groupDigits(n.toString()) + ' ' + unit;
+}
+
+export function currencySymbol(currency: string | null | undefined): string {
+  if (currency === 'CNY' || currency === 'RMB' || currency === null || currency === undefined) return '¥';
+  return currency;
+}
+
+/** 云端费用预算以 micro 货币为单位；人民币显示为 ¥ + 两位小数，其他单位保留代码。 */
+export function formatMicroMoney(value: unknown, currency: string): string {
+  const n = parseInteger(value);
+  if (n === null) return '—';
+  if (currency !== 'CNY') return formatMicro(n) + ' ' + currency;
+  const negative = n < 0n;
+  const abs = negative ? -n : n;
+  let whole = abs / 1_000_000n;
+  let fen = (abs % 1_000_000n + 5_000n) / 10_000n;
+  if (fen === 100n) {
+    whole += 1n;
+    fen = 0n;
+  }
+  return (negative ? MINUS : '') + '¥' + groupDigits(whole.toString()) + '.' + fen.toString().padStart(2, '0');
+}
+
+/** 本机时间戳 → 日期（Asia/Shanghai），用于“2026-11-05”这类表头。 */
+export function formatDateFromTimestamp(value: unknown): string {
+  const ms = parseTimestamp(value);
+  if (ms === null) return '—';
+  const p = shanghaiParts(ms);
+  return p.year + '-' + p.month + '-' + p.day;
+}
+
 export function formatMicro(value: unknown, options: { currency?: string; signed?: boolean } = {}): string {
   const n = parseInteger(value);
   if (n === null) return '—';

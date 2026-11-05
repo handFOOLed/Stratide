@@ -44,7 +44,7 @@ export function useWorkspace(): WorkspaceState {
       try {
         const r = await fetch('/api/v1/workspace', {signal: controller.signal, cache: 'no-store'});
         const v = await r.json();
-        if (!r.ok) throw new ApiError(v.error.code, '本地研究资料读取失败；请在技术详情核对原因。', r.status);
+        if (!r.ok) throw new ApiError(v.error.code, '本地研究资料读取失败。', r.status);
         const w: Workspace = v.data;
         if (w.schema_version !== 1 || !Array.isArray(w.studies) || !Array.isArray(w.evaluations) || !Array.isArray(w.evidence) || !Array.isArray(w.candidates) || w.paper_allowed !== false || w.live_allowed !== false) throw new ApiError('WORKSPACE_SCHEMA', '研究响应版本不兼容。');
         setData(w); setError(null);
@@ -63,14 +63,14 @@ export const readNotices = (token: string, ids: string[]) => agentFetch<unknown>
 
 const states: Record<string,string> = {
   RESEARCH_ONLY:'仅供研究',REGISTERED:'已登记',FROZEN_CANDIDATE:'候选已冻结',
-  NOT_BILLED:'离线录制，不是真实云调用或账单',
-  reserved:'已预留',dispatched:'已派发',usage_received:'用量估算已记录',settled:'已核验账单',no_charge:'确认未计费',
-  pending:'待审批', approved:'已许可，尚未执行', rejected:'已拒绝', revoked:'已撤销', expired:'已过期',
-  running:'运行中', local_running:'本地研究中', completed:'已完成', failed:'失败', cancelled:'已取消', cancel_requested:'取消待确认',
-  outcome_uncertain:'调用结果未知', BLOCKED:'受阻', ready:'可读取', not_configured:'未配置',
-  historical_research_only:'事后历史研究', synthetic_test:'合成测试', forward_observed_eod:'前向盘后观察',
-  FROZEN_NOT_RUN:'输入已冻结，尚未运行', LOCAL_NO_BILLING:'本地运行，不计费',
-  ESTIMATED_NOT_VERIFIED_BILL:'估算费用，非核验账单', verified_local_integrity:'本地完整性已核对',
-  stored_evidence_not_qualification:'已有来源记录，非交易资格',
+  NOT_BILLED:'离线记录，不产生费用',
+  reserved:'已预留',dispatched:'已派发',usage_received:'用量已记录',settled:'账单已核对',no_charge:'确认未计费',
+  pending:'等待批准', approved:'已许可，尚未执行', rejected:'已拒绝', revoked:'已撤销', expired:'已过期',
+  running:'运行中', local_running:'本地运行中', completed:'已完成', failed:'运行失败', cancelled:'已取消', cancel_requested:'正在取消',
+  outcome_uncertain:'结果未确认', BLOCKED:'已被阻止', ready:'可读取', not_configured:'未设置',
+  historical_research_only:'历史研究数据', synthetic_test:'本地测试数据', forward_observed_eod:'前向盘后观察',
+  FROZEN_NOT_RUN:'已冻结，尚未运行', LOCAL_NO_BILLING:'本地运行，不产生费用',
+  ESTIMATED_NOT_VERIFIED_BILL:'费用为估算，尚未核对账单', verified_local_integrity:'本地完整性已核对',
+  stored_evidence_not_qualification:'有来源记录，不代表已获交易资格',
 };
-export function stateLabel(state: string): string {return Object.hasOwn(states,state) ? states[state] : '待核对（见技术详情）';}
+export function stateLabel(state: string): string {return Object.hasOwn(states,state) ? states[state] : '状态未知';}

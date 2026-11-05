@@ -23,8 +23,8 @@ export interface RouteTarget {
 
 export const PAGE_LABELS: Record<PageKey, string> = {
   overview: '总览',
-  history: '历史报告',
-  agents: 'Agent 管理',
+  history: '交易记录',
+  agents: 'AI 研究',
   notifications: '通知',
   settings: '设置',
 };
@@ -32,16 +32,16 @@ export const PAGE_LABELS: Record<PageKey, string> = {
 export const HISTORY_TAB_LABELS: Record<HistoryTab, string> = {
   fills: '成交',
   orders: '订单',
-  daily: '逐日核对',
-  strategies: '策略档案',
-  research: '研究档案',
+  daily: '每日账本',
+  strategies: '策略记录',
+  research: '研究报告',
 };
 
 export const SETTINGS_SECTION_LABELS: Record<SettingsSection, string> = {
   appearance: '外观',
-  ai: 'AI 服务',
-  runtime: '运行与安装',
-  data: '数据连接',
+  ai: 'AI 服务与预算',
+  runtime: '系统与诊断',
+  data: '数据与行情',
   about: '关于',
 };
 
