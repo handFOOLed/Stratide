@@ -45,7 +45,22 @@ export function useWorkspace(): WorkspaceState {
         const r = await fetch('/api/v1/workspace', {signal: controller.signal, cache: 'no-store'});
         const v = await r.json();
         if (!r.ok) throw new ApiError(v.error.code, '本地研究资料读取失败。', r.status);
-        const w: Workspace = v.data;
+        // 未配置桌面研究桥时后端只返回 {state:"not_configured"}，这是真实空态，
+        // 用空集合归一化，避免误报“响应版本不兼容”。
+        const raw = v.data as Partial<Workspace> & { state?: string };
+        const w: Workspace =
+          raw.state === 'not_configured'
+            ? {
+                schema_version: 1,
+                state: 'not_configured',
+                studies: [],
+                evaluations: [],
+                evidence: [],
+                candidates: [],
+                paper_allowed: false,
+                live_allowed: false,
+              }
+            : (raw as Workspace);
         if (w.schema_version !== 1 || !Array.isArray(w.studies) || !Array.isArray(w.evaluations) || !Array.isArray(w.evidence) || !Array.isArray(w.candidates) || w.paper_allowed !== false || w.live_allowed !== false) throw new ApiError('WORKSPACE_SCHEMA', '研究响应版本不兼容。');
         setData(w); setError(null);
       } catch (e) {if (!controller.signal.aborted) setError(friendlyError(e));}

@@ -2,44 +2,41 @@ import type { ApiError } from '../../lib/api';
 import { Button } from '../ui/Button';
 import { EmptyState } from '../ui/EmptyState';
 import { Card } from '../ui/Card';
-import { TechnicalDetails } from './WorkspaceStudies';
+import { Diagnostics } from '../ui/Diagnostics';
+import { humanReasonText } from '../../lib/status';
 
-function describe(error: Pick<ApiError, 'code' | 'message'>): { title: string; detail: string; hint?: string } {
+function describe(error: Pick<ApiError, 'code' | 'message'>): { title: string; detail: string } {
   switch (error.code) {
     case 'CURRENT_PAPER_ACCOUNT_UNCONFIGURED':
-      return {title:'当前 Paper 账户尚未配置',detail:'在本机启动配置中选择原 Paper 账本。历史报告继续在历史页显示，不作为当前账户资金。'};
+      return {
+        title: '尚未配置模拟账户',
+        detail: '完成安装向导后会显示模拟账户资产；历史记录仍可在交易记录中查看。',
+      };
     case 'NO_SNAPSHOT':
       return {
-        title: '尚未选择 Paper 报告',
-        detail:
-          '启动时通过 --report-dir 指定一个已发布的完整六报告目录。服务不会自动寻找“最近实验”，没有默认资金或默认测试账户。',
-        hint: 'pwsh -NoProfile -File scripts/start-dashboard.ps1 -ReportDir <目录>',
+        title: '尚未设置模拟账户',
+        detail: '在安装向导或本机设置中指定一个已发布的模拟账户数据目录后，这里会显示资产与交易记录。',
       };
     case 'INVALID_SNAPSHOT':
       return {
-        title: 'Paper 报告不可用',
-        detail:
-          error.message ||
-          '六报告缺失、损坏、格式不支持或在读取期间发生变化。修复报告后，以同一明确目录重启服务。',
+        title: '模拟账户数据不可用',
+        detail: humanReasonText(error.message) ?? '数据缺失、损坏或格式不支持。修复后重新读取。',
       };
     case 'OFFLINE':
     case 'TIMEOUT':
       return {
         title: '无法连接本地服务',
-        detail:
-          '请确认 Windows 本机的 stratided 服务仍在运行。该服务只绑定 127.0.0.1，不提供远程访问。',
-        hint: 'pwsh -NoProfile -File scripts/start-dashboard.ps1 -ReportDir <目录>',
+        detail: '请确认 Stratide 后台服务正在运行，然后重新读取。',
       };
     case 'SNAPSHOT_CHANGED':
       return {
-        title: '读取期间快照发生变化',
-        detail:
-          '不同接口返回了不同的 snapshot_id，已停止组合显示，避免把两份报告混在一起。请重新读取。',
+        title: '数据在读取期间发生变化',
+        detail: '为避免把两份数据混在一起，已停止显示。请重新读取。',
       };
     default:
       return {
         title: '账户数据读取失败',
-        detail: error.message || '本地服务返回了未预期的错误。',
+        detail: humanReasonText(error.message) ?? '本地服务返回了未预期的错误。',
       };
   }
 }
@@ -65,13 +62,17 @@ export function PaperErrorPanel({
           </Button>
         }
       />
-      <TechnicalDetails value={error}/>
-      {info.hint ? (
-        <div className="command-hint">
-          <span className="command-hint__label">启动示例</span>
-          <code>{info.hint}</code>
-        </div>
-      ) : null}
+      <div className="paper-error-card__diagnostics">
+        <Diagnostics
+          title="读取诊断信息"
+          items={[
+            { label: '状态', value: error.code },
+            { label: '提示', value: error.message },
+            { label: '读取方式', value: '本机只读接口' },
+          ]}
+          data={error}
+        />
+      </div>
     </Card>
   );
 }

@@ -6,7 +6,7 @@ export type PageKey = (typeof PAGE_KEYS)[number];
 export const HISTORY_TABS = ['fills', 'orders', 'daily', 'strategies', 'research'] as const;
 export type HistoryTab = (typeof HISTORY_TABS)[number];
 
-export const SETTINGS_SECTIONS = ['appearance', 'ai', 'runtime', 'data', 'about'] as const;
+export const SETTINGS_SECTIONS = ['appearance', 'ai', 'data', 'runtime', 'about'] as const;
 export type SettingsSection = (typeof SETTINGS_SECTIONS)[number];
 
 export interface Route {

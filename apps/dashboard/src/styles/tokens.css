@@ -94,6 +94,23 @@
   --success-soft: #f2f3f5;
   --success-border: #e5e7eb;
 
+  /* 统一 5 态：正常 / 进行中 / 需要处理 / 出错 / 未设置 */
+  --status-ok: #0b7350;
+  --status-ok-soft: #ecf7f1;
+  --status-ok-border: #cfe8dc;
+  --status-progress: #0062c4;
+  --status-progress-soft: #eef6ff;
+  --status-progress-border: #cfe6fb;
+  --status-attention: #8a5a08;
+  --status-attention-soft: #fdf6e7;
+  --status-attention-border: #ecdcbb;
+  --status-error: #b32e26;
+  --status-error-soft: #fdf0ee;
+  --status-error-border: #f0d2ce;
+  --status-unset: #61666e;
+  --status-unset-soft: #f2f3f5;
+  --status-unset-border: #e5e7eb;
+
   --focus: #2f6fed;
   --overlay: rgba(20, 21, 23, 0.42);
   --scrim: rgba(20, 21, 23, 0.32);
@@ -190,6 +207,22 @@
   --success: #b3b6bc;
   --success-soft: #1a1b1d;
   --success-border: #3a3c41;
+
+  --status-ok: #66d9a8;
+  --status-ok-soft: #10251b;
+  --status-ok-border: #244d3a;
+  --status-progress: #409cff;
+  --status-progress-soft: #16233c;
+  --status-progress-border: #2b4068;
+  --status-attention: #e6b46b;
+  --status-attention-soft: #2a2113;
+  --status-attention-border: #4a3a1f;
+  --status-error: #ff9188;
+  --status-error-soft: #2a1716;
+  --status-error-border: #4d2b28;
+  --status-unset: #9aa0a9;
+  --status-unset-soft: #1a1b1d;
+  --status-unset-border: #3a3c41;
 
   --focus: #7ba5ff;
   --overlay: rgba(0, 0, 0, 0.64);
