@@ -131,6 +131,7 @@ impl State {
                 | Command::PausePortfolioV1 { now, .. } => *now,
                 Command::FreezePortfolioV1 { decision } => decision.now,
                 Command::ConfirmPortfolioV1 { confirmation } => confirmation.now,
+                Command::RecoverPortfolioValuationV1 { valuation } => valuation.now,
                 Command::Freeze { .. } => book.last_event_at,
                 _ => return Err("PORTFOLIO_SINGLE_EXECUTION_PATH_REQUIRED".into()),
             };
@@ -146,6 +147,7 @@ impl State {
                 | Command::PausePortfolioV1 { now, .. } => Some(*now),
                 Command::FreezePortfolioV1 { decision } => Some(decision.now),
                 Command::ConfirmPortfolioV1 { confirmation } => Some(confirmation.now),
+                Command::RecoverPortfolioValuationV1 { valuation } => Some(valuation.now),
                 Command::SubmitPaperIntentV1 { intent } => Some(intent.now),
                 Command::ExpirePaperIntentsV1 { now }
                 | Command::FreezePaperIntentsV1 { now, .. }
@@ -222,6 +224,9 @@ impl State {
             }
             Command::FreezePortfolioV1 { decision } => self.freeze_portfolio(decision)?,
             Command::ConfirmPortfolioV1 { confirmation } => self.confirm_portfolio(confirmation)?,
+            Command::RecoverPortfolioValuationV1 { valuation } => {
+                self.recover_portfolio_valuation(valuation)?
+            }
             Command::SubmitPaperIntentV1 { intent } => self.submit_paper_intent(intent)?,
             Command::ExpirePaperIntentsV1 { now } => self.expire_paper_intents(*now)?,
             Command::FreezePaperIntentsV1 {

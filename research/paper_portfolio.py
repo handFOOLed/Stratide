@@ -49,6 +49,16 @@ def fen(value):
     return int(n)
 
 
+def factors(parts):
+    # Exact, normalized source decimals; never infer actions_verified from this.
+    result = {}
+    for row in parts.get("adj_factor", []):
+        value = Decimal(row["adj_factor"])
+        m.require(value.is_finite() and value > 0, "PAPER_ADJUSTMENT_FACTOR_INVALID")
+        result[row["ts_code"]] = format(value.normalize(), "f")
+    return result
+
+
 def load_day(market, day):
     with market.read(inspect_raw_paths=False) as db:
         snapshot = market.load_snapshot(db, day)
@@ -122,13 +132,14 @@ def decision(snapshot, parts, calendar, refs, r, now):
     day = snapshot["source_day"]
     at = milliseconds(snapshot["available_at"])
     prices = {p["ts_code"]: p for p in parts.get("daily", [])}
+    adjustments = factors(parts)
     securities, marks = [], []
     for s in snapshot["securities"]:
         row = prices.get(s["ts_code"])
         supported, rules = rule(s, row, day, at)
         close = fen(row["close"]) if row else 0
         securities.append(dict(instrument=instrument(s["ts_code"]), close=close, rules=rules, supported=supported,
-            amount_thousand_yuan=int(Decimal(row["amount"])) if row else 0, reason=s["category"]))
+            amount_thousand_yuan=int(Decimal(row["amount"])) if row else 0, reason=s["category"], adjustment_factor=adjustments.get(s["ts_code"])))
         if row:
             marks.append(dict(instrument=instrument(s["ts_code"]), price=close, as_of=at, available_at=at,
                               source=snapshot["snapshot_sha256"]))
@@ -150,6 +161,7 @@ def confirmation(state, snapshot, parts, now):
     day = snapshot["source_day"]
     at = milliseconds(snapshot["available_at"])
     prices = {p["ts_code"]: p for p in parts.get("daily", [])}
+    adjustments = factors(parts)
     quotes = []
     wanted = {code(l["instrument"]) for l in state["snapshot"]["positions"]} | {code(o["instrument"]) for o in state["snapshot"]["pending_orders"]}
     for s in snapshot["securities"]:
@@ -165,7 +177,8 @@ def confirmation(state, snapshot, parts, now):
             open=fen(row["open"]), high=fen(row["high"]), low=fen(row["low"]), close=fen(row["close"]),
             volume_shares=int(Decimal(row["vol"])*100), capacity_shares=state["portfolio"]["policy"]["capacity_shares"],
             status_verified=supported), rules=rules, corporate_actions_verified=False,
-            reason="CORPORATE_ACTION_AND_EXACT_PRICE_BAND_NOT_VERIFIED"))
+            reason="CORPORATE_ACTIONS_UNVERIFIED / EX_POST_PAPER_ASSUMPTION",
+            paper_assumption=dict(pre_close=fen(row["pre_close"]),adjustment_factor=adjustments[s["ts_code"]]) if s["ts_code"] in adjustments else None))
     return dict(now=now, day=int(day), source_sha256=snapshot["snapshot_sha256"], received_at=at, quotes=quotes)
 
 
@@ -196,6 +209,11 @@ def once(market, phase="all"):
                 bridge(ledger, "confirm", confirmation(state, snapshot, parts, now))
             else:
                 return dict(state="WAITING_FOR_TARGET_EOD", target_day=target)
+            view = bridge(ledger, "status")
+            state, book = view["state"], view["state"]["portfolio"]
+        if book["pending"] is None and state["valuation_error"] is not None and int(today) > state["snapshot"]["trading_day"]:
+            snapshot, parts, _, _ = load_day(market, today)
+            bridge(ledger, "recover", confirmation(state, snapshot, parts, now))
             view = bridge(ledger, "status")
             state, book = view["state"], view["state"]["portfolio"]
         if phase == "confirm":

@@ -544,6 +544,16 @@ class Market(h.Warehouse):
                         sources={api: sorted(rows.values(), key=canonical) for api, rows in parts.items()})
 
 
+def optional_paper_step(market, phase):
+    # Include import/initialization in the optional boundary. Explicit process
+    # stops (BaseException) still leave the foreground watch immediately.
+    try:
+        import paper_portfolio
+        return paper_portfolio.optional_step(market, phase)
+    except Exception:
+        return dict(state="BLOCKED", reason="PAPER_MODULE_UNAVAILABLE")
+
+
 def cli(argv=None):
     parser = argparse.ArgumentParser(description="全市场 EOD；复用原仓库和 journal，无研究/交易派发。")
     parser.add_argument("action", choices=("init", "enable", "disable", "once", "watch", "status", "report", "verify"))
@@ -567,8 +577,7 @@ def cli(argv=None):
                 result = market.once(token_source=args.credential_source)
                 # Settle the prior frozen Paper batch before optional research;
                 # Agent faults cannot starve ledger expiry or future collection.
-                import paper_portfolio
-                result["paper_confirmation"] = paper_portfolio.optional_step(market, "confirm")
+                result["paper_confirmation"] = optional_paper_step(market, "confirm")
                 # Optional research is a separate failure boundary AFTER the
                 # collector committed its result. Even an unavailable Agent DB
                 # must not stop future EOD polls. Explicit stops still propagate.
@@ -580,7 +589,7 @@ def cli(argv=None):
                     # Do not depend on that same failed DB to report the fault,
                     # or expose exception text containing private paths/payloads.
                     result["research"] = dict(state="BLOCKED", reason="RESEARCH_UNAVAILABLE")
-                result["paper_decision"] = paper_portfolio.optional_step(market, "freeze")
+                result["paper_decision"] = optional_paper_step(market, "freeze")
                 if args.action == "once":
                     break
                 print(json.dumps(result, ensure_ascii=False), flush=True)

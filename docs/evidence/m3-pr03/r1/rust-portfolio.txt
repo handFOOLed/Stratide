@@ -1,0 +1,17 @@
+   Compiling libsqlite3-sys v0.36.0
+   Compiling rusqlite v0.38.0
+   Compiling stratide-ledger v0.0.1 (F:\Desktop\Documents\Codex\Stratide\issue84-worktree\crates\ledger)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.91s
+     Running unittests src\lib.rs (target\debug\deps\stratide_ledger-fde1f0499d29a5c0.exe)
+
+running 8 tests
+test store::tests::portfolio::crash_portfolio_child ... ok
+test store::tests::portfolio::batch_capacity_is_consumed_once_across_securities ... ok
+test store::tests::portfolio::shared_cash_24_securities_partial_missing_actions_limits_restart_and_repeat ... ok
+test store::tests::portfolio::no_lookahead_reordered_delivery_and_close_does_not_select_fills ... ok
+test store::tests::portfolio::multiday_tplusone_sells_cash_fees_and_unknown_whole_account_marks ... ok
+test store::tests::portfolio::future_research_bad_calendar_pause_and_expiry_never_trade ... ok
+test store::tests::portfolio::unknown_nav_recovers_current_valuation_without_old_trades_or_unlocking_losses ... ok
+test store::tests::portfolio::atomic_batch_crash_before_and_after_commit_recovers_exactly_once ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 51 filtered out; finished in 1.27s

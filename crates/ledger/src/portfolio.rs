@@ -6,6 +6,20 @@ use stratide_contracts::*;
 
 pub const VERSION: &str = "fixed-ticket-paper-v1";
 pub const LABEL: &str = "UNVERIFIED_PAPER_HYPOTHESIS";
+pub const ASSUMPTION: &str = "no-detected-action-mainboard-v1";
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum CapacityScope {
+    Batch,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct UnverifiedEodPolicy {
+    pub version: String,
+    /// Separate Owner cap, never above the existing strategy/account limits.
+    pub max_exposure: Cny,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -18,6 +32,12 @@ pub struct Policy {
     pub max_candidates: usize,
     pub max_order_shares: i64,
     pub capacity_shares: i64,
+    // Omission preserves already-written PR88 events; new Owner CLI policy
+    // requires Batch. Legacy events retain their original per-order semantics.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub capacity_scope: Option<CapacityScope>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unverified_eod_assumption: Option<UnverifiedEodPolicy>,
     pub max_symbol_value: Cny,
     pub max_daily_fees: Cny,
     pub slippage_bps: u32,
@@ -63,6 +83,8 @@ pub struct Security {
     pub supported: bool,
     pub amount_thousand_yuan: u64,
     pub reason: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub adjustment_factor: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -90,6 +112,22 @@ pub struct Quote {
     pub rules: TradingRules,
     pub corporate_actions_verified: bool,
     pub reason: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub paper_assumption: Option<EodAssumption>,
+}
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct EodAssumption {
+    pub pre_close: Cny,
+    pub adjustment_factor: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct Recovery {
+    pub label: String,
+    pub previous_day: TradingDay,
+    pub valuation: Confirmation,
+    pub equity: Cny,
 }
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -122,6 +160,8 @@ pub struct Book {
     pub pending: Option<usize>,
     pub batches: Vec<Batch>,
     pub last_event_at: Timestamp,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub recoveries: Vec<Recovery>,
 }
 
 pub fn digest<T: Serialize>(value: &T) -> String {

@@ -4,8 +4,21 @@ use stratide_contracts::Timestamp;
 use stratide_ledger::{portfolio::*, Command, Ledger};
 
 pub fn run(args: &[String]) -> Result<(), String> {
+    let now = Timestamp(
+        i64::try_from(
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map_err(|e| e.to_string())?
+                .as_millis(),
+        )
+        .map_err(|e| e.to_string())?,
+    );
+    run_at(args, now)
+}
+
+fn run_at(args: &[String], now: Timestamp) -> Result<(), String> {
     if args.len() != 3 {
-        return Err("paper-portfolio <原Paper账本> status|configure|pause|resume|freeze|confirm；JSON经stdin".into());
+        return Err("paper-portfolio <原Paper账本> status|configure|pause|resume|freeze|confirm|recover；JSON经stdin".into());
     }
     let action = args[2].as_str();
     let mut ledger = if action == "status" {
@@ -22,15 +35,6 @@ pub fn run(args: &[String]) -> Result<(), String> {
         if raw.len() > 4 * 1024 * 1024 {
             return Err("PORTFOLIO_INPUT_SIZE".into());
         }
-        let now = Timestamp(
-            i64::try_from(
-                std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .map_err(|e| e.to_string())?
-                    .as_millis(),
-            )
-            .map_err(|e| e.to_string())?,
-        );
         let (id, mut cmd) = match action {
             "configure" => (
                 "portfolio:policy".into(),
@@ -55,6 +59,15 @@ pub fn run(args: &[String]) -> Result<(), String> {
                     Command::FreezePortfolioV1 { decision },
                 )
             }
+            "recover" => {
+                let mut valuation: Confirmation =
+                    serde_json::from_str(&raw).map_err(|e| e.to_string())?;
+                valuation.now = now;
+                (
+                    format!("portfolio:valuation-recovery:{}", valuation.day.0),
+                    Command::RecoverPortfolioValuationV1 { valuation },
+                )
+            }
             "confirm" => {
                 let mut confirmation: Confirmation =
                     serde_json::from_str(&raw).map_err(|e| e.to_string())?;
@@ -66,6 +79,13 @@ pub fn run(args: &[String]) -> Result<(), String> {
             }
             _ => return Err("PORTFOLIO_ACTION_INVALID".into()),
         };
+        if let Command::ConfigurePortfolioV1 { policy, .. } = &cmd {
+            if policy.capacity_scope != Some(CapacityScope::Batch)
+                && ledger.state().portfolio.is_none()
+            {
+                return Err("OWNER_BATCH_CAPACITY_SCOPE_REQUIRED".into());
+            }
+        }
         // Identical retries bind to the original wall clock, never a new day.
         if let Some(old) = ledger
             .history()?
@@ -88,6 +108,10 @@ pub fn run(args: &[String]) -> Result<(), String> {
                         confirmation: prior,
                     },
                 ) => confirmation.now = prior.now,
+                (
+                    Command::RecoverPortfolioValuationV1 { valuation },
+                    Command::RecoverPortfolioValuationV1 { valuation: prior },
+                ) => valuation.now = prior.now,
                 _ => return Err("PORTFOLIO_EVENT_ID_CONFLICT".into()),
             }
         }
@@ -96,4 +120,28 @@ pub fn run(args: &[String]) -> Result<(), String> {
     println!("{}",serde_json::to_string(&serde_json::json!({"ledger_head":ledger.head(),"state":ledger.state(),
         "opening_observed":"NOT_VERIFIED","historical_pit":"NOT_VERIFIED","real_tradability":"NOT_VERIFIED","live_allowed":false})).map_err(|e|e.to_string())?);
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn runner_child() {
+        let Ok(args) = std::env::var("STRATIDE_PORTFOLIO_TEST_ARGS") else {
+            return;
+        };
+        let args: Vec<String> = serde_json::from_str(&args).unwrap();
+        let now = Timestamp(
+            std::env::var("STRATIDE_PORTFOLIO_TEST_AT")
+                .unwrap()
+                .parse()
+                .unwrap(),
+        );
+        if args[2] == "init" {
+            let genesis: stratide_ledger::Genesis = serde_json::from_reader(io::stdin()).unwrap();
+            Ledger::create(&args[1], genesis).unwrap();
+        } else {
+            run_at(&args, now).unwrap();
+        }
+    }
 }

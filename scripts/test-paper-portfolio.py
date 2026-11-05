@@ -4,6 +4,8 @@ import datetime as dt
 import importlib.util
 import io
 import json
+import os
+import subprocess
 from pathlib import Path
 import sys
 import tempfile
@@ -23,6 +25,84 @@ f=importlib.util.module_from_spec(spec);spec.loader.exec_module(f)
 
 
 class Tests(unittest.TestCase):
+    def test_runner_cli_ledger_eod_assumption_then_missing_nav_and_cross_day_recovery(self):
+        # The test-only CLI child supplies a fixed wall clock; production has no
+        # clock override. All quotes are produced by the actual Market/Runner,
+        # using an offline transport in the real-EOD schema (not real prices).
+        exe=Path(os.environ["STRATIDE_PORTFOLIO_TEST_BIN"])
+        class HTTP(f.HTTP):
+            def __call__(self,api,params,fields):
+                status,raw,extra=super().__call__(api,params,fields)
+                data=json.loads(raw); names=data["data"]["fields"]
+                if api=="daily" and params["trade_date"]>f.DAY:
+                    for row in data["data"]["items"]:
+                        row[names.index("pre_close")]="10.10";row[names.index("change")]="0";row[names.index("pct_chg")]="0"
+                if api=="adj_factor" and params["trade_date"]>f.DAY:
+                    for row in data["data"]["items"]:
+                        if row[names.index("ts_code")]==f.B:row[names.index("adj_factor")]="2"
+                return status,m.canonical(data),extra
+        for approved in [False,True]:
+            with tempfile.TemporaryDirectory(dir=TEST_ROOT) as tmp:
+                root=Path(tmp);ledger=root/"account";at=["2026-11-04T08:00:00Z"]
+                def bridge(path,action,value=None):
+                    env=dict(os.environ,STRATIDE_PORTFOLIO_TEST_ARGS=json.dumps(["paper-portfolio",str(path),action]),
+                             STRATIDE_PORTFOLIO_TEST_AT=str(p.milliseconds(at[0])))
+                    result=subprocess.run([str(exe),"--exact","portfolio::tests::runner_child","--nocapture"],
+                        input=m.canonical(value or {}),capture_output=True,env=env,timeout=20)
+                    self.assertEqual(result.returncode,0,result.stdout.decode()+result.stderr.decode())
+                    if action=="init":return {}
+                    return next(json.loads(line) for line in result.stdout.decode().splitlines() if line.startswith("{"))
+                config=json.loads((ROOT/"docs/evidence/m0-pr03/sample-report/report.json").read_text(encoding="utf-8"))["config"]
+                config.update(max_mark_age_ms=8*3600000,max_snapshot_age_ms=8*3600000)
+                provenance=dict(mode="historical_replay",source_version="paper-eod-assumption-v1:offline-schema-test",
+                    dataset_hash="a"*64,timezone="Asia/Shanghai",price_semantics="unadjusted_cny_fen")
+                bridge(ledger,"init",dict(config=config,provenance=provenance,at=p.milliseconds(at[0]),day=20261104))
+                symbols=[p.instrument(f.A),p.instrument(f.B)]
+                fees=[dict(version="test-fees",source="offline-test",instrument=i,valid_from=20261104,valid_through=20261231,
+                    commission_ppm=300,minimum_commission=1,transfer_ppm=10,sell_tax_ppm=500) for i in symbols]
+                policy=dict(version="fixed-ticket-paper-v1",universe=symbols,target_value=201000,max_positions=2,max_daily_orders=2,
+                    max_candidates=2,max_order_shares=100,capacity_shares=100,capacity_scope="Batch",max_symbol_value=400000,
+                    max_daily_fees=100000,slippage_bps=100,min_amount_thousand_yuan=100,fees=fees,approve_fixed_baseline=True,automatic=True)
+                if approved:policy["unverified_eod_assumption"]=dict(version="no-detected-action-mainboard-v1",max_exposure=config["strategy_limits"]["max_exposure"])
+                bridge(ledger,"configure",policy)
+                binding=root/"binding.json";binding.write_text(json.dumps(dict(ledger=str(ledger))),encoding="utf-8")
+                market=m.Market(root/"market");market.initialize(f.DAY);market.control(True)
+                http=HTTP();http.closed={"20261107","20261108"};http.missing_dates={"20261106":{f.A}}
+                original=m.Download.__init__
+                def init(download,*args,**kwargs):kwargs["sleep"]=lambda _:None;original(download,*args,**kwargs)
+                def research(market,day,snapshot):
+                    return dict(task_id="7",candidate_sha256="b"*64,registration_sha256="c"*64,model_version="offline-original-research-stub",
+                        generated_at=p.milliseconds(at[0]),finished_at=p.milliseconds(at[0]),ready_sessions=84,
+                        restriction="RESEARCH_ONLY",eligibility="ELIGIBILITY_DENIED",can_execute_forward_paper=False,selected=symbols)
+                with patch.object(p,"binding_path",return_value=binding),patch.object(p,"bridge",side_effect=bridge),\
+                        patch.object(p,"research",side_effect=research),patch.object(m.h,"now",side_effect=lambda:at[0]),\
+                        patch.object(m.Download,"__init__",init):
+                    def collect(day):
+                        at[0]=m.h.day(day).isoformat()+"T08:10:00Z"
+                        market.once(transport=http,clock=lambda:at[0]);at[0]=m.h.day(day).isoformat()+"T08:11:00Z"
+                    collect(f.DAY);p.once(market)
+                    collect("20261105");p.once(market)
+                    view=bridge(ledger,"status");state=view["state"]
+                    if not approved:
+                        self.assertEqual(state["fills"],[])
+                        continue
+                    self.assertEqual(len(state["fills"]),1)
+                    self.assertIn("CORPORATE_ACTIONS=UNVERIFIED",state["fills"][0]["historical_execution"])
+                    first=state["portfolio"]["batches"][0]
+                    self.assertTrue(all(q["corporate_actions_verified"] is False for q in first["confirmation"]["quotes"]))
+                    self.assertTrue(any(o["status"]=="Expired" and o["proposal"]["instrument"]==p.instrument(f.B) for o in state["orders"]))
+                    count=len(state["fills"]);p.once(market);self.assertEqual(len(bridge(ledger,"status")["state"]["fills"]),count)
+                    collect("20261106");p.once(market,phase="confirm")
+                    missing=bridge(ledger,"status")["state"];self.assertIsNotNone(missing["valuation_error"])
+                    self.assertIsNone(missing["portfolio"]["pending"])
+                    collect("20261109");p.once(market,phase="confirm")
+                    recovered=bridge(ledger,"status")["state"]
+                    self.assertIsNone(recovered["valuation_error"]);self.assertEqual(len(recovered["portfolio"]["recoveries"]),1)
+                    for key in ("cash","positions","pending_orders"):
+                        self.assertEqual(recovered["snapshot"][key],missing["snapshot"][key])
+                    self.assertEqual(recovered["fills"],missing["fills"]);self.assertEqual(recovered["orders"],missing["orders"])
+                    p.once(market);self.assertEqual(bridge(ledger,"status")["state"]["portfolio"]["batches"][-1]["decision"]["day"],20261109)
+
     def test_future_calendar_keeps_market_requests_in_past_and_freezes_actual_next_session(self):
         with tempfile.TemporaryDirectory(dir=TEST_ROOT) as tmp:
             market=m.Market(Path(tmp)/"market")
@@ -97,6 +177,21 @@ class Tests(unittest.TestCase):
             value=json.loads(out.getvalue())
             self.assertEqual(calls,["collect","confirm","freeze"])
             self.assertEqual(value["research"]["reason"],"RESEARCH_UNAVAILABLE")
+
+    def test_optional_paper_import_failure_keeps_watch_polling_and_stop_propagates(self):
+        import builtins
+        real_import=builtins.__import__;calls=[]
+        def broken(name,*args,**kwargs):
+            if name=="paper_portfolio":raise ImportError("offline test missing optional module")
+            return real_import(name,*args,**kwargs)
+        with tempfile.TemporaryDirectory(dir=TEST_ROOT) as tmp,patch.object(m,"common_root",return_value=Path(tmp)),\
+                patch.object(m.Market,"once",side_effect=lambda **kwargs:calls.append("collect") or {"state":"READY"}),\
+                patch.object(builtins,"__import__",side_effect=broken),patch.object(m.time,"sleep",side_effect=[None,KeyboardInterrupt]),\
+                contextlib.redirect_stdout(io.StringIO()) as out:
+            with self.assertRaises(KeyboardInterrupt):m.cli(["watch","--root",str(Path(tmp)/"market")])
+            self.assertEqual(calls,["collect","collect"])
+            for line in out.getvalue().splitlines():
+                self.assertEqual(json.loads(line)["paper_confirmation"]["reason"],"PAPER_MODULE_UNAVAILABLE")
 
 
 if __name__=="__main__":unittest.main()

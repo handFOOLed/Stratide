@@ -60,6 +60,9 @@ export interface PaperPortfolioBatch {
   order_ids: string[]; rejections: Array<[Instrument,string]>; confirmation_source_sha256: string | null;
 }
 export interface PaperPortfolio {
+  capacity_scope?: string | null; capacity_shares?: string;
+  unverified_eod_assumption?: {version:string;max_exposure:string} | null;
+  recoveries?: Array<{label:string;previous_day:string;valuation:{day:string};equity:string}>;
   automatic: boolean; policy_version: string; policy_sha256:string; target_value_fen:string;
   max_positions: string; max_daily_orders: string; pending: string | null; batches: PaperPortfolioBatch[];
 }

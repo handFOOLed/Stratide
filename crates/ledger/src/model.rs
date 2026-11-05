@@ -217,6 +217,9 @@ pub enum Command {
     FreezePortfolioV1 {
         decision: crate::portfolio::Decision,
     },
+    RecoverPortfolioValuationV1 {
+        valuation: crate::portfolio::Confirmation,
+    },
     ConfirmPortfolioV1 {
         confirmation: crate::portfolio::Confirmation,
     },

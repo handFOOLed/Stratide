@@ -46,11 +46,19 @@ pub fn load(path: &Path) -> Result<(Value, Value), String> {
                 && b.finalized_at.is_some()
         })
     });
-    let session = s.equity.filter(|_| !missing_prior_session).map(|v| {
-        i128::from(v.fen())
-            - i128::from(s.snapshot.equity_basis.net_external_flow_today_fen)
-            - i128::from(s.snapshot.equity_basis.day_start_equity.fen())
+    let recovery_day = s.portfolio.as_ref().is_some_and(|book| {
+        book.recoveries
+            .iter()
+            .any(|r| r.valuation.day == s.snapshot.trading_day)
     });
+    let session = s
+        .equity
+        .filter(|_| !missing_prior_session && !recovery_day)
+        .map(|v| {
+            i128::from(v.fen())
+                - i128::from(s.snapshot.equity_basis.net_external_flow_today_fen)
+                - i128::from(s.snapshot.equity_basis.day_start_equity.fen())
+        });
     let reserved: i64 = s
         .snapshot
         .pending_orders
@@ -78,6 +86,9 @@ pub fn load(path: &Path) -> Result<(Value, Value), String> {
             "automatic":book.automatic,"policy_version":book.policy.version,"policy_sha256":stratide_ledger::portfolio::digest(&book.policy),
             "max_positions":book.policy.max_positions,"max_daily_orders":book.policy.max_daily_orders,
             "target_value_fen":book.policy.target_value.fen(),"pending":book.pending,
+            "capacity_scope":book.policy.capacity_scope,"capacity_shares":book.policy.capacity_shares,
+            "unverified_eod_assumption":book.policy.unverified_eod_assumption,
+            "recoveries":book.recoveries.iter().rev().take(30).collect::<Vec<_>>(),
             "batches":book.batches.iter().rev().take(30).map(|b|json!({
                 "decision_day":b.decision.day,"target_day":b.target_day,"frozen_at":b.decision.now,"finalized_at":b.finalized_at,
                 "label":b.label,"reason":b.reason,"candidate":b.decision.research,"source_sha256":b.decision.source_sha256,
@@ -158,6 +169,10 @@ pub fn load(path: &Path) -> Result<(Value, Value), String> {
     if let Some(book) = &s.portfolio {
         gaps.extend(book.batches.iter().filter(|b|b.finalized_at.is_some() && b.confirmation.as_ref().is_some_and(|c|c.quotes.is_empty()))
             .map(|b|json!({"day":b.target_day.map(|d|d.0.to_string()),"reason":"组合确认无报价终结；无新增估值，跨缺口的单日盈亏不可用","finalized_at":b.finalized_at})));
+    }
+    if let Some(book) = &s.portfolio {
+        gaps.extend(book.recoveries.iter().map(|r|json!({"day":r.valuation.day.0.to_string(),
+            "reason":"NO_TRADE_REBASE：当前估值恢复，缺口与恢复日的当日盈亏未核验；无历史补单","previous_day":r.previous_day})));
     }
     let meta = json!({"mode":if synthetic {"synthetic_test"}else{"ex_post_paper_assumption"},"source":"Owner selected Paper Ledger","source_version":s.provenance.source_version,"as_of":day,
         "first_day":history[0].state.snapshot.trading_day.0.to_string(),"last_day":day,"last_valid_valuation_at":s.equity.map(|_|s.snapshot.as_of.0.to_string()),

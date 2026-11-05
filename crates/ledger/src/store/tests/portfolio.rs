@@ -40,6 +40,8 @@ pub(super) fn setup() -> (tempfile::TempDir, Ledger) {
         max_candidates: 24,
         max_order_shares: 200,
         capacity_shares: 100,
+        capacity_scope: Some(CapacityScope::Batch),
+        unverified_eod_assumption: None,
         max_symbol_value: c(400_000),
         max_daily_fees: c(100_000),
         slippage_bps: 100,
@@ -78,6 +80,7 @@ pub(super) fn decision(l: &Ledger, day: u32, target_day: u32) -> Command {
                 close: c(1000),
                 rules: r,
                 supported: n < 20,
+                adjustment_factor: None,
                 amount_thousand_yuan: 20000,
                 reason: if n >= 20 { "BSE_ST_NEW_UNVERIFIED" } else { "" }.into(),
             }
@@ -163,6 +166,7 @@ pub(super) fn confirm(l: &Ledger) -> Command {
                 bar: b,
                 rules: r,
                 corporate_actions_verified: true,
+                paper_assumption: None,
                 reason: String::new(),
             }
         })
@@ -353,6 +357,127 @@ fn crash_portfolio_child() {
         confirm(&l)
     };
     apply(&mut l, "crash-event", cmd);
+}
+
+#[test]
+fn batch_capacity_is_consumed_once_across_securities() {
+    let (_t, mut l) = setup();
+    let d = decision(&l, 20261028, 20261029);
+    apply(&mut l, "batch", d);
+    assert!(l.state.orders.iter().filter(|o| o.active()).count() >= 2);
+    let c = confirm(&l);
+    apply(&mut l, "confirm", c);
+    assert_eq!(l.state.fills.iter().map(|f| f.quantity).sum::<i64>(), 100);
+    assert_eq!(l.state.fills.len(), 1);
+    assert!(l.state.snapshot.pending_orders.is_empty());
+}
+
+#[test]
+fn unknown_nav_recovers_current_valuation_without_old_trades_or_unlocking_losses() {
+    for recovery_price in [1000, 800] {
+        let (t, mut l) = setup();
+        let d = decision(&l, 20261028, 20261029);
+        apply(&mut l, "d28", d);
+        let c29 = confirm(&l);
+        apply(&mut l, "c29", c29);
+        let d29 = decision(&l, 20261029, 20261030);
+        apply(&mut l, "d29", d29);
+        let held = l.state.snapshot.positions[0].instrument.clone();
+        let mut missing = confirm(&l);
+        if let Command::ConfirmPortfolioV1 { confirmation: c } = &mut missing {
+            c.quotes.retain(|q| q.bar.instrument != held);
+        }
+        apply(&mut l, "missing", missing);
+        assert!(l.state.valuation_error.is_some());
+        if recovery_price == 800 {
+            apply(
+                &mut l,
+                "prior-manual-lock",
+                Command::Freeze {
+                    scope: RiskScope::Account,
+                    reason: FreezeReason::Manual,
+                },
+            );
+        }
+        let original = l.state.clone();
+        let mut v = match confirm(&l) {
+            Command::ConfirmPortfolioV1 { confirmation } => confirmation,
+            _ => unreachable!(),
+        };
+        v.day = TradingDay(20261102);
+        v.now = at(20261102, 8);
+        v.received_at = v.now;
+        for q in &mut v.quotes {
+            q.bar.day = v.day;
+            q.bar.opens_at = session(v.day, 1, 30).unwrap();
+            q.bar.closes_at = session(v.day, 7, 0).unwrap();
+            q.bar.available_at = v.now;
+            q.bar.close = c(recovery_price);
+            q.rules.trading_day = v.day;
+            q.rules.available_at = v.now;
+        }
+        let mut bad = v.clone();
+        bad.quotes.clear();
+        assert!(l
+            .execute(
+                "bad-recovery",
+                Command::RecoverPortfolioValuationV1 { valuation: bad }
+            )
+            .is_err());
+        assert_eq!(l.state, original);
+        let path = t.path().join("account");
+        drop(l);
+        let mut l = Ledger::open(&path).unwrap();
+        let cmd = Command::RecoverPortfolioValuationV1 { valuation: v };
+        apply(&mut l, "recover", cmd.clone());
+        assert!(!l.execute("recover", cmd).unwrap());
+        assert!(l.state.valuation_error.is_none());
+        assert_eq!(l.state.snapshot.cash, original.snapshot.cash);
+        assert_eq!(l.state.snapshot.positions, original.snapshot.positions);
+        assert_eq!(l.state.orders, original.orders);
+        assert_eq!(l.state.fills, original.fills);
+        assert_eq!(
+            l.state.portfolio.as_ref().unwrap().recoveries[0].label,
+            "NO_TRADE_REBASE"
+        );
+        assert!(l
+            .history()
+            .unwrap()
+            .iter()
+            .any(|e| e.event_id == "missing" && e.state.equity.is_none()));
+        if recovery_price == 800 {
+            assert!(l
+                .state
+                .risk
+                .freezes(RiskScope::Account)
+                .contains(&FreezeReason::Manual));
+            assert!(l
+                .state
+                .risk
+                .freezes(RiskScope::Account)
+                .contains(&FreezeReason::DailyLoss));
+            assert!(l
+                .state
+                .risk
+                .freezes(RiskScope::Account)
+                .contains(&FreezeReason::Drawdown));
+        }
+        let d = decision(&l, 20261102, 20261103);
+        apply(&mut l, "fresh-day", d);
+        if recovery_price == 1000 {
+            assert!(l.state.orders.iter().any(|o| o.active()));
+        } else {
+            assert!(l
+                .state
+                .orders
+                .iter()
+                .filter(|o| o.accepted_on == TradingDay(20261102))
+                .all(|o| o.status == OrderStatus::Rejected));
+        }
+        let state = l.state.clone();
+        drop(l);
+        assert_eq!(Ledger::open(path).unwrap().state, state);
+    }
 }
 
 #[test]

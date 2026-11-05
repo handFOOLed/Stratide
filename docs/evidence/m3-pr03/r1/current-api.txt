@@ -1,0 +1,21 @@
+   Compiling ring v0.17.14
+   Compiling rustls v0.23.46
+   Compiling libsqlite3-sys v0.36.0
+   Compiling chrono v0.4.45
+   Compiling chrono-tz v0.10.4
+   Compiling rusqlite v0.38.0
+   Compiling stratide-ledger v0.0.1 (F:\Desktop\Documents\Codex\Stratide\issue84-worktree\crates\ledger)
+   Compiling rustls-webpki v0.103.16
+   Compiling tokio-rustls v0.26.6
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.12.28
+   Compiling stratide-research v0.0.1 (F:\Desktop\Documents\Codex\Stratide\issue84-worktree\research\agent)
+   Compiling stratided v0.0.1 (F:\Desktop\Documents\Codex\Stratide\issue84-worktree\apps\stratided)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.82s
+     Running unittests src\lib.rs (target\debug\deps\stratided-196b96cc4fbe5eab.exe)
+
+running 2 tests
+test current_account_tests::selected_historical_projection_never_becomes_current_nav ... ok
+test current_account_tests::current_projection_preserves_fill_costs_flows_and_assumption_provenance ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s

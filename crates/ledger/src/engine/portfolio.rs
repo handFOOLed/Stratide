@@ -53,6 +53,173 @@ fn supported_rules(r: &TradingRules) -> bool {
 }
 
 impl State {
+    fn portfolio_factor_matches_holding(&self, instrument: &Instrument, factor: &str) -> bool {
+        // Anchor existing modeled shares to their original accepted buy receipt,
+        // not a newer research decision following a detected corporate action.
+        let book = self.portfolio.as_ref().expect("portfolio");
+        for fill in self
+            .fills
+            .iter()
+            .rev()
+            .filter(|f| f.instrument == *instrument && f.side == Side::Buy)
+        {
+            for batch in book.batches.iter().rev() {
+                if let Some(c) = &batch.confirmation {
+                    if c.day == fill.day {
+                        if let Some(q) = c.quotes.iter().find(|q| {
+                            q.bar.instrument == *instrument && !q.corporate_actions_verified
+                        }) {
+                            if let Some(a) = &q.paper_assumption {
+                                return a.adjustment_factor == factor;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        true // No earlier assumption-based buy; the current frozen T is the initial anchor.
+    }
+
+    fn portfolio_quote_eligible(
+        &self,
+        q: &Quote,
+        securities: &[Security],
+        consecutive: bool,
+    ) -> bool {
+        if q.corporate_actions_verified {
+            return q.bar.status_verified;
+        }
+        let policy = &self.portfolio.as_ref().expect("portfolio").policy;
+        if policy.unverified_eod_assumption.is_none()
+            || !q.bar.status_verified
+            || !supported_rules(&q.rules)
+            || !q.rules.tradable
+        {
+            return false;
+        }
+        let Some(anchor) = securities.iter().find(|s| s.instrument == q.bar.instrument) else {
+            return false;
+        };
+        let Some(factor) = &anchor.adjustment_factor else {
+            return false;
+        };
+        let Some(assumption) = &q.paper_assumption else {
+            return false;
+        };
+        !factor.is_empty()
+            && self.portfolio_factor_matches_holding(&q.bar.instrument, factor)
+            && assumption.adjustment_factor == *factor
+            && anchor.supported
+            && (!consecutive || assumption.pre_close == anchor.close)
+    }
+
+    pub(super) fn recover_portfolio_valuation(&mut self, c: &Confirmation) -> Result<()> {
+        let book = self.portfolio.as_ref().ok_or("PORTFOLIO_NOT_CONFIGURED")?;
+        let (local_day, _) = crate::paper_eod::shanghai_day(c.now)?;
+        if self.valuation_error.is_none()
+            || book.pending.is_some()
+            || self.orders.iter().any(PaperOrder::active)
+            || c.day != local_day
+            || c.day <= self.snapshot.trading_day
+            || c.now < session(c.day, 8, 0)?
+            || c.now < self.snapshot.as_of
+            || c.received_at < session(c.day, 8, 0)?
+            || c.received_at > c.now
+            || !valid_sha(&c.source_sha256)
+        {
+            return Err("NO_TRADE_REBASE_WINDOW_OR_STATE_INVALID".into());
+        }
+        let mut anchors = Vec::new();
+        // Last frozen T evidence per security, including through a quote gap.
+        for batch in book.batches.iter().rev() {
+            if batch.target_day.is_none() {
+                continue;
+            }
+            for security in &batch.decision.securities {
+                if !security.supported
+                    || !security.adjustment_factor.as_ref().is_some_and(|f| {
+                        self.portfolio_factor_matches_holding(&security.instrument, f)
+                    })
+                {
+                    continue;
+                }
+                if !anchors
+                    .iter()
+                    .any(|s: &Security| s.instrument == security.instrument)
+                {
+                    anchors.push(security.clone());
+                }
+            }
+        }
+        let mut marks = Vec::new();
+        for lot in &self.snapshot.positions {
+            if marks
+                .iter()
+                .any(|m: &PositionMark| m.instrument == lot.instrument)
+            {
+                continue;
+            }
+            let quotes = c
+                .quotes
+                .iter()
+                .filter(|q| q.bar.instrument == lot.instrument)
+                .collect::<Vec<_>>();
+            if quotes.len() != 1 {
+                return Err("NO_TRADE_REBASE_COMPLETE_HOLDINGS_REQUIRED".into());
+            }
+            let q = quotes[0];
+            let b = &q.bar;
+            if b.day != c.day
+                || b.provenance != self.provenance
+                || b.close == Cny::ZERO
+                || b.closes_at != session(c.day, 7, 0)?
+                || b.opens_at != session(c.day, 1, 30)?
+                || b.available_at < session(c.day, 8, 0)?
+                || b.available_at > c.received_at
+                || q.rules.instrument != lot.instrument
+                || q.rules.trading_day != c.day
+                || q.rules.available_at > c.now
+                || !self.portfolio_quote_eligible(q, &anchors, false)
+            {
+                return Err("NO_TRADE_REBASE_SOURCE_OR_ACTION_UNRESOLVED".into());
+            }
+            marks.push(PositionMark {
+                instrument: lot.instrument.clone(),
+                price: b.close,
+                as_of: b.closes_at,
+                available_at: b.available_at,
+                source: format!(
+                    "NO_TRADE_REBASE / {} / CORPORATE_ACTIONS_{}",
+                    c.source_sha256,
+                    if q.corporate_actions_verified {
+                        "VERIFIED"
+                    } else {
+                        "UNVERIFIED"
+                    }
+                ),
+            });
+        }
+        let previous_day = self.snapshot.trading_day;
+        self.snapshot.as_of = c.now;
+        self.snapshot.trading_day = c.day;
+        self.snapshot.marks = marks;
+        // Evaluate the entire gap against the OLD loss basis and high-water mark
+        // first. Rebase never erases a lock or treats missing-day PnL as zero.
+        self.observe()?;
+        let equity = self.equity.ok_or("NO_TRADE_REBASE_NAV_UNAVAILABLE")?;
+        self.snapshot.equity_basis.day_start_equity = equity;
+        self.snapshot.equity_basis.net_external_flow_today_fen = 0;
+        let book = self.portfolio.as_mut().expect("portfolio");
+        book.last_event_at = c.now;
+        book.recoveries.push(Recovery {
+            label: "NO_TRADE_REBASE".into(),
+            previous_day,
+            valuation: c.clone(),
+            equity,
+        });
+        Ok(())
+    }
+
     pub(super) fn configure_portfolio(&mut self, now: Timestamp, p: &Policy) -> Result<()> {
         if self.portfolio.is_some()
             || self.paper_eod.as_ref().is_some_and(|b| b.pending.is_some())
@@ -105,6 +272,16 @@ impl State {
             }
             fees[0].validate(i, crate::paper_eod::shanghai_day(now)?.0)?;
         }
+        if let Some(assumption) = &p.unverified_eod_assumption {
+            if assumption.version != ASSUMPTION
+                || assumption.max_exposure == Cny::ZERO
+                || assumption.max_exposure > self.config.strategy_limits.max_exposure
+                || p.capacity_scope != Some(CapacityScope::Batch)
+                || p.capacity_shares > 100
+            {
+                return Err("OWNER_EOD_ASSUMPTION_LIMIT_INVALID".into());
+            }
+        }
         self.portfolio = Some(Book {
             policy: p.clone(),
             approved_at: now,
@@ -112,6 +289,7 @@ impl State {
             pending: None,
             batches: vec![],
             last_event_at: now,
+            recoveries: vec![],
         });
         Ok(())
     }
@@ -210,8 +388,35 @@ impl State {
                 {
                     return Err("FUTURE_DECISION_MARK".into());
                 }
-                self.snapshot.marks = d.marks.clone();
+                self.snapshot.marks = d
+                    .marks
+                    .iter()
+                    .filter(|m| {
+                        p.unverified_eod_assumption.is_none()
+                            || !self
+                                .snapshot
+                                .positions
+                                .iter()
+                                .any(|l| l.instrument == m.instrument)
+                            || d.securities
+                                .iter()
+                                .find(|s| s.instrument == m.instrument)
+                                .and_then(|s| s.adjustment_factor.as_ref())
+                                .is_some_and(|f| {
+                                    self.portfolio_factor_matches_holding(&m.instrument, f)
+                                })
+                    })
+                    .cloned()
+                    .collect();
                 self.observe()?;
+                if p.unverified_eod_assumption.is_some() && self.valuation_error.is_some() {
+                    batch.reason = "NO_TRADE / HOLDING_VALUATION_OR_ACTION_UNRESOLVED".into();
+                    batch.finalized_at = Some(d.now);
+                    let book = self.portfolio.as_mut().expect("portfolio");
+                    book.batches.push(batch);
+                    book.last_event_at = d.now;
+                    return Ok(());
+                }
                 let selected = &d.research.as_ref().expect("admitted research").selected;
                 let mut instruments = selected.clone();
                 for lot in &self.snapshot.positions {
@@ -355,6 +560,47 @@ impl State {
                             .push((s.instrument, "DAILY_FEE_CAP".into()));
                         continue;
                     }
+                    if side == Side::Buy {
+                        if let Some(assumption) = &p.unverified_eod_assumption {
+                            let held_value = self.snapshot.positions.iter().try_fold(
+                                Cny::ZERO,
+                                |sum, lot| {
+                                    let mark = self
+                                        .snapshot
+                                        .marks
+                                        .iter()
+                                        .find(|m| m.instrument == lot.instrument)
+                                        .ok_or("ASSUMPTION_MARK_MISSING")?;
+                                    sum.checked_add(
+                                        mark.price
+                                            .checked_mul(lot.quantity)
+                                            .map_err(|e| e.to_string())?,
+                                    )
+                                    .map_err(|e| e.to_string())
+                                },
+                            )?;
+                            let committed = self.snapshot.pending_orders.iter().try_fold(
+                                held_value,
+                                |sum, order| {
+                                    sum.checked_add(order.reserved_cash)
+                                        .map_err(|e| e.to_string())
+                                },
+                            )?;
+                            let proposed = limit_price
+                                .checked_mul(quantity)
+                                .and_then(|v| v.checked_add(money(bound).expect("fee bound")))
+                                .map_err(|e| e.to_string())?;
+                            if committed.checked_add(proposed).map_err(|e| e.to_string())?
+                                > assumption.max_exposure
+                            {
+                                batch.rejections.push((
+                                    s.instrument,
+                                    "UNVERIFIED_ASSUMPTION_EXPOSURE_CAP".into(),
+                                ));
+                                continue;
+                            }
+                        }
+                    }
                     self.submit_order(
                         &proposal,
                         d.now,
@@ -411,6 +657,8 @@ impl State {
             return Err("PORTFOLIO_CONFIRMATION_TIME_OR_SOURCE_INVALID".into());
         }
         let capacity = book.policy.capacity_shares;
+        let batch_capacity = book.policy.capacity_scope == Some(CapacityScope::Batch);
+        let mut remaining_capacity = capacity;
         let timely = c.now < end && c.received_at >= session(day, 8, 0)? && c.received_at < end;
         for q in &c.quotes {
             let b = &q.bar;
@@ -435,7 +683,8 @@ impl State {
                 .quotes
                 .iter()
                 .filter(|q| {
-                    q.corporate_actions_verified && q.bar.status_verified && q.bar.open > Cny::ZERO
+                    self.portfolio_quote_eligible(q, &batch.decision.securities, true)
+                        && q.bar.open > Cny::ZERO
                 })
                 .map(|q| PositionMark {
                     instrument: q.bar.instrument.clone(),
@@ -475,8 +724,7 @@ impl State {
                     )
                     .map_err(|_| "PORTFOLIO_PRICE_OVERFLOW".to_string())
                     .and_then(money);
-                    if q.corporate_actions_verified
-                        && q.bar.status_verified
+                    if self.portfolio_quote_eligible(q, &batch.decision.securities, true)
                         && supported_rules(&q.rules)
                         && q.rules.tradable
                         && q.bar.open > q.rules.min_price
@@ -491,10 +739,52 @@ impl State {
                                 }
                         })
                     {
+                        if let Some(assumption) = &self
+                            .portfolio
+                            .as_ref()
+                            .expect("portfolio")
+                            .policy
+                            .unverified_eod_assumption
+                        {
+                            if self.valuation_error.is_none() {
+                                let committed = self.snapshot.positions.iter().try_fold(
+                                    Cny::ZERO,
+                                    |sum, lot| {
+                                        let mark = self
+                                            .snapshot
+                                            .marks
+                                            .iter()
+                                            .find(|m| m.instrument == lot.instrument)
+                                            .expect("complete valuation");
+                                        sum.checked_add(
+                                            mark.price
+                                                .checked_mul(lot.quantity)
+                                                .map_err(|e| e.to_string())?,
+                                        )
+                                        .map_err(|e| e.to_string())
+                                    },
+                                )?;
+                                let committed = self.snapshot.pending_orders.iter().try_fold(
+                                    committed,
+                                    |sum, order| {
+                                        sum.checked_add(order.reserved_cash)
+                                            .map_err(|e| e.to_string())
+                                    },
+                                )?;
+                                if committed > assumption.max_exposure {
+                                    self.expire(oi);
+                                    self.orders[oi].reason =
+                                        "NO_FILL / UNVERIFIED_ASSUMPTION_EXPOSURE_CAP".into();
+                                    continue;
+                                }
+                            }
+                        }
                         let mut rules = q.rules.clone();
                         rules.available_at = opens;
                         rules.source = format!("EX_POST_OPEN_ASSUMPTION | {}", rules.source);
-                        let mut remaining_capacity = capacity;
+                        if !batch_capacity {
+                            remaining_capacity = capacity;
+                        }
                         let before = self.fills.len();
                         self.fill_order(
                             oi,
@@ -508,7 +798,23 @@ impl State {
                             },
                         )?;
                         for f in &mut self.fills[before..] {
-                            f.historical_execution = Some(format!("EX_POST_OPEN_ASSUMPTION; batch={}; source={}; OPENING_OBSERVED=NOT_VERIFIED; HISTORICAL_PIT=NOT_VERIFIED; REAL_TRADABILITY=NOT_VERIFIED",batch.decision.source_sha256,c.source_sha256));
+                            let mut label = format!("EX_POST_OPEN_ASSUMPTION; batch={}; source={}; OPENING_OBSERVED=NOT_VERIFIED; HISTORICAL_PIT=NOT_VERIFIED; REAL_TRADABILITY=NOT_VERIFIED",batch.decision.source_sha256,c.source_sha256);
+                            if batch_capacity {
+                                label.push_str(&format!(
+                                    "; CORPORATE_ACTIONS={}; PAPER_POLICY={}",
+                                    if q.corporate_actions_verified {
+                                        "VERIFIED"
+                                    } else {
+                                        "UNVERIFIED"
+                                    },
+                                    if q.corporate_actions_verified {
+                                        "VERIFIED_EVIDENCE"
+                                    } else {
+                                        ASSUMPTION
+                                    }
+                                ));
+                            }
+                            f.historical_execution = Some(label);
                         }
                         reason = self.orders[oi].reason.clone();
                     } else {
@@ -530,7 +836,8 @@ impl State {
                 .quotes
                 .iter()
                 .filter(|q| {
-                    q.corporate_actions_verified && q.bar.status_verified && q.bar.close > Cny::ZERO
+                    self.portfolio_quote_eligible(q, &batch.decision.securities, true)
+                        && q.bar.close > Cny::ZERO
                 })
                 .map(|q| PositionMark {
                     instrument: q.bar.instrument.clone(),
