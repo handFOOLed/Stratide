@@ -1,5 +1,7 @@
 # V1 本地产品收尾（Issue #77）
 
+> **历史模块说明｜2026-11-05**：本篇描述已由 [PR #80](https://github.com/handFOOLed/Stratide/pull/80) 合并的 **V1 当时**功能。下文“Draft / 仍单证券 / 手动 JSON / 只有旧启动脚本”的描述在该交付日期真实，但不代表当前 main：V2 #82/#83/#84 已由 PR #86/#87/#88 合并，已实现全市场 EOD、自动研究和多证券共享 Paper 的软件链路。**现在仅剩 [#85](https://github.com/handFOOLed/Stratide/issues/85)（DeepSeek 负责 Windows 安装包/后台登录自启/双击打开 Dashboard）**，不应把此文的 `local-windows.ps1` 误当已打包的应用。PIT、开盘实收、真实公司行为、收益资格仍未验证。详见 [STATUS](STATUS.md)。保留 V1 原始操作和验收记录不改写。
+
 2026-11-04，基于 main `62a4299`（已含 PR #75/#78）。本期是 Windows 本地软件集成与开发者自测；提交 Draft，Owner 决定合并。N100 主机、Linux 服务器化、物理断电长稳不在本期范围。
 
 ## 已实装的产品链路
