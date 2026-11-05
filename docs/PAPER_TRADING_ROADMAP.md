@@ -1,4 +1,6 @@
-# Stratide Paper 阶段路线图（当前执行版）
+# Stratide Paper 阶段路线图（历史背景归档）
+
+> **现行路线｜2026-11-05**：此文档原为 Paper/V1 阶段过程记录，文内旧“当前 #74/#76/#77”及 Draft 是**历史语境**，不再代表最新 `main`。V2/M3 的数据、自动研究、自动多证券 Paper 已分别通过 [PR #86](https://github.com/handFOOLed/Stratide/pull/86)、[#87](https://github.com/handFOOLed/Stratide/pull/87)、[#88](https://github.com/handFOOLed/Stratide/pull/88) 合并。**唯一当前执行为 [Issue #85](https://github.com/handFOOLed/Stratide/issues/85)（Owner 指定 DeepSeek：Windows 安装包、登录后台自启、双击启动 Dashboard）**。请以 [docs/STATUS.md](STATUS.md) 与 [V2 #81](https://github.com/handFOOLed/Stratide/issues/81) 为准。历史背景和验收证据保留，不改写旧记录；仅 Paper，真实公司行为/PIT/开盘与收益资格未验证。
 
 **2026-11-04 / #77 产品集成已实装（Draft）：** [V1 本地产品闭环](V1_COMPLETION.md) 已达到工程收尾，含当前/历史独立来源、原研究/任务/预算、审批通知、假设成交与 Windows 恢复。Owner 合并决定仍待进行。#10/#17 缺证据与真实交易资格保持原判定；N100/Linux 服务器化暂缓，不计本次 Done。后续真实观察不得由合成测试补齐。[本地检查](evidence/v1-closeout-b/README.md)。
 
