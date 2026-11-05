@@ -112,3 +112,16 @@
 
 不能证明：真实行情/真实研究收益、真实成交或券商能力、真实云端调用与账单、
 安装包在干净机器上的 E2E（属于 #85 安装验收范围）。本产品仍是 Paper-only。
+
+## 2026-11-06 增量（可编辑预算与后台自动化）
+
+以下截图使用最终前端 dist + 新后端 fixture（fake 研究模型，无云调用）补拍：
+
+- [27 预算卡（含编辑入口）](after/27-budget-card-with-edit.png)
+- [28 编辑预算弹窗](after/28-budget-editor-modal.png)
+- [29 保存成功 toast](after/29-budget-saved.png)
+
+安装版（`--agent-observer`）会禁用“新建研究”并显示“安装版由后台自动研究执行任务，手动新建研究暂不可用”；
+该文案已由 Playwright 在 `manual_research_available:false` 的 mock 状态验证，未再单独截图。
+预算编辑 API、通知字段、撤销首次设置与构建信息等端到端证据见 `scripts/test-dashboard-api.py`（57 checks）与
+`docs/AUTOMATION_RELIABILITY.md`。

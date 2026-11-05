@@ -124,3 +124,13 @@ snapshot_id/sha256/evidence_class/PIT/daily.open；关于页是技术栈、N100�
 - 交付物：`docs/ui-copy-audit.md`（审计）、`docs/UI_TERMINOLOGY.md`（术语表）、
   `docs/UI_BACKEND_REQUIREMENTS.md`（后端需求）、`docs/UI_KNOWN_ISSUES.md`（遗留问题）、
   `docs/ui-evidence/`（改造前后截图与验收记录）、`docs/TECHNICAL_NOTES.md`（原关于页开发笔记）。
+
+## 5. 后续：可编辑预算与真正的后台自动化（2026-11-06）
+
+- AI 研究页与设置页的预算改为可编辑：日/月上限（CNY，元输入），低于已结算+预留时二次确认；
+  保存后静默刷新，不伪造“已生效率”。
+- 安装版 dashboard 转为观察者模式，后台 watch 独占研究执行者；AI 研究页显示“由后台自动研究执行任务”，
+  手动新建研究在安装版禁用（开发模式保留）。
+- 首次成功采集后自动启用 Paper-only 默认模拟策略；总览/交易记录可见策略、批次与拒绝原因。
+- 通知页直接使用后端标题/结论/类型/全量未读数；设置页可撤销首次设置；关于页显示版本/提交/反馈入口。
+- 自动化时点、本地失败恢复、云端响应边界与验证证据见 `docs/AUTOMATION_RELIABILITY.md`。

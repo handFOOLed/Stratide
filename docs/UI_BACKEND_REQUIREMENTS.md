@@ -161,3 +161,33 @@
 - 不改 Risk Kernel、账本、订单路径、Paper 语义与数据来源。
 - 不改 `/api/v1/*` 现有字段含义；新增字段必须可选、向后兼容。
 - 不新增任何自动重试、自动清锁、自动加预算或实盘能力。
+## 实现状态（2026-11-06 更新）
+
+> Owner 已批准修改后端。以下需求已按最小契约落地并通过交叉编译、API 与实际安装验证；
+> 原“建议契约”保留作为设计依据，不再表示未实现。
+
+| 需求 | 状态 | 落地位置 / 说明 |
+| --- | --- | --- |
+| B1 预算编辑 | 已实现 | `POST /api/agent/budget`（research/agent/src/budget_admin.rs、apps/stratided/src/agent_api.rs）；前端 BudgetEditor |
+| B2 原因中文 | 已实现 | research/agent/src/reasons.rs（165+ 条）；tasks/calls/eod/models 返回 `reason_text` |
+| B3 交易保护详情 | 已有字段；无新增触发时间 | 不伪造时间，界面继续显示“未记录” |
+| B4 暖机 N/84 | 已实现 | 以 `backfill.progress.remaining==0` 为准；不混用 84 语义 |
+| B5 通知字段 | 已实现 | inbox `name/conclusion/provider_id/kind` + 顶层 `unread_count`，不再由前端 join 任务 |
+| B6 撤销首次设置 | 已实现 | `POST /api/runtime/setup-complete {completed:false}`（幂等） |
+| B7 数据接收时刻 | 保留现状 | 不展示未提供的接收时刻 |
+| B8 运行时动态原因码 | 已实现 | 后端 reason_text + 前端映射双保险；未知码只进诊断 |
+| B9 阻断伪任务 kind | 已实现 | `provider_id=market-research-status` → `research_blocked_notice` |
+| B10 构建信息/反馈入口 | 已实现 | runtime status `build{version,commit,built_at}` + `repo_url/issues_url` |
+| B11 未配置预算字段 | 已实现 | `state=unconfigured` 时返回可编辑初值；首次配置可写币种/时区 |
+| B12 契约文档漂移 | 已修正 | `docs/AGENT_API.md` / `docs/DASHBOARD_API.md` 已同步 0.3.0 现实契约 |
+| B13-B15 | 见 `docs/UI_KNOWN_ISSUES.md` 的更新段 | — |
+
+新增（本轮自动化可用性）后端行为：
+
+- 安装版 dashboard 以 `--agent-observer` 附加模式运行，不再持有 `agent.lock`，后台 watch 是唯一研究执行者；
+  `POST /api/agent/tasks` 在观察者模式返回 409 `MANUAL_RESEARCH_UNAVAILABLE_IN_BACKGROUND_MODE`，
+  `/api/agent/status` 增加 `manual_research_available`。
+- 首次成功采集后自动启用默认模拟交易策略（Paper-only，¥100,000 名义本金、最多 2 只、单票 ¥20,000、
+  批次容量 100 股、不接券商）；策略写入原 Paper 账本，只能暂停/恢复。
+- 本地研究代码更新不再永久卡死：未派发云端任务的 BLOCKED 运行会在当前时点重建 screen/plan；
+  云端 JSON 模式字段回显在边界剥离；本地模型 pin 变化仅允许在无付费调用时审计后替换。

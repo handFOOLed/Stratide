@@ -2,7 +2,7 @@
 
 # Stratide
 
-> **项目现行状态｜2026-11-05**：V2/M3 **模块 A/B/C 软件工程已合并至 `main`**：[#82 / PR #86](https://github.com/handFOOLed/Stratide/pull/86) 全市场 EOD 数据层、[#83 / PR #87](https://github.com/handFOOLed/Stratide/pull/87) 受控 TimesFM + DeepSeek 自动研究、[#84 / PR #88](https://github.com/handFOOLed/Stratide/pull/88) 多证券共享 Paper 账户与 T+1 事后模拟。**#85 / M3-PR04 已提交 Draft 开发交付（未合并）：** 可构建的 Windows 11 安装包、用户登录后台自启、单实例 Supervisor/Launcher、双击打开 Dashboard、运行诊断页、升级/卸载数据保全。安装与首启步骤见 [WINDOWS_INSTALL](docs/WINDOWS_INSTALL.md)，设计与已知限制见 [M3_PR04](docs/M3_PR04.md)、[证据](docs/evidence/m3-pr04/README.md)。**未 Ready/未合并；研究/WSL 自动链路仍未接入。** [现行状态](docs/STATUS.md) · [V2 总路线图 #81](https://github.com/handFOOLed/Stratide/issues/81)。
+> **项目现行状态｜2026-11-05**：V2/M3 **模块 A/B/C 软件工程已合并至 `main`**：[#82 / PR #86](https://github.com/handFOOLed/Stratide/pull/86) 全市场 EOD 数据层、[#83 / PR #87](https://github.com/handFOOLed/Stratide/pull/87) 受控 TimesFM + DeepSeek 自动研究、[#84 / PR #88](https://github.com/handFOOLed/Stratide/pull/88) 多证券共享 Paper 账户与 T+1 事后模拟。**#85 / M3-PR04 已提交 Draft 开发交付（未合并）：** 可构建的 Windows 11 安装包、用户登录后台自启、单实例 Supervisor/Launcher、双击打开 Dashboard、运行诊断页、升级/卸载数据保全。安装与首启步骤见 [WINDOWS_INSTALL](docs/WINDOWS_INSTALL.md)，设计与已知限制见 [M3_PR04](docs/M3_PR04.md)、[证据](docs/evidence/m3-pr04/README.md)。**未 Ready/未合并。** 2026-11-06：Dashboard 产品化改造、可编辑研究预算与安装版后台自动研究链路已修复并在隔离真实数据副本上验证（本地 TimesFM → 云端研究 → Candidate 冻结 → Paper 批次）；真实安装已更新，等待下一交易日完整 E2E。详见 [自动化可用性记录](docs/AUTOMATION_RELIABILITY.md)。 [现行状态](docs/STATUS.md) · [V2 总路线图 #81](https://github.com/handFOOLed/Stratide/issues/81)。
 
 > **不能误解的能力边界**：目前是 Paper-only，不接券商/真钱；自动模拟采用冻结 T 日意图、T+1 盘后实收日线的 `EX_POST_OPEN_ASSUMPTION`。未核验公司行为假设必须 Owner 单独批准且受原 Risk 与保守额度约束，不能当作真实成交或策略有效性。真实全市场在线采集/自动模型/Windows 安装产品尚未完成全部实机 E2E（本机沙箱无法执行快捷方式/自启/卸载注册表，见证据），84 个 READY 会话为研究暖机条件；真实数据云外发默认 DENIED，DeepSeek 内部硬预算仍是 CNY ¥5/日、¥100/月。N100 部署延期。
 
@@ -34,7 +34,7 @@ Owner 首次使用：在既有真实 CNY Agent 的 `settings.json` 手动填日/
 - **公司行为证据已合并（PR #38）：** [证据包 V1](docs/M1_PR07B.md) 保留真实公告的 `FACTS_PARTIAL / historical_pit=NOT_VERIFIED`，没有真实历史准入。
 - **现金分红模型已合并（PR #40）：** [CASH_DIVIDEND_V1](docs/M1_PR08.md) 完成隔离现金分红的登记→应收/税负→到账、统一 NAV/Risk、七报告和独立算法复算；旧 synthetic CLI、v3/68 日保持兼容。
 - **历史分红桥接已合并（PR #42）：** [历史分红桥接 V1](docs/M1_PR09.md) 将原冻结行情、PR38 证据和显式模型假设接入 v4、原 SMA5/20、七报告及独立算法/双基准；实际运行 77 会话 **EXPLORATORY_EX_POST**，真实 PIT 新增 **0 天**，真实准入继续拒绝。
-- **仍受阻：** 仅 68 个历史交易日、3 笔模拟成交，长窗口公司行为/费用证据 `DATA_BLOCKED`；真实 EOD 两日 `EOD_CONTINUITY_VERIFIED`，开盘源仍 BLOCKED，**尚无真正前向模拟成交或 NAV**。
+- **仍受阻：** 仅 68 个历史交易日、3 笔模拟成交，长窗口公司行为/费用证据 `DATA_BLOCKED`；真实 EOD 两日 `EOD_CONTINUITY_VERIFIED`，开盘源仍 BLOCKED；2026-11-05 首次真实计费研究调用因响应契约被拒绝（`outcome_uncertain`，不自动重试），修复后已在隔离副本跑到 Candidate 冻结；**尚无真正前向模拟成交或 NAV**。详见 [自动化可用性记录](docs/AUTOMATION_RELIABILITY.md)。
 - **当前顺序：** #74 交付真实历史 → 本地 TimesFM 核心闭环，单个 Draft 等待固定 HEAD 审查。后续预冻结样本外协议、积累前向 EOD；UI 在核心之后。见[当前状态](docs/STATUS.md)。
 - **PR #56 审查修复：** 新链路须显式绑定已有 Owner AgentDir/配置，与旧 Agent 共用同一费用库，不再初始化第二个预算。预算修复已获源码复审确认；原 PR52/54 三套盘后完整回归 **10+4+13 项均 exit 0**，PR #56 后续已合并，原开发证据保留；见 [R1 证据](docs/evidence/m2-pr11/r1/README.md)。
 

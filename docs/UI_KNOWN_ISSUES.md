@@ -56,3 +56,31 @@
   “不发起推理”、hash、内部版本串。全站术语见 `docs/UI_TERMINOLOGY.md`。
 - 若后续新增页面/组件，请复用 `apps/dashboard/src/lib/copy.ts` 与
   `apps/dashboard/src/lib/status.ts`，不要新造状态词。
+
+## 更新（2026-11-06）：后端实现后的已解决项与当前限制
+
+### 已解决
+
+| 原问题 | 处理 |
+| --- | --- |
+| 预算不可在页面修改（B1） | 已提供 `POST /api/agent/budget`，AI 研究页与设置页均可编辑；低于已结算+预留需二次确认 |
+| 研究失败只有英文码（B2） | 后端 `reason_text` + 前端映射；主界面不显示原始码，诊断区保留 |
+| 通知标题/结论/分类需前端 join（B5） | 后端直接返回 `name/conclusion/provider_id/kind/unread_count` |
+| “已标记完成”不可撤销（B6） | 设置页可撤销首次设置（经确认，幂等） |
+| 构建信息缺失（B10） | 关于/诊断显示 build、repo、issues |
+| Paper 永远被 `OWNER_PORTFOLIO_POLICY_REQUIRED` / `PAPER_LOCAL_INPUT_OR_LEDGER_UNAVAILABLE` 阻断 | 首次成功采集后自动启用默认 Paper 策略；模拟确认/冻结链路恢复 |
+| 安装版 dashboard 持有 agent.lock，自动研究永远无法运行 | dashboard 改为观察者模式，后台 watch 独占研究执行 |
+| 代码更新后研究永久 `SCREEN_IMPLEMENTATION_CHANGED` | 未派发云任务的阻断运行可重建 screen/plan；有云端任务时仍严格拒绝 |
+| 云端返回 JSON 模式回显 `type=json_object` 导致 `PORTFOLIO_SCHEMA` | 在解析边界剥离该传输字段并记录本地诊断；不再重试已不确定的计费调用 |
+
+### 当前限制（诚实说明）
+
+1. **观察者模式下手动新建研究不可用**：安装版由后台自动研究执行任务，按钮禁用并显示原因；
+   这是“单一研究执行者”设计，避免 dashboard 与 watch 争抢 agent.lock。
+2. **真实安装 2026-11-05 的云端研究已被拒绝**：当日上午的 billable 调用返回内容不符合契约，
+   产品按“未知结果不自动重试”保留 `outcome_uncertain`；该日不会补跑。修复后的代码在下一交易日
+   自动流程中生效（当晚在隔离数据副本中已验证 `CANDIDATE_FROZEN`）。
+3. **跨日后再补研究上一日不可行**：研究要求决策时点与 84 会话上下文同日盘后；午夜后不应补跑。
+   这是时点规则，不是缺陷。
+4. **Paper 成交需要下一交易日开盘数据确认**：冻结批次后等待 T+1 日线；首日验证只到冻结点。
+5. **默认策略自动启用是 Paper-only 的产品默认值**：不接券商、不产生真实委托；仍可在账本层暂停。

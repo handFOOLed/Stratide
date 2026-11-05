@@ -41,3 +41,18 @@
 - `docs/UI_BACKEND_REQUIREMENTS.md`：需要后端配合的事项
 - `docs/UI_KNOWN_ISSUES.md`：遗留问题
 - `docs/ui-redesign-summary.md`：按页面的改造说明
+
+## 2026-11-06 自动化与后端补充
+
+- **安装版 dashboard 观察者模式**：supervisor 启动 dashboard 时传 `--agent-observer`；dashboard 使用
+  `Agent::attach` 且不启动内置 worker，释放 `data/agent/agent.lock` 给后台 watch 的本地 TimesFM 与
+  云端 bridge。开发期直接运行 `stratided`（无该 flag）行为不变。
+- **预算编辑**：`POST /api/agent/budget` 原子写 `settings.json`（临时文件+fsync+rename+sha256 重读），
+  写 `budget_audit:<RFC3339>` 审计；不改 calls/预留；币种/时区首次后不可变；低于 committed 需确认。
+- **Paper 默认策略**：`research/paper_portfolio.py:ensure_policy()` 在首次成功采集后以最新 READY 快照的
+  5217 只沪深主板证券构建 universe、逐证券费率与 `fixed-ticket-paper-v1` 策略；幂等，已存在只读。
+- **研究健壮性**：本地失败记录异常类型/摘要并写 stderr；本地失败与 WSL/bridge 失败有 600s 冷却；
+  代码/规则更新时未派发云任务的 BLOCKED run 可重建 screen/plan；本地 TimesFM pin 变化在无 calls 时
+  审计替换；市场桥接的 parent `as_of` 用 RFC3339 解析比较，避免 Python `Z` 与 Rust `+00:00` 字符串误判；
+  云端内容若回显 `type:"json_object"` 在解析边界剥离。
+- **通知/原因/构建字段**：见 `docs/AGENT_API.md` 与 `docs/DASHBOARD_API.md` 的 0.3.0 后字段说明。
