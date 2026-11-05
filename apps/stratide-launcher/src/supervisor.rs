@@ -561,10 +561,59 @@ impl Supervisor {
         }
     }
 
+    /// The market warehouse is created and enabled automatically: the product has
+    /// no manual collection schedule, and the owner agreement already covers data
+    /// use. Idempotent, so every watch start is safe.
+    fn prepare_market(&self) -> Result<(), String> {
+        let script = self.layout.app.join("scripts").join("eod-operator.py");
+        let warehouse = self
+            .layout
+            .data
+            .join("state/historical-warehouse/market-eod/warehouse.sqlite");
+        let actions: &[&str] = if warehouse.is_file() {
+            &["enable"]
+        } else {
+            &["init", "enable"]
+        };
+        for action in actions {
+            let mut command = Command::new(self.layout.python());
+            command
+                .args(["-B", "-X", "utf8"])
+                .arg(&script)
+                .args(["market", action])
+                .current_dir(&self.layout.app)
+                .env("STRATIDE_STATE_ROOT", &self.layout.data)
+                .env("STRATIDE_BIN_DIR", self.layout.app.join("bin"))
+                .env_remove("STRATIDE_TUSHARE_TOKEN")
+                .stdin(Stdio::null());
+            let outcome =
+                stratide_runtime::run_capture(command, Duration::from_secs(60))?;
+            if outcome.0 != Some(0) {
+                let stderr: String = String::from_utf8_lossy(&outcome.2)
+                    .chars()
+                    .take(200)
+                    .collect();
+                log(
+                    &self.layout,
+                    &format!("market {action} failed code={:?}: {stderr}", outcome.0),
+                );
+                return Err("EOD_PREPARE_FAILED".into());
+            }
+        }
+        Ok(())
+    }
+
     fn start_watch(&mut self) -> Result<(), String> {
         let script = self.layout.app.join("scripts").join("eod-operator.py");
         if !script.is_file() {
             self.reason = "EOD_OPERATOR_MISSING".into();
+            return Ok(());
+        }
+        if let Err(error) = self.prepare_market() {
+            self.reason = error;
+            if let Some(watch) = self.watch.as_mut() {
+                watch.next_start = Instant::now() + Duration::from_secs(120);
+            }
             return Ok(());
         }
         let mut command = Command::new(self.layout.python());

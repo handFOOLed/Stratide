@@ -134,7 +134,6 @@ export function OverviewPage({ paper, titleRef }: { paper: PaperDataState; title
         {meta ? (
           <>
             <ModeBadge mode={meta.mode} />
-            <Badge tone="outline">只读快照</Badge>
             <span className="page-meta"><FreshnessNote loadedAt={paper.loadedAt} /></span>
           </>
         ) : null}
@@ -452,7 +451,7 @@ export function OverviewPage({ paper, titleRef }: { paper: PaperDataState; title
           <CardBody>
             <h2 className="card__title">接下来会发生什么</h2>
             <ol className="guide-steps">
-              <li><strong>每天盘后</strong>自动采集全市场行情，时间约 16:10–18:00。</li>
+              <li><strong>每天收盘后</strong>自动采集当天行情，不需要你启动。</li>
               <li><strong>数据满 84 个交易日后</strong>，本机模型与已授权的云研究才会生成候选。</li>
               <li><strong>通过风控后</strong>，才会在你的 {formatCny(account.initial_nav_fen)} 模拟账户里产生模拟成交。</li>
             </ol>

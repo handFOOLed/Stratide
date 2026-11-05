@@ -6,7 +6,7 @@ export type PageKey = (typeof PAGE_KEYS)[number];
 export const HISTORY_TABS = ['fills', 'orders', 'daily', 'strategies', 'research'] as const;
 export type HistoryTab = (typeof HISTORY_TABS)[number];
 
-export const SETTINGS_SECTIONS = ['appearance', 'ai', 'runtime', 'data', 'security', 'about'] as const;
+export const SETTINGS_SECTIONS = ['appearance', 'ai', 'runtime', 'data', 'about'] as const;
 export type SettingsSection = (typeof SETTINGS_SECTIONS)[number];
 
 export interface Route {
@@ -42,7 +42,6 @@ export const SETTINGS_SECTION_LABELS: Record<SettingsSection, string> = {
   ai: 'AI 服务',
   runtime: '运行与安装',
   data: '数据连接',
-  security: '权限与安全',
   about: '关于',
 };
 

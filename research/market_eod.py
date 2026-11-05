@@ -439,8 +439,7 @@ class Market(h.Warehouse):
                        (date, canonical(value).decode(), sha(canonical(value))))
         return value
 
-    def once(self, *, transport=None, clock=h.now, token_source="auto", fault=lambda point: None,
-             window=True):
+    def once(self, *, transport=None, clock=h.now, token_source="auto", fault=lambda point: None):
         with self.write() as db:
             config, enabled = self.config(db)
             if not enabled:
@@ -456,10 +455,6 @@ class Market(h.Warehouse):
                         pending |= previous is None or previous["state"] != "READY"
                 if not pending:
                     return dict(state="ALREADY_FROZEN", snapshot_sha256=old["snapshot_sha256"], **SAFE)
-            if window and local.time() < dt.time.fromisoformat(config["start_at"]):
-                return dict(state="WAITING_FOR_COLLECTION_WINDOW", **SAFE)
-            if window and local.time() > dt.time.fromisoformat(config["cutoff"]):
-                return dict(state="DEADLINE_REACHED", **SAFE)
             require(config["start_date"] <= today, "START_DATE_IN_FUTURE")
             if transport is None:
                 token, source = h.credential(token_source)
@@ -469,12 +464,9 @@ class Market(h.Warehouse):
             download = Download(self, db, "market-eod", config["start_date"], today, transport, source,
                                 max_calls=90, total_cap=10000, rpm=config["rpm"])
             download.session_start = local.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(dt.timezone.utc).isoformat()
-            if window:
-                download.deadline = local.replace(hour=dt.time.fromisoformat(config["cutoff"]).hour,
-                                                  minute=dt.time.fromisoformat(config["cutoff"]).minute, second=0, microsecond=0)
-            else:
-                # Historical backfill is outside the EOD window; bound the batch instead.
-                download.deadline = local + dt.timedelta(minutes=30)
+            # No fixed clock window: each run is bounded, and today's snapshot is
+            # only requested after the market has closed.
+            download.deadline = local + dt.timedelta(minutes=30)
             try:
                 calendar, cal_refs = self.calendar(db, download, today)
                 if calendar[today] == "0":
@@ -485,6 +477,12 @@ class Market(h.Warehouse):
                 for date, opened in sorted(calendar.items()):
                     if opened == "0":
                         continue
+                    if date == today:
+                        if local.time() < dt.time(15, 5):
+                            continue
+                        if old and old["state"] == "BLOCKED" and (
+                                instant(local.isoformat()) - instant(old["received_at"])) < dt.timedelta(minutes=10):
+                            continue
                     previous = self.load_snapshot(db, date)
                     if previous and previous["state"] == "READY":
                         continue
@@ -511,11 +509,10 @@ class Market(h.Warehouse):
                 return dict(state=str(error), requests_this_run=download.calls, **SAFE)
 
     def backfill(self, sessions=84, *, transport=None, clock=h.now, token_source="auto"):
-        """Collect past sessions without the EOD window gate.
+        """Collect past sessions, then continue from the latest trading day.
 
-        Only already-closed trading days are requested; today is included once the
-        cutoff has passed. Each call stays inside the normal per-run call cap, so a
-        wide range is filled across several rounds.
+        Each run stays inside the normal per-run call cap, so a wide range is
+        filled across several rounds.
         """
         require(1 <= sessions <= 250, "INVALID_BACKFILL_SESSIONS")
         with self.write() as db:
@@ -530,8 +527,7 @@ class Market(h.Warehouse):
                 with db:
                     db.execute("UPDATE market_control SET config=?,config_sha=? WHERE id=1",
                                (blob, sha(blob.encode())))
-        outcome = self.once(transport=transport, clock=clock, token_source=token_source,
-                            window=False)
+        outcome = self.once(transport=transport, clock=clock, token_source=token_source)
         report = self.report()
         return dict(outcome, target_start=floor, sessions=sessions,
                     remaining=len(report["gaps"]),

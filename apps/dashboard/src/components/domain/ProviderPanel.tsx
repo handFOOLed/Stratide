@@ -110,7 +110,7 @@ export function ProviderPanel() {
     <div className="provider-panel">
       <h2 className="card__title">AI 服务</h2>
       <p className="provider-intro">
-        连接云端研究模型。密钥只保存在 Windows 凭据管理器，不会写入文件、日志、页面源码或 Git。
+        连接云端研究模型。密钥只保存在 Windows 凭据管理器，不会写入文件、日志或页面源码。
       </p>
 
       {error ? (
@@ -200,15 +200,6 @@ export function ProviderPanel() {
               {status.model_installed ? '重新安装' : '安装'}
             </Button>
           </div>
-          <div className="provider-step">
-            <div>
-              <strong>2. 授权数据外发</strong>
-              <p className="muted">只有你明确同意后，行情摘要才会发送到该服务商；可随时撤回。</p>
-            </div>
-            <Button size="sm" variant="secondary" onClick={() => navigate({ page: 'settings', section: 'security' })}>
-              前往授权
-            </Button>
-          </div>
         </div>
       ) : null}
 
@@ -218,7 +209,7 @@ export function ProviderPanel() {
         </p>
       ) : null}
       <p className="provider-note">
-        自动研究还要求行情累计满 84 个交易日，并通过风控与预算检查；本页不提升预算、不授予交易权限。
+        研究需要行情累计满 84 个交易日；首次使用已一次性同意数据外发，本页不再询问。
       </p>
     </div>
   );

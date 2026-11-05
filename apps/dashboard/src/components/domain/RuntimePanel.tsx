@@ -288,8 +288,8 @@ export function RuntimePanel() {
             <p className="muted">{reasonText}</p>
           </div>
           <div className="install-item">
-            <div className="install-item__head"><strong>EOD watch</strong><Badge tone={supervisor?.watch ? 'success' : 'warning'}>{supervisor?.watch ? '运行中' : '未运行'}</Badge></div>
-            <p className="muted">按 Asia/Shanghai 交易日，盘后 16:10–18:00 自动采集。</p>
+            <div className="install-item__head"><strong>EOD watch</strong><Badge tone={backfillRunning ? 'warning' : supervisor?.watch ? 'success' : 'warning'}>{backfillRunning ? '补录中' : supervisor?.watch ? '运行中' : '未运行'}</Badge></div>
+            <p className="muted">{backfillRunning ? '历史补录占用数据仓，结束后自动恢复。' : '按 Asia/Shanghai 交易日，收盘后自动采集。'}</p>
           </div>
           <div className="install-item install-item--wide">
             <div className="install-item__head"><strong>版本</strong><span className="mono">v{status?.product_version ?? '—'}</span></div>
@@ -343,9 +343,6 @@ export function RuntimePanel() {
             );
           })}
         </div>
-        <Callout tone="info" title="已存在的 Owner 设置仍是权威">
-          DeepSeek 预算（¥5/日、¥100/月）、研究自动开关与真实行情外发授权，继续在“设置 → 权限与安全”的既有 Owner 流程中维护；此安装页不提升预算、不授予外发、不写入 Paper 本金或风险限额。
-        </Callout>
       </section>
 
       <section className="install-section">
@@ -478,49 +475,14 @@ export function RuntimePanel() {
 
           <div className="install-setup__row">
             <div>
-              <strong>EOD 行情采集</strong>
-              <p className="muted">首次初始化不会立即拉取行情；启用后按上海交易日 16:10–18:00 窗口复用原 {status?.dependencies.market_eod.state === 'INITIALIZED' ? '已初始化' : '未初始化'} 数据仓库。</p>
+              <strong>行情采集</strong>
+              <p className="muted">
+                自动运行。启动时检测最新交易日，收盘后采集；已初始化 {status?.dependencies.market_eod.state === 'INITIALIZED' ? '的数据仓库' : '状态读取中'}。
+              </p>
             </div>
-            <div className="install-token-row">
-              <Field label="起始日期" htmlFor="runtime-start-date" hint="YYYYMMDD；不早于 16:00 的正式起点。">
-                <TextInput
-                  id="runtime-start-date"
-                  value={startDate}
-                  inputMode="numeric"
-                  maxLength={8}
-                  disabled={!token || status?.dependencies.market_eod.state === 'INITIALIZED'}
-                  onChange={(event) => setStartDate(event.target.value.replace(/\D/g, '').slice(0, 8))}
-                />
-              </Field>
-              <Button
-                variant="secondary"
-                disabled={!token || startDate.length !== 8 || busy !== null || status?.dependencies.market_eod.state === 'INITIALIZED'}
-                loading={busy === 'init'}
-                onClick={() => act('init', 'market', { action: 'init', start_date: startDate }, 'EOD 数据仓库已初始化')}
-              >
-                初始化
-              </Button>
-            </div>
-            <div className="install-actions">
-              <Button
-                size="sm"
-                variant="primary"
-                disabled={!token || busy !== null || status?.dependencies.market_eod.state !== 'INITIALIZED'}
-                loading={busy === 'enable'}
-                onClick={() => act('enable', 'market', { action: 'enable' }, 'EOD 采集已启用')}
-              >
-                启用采集
-              </Button>
-              <Button
-                size="sm"
-                variant="danger"
-                disabled={!token || busy !== null || status?.dependencies.market_eod.state !== 'INITIALIZED'}
-                loading={busy === 'disable'}
-                onClick={() => act('disable', 'market', { action: 'disable' }, 'EOD 采集已停用')}
-              >
-                安全停用采集
-              </Button>
-            </div>
+            <Badge tone={status?.dependencies.market_eod.state === 'INITIALIZED' ? 'success' : 'warning'}>
+              {status?.dependencies.market_eod.state === 'INITIALIZED' ? '自动' : '等待初始化'}
+            </Badge>
           </div>
 
           <div className="install-setup__row">

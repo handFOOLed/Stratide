@@ -18,7 +18,6 @@ import { TechnicalDetails } from '../components/domain/WorkspaceStudies';
 import type { WorkspaceState } from '../lib/workspace';
 import type { AgentState } from '../state/useAgent';
 import { formatMicro } from '../lib/format';
-import { MarketResearchPanel } from '../components/domain/MarketResearchPanel';
 import { ProviderPanel } from '../components/domain/ProviderPanel';
 import { RuntimePanel } from '../components/domain/RuntimePanel';
 
@@ -27,7 +26,6 @@ const SECTION_ICONS: Record<SettingsSection, IconName> = {
   ai: 'key',
   runtime: 'server',
   data: 'database',
-  security: 'shield',
   about: 'info',
 };
 
@@ -240,32 +238,6 @@ export function SettingsPage({
               code={paper.error?.code}
             />
           )}
-        </CardBody>
-      );
-    }
-
-    if (section === 'security') {
-      return (
-        <CardBody className="security-card">
-          <MarketResearchPanel token={agent.token} />
-          <div className="security-list">
-            <SecurityRow icon="shield" title="Paper 模式">
-              只读报告快照，未连接券商或实盘账户。
-            </SecurityRow>
-            <SecurityRow icon="key" title="仅本机访问">
-              服务只监听 127.0.0.1，并校验同源请求；不向任何远端开放。
-            </SecurityRow>
-            <SecurityRow icon="database" title="可信本机配置">
-              模型、费率、预算和云授权由本机维护；Web 不提供加额、清锁或密钥读取。
-            </SecurityRow>
-            <SecurityRow icon="server" title="通知审批">
-              {health.error ? '本地服务状态不可读。' : health.data!==null && health.data.notifications==='local_persistent_inbox'?'本机持久通知与研究审批可用；审批不提升预算、云外发或交易权限。':'尚未配置 Agent 控制服务；在本机启动时指定原 Agent 目录。'}
-            </SecurityRow>
-            <SecurityRow icon="database" title="Provider 与共享预算">
-              {agent.status===null?'解锁 Agent 管理后查看原 Provider 与预算。':`日上限 ${formatMicro(agent.status.budget.daily_limit_micro,{currency:agent.status.budget.currency})}，月上限 ${formatMicro(agent.status.budget.monthly_limit_micro,{currency:agent.status.budget.currency})}。实际账单可能不同于估算。`}
-              真实行情、TimesFM 风险及派生摘要默认拒绝外发；须在上方明确授权字段与范围。
-            </SecurityRow>
-          </div>
         </CardBody>
       );
     }

@@ -75,6 +75,12 @@ pub fn reply(app: &App, agent: Option<&Agent>, req: &mut Request, port: u16) -> 
     };
     let now = chrono::Utc::now();
     let result: stratide_research::Result<Value> = (|| {
+        if method == "GET" && path == "/api/agent/consent" {
+            return stratide_research::consent::status(agent);
+        }
+        if method == "POST" && path == "/api/agent/consent" && body == json!({}) {
+            return stratide_research::consent::accept(agent);
+        }
         if method == "GET" && path == "/api/agent/market-research" {
             return stratide_research::market_research::status(agent);
         }

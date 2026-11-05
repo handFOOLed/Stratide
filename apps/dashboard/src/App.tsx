@@ -6,6 +6,7 @@ import { HistoryPage } from './pages/HistoryPage';
 import { AgentPage } from './pages/AgentPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { AgreementPage } from './pages/AgreementPage';
 import { navigate, useRoute, PAGE_LABELS } from './lib/route';
 import type { HistoryTab, SettingsSection } from './lib/route';
 import { usePageScrollReset, usePageTitle } from './lib/hooks';
@@ -14,9 +15,18 @@ import { useHealth } from './state/useHealth';
 import { useResearch } from './state/useResearch';
 import { useAgent } from './state/useAgent';
 import { useWorkspace } from './lib/workspace';
+import { readConsent } from './lib/consent';
+import type { ConsentState } from './lib/consent';
+import { useEffect as useEffectConsent, useState } from 'react';
 
 export function App() {
   const route = useRoute();
+  const [consent, setConsent] = useState<ConsentState | null>(null);
+  useEffectConsent(() => {
+    readConsent()
+      .then(setConsent)
+      .catch(() => setConsent(null));
+  }, []);
   const paper = usePaperData('selected_report');
   const current = usePaperData('current');
   const health = useHealth();
@@ -92,6 +102,13 @@ export function App() {
     default:
       page = <OverviewPage paper={current} titleRef={titleRef} />;
       break;
+  }
+
+  if (consent === null) {
+    return <div className="agreement agreement--loading" role="status">正在读取本机设置…</div>;
+  }
+  if (consent.required) {
+    return <AgreementPage />;
   }
 
   return (

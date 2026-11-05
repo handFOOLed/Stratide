@@ -1,5 +1,97 @@
 /* Page compositions. Shared primitives live in components.css. */
 
+/* ---------- First-launch agreement ---------- */
+.agreement {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 40px 24px;
+  background: var(--page-bg);
+}
+
+.agreement--loading {
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+.agreement__card {
+  width: min(760px, 100%);
+  max-height: calc(100dvh - 80px);
+  overflow-y: auto;
+  padding: 40px 44px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: 0 24px 60px rgba(15, 18, 25, 0.12);
+}
+
+.agreement__eyebrow {
+  margin: 0 0 10px;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+}
+
+.agreement__title {
+  margin: 0 0 10px;
+  font-size: 30px;
+  letter-spacing: -0.03em;
+}
+
+.agreement__lead {
+  margin: 0 0 26px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.agreement__sections {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.agreement__sections h2 {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
+
+.agreement__sections p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  line-height: 1.7;
+}
+
+.agreement__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--divider);
+}
+
+.agreement__hint {
+  color: var(--text-faint);
+  font-size: 12.5px;
+}
+
+@media (max-width: 720px) {
+  .agreement__card {
+    padding: 28px 22px;
+  }
+
+  .agreement__title {
+    font-size: 24px;
+  }
+
+  .agreement__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 /* ---------- Overview: one desktop screen, two tiers ---------- */
 /* Tier 1: risk | account assets | equity curve. Tier 2: positions | recent fills. */
 .overview-page {

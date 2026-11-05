@@ -34,7 +34,6 @@ import {
 import type { AgentCall, AgentModel, AgentStatus, AgentTask, AgentTaskDetail } from '../lib/types';
 import type { AgentState } from '../state/useAgent';
 import { formatDay } from '../lib/format';
-import { ResearchOperations } from '../components/domain/ResearchOperations';
 import { humanReason } from '../lib/api';
 import { ModeBadge } from '../components/domain/Badges';
 import { stateLabel } from '../lib/workspace';
@@ -173,14 +172,14 @@ export function AgentPage({ agent, workspace, titleRef }: { agent: AgentState; w
               title="研究运行状态"
               actions={
                 <Badge tone={status.paused ? 'warning' : runningTasks ? 'accent' : 'neutral'}>
-                  {status.paused ? '已优雅暂停' : runningTasks ? '研究中 ' + String(runningTasks) : '等待执行'}
+                  {status.paused ? '已暂停' : runningTasks ? '研究中 ' + String(runningTasks) : '等待执行'}
                 </Badge>
               }
             />
             <CardBody>
               <div className="runtime-head">
                 <div>
-                  <h3 className="runtime-title">{status.paused ? '已暂停接收新任务' : '等待或执行已授权研究'}</h3>
+                  <h3 className="runtime-title">{status.paused ? '已暂停接收新任务' : '等待研究任务'}</h3>
                   <p className="runtime-desc">
                     {status.paused
                       ? '暂停接收新任务，已提交的调用可完成。'
@@ -195,10 +194,10 @@ export function AgentPage({ agent, workspace, titleRef }: { agent: AgentState; w
                     onClick={async () => {
                       const error = await agent.control({ action: status.paused ? 'resume' : 'pause' });
                       if (error) toast.push({ title: '操作失败', description: error.message, tone: 'danger' });
-                      else toast.push({ title: status.paused ? '已恢复研究' : '已优雅暂停研究', tone: 'success' });
+                      else toast.push({ title: status.paused ? '已恢复研究' : '已暂停研究', tone: 'success' });
                     }}
                   >
-                    {status.paused ? '恢复研究' : '优雅暂停'}
+                    {status.paused ? '恢复研究' : '暂停'}
                   </Button>
                 </div>
               </div>
@@ -272,7 +271,6 @@ export function AgentPage({ agent, workspace, titleRef }: { agent: AgentState; w
         </div>
       </div>
 
-      {agent.token !== null ? <ResearchOperations token={agent.token}/> : null}
       <WorkspaceStudies workspace={workspace}/>
       <TaskDrawer agent={agent} status={status} />
 
@@ -378,7 +376,7 @@ function ModelsCard({ status, agent }: { status: AgentStatus; agent: AgentState 
       <CardHead
         title="模型与自动研究"
         subtitle="模型选择仅影响新任务"
-        actions={<Badge tone="outline">{status.automatic_fallback.startsWith('disabled') ? '自动 fallback 关闭' : '备用仅保存'}</Badge>}
+        actions={<Badge tone="outline">{status.automatic_fallback.startsWith('disabled') ? '备用模型仅保存' : '备用仅保存'}</Badge>}
       />
       <CardBody>
         <div className="model-config-grid">
@@ -401,7 +399,7 @@ function ModelsCard({ status, agent }: { status: AgentStatus; agent: AgentState 
               ))}
             </Select>
           </Field>
-          <Field label="备用配置" htmlFor="agent-backup-model" hint="仅保存，不自动 fallback；不可用时明确失败。">
+          <Field label="备用配置" htmlFor="agent-backup-model" hint="只在手动切换时使用。">
             <Select
               id="agent-backup-model"
               value={status.backup_model ?? ''}
@@ -426,13 +424,7 @@ function ModelsCard({ status, agent }: { status: AgentStatus; agent: AgentState 
             {selected ? (
               <div className="model-selected__body">
                 <span className="model-selected__name">{selected.label}</span>
-                <div className="inline-row inline-row--tight">
-                  <Badge tone={selected.verification === 'FAKE_SYNTHETIC_ONLY' ? 'warning' : 'warning'}>
-                    {VERIFICATION_LABELS[selected.verification] ?? selected.verification}
-                  </Badge>
-                  <AvailabilityBadge availability={selected.availability} />
-                </div>
-                <span className="model-selected__meta" title={selected.authorization}>{selected.kind==='fake'?'本地合成':'云 API'} · {selected.model} · {selected.authorization==='authorized'?'原授权有效':'授权受阻，查看技术原因'}</span>
+                <span className="model-selected__meta">{selected.kind==='fake'?'本地合成':'云 API'} · {selected.model}</span>
                 {selected.last_reason ? (
                   <span className="model-selected__meta">最近 Provider 观察：{selected.last_reason}</span>
                 ) : null}
@@ -455,9 +447,6 @@ function ModelsCard({ status, agent }: { status: AgentStatus; agent: AgentState 
                 <tr>
                   <th>配置</th>
                   <th>类型 / 模型</th>
-                  <th>授权</th>
-                  <th>可用性</th>
-                  <th>核验</th>
                   <th>费率版本</th>
                 </tr>
               </thead>
@@ -466,12 +455,6 @@ function ModelsCard({ status, agent }: { status: AgentStatus; agent: AgentState 
                   <tr key={model.id}>
                     <td><span className="cell-title">{model.label}</span><span className="cell-sub">{model.id}</span></td>
                     <td><span className="cell-sub">{model.kind==='fake'?'本地合成':'云 API'}</span><span className="cell-mono">{model.model}</span></td>
-                    <td title={model.authorization}>{model.authorization==='authorized'?'原授权有效':'授权受阻'}</td>
-                    <td>
-                      <AvailabilityBadge availability={model.availability} />
-                      {model.last_reason ? <span className="cell-sub" title={model.last_reason}>{humanReason(model.last_reason)}</span> : null}
-                    </td>
-                    <td><Badge tone="neutral" title={model.verification}>{VERIFICATION_LABELS[model.verification] ?? '待核验'}</Badge></td>
                     <td className="cell-mono">{model.price_version}</td>
                   </tr>
                 ))}
