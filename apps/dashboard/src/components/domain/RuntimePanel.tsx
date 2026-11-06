@@ -88,15 +88,16 @@ const ACTION_REASONS: Record<string, string> = {
   LAUNCHER_MISSING: '缺少启动程序，请重新安装 Stratide',
   WSL_PATH_INVALID: 'WSL 路径格式不正确',
   WSL_DETECT_FAILED: '自动检测未完成，请重试',
-  WSL_PROBE_FAILED: '本地预测引擎检测未完成，请重试',
-  UPDATE_CHECK_MISSING: '缺少检查更新组件，请重新安装 Stratide',
-  FOLDER_OPEN_FAILED: '无法打开文件夹，请稍后重试',
-  PYTHON_RUNTIME_MISSING: '缺少 Python 运行时，请重新安装 Stratide',
-  CREDENTIAL_HELPER_MISSING: '缺少凭据保存组件，请重新安装 Stratide',
+  WSL_PROBE_FAILED: '本地预测引擎检测未完成',
+  WSL_PROBE_PERSIST_FAILED: '本地预测引擎检查结果未能保存，请重试',
   WSL_NOT_CONFIGURED: '尚未配置本地预测引擎，请先填写并保存设置',
   WSL_DETECT_OUTPUT_INVALID: '自动检测返回了无法识别的内容，请手动填写',
   TIMESFM_CLI_MISSING: '安装包缺少本地预测组件，请重新安装 Stratide',
   RUNTIME_CONFIG_INVALID: '运行配置无效，请检查安装',
+  UPDATE_CHECK_MISSING: '缺少检查更新组件，请重新安装 Stratide',
+  FOLDER_OPEN_FAILED: '无法打开文件夹，请稍后重试',
+  PYTHON_RUNTIME_MISSING: '缺少 Python 运行时，请重新安装 Stratide',
+  CREDENTIAL_HELPER_MISSING: '缺少凭据保存组件，请重新安装 Stratide',
 };
 
 interface UpdateCheckResult {

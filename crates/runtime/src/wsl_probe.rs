@@ -115,4 +115,26 @@ mod tests {
         assert!(matching(&layout, &wsl).is_some());
         assert!(matching(&layout, &changed).is_none());
     }
+
+    #[test]
+    fn write_to_read_only_parent_fails_without_panic() {
+        let tmp = tempfile::tempdir().unwrap();
+        let layout = layout(tmp.path());
+        let wsl = WslSettings {
+            distribution: "Ubuntu-24.04".into(),
+            workspace: "/home/stratide".into(),
+            python: None,
+            model: None,
+        };
+        let record = WslProbeRecord::new(&wsl, "READY", None);
+        std::fs::write(layout.data.join("state"), b"").unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mut perms = std::fs::metadata(layout.data.join("state")).unwrap().permissions();
+            perms.set_mode(0o500);
+            std::fs::set_permissions(layout.data.join("state"), perms).unwrap();
+        }
+        assert!(write(&layout, record).is_err());
+    }
 }

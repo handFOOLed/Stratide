@@ -7,10 +7,19 @@ use std::process::Command;
 pub const REPO_URL: &str = "https://github.com/handFOOLed/Stratide";
 pub const ISSUES_URL: &str = "https://github.com/handFOOLed/Stratide/issues";
 
+fn diagnostics_test_delay() {
+    if let Ok(raw) = std::env::var("STRATIDE_DIAGNOSTICS_SLEEP_MS") {
+        if let Ok(millis) = raw.parse::<u64>() {
+            std::thread::sleep(std::time::Duration::from_millis(millis));
+        }
+    }
+}
+
 /// `service` is supplied by the process answering this read-only request.
 /// Probing our own single-threaded port from inside a handler would block and
 /// report a healthy service as unavailable.
 pub fn collect(layout: &Layout, service: Value) -> Result<Value, &'static str> {
+    diagnostics_test_delay();
     let config = layout.config();
     let config_error = config.as_ref().err().cloned();
     let state = crate::state::SupervisorState::read(&layout.state_path());
@@ -63,6 +72,111 @@ pub fn collect(layout: &Layout, service: Value) -> Result<Value, &'static str> {
         },
         "log_tail": crate::log::tail(&layout.supervisor_log(), 25),
     }))
+}
+
+/// Fast status snapshot without subprocess helpers. Used when the HTTP handler
+/// must not block `/api/health` on cold cache; full probes refresh in background.
+pub fn collect_light(layout: &Layout, service: Value) -> Result<Value, &'static str> {
+    let config = layout.config();
+    let config_error = config.as_ref().err().cloned();
+    let state = crate::state::SupervisorState::read(&layout.state_path());
+    let autostart = crate::autostart::status();
+    let configured_wsl = config.as_ref().ok().and_then(|config| config.wsl.as_ref());
+    let wsl = wsl_status_light(configured_wsl);
+    let setup_complete = layout.runtime.join("setup-complete").is_file();
+    let supervisor_running = state
+        .as_ref()
+        .is_some_and(|state| state.status != "STOPPED" && state.status != "FAILED");
+    Ok(json!({
+        "managed": true,
+        "product_version": layout.version,
+        "repo_url": REPO_URL,
+        "issues_url": ISSUES_URL,
+        "build": build_info(layout)?,
+        "home": layout.home.to_string_lossy(),
+        "app_dir": layout.app.to_string_lossy(),
+        "data_root": layout.data.to_string_lossy(),
+        "logs_dir": layout.logs.to_string_lossy(),
+        "port": config.as_ref().map(|config| config.port).unwrap_or(0),
+        "config_error": config_error,
+        "setup_complete": setup_complete,
+        "autostart": autostart,
+        "supervisor": {
+            "running": supervisor_running,
+            "status": state.as_ref().map(|state| state.status.clone()).unwrap_or_else(|| "NOT_STARTED".into()),
+            "reason": state.as_ref().map(|state| state.reason.clone()).unwrap_or_default(),
+            "pid": state.as_ref().map(|state| state.supervisor_pid).unwrap_or(0),
+            "instance_id": state.as_ref().map(|state| state.instance_id.clone()).unwrap_or_default(),
+            "started_at": state.as_ref().map(|state| state.started_at.clone()).unwrap_or_default(),
+            "updated_at": state.as_ref().map(|state| state.updated_at.clone()).unwrap_or_default(),
+            "dashboard": state.as_ref().and_then(|state| state.dashboard.clone()),
+            "watch": state.as_ref().and_then(|state| state.watch.clone()),
+        },
+        "service": service,
+        "dependencies": {
+            "python": python_status_light(layout),
+            "wsl": wsl,
+            "timesfm": timesfm_status(layout, &wsl, configured_wsl),
+            "tushare_credential": credential_status_light(layout),
+            "market_eod": market_status(layout),
+            "paper_account": paper_status(layout),
+            "agent": agent_status(layout),
+        },
+        "log_tail": crate::log::tail(&layout.supervisor_log(), 25),
+        "status_refresh": "light",
+    }))
+}
+
+fn python_status_light(layout: &Layout) -> Value {
+    let path = layout.python();
+    if !path.is_file() {
+        return json!({"state":"MISSING","path":path.to_string_lossy(),"reason":"BUNDLED_PYTHON_MISSING"});
+    }
+    json!({
+        "state":"READY",
+        "path":path.to_string_lossy(),
+        "version":Value::Null,
+        "note":"完整 Python 自检在后台刷新中进行。",
+    })
+}
+
+fn wsl_status_light(configured: Option<&crate::WslSettings>) -> Value {
+    let mut value = if configured.is_some() {
+        json!({"state":"READY","configured": true})
+    } else {
+        json!({"state":"UNAVAILABLE","configured": false, "reason":"TIMESFM_CPU_REQUIRES_THE_EXISTING_LINUX_WORKSPACE_ISOLATION"})
+    };
+    if let Some(object) = value.as_object_mut() {
+        object.insert(
+            "distribution".into(),
+            json!(configured.map(|settings| settings.distribution.as_str())),
+        );
+        object.insert(
+            "workspace".into(),
+            json!(configured.map(|settings| settings.workspace.as_str())),
+        );
+        object.insert(
+            "python".into(),
+            json!(configured.map(|settings| settings.python_path())),
+        );
+        object.insert(
+            "model".into(),
+            json!(configured.map(|settings| settings.model_path())),
+        );
+    }
+    value
+}
+
+fn credential_status_light(layout: &Layout) -> Value {
+    let helper = layout.app.join("scripts").join("stratide-credential.py");
+    if !helper.is_file() {
+        return json!({"state":"UNKNOWN","reason":"CREDENTIAL_HELPER_MISSING"});
+    }
+    json!({
+        "state":"UNKNOWN",
+        "reason":"CREDENTIAL_CHECK_DEFERRED",
+        "note":"凭据检查在后台刷新中进行。",
+    })
 }
 
 /// Installer metadata lives next to the executables. Source-tree runs have no

@@ -2,6 +2,7 @@ pub mod agent_api;
 pub mod desktop;
 pub mod paper_view;
 pub mod runtime_api;
+pub mod runtime_status_cache;
 pub mod snapshot;
 
 use serde_json::{json, Value};

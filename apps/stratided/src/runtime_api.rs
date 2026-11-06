@@ -5,70 +5,43 @@
 //! never sent to any remote service). Financial, budget and egress authority
 //! stay with the existing Owner flows and are not modified here.
 use crate::{App, Reply};
+use crate::runtime_status_cache::{self, SERVE_MAX_AGE};
 use serde_json::{json, Value};
 use std::process::Command;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 use stratide_runtime::Layout;
 use tiny_http::Request;
 
-struct StatusCacheState {
-    value: Value,
-    built_at: Instant,
-}
+/// Serialize dependency-changing runtime POST handlers (config, probe, market, …).
+static RUNTIME_WRITE: Mutex<()> = Mutex::new(());
 
-static STATUS_CACHE: Mutex<Option<StatusCacheState>> = Mutex::new(None);
-static STATUS_REFRESHING: AtomicBool = AtomicBool::new(false);
-
-const STATUS_STALE_AFTER: Duration = Duration::from_secs(4);
-const STATUS_SERVE_MAX_AGE: Duration = Duration::from_secs(120);
-
-fn collect_status(app: &App, layout: &Layout) -> Result<Value, &'static str> {
+fn collect_status_light(app: &App, layout: &Layout) -> Result<Value, &'static str> {
     let service = json!({"healthy": true, "instance_id": app.instance_id(),
         "pid": std::process::id().to_string()});
-    stratide_runtime::diagnostics::collect(layout, service)
-}
-
-fn store_status_cache(value: Value) {
-    if let Ok(mut cache) = STATUS_CACHE.lock() {
-        *cache = Some(StatusCacheState {
-            value,
-            built_at: Instant::now(),
-        });
-    }
+    stratide_runtime::diagnostics::collect_light(layout, service)
 }
 
 fn schedule_status_refresh(app: &App, layout: &Layout) {
-    let stale = STATUS_CACHE
-        .lock()
-        .ok()
-        .and_then(|cache| cache.as_ref().map(|entry| entry.built_at.elapsed() > STATUS_STALE_AFTER))
-        .unwrap_or(true);
-    if !stale {
-        return;
-    }
-    if STATUS_REFRESHING
-        .compare_exchange(false, true, Ordering::Acquire, Ordering::Relaxed)
-        .is_err()
-    {
+    if !runtime_status_cache::try_begin_background_refresh() {
         return;
     }
     let layout = layout.clone();
     let instance_id = app.instance_id().to_string();
     let pid = std::process::id();
+    let captured_epoch = runtime_status_cache::epoch();
     std::thread::spawn(move || {
         let service = json!({"healthy": true, "instance_id": instance_id, "pid": pid.to_string()});
         if let Ok(value) = stratide_runtime::diagnostics::collect(&layout, service) {
-            store_status_cache(value);
+            runtime_status_cache::publish_if_current(value, captured_epoch);
         }
-        STATUS_REFRESHING.store(false, Ordering::Release);
+        runtime_status_cache::end_background_refresh();
     });
 }
 
-fn refresh_status_cache_sync(app: &App, layout: &Layout) -> Result<(), &'static str> {
-    let value = collect_status(app, layout)?;
-    store_status_cache(value);
+fn publish_light_snapshot(app: &App, layout: &Layout) -> Result<(), Reply> {
+    let value = collect_status_light(app, layout).map_err(|code| layout_error(503, code))?;
+    runtime_status_cache::publish(value);
     Ok(())
 }
 
@@ -142,6 +115,20 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
         Ok(value) => value,
         Err(_) => return error(400, "JSON_INVALID"),
     };
+    let _mutation = RUNTIME_WRITE
+        .lock()
+        .map_err(|_| error(503, "RUNTIME_WRITE_BUSY"))?;
+    runtime_status_cache::bump_epoch();
+    let affects_status = matches!(
+        path.as_str(),
+        "/api/runtime/wsl"
+            | "/api/runtime/wsl-detect"
+            | "/api/runtime/wsl-probe"
+            | "/api/runtime/tushare-token"
+            | "/api/runtime/market"
+            | "/api/runtime/setup-complete"
+            | "/api/runtime/autostart"
+    );
     let result = (|| -> Result<Reply, Reply> {
         match path.as_str() {
             "/api/runtime/autostart" => autostart(app, &layout, &body),
@@ -149,7 +136,7 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
             "/api/runtime/market" => market(&layout, &body),
             "/api/runtime/wsl" => configure_wsl(&layout, &body),
             "/api/runtime/wsl-detect" => detect_wsl(&layout),
-            "/api/runtime/wsl-probe" => probe_wsl(&layout),
+            "/api/runtime/wsl-probe" => probe_wsl(app, &layout),
             "/api/runtime/open-folder" => open_folder(&layout, &body),
             "/api/runtime/setup-complete" => setup_complete(&layout, &body),
             "/api/runtime/update-check" => update_check(&layout),
@@ -161,21 +148,10 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
             _ => Err(error(404, "RUNTIME_ROUTE_NOT_FOUND")),
         }
     })();
-    if result.is_ok() {
-        match path.as_str() {
-            "/api/runtime/wsl"
-            | "/api/runtime/wsl-detect"
-            | "/api/runtime/wsl-probe"
-            | "/api/runtime/tushare-token"
-            | "/api/runtime/market"
-            | "/api/runtime/setup-complete"
-            | "/api/runtime/autostart" => {
-                let _ = refresh_status_cache_sync(app, &layout);
-            }
-            _ => invalidate(),
-        }
-    } else {
-        invalidate();
+    if result.is_ok() && affects_status {
+        schedule_status_refresh(app, &layout);
+    } else if result.is_err() {
+        runtime_status_cache::invalidate_cache();
     }
     match result {
         Ok(reply) => reply,
@@ -184,29 +160,18 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
 }
 
 fn status(app: &App, layout: &Layout) -> Result<Value, &'static str> {
-    if let Ok(cache) = STATUS_CACHE.lock() {
-        if let Some(entry) = cache.as_ref() {
-            if entry.built_at.elapsed() <= STATUS_SERVE_MAX_AGE {
-                let value = entry.value.clone();
-                drop(cache);
-                schedule_status_refresh(app, layout);
-                return Ok(value);
-            }
-        }
+    if let Some(value) = runtime_status_cache::cached_value(SERVE_MAX_AGE) {
+        schedule_status_refresh(app, layout);
+        return Ok(value);
     }
-    refresh_status_cache_sync(app, layout)?;
-    STATUS_CACHE
-        .lock()
-        .map_err(|_| "RUNTIME_STATUS_BUSY")?
-        .as_ref()
-        .map(|entry| entry.value.clone())
-        .ok_or("RUNTIME_STATUS_EMPTY")
+    let light = collect_status_light(app, layout)?;
+    runtime_status_cache::publish(light.clone());
+    schedule_status_refresh(app, layout);
+    Ok(light)
 }
 
 fn invalidate() {
-    if let Ok(mut cache) = STATUS_CACHE.lock() {
-        *cache = None;
-    }
+    runtime_status_cache::invalidate_cache();
 }
 
 fn autostart(app: &App, layout: &Layout, body: &Value) -> Result<Reply, Reply> {
@@ -516,7 +481,7 @@ fn detect_wsl(layout: &Layout) -> Result<Reply, Reply> {
     ))
 }
 
-fn probe_wsl(layout: &Layout) -> Result<Reply, Reply> {
+fn probe_wsl(app: &App, layout: &Layout) -> Result<Reply, Reply> {
     let config = layout
         .config()
         .map_err(|_| layout_error(409, "RUNTIME_CONFIG_INVALID"))?;
@@ -566,13 +531,17 @@ fn probe_wsl(layout: &Layout) -> Result<Reply, Reply> {
         if ready { "READY" } else { "BLOCKED" },
         reason.clone(),
     );
-    let _ = stratide_runtime::wsl_probe::write(layout, record);
+    stratide_runtime::wsl_probe::write(layout, record).map_err(|_| {
+        layout_error(409, "WSL_PROBE_PERSIST_FAILED")
+    })?;
+    publish_light_snapshot(app, layout)?;
     Ok(layout_envelope(
         200,
         json!({
             "state": if ready { "READY" } else { "BLOCKED" },
             "reason": if ready { Value::Null } else { json!(reason) },
             "probe": value,
+            "persisted": true,
         }),
     ))
 }

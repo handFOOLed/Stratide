@@ -139,8 +139,23 @@ fn run() -> Result<(), String> {
         "Stratide Paper Dashboard: http://127.0.0.1:{}\nPaper 账户只读；研究控制需本机 Owner 令牌。Ctrl+C 停止。",
         config.port
     );
+    let app = std::sync::Arc::new(app);
+    let assets = std::sync::Arc::new(assets);
+    let agent = agent.map(std::sync::Arc::new);
     for req in server.incoming_requests() {
-        handle_with_agent(&app, &assets, req, config.port, agent.as_ref());
+        let app = std::sync::Arc::clone(&app);
+        let assets = std::sync::Arc::clone(&assets);
+        let agent = agent.as_ref().map(std::sync::Arc::clone);
+        let port = config.port;
+        std::thread::spawn(move || {
+            handle_with_agent(
+                &app,
+                &assets,
+                req,
+                port,
+                agent.as_deref(),
+            );
+        });
     }
     Ok(())
 }

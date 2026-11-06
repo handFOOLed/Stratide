@@ -92,6 +92,7 @@ const REASON_TEXT: Record<string, string> = {
   UPDATE_CHECK_FAILED: '检查更新失败',
   WSL_DETECT_FAILED: '自动检测未完成',
   WSL_PROBE_FAILED: '本地预测引擎检测未完成',
+  WSL_PROBE_PERSIST_FAILED: '本地预测引擎检查结果未能保存，请重试',
   WSL_PROBE_REQUIRED: '需要先检测本地预测引擎',
   TIMESFM_WSL_NOT_CONFIGURED: '尚未配置本地预测引擎',
   TIMESFM_WSL_CONFIG_INCOMPLETE: '本地预测引擎配置不完整',
