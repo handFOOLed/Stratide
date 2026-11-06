@@ -537,11 +537,12 @@ impl DetectContext {
     pub(crate) fn capture(layout: &Layout) -> Self {
         Self {
             epoch_at_start: runtime_status_cache::epoch(),
-            config_fingerprint_at_start: layout
-                .config()
-                .ok()
-                .and_then(|config| config.wsl.as_ref())
-                .map(|wsl| stratide_runtime::wsl_probe::fingerprint(wsl)),
+            config_fingerprint_at_start: layout.config().ok().and_then(|config| {
+                config
+                    .wsl
+                    .as_ref()
+                    .map(|wsl| stratide_runtime::wsl_probe::fingerprint(wsl))
+            }),
         }
     }
 }
@@ -550,11 +551,12 @@ pub(crate) fn detect_commit_allowed(layout: &Layout, context: &DetectContext) ->
     if runtime_status_cache::epoch() != context.epoch_at_start {
         return false;
     }
-    let current = layout
-        .config()
-        .ok()
-        .and_then(|config| config.wsl.as_ref())
-        .map(|wsl| stratide_runtime::wsl_probe::fingerprint(wsl));
+    let current = layout.config().ok().and_then(|config| {
+        config
+            .wsl
+            .as_ref()
+            .map(|wsl| stratide_runtime::wsl_probe::fingerprint(wsl))
+    });
     current == context.config_fingerprint_at_start
 }
 
