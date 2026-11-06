@@ -93,7 +93,7 @@ pub fn fingerprint_matches_layout(layout: &Layout, expected: &str) -> bool {
     let Some(wsl) = config.wsl else {
         return false;
     };
-    fingerprint(wsl) == expected
+    fingerprint(&wsl) == expected
 }
 
 pub fn matching(layout: &Layout, wsl: &WslSettings) -> Option<WslProbeRecord> {
