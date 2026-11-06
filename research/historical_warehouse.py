@@ -429,23 +429,29 @@ class Warehouse:
 
         A killed writer can leave a non-empty WAL. Readonly status then refuses
         the file (WRITER_ACTIVE_OR_RECOVERY_REQUIRED) instead of reading a stale
-        main database, and the dashboard has nothing to show. This does not read
-        that snapshot: it takes the same exclusive lock a writer uses, checkpoints,
-        and returns. A busy lock raises WAREHOUSE_WRITER_BUSY.
+        main database. This takes the same exclusive lock a writer uses and
+        checkpoints. It does not read that snapshot.
+
+        A held writer lock raises WAREHOUSE_WRITER_BUSY. SQLite's own busy
+        result (another connection still reading) also raises that code and
+        leaves the WAL in place: TRUNCATE does not drop frames it did not apply.
         """
         wal = Path(str(self.path) + "-wal")
-        try:
-            if not self.path.is_file() or not (self.root / "writer.lock").is_file():
-                return
-            if not wal.is_file() or wal.stat().st_size == 0:
-                return
-        except OSError:
+        if not self.path.is_file() or not (self.root / "writer.lock").is_file():
+            return
+        if not wal.is_file() or wal.stat().st_size == 0:
             return
         self.check_paths(descendants=False)
         with writer_lock(self.root):
+            if not wal.is_file() or wal.stat().st_size == 0:
+                return
             db = connection(self.path)
             try:
-                db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+                row = db.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()
+                # busy=1 means SQLite left the frames in the WAL.
+                require(row is not None and int(row[0]) == 0, "WAREHOUSE_WRITER_BUSY")
+                if wal.is_file() and wal.stat().st_size != 0:
+                    raise WarehouseError("WRITER_ACTIVE_OR_RECOVERY_REQUIRED")
             finally:
                 db.close()
 

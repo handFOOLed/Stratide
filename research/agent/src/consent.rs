@@ -8,6 +8,7 @@ use crate::{market_research, risk_binding, Agent, Result};
 use chrono::Utc;
 use serde_json::{json, Value};
 use std::fs;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 
 pub const VERSION: &str = "owner-agreement-v1";
@@ -47,11 +48,11 @@ fn write_record(agent: &Agent, record: &Value) -> Result<()> {
         fs::create_dir_all(dir).map_err(|_| "CONSENT_WRITE_FAILED")?;
     }
     let pending = path.with_extension("json.pending");
-    fs::write(
-        &pending,
-        serde_json::to_vec_pretty(record).expect("consent JSON"),
-    )
-    .map_err(|_| "CONSENT_WRITE_FAILED")?;
+    let mut file = fs::File::create(&pending).map_err(|_| "CONSENT_WRITE_FAILED")?;
+    file.write_all(&serde_json::to_vec_pretty(record).expect("consent JSON"))
+        .map_err(|_| "CONSENT_WRITE_FAILED")?;
+    file.sync_all().map_err(|_| "CONSENT_WRITE_FAILED")?;
+    drop(file);
     fs::rename(&pending, &path).map_err(|_| "CONSENT_WRITE_FAILED")?;
     Ok(())
 }
@@ -69,9 +70,11 @@ fn read_record(agent: &Agent) -> Option<Value> {
     Some(value)
 }
 
-/// Create the standing grant only when none was recorded. Failures stay local:
-/// the seen flag is already durable, and the next status read tries again.
-/// Unit tests skip this so they cannot write a grant into the repo state root.
+/// Create the standing grant only when the store is readable and no version
+/// exists. A connect/read failure is `Unreadable`, not absent, so this does
+/// not mint and does not cache "present". The next status read tries again.
+/// A revoked grant has a version and is not minted again. Unit tests skip the
+/// write so they cannot touch the repo state root.
 fn materialize_if_absent(agent: &Agent) {
     if cfg!(test) {
         return;
@@ -183,5 +186,44 @@ mod tests {
         assert_eq!(viewed["required"], json!(false));
         assert_eq!(viewed["accepted_at"], "2026-11-01T00:00:00Z");
         assert!(agent_dir.join("consent.json").is_file());
+    }
+
+    #[test]
+    fn a_revoked_grant_is_recorded_and_a_broken_store_is_not_absent() {
+        let root = tempfile::tempdir().unwrap();
+        let dir = root.path().join("agent");
+        let agent = open_agent(&dir);
+        assert_eq!(
+            crate::market_research::standing_grant(&agent),
+            crate::market_research::StandingGrant::Absent
+        );
+        {
+            let connection = agent.store().connect().unwrap();
+            connection
+                .execute(
+                    "INSERT INTO meta(key,value) VALUES('market_research_current_grant','1')",
+                    [],
+                )
+                .unwrap();
+            connection
+                .execute(
+                    "INSERT INTO meta(key,value) VALUES('market_research_revoked:1','true')",
+                    [],
+                )
+                .unwrap();
+        }
+        assert_eq!(
+            crate::market_research::standing_grant(&agent),
+            crate::market_research::StandingGrant::Recorded
+        );
+        assert!(!crate::market_research::standing_grant_absent(&agent));
+        std::fs::write(dir.join("agent.sqlite"), b"not-a-database").unwrap();
+        let _ = std::fs::remove_file(dir.join("agent.sqlite-wal"));
+        let _ = std::fs::remove_file(dir.join("agent.sqlite-shm"));
+        assert_eq!(
+            crate::market_research::standing_grant(&agent),
+            crate::market_research::StandingGrant::Unreadable
+        );
+        assert!(!crate::market_research::standing_grant_absent(&agent));
     }
 }

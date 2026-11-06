@@ -148,13 +148,34 @@ pub fn is_model(m: &Model) -> bool {
     m.kind == POLICY
 }
 
+/// Whether a standing grant version is recorded.
+///
+/// `Unreadable` is not `Absent`: a locked or corrupt database must not be
+/// treated as "no grant" (which would mint) and must not be treated as
+/// "grant exists" for a later retry. The next `consent::status` calls this
+/// again. A revoked grant still has a version, so it is `Recorded`.
+#[derive(Debug, PartialEq, Eq)]
+pub enum StandingGrant {
+    Absent,
+    Recorded,
+    Unreadable,
+}
+
+pub fn standing_grant(agent: &Agent) -> StandingGrant {
+    let Ok(connection) = agent.store().connect() else {
+        return StandingGrant::Unreadable;
+    };
+    match get::<u64>(&connection, CURRENT_GRANT) {
+        Ok(None) => StandingGrant::Absent,
+        Ok(Some(_)) => StandingGrant::Recorded,
+        Err(_) => StandingGrant::Unreadable,
+    }
+}
+
 /// True only when no standing grant version has been recorded. A revoked
 /// grant still has a version and must not be minted again from a page load.
 pub fn standing_grant_absent(agent: &Agent) -> bool {
-    let Ok(connection) = agent.store().connect() else {
-        return false;
-    };
-    matches!(get::<u64>(&connection, CURRENT_GRANT), Ok(None))
+    standing_grant(agent) == StandingGrant::Absent
 }
 pub fn is_input(i: &InputSummary) -> bool {
     i.scopes.iter().any(|s| s == POLICY)
@@ -889,6 +910,45 @@ mod tests {
         assert_eq!(
             display_authorization_scopes(),
             vec![rp::SCOPE.to_string(), POLICY.to_string()]
+        );
+    }
+
+    #[test]
+    fn display_scopes_are_only_used_by_status_projection() {
+        let src = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+        fn walk(dir: &std::path::Path, src: &std::path::Path, callers: &mut Vec<String>) {
+            for entry in std::fs::read_dir(dir).unwrap() {
+                let path = entry.unwrap().path();
+                if path.is_dir() {
+                    walk(&path, src, callers);
+                    continue;
+                }
+                if path.extension().and_then(|ext| ext.to_str()) != Some("rs") {
+                    continue;
+                }
+                let text = std::fs::read_to_string(&path).unwrap();
+                if text.contains("display_authorization_scopes(") {
+                    let rel = path
+                        .strip_prefix(src)
+                        .unwrap()
+                        .to_string_lossy()
+                        .replace('\\', "/");
+                    callers.push(rel);
+                }
+            }
+        }
+        let mut callers = Vec::new();
+        walk(&src, &src, &mut callers);
+        callers.sort();
+        assert_eq!(
+            callers,
+            vec!["market_research.rs".to_string(), "service.rs".to_string()]
+        );
+        let service = std::fs::read_to_string(src.join("service.rs")).unwrap();
+        let run_task = service.split_once("fn run_task").expect("run_task").1;
+        assert!(
+            !run_task.contains("display_authorization_scopes"),
+            "dispatch must authorize the task input, not the settings projection"
         );
     }
 
