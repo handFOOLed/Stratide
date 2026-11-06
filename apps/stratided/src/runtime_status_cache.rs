@@ -123,9 +123,18 @@ pub fn end_background_refresh() {
 mod tests {
     use super::*;
 
+    fn reset_test_state() {
+        STATUS_EPOCH.store(0, Ordering::Release);
+        STATUS_GENERATION.store(0, Ordering::Release);
+        STATUS_REFRESHING.store(false, Ordering::Release);
+        if let Ok(mut cache) = STATUS_CACHE.lock() {
+            *cache = None;
+        }
+    }
+
     #[test]
     fn stale_epoch_refresh_cannot_overwrite_newer_cache() {
-        invalidate_cache();
+        reset_test_state();
         let old_epoch = epoch();
         publish_if_not_superseded(serde_json::json!({"generation": "old"}), old_epoch, 0);
         bump_epoch();
@@ -144,7 +153,7 @@ mod tests {
 
     #[test]
     fn same_epoch_probe_snapshot_not_replaced_by_earlier_refresh() {
-        invalidate_cache();
+        reset_test_state();
         let current_epoch = epoch();
         let gen_start = generation();
         publish(serde_json::json!({
@@ -163,7 +172,7 @@ mod tests {
 
     #[test]
     fn refresh_started_during_mutation_is_dropped_when_generation_advances() {
-        invalidate_cache();
+        reset_test_state();
         let refresh_epoch = epoch();
         let refresh_generation_start = generation();
         bump_epoch();

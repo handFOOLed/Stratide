@@ -52,7 +52,7 @@ jobs:
 
       - name: stratided runtime_status_cache unit tests
         shell: bash
-        run: cargo test -p stratided runtime_status_cache --locked
+        run: cargo test -p stratided runtime_status_cache --locked -- --test-threads=1
 
       - name: stratided runtime_status_health integration
         shell: bash
