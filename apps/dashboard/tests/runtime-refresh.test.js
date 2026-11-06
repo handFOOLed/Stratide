@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  backfillOverviewMessage,
+  backfillPresentation,
   backfillReadFailure,
   createRuntimeRefreshLocks,
   marketSummaryFrom,
@@ -101,14 +101,16 @@ test('market summary keeps backfill progress when warehouse status fails', () =>
   assert.match(summary.statusError, /WAREHOUSE_WRITER_BUSY/);
 });
 
-test('market summary is complete from a finished progress file that met the target', () => {
+test('a full progress file without a warehouse report is not verified complete', () => {
   const summary = marketSummaryFrom(
     { running: false, progress: { sessions: 84, sessions_ready: 84, remaining: 0 } },
     null,
     'MARKET_STATUS_UNAVAILABLE',
   );
   assert.equal(summary.backfillRunning, false);
-  assert.equal(summary.backfillComplete, true);
+  assert.equal(summary.backfillComplete, false);
+  assert.equal(summary.verification, 'unknown');
+  assert.equal(summary.downloadPercent, 100);
   assert.equal(summary.remaining, 0);
 });
 
@@ -182,7 +184,7 @@ test('overview copy keeps the diagnostic code out of the sentence', () => {
     'MARKET_STATUS_TIMEOUT',
   );
   const once = mergeMarketRead(null, failed);
-  const fresh = backfillOverviewMessage(once, false);
+  const fresh = backfillPresentation(once, false);
   assert.equal(fresh.complete, false);
   assert.equal(fresh.diagnosticCode, 'MARKET_STATUS_TIMEOUT');
   assert.match(fresh.text, /超时/);
@@ -193,7 +195,7 @@ test('overview copy keeps the diagnostic code out of the sentence', () => {
     { sessions_ready: 84, gaps: [], coverage_complete: true },
   );
   const stale = mergeMarketRead(mergeMarketRead(confirmed, failed), failed);
-  const aged = backfillOverviewMessage(stale, false);
+  const aged = backfillPresentation(stale, false);
   assert.equal(stale.statusStale, true);
   assert.equal(aged.complete, false);
   assert.equal(aged.text, '行情进度无法读取，请稍后重试。');
@@ -206,11 +208,12 @@ test('overview copy keeps the diagnostic code out of the sentence', () => {
     'MARKET_STATUS_TIMEOUT',
   );
   const staleProgress = mergeMarketRead(mergeMarketRead(confirmed, progressDone), progressDone);
-  const stillUnconfirmed = backfillOverviewMessage(staleProgress, false);
-  assert.equal(staleProgress.backfillComplete, true);
+  const stillUnconfirmed = backfillPresentation(staleProgress, false);
+  assert.equal(staleProgress.backfillComplete, false);
   assert.equal(staleProgress.statusStale, true);
   assert.equal(stillUnconfirmed.complete, false);
   assert.equal(stillUnconfirmed.text, '行情进度无法读取，请稍后重试。');
+  assert.equal(stillUnconfirmed.downloadPercent, null);
 });
 
 test('an idle warehouse failure keeps a stable diagnostic code', () => {

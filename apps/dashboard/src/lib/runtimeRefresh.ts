@@ -4,14 +4,35 @@
  * or the UI keeps a light UNKNOWN / UNVERIFIED snapshot after full diagnostics.
  */
 
+/**
+ * verified: the latest successful warehouse report says coverage_complete.
+ * rejected: that report explicitly says coverage_complete false.
+ * unknown: no fresh report, a missing flag, or a backfill still running.
+ * A progress file cannot change this.
+ */
+export type WarehouseVerification = 'verified' | 'rejected' | 'unknown';
+
 export interface MarketSummary {
   sessionsReady: number;
   targetSessions: number;
   /** Null when the progress file has no remaining count and status has not arrived. */
   remaining: number | null;
+  /** Download counter from the progress file, when that file had a number. */
+  progressSessions: number | null;
+  /** Session count from the latest successful warehouse report. */
+  reportSessions: number | null;
+  /** Explicit flag from the latest successful report. Null when this read has none. */
+  coverageComplete: boolean | null;
+  verification: WarehouseVerification;
+  /**
+   * Download ratio as a real percentage. Null when the counts are not known.
+   * This is not warehouse verification.
+   */
+  downloadPercent: number | null;
   lastSuccessfulDate: string | null;
   gaps: number | null;
   backfillRunning: boolean;
+  /** True only when verification is verified. Progress files and cached trues cannot set this. */
   backfillComplete: boolean;
   /** True only after a successful market status read. */
   statusKnown: boolean;
@@ -39,39 +60,88 @@ export interface MarketStatusSnapshot {
 /** Failures before a previously confirmed completion is dropped. */
 export const MARKET_STATUS_STALE_POLLS = 2;
 
+function finiteCount(value: number | undefined | null): number | null {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : null;
+}
+
+/** Real download ratio. Null when either count is missing. Never a stand-in for verification. */
+export function downloadPercent(ready: number | null, target: number | null): number | null {
+  if (ready === null || target === null || target <= 0) return null;
+  return Math.round((Math.min(ready, target) / target) * 100);
+}
+
+function coverageFlag(summary: MarketStatusSnapshot | null): boolean | null {
+  if (summary === null || summary.coverage_complete === undefined) return null;
+  return summary.coverage_complete === true;
+}
+
+/**
+ * The latest successful report decides. Explicit false wins over a full
+ * progress file, a full session count, and empty gaps. A missing flag or a
+ * running job is unknown, not complete.
+ */
+export function warehouseVerification(
+  running: boolean,
+  statusKnown: boolean,
+  coverageComplete: boolean | null,
+  reportSessions: number | null,
+  targetSessions: number,
+  gaps: number | null,
+): WarehouseVerification {
+  if (!statusKnown) return 'unknown';
+  if (coverageComplete === false) return 'rejected';
+  if (running) return 'unknown';
+  if (
+    coverageComplete === true &&
+    (reportSessions ?? 0) >= targetSessions &&
+    (gaps ?? 0) === 0
+  ) {
+    return 'verified';
+  }
+  return 'unknown';
+}
+
 export function marketSummaryFrom(
   backfill: MarketBackfillState,
   summary: MarketStatusSnapshot | null,
   statusError: string | null = null,
 ): MarketSummary {
   const progress = backfill.progress ?? null;
-  const target = progress?.sessions ?? 84;
-  const sessionsReady = progress?.sessions_ready ?? summary?.sessions_ready ?? 0;
+  const progressSessions = finiteCount(progress?.sessions_ready);
+  const progressTarget = finiteCount(progress?.sessions);
+  const progressRemaining = progress === null ? null : finiteCount(progress.remaining);
+  const reportSessions = summary === null ? null : finiteCount(summary.sessions_ready);
+  const target = progressTarget ?? 84;
+  const coverageComplete = coverageFlag(summary);
   const gaps = summary === null ? null : summary.gaps?.length ?? 0;
   const running = backfill.running === true;
-  const progressDone =
-    progress !== null &&
-    progress.remaining === 0 &&
-    !running &&
-    (progress.sessions_ready ?? 0) >= (progress.sessions ?? target);
-  // Empty gaps are not completion. report() sets coverage_complete only when
-  // the calendar covers the configured window and sessions_ready meets the target.
-  const warehouseDone =
-    summary !== null &&
-    !running &&
-    summary.coverage_complete === true &&
-    (summary.sessions_ready ?? 0) >= target &&
-    (summary.gaps?.length ?? 0) === 0;
-  const remaining = progress?.remaining ?? (warehouseDone ? 0 : null);
+  const statusKnown = summary !== null;
+  const verification = warehouseVerification(
+    running,
+    statusKnown,
+    coverageComplete,
+    reportSessions,
+    target,
+    gaps,
+  );
+  // A fresh report's own session count is the download figure. The progress
+  // file fills in only when that report is missing.
+  const measuredReady = reportSessions ?? progressSessions;
+  const measuredTarget = progressSessions !== null || reportSessions !== null ? target : null;
   return {
-    sessionsReady,
+    sessionsReady: reportSessions ?? progressSessions ?? 0,
     targetSessions: target,
-    remaining,
+    remaining: progressRemaining,
+    progressSessions,
+    reportSessions,
+    coverageComplete,
+    verification,
+    downloadPercent: downloadPercent(measuredReady, measuredTarget),
     lastSuccessfulDate: summary?.last_successful_date ?? null,
     gaps,
     backfillRunning: running,
-    backfillComplete: progressDone || warehouseDone,
-    statusKnown: summary !== null,
+    backfillComplete: verification === 'verified',
+    statusKnown,
     statusError: summary !== null ? null : statusError,
     statusFailures: 0,
     statusStale: false,
@@ -79,10 +149,9 @@ export function marketSummaryFrom(
 }
 
 /**
- * Keep the last confirmed session counts across a failed status read.
- * A completion that came only from the warehouse report is dropped at once.
- * After MARKET_STATUS_STALE_POLLS the read is marked stale. A progress file
- * from this read can still prove completion when it met the target.
+ * A fresh report replaces the previous decision, including an explicit false.
+ * A failed read does not keep a cached complete, and a progress file on that
+ * read cannot create one. Download counts may still be shown.
  */
 export function mergeMarketRead(previous: MarketSummary | null, incoming: MarketSummary): MarketSummary {
   if (incoming.statusKnown && incoming.statusError === null) {
@@ -90,18 +159,23 @@ export function mergeMarketRead(previous: MarketSummary | null, incoming: Market
   }
   const statusFailures = (previous?.statusFailures ?? 0) + 1;
   const kept = previous ?? incoming;
-  // A progress file from this read can still prove completion. A previous
-  // warehouse report cannot: its coverage flag was not reconfirmed.
-  const progressConfirmed =
-    incoming.remaining === 0 && !incoming.backfillRunning && incoming.sessionsReady >= incoming.targetSessions;
+  const progressSessions = incoming.progressSessions ?? kept.progressSessions;
+  const targetSessions = incoming.targetSessions || kept.targetSessions;
   return {
-    sessionsReady: incoming.remaining !== null || incoming.backfillRunning ? incoming.sessionsReady : kept.sessionsReady,
-    targetSessions: incoming.targetSessions || kept.targetSessions,
+    sessionsReady: incoming.reportSessions ?? progressSessions ?? kept.sessionsReady,
+    targetSessions,
     remaining: incoming.remaining !== null ? incoming.remaining : kept.remaining,
+    progressSessions,
+    // A failed read has no report. Do not keep the previous report count, or
+    // the meter can pair a stale session total with a newer progress-file percent.
+    reportSessions: null,
+    coverageComplete: null,
+    verification: 'unknown',
+    downloadPercent: incoming.progressSessions !== null ? incoming.downloadPercent : null,
     lastSuccessfulDate: incoming.lastSuccessfulDate ?? kept.lastSuccessfulDate,
     gaps: incoming.gaps ?? kept.gaps,
     backfillRunning: incoming.backfillRunning,
-    backfillComplete: progressConfirmed,
+    backfillComplete: false,
     statusKnown: false,
     statusError: incoming.statusError,
     statusFailures,
@@ -120,69 +194,131 @@ export function backfillReadFailure(code: string): { hint: string; diagnosticCod
   return { hint, diagnosticCode: code };
 }
 
-export interface BackfillOverviewMessage {
-  text: string;
-  /** Shown apart from the sentence, in the muted diagnostic style. */
-  diagnosticCode: string | null;
+export interface BackfillPresentation {
+  /** Same bit as MarketSummary.backfillComplete. Views must not add another. */
   complete: boolean;
+  verification: WarehouseVerification;
+  /** Null means the bar is indeterminate. A number is the download ratio only. */
+  downloadPercent: number | null;
+  title: string;
+  text: string;
+  /** Secondary count. Null when we would be inventing one. */
+  countText: string | null;
+  diagnosticCode: string | null;
+  tone: 'ok' | 'progress' | 'attention' | 'unset';
+}
+
+function countLine(market: MarketSummary, percent: number | null): string | null {
+  if (percent === null) return null;
+  const downloaded = market.reportSessions ?? market.progressSessions;
+  if (downloaded === null) return null;
+  let line = '已下载 ' + String(downloaded) + '/' + String(market.targetSessions) + '（' + String(percent) + '%）';
+  if (
+    market.reportSessions !== null &&
+    market.progressSessions !== null &&
+    market.reportSessions !== market.progressSessions
+  ) {
+    line += '，进度文件 ' + String(market.progressSessions) + '/' + String(market.targetSessions);
+  }
+  return line;
 }
 
 /**
- * Checklist copy for the merged market summary. A stale read is not a
- * confirmed warehouse: the sentence says it cannot be read, and the code
- * stays out of that sentence.
+ * One presentation for settings, overview, and the checklist.
+ * complete is copied from the summary; it is not recomputed here.
  */
-export function backfillOverviewMessage(
-  market: MarketSummary | null,
-  runtimeUnreadable: boolean,
-): BackfillOverviewMessage {
+export function backfillPresentation(market: MarketSummary | null, runtimeUnreadable: boolean): BackfillPresentation {
   if (market === null) {
     return {
+      complete: false,
+      verification: 'unknown',
+      downloadPercent: null,
+      title: runtimeUnreadable ? '无法读取' : '正在读取',
       text: runtimeUnreadable ? '无法读取历史行情补录进度' : '正在读取历史行情补录进度',
+      countText: null,
       diagnosticCode: null,
-      complete: false,
+      tone: runtimeUnreadable ? 'attention' : 'progress',
     };
   }
+  const complete = market.backfillComplete;
+  const percent = market.statusStale ? null : market.downloadPercent;
+  const countText = market.statusStale ? null : countLine(market, percent);
   if (market.backfillRunning) {
+    const rejected = market.verification === 'rejected' ? '仓库校验未通过。' : '';
     return {
+      complete,
+      verification: market.verification,
+      downloadPercent: percent,
+      title: '进行中',
       text:
-        market.remaining === null
-          ? '历史行情补录已开始'
-          : '历史行情补录中：待补齐 ' + String(market.remaining) + ' 个交易日',
+        (market.remaining === null ? '历史行情补录已开始。' : '待补齐 ' + String(market.remaining) + ' 个交易日。') +
+        rejected,
+      countText,
       diagnosticCode: null,
-      complete: false,
+      tone: 'progress',
     };
   }
-  const confirmed = market.backfillComplete && !market.statusStale;
-  if (market.statusError !== null && !confirmed) {
+  if (complete) {
+    return {
+      complete,
+      verification: 'verified',
+      downloadPercent: percent,
+      title: '已完成',
+      text: '历史行情已就绪（' + String(market.sessionsReady) + ' 个交易日）',
+      countText,
+      diagnosticCode: null,
+      tone: 'ok',
+    };
+  }
+  if (market.verification === 'rejected') {
+    return {
+      complete,
+      verification: 'rejected',
+      downloadPercent: percent,
+      title: '待校验',
+      text: '仓库校验未通过，下载数量不能当成已完成。',
+      countText,
+      diagnosticCode: null,
+      tone: 'attention',
+    };
+  }
+  if (market.statusError !== null) {
     const failure = backfillReadFailure(market.statusError);
     return {
+      complete,
+      verification: 'unknown',
+      downloadPercent: percent,
+      title: '无法读取',
       text: market.statusStale ? '行情进度无法读取，请稍后重试。' : failure.hint,
+      countText,
       diagnosticCode: failure.diagnosticCode,
-      complete: false,
-    };
-  }
-  if (confirmed) {
-    return {
-      text: '历史行情已就绪（' + String(market.sessionsReady) + ' 个交易日）',
-      diagnosticCode: null,
-      complete: true,
+      tone: 'attention',
     };
   }
   if (!market.statusKnown) {
-    return { text: '正在读取历史行情补录进度', diagnosticCode: null, complete: false };
-  }
-  if (market.sessionsReady > 0) {
     return {
-      text: '历史行情补录尚未完成：待补齐 ' + String(market.remaining ?? market.gaps ?? 0) + ' 个交易日',
+      complete,
+      verification: 'unknown',
+      downloadPercent: percent,
+      title: percent === null ? '正在读取' : '尚未确认',
+      text: percent === null ? '正在读取历史行情补录进度' : '已有下载计数，仓库校验还没有读到。',
+      countText,
       diagnosticCode: null,
-      complete: false,
+      tone: 'progress',
     };
   }
   return {
-    text: '历史行情补录尚未开始（目标 ' + String(market.targetSessions) + ' 个交易日）',
+    complete,
+    verification: 'unknown',
+    downloadPercent: percent,
+    title: market.sessionsReady > 0 ? '尚未完成' : '尚未开始',
+    text:
+      market.sessionsReady > 0
+        ? '仓库还没有确认校验完成。'
+        : '历史行情补录尚未开始（目标 ' + String(market.targetSessions) + ' 个交易日）',
+    countText: market.sessionsReady > 0 ? countText : null,
     diagnosticCode: null,
-    complete: false,
+    tone: 'unset',
   };
 }
 

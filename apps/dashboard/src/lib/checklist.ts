@@ -23,10 +23,16 @@ export function checklistProgress(runtime: RuntimeState, agent: AgentState): Che
   const tushareDone = tushareProgress === 'done';
   const marketEodDone = marketEodProgress === 'done';
   const market = runtime.market;
-  const backfillDone = market !== null && market.backfillComplete;
+  // backfillComplete is the only completion bit. A rejected report is a known gap
+  // even if a progress file previously caused the list to be dismissed.
+  const backfillDone = market !== null && market.backfillComplete === true;
   const backfillKnown =
     market !== null &&
-    (market.backfillComplete || market.backfillRunning || market.statusKnown || market.statusError !== null);
+    (backfillDone ||
+      market.backfillRunning === true ||
+      market.statusKnown === true ||
+      market.statusError !== null ||
+      market.verification === 'rejected');
   const researchConfigured =
     agent.status !== null && agent.status.default_model !== null && agent.status.budget.state === 'configured';
   const knownIncomplete =
@@ -62,4 +68,11 @@ export function checklistVisible(progress: ChecklistProgress, dismissed: boolean
   if (progress.knownComplete) return false;
   if (progress.knownIncomplete) return true;
   return !dismissed;
+}
+
+/** Null leaves the stored flag alone. A known gap clears it; a known complete sets it. */
+export function nextChecklistDismissed(progress: ChecklistProgress): boolean | null {
+  if (progress.knownComplete) return true;
+  if (progress.knownIncomplete) return false;
+  return null;
 }

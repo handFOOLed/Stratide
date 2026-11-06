@@ -1291,6 +1291,20 @@
   background: var(--danger);
 }
 
+.progress--indeterminate {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--surface-sunken),
+    var(--surface-sunken) 6px,
+    var(--border-faint) 6px,
+    var(--border-faint) 8px
+  );
+}
+
+.progress__bar--indeterminate {
+  width: 0;
+}
+
 /* ---------- Key/value ---------- */
 .kv {
   display: grid;
@@ -2478,6 +2492,23 @@ a.health-bar__item:hover { background: var(--surface-hover); }
 .checklist__desc .backfill-diagnostic__code {
   display: block;
   margin-top: 2px;
+}
+.backfill-meter__text,
+.backfill-meter__percent,
+.backfill-meter__count {
+  margin: 0;
+}
+.backfill-meter__percent {
+  margin-top: 4px;
+  color: var(--text);
+  font-size: var(--fs-md);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+.backfill-meter__count {
+  margin-top: 2px;
+  color: var(--text-faint);
+  font-size: var(--fs-2xs);
 }
 .checklist__action { flex: 0 0 auto; }
 

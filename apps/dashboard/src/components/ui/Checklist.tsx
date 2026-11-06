@@ -46,7 +46,7 @@ export function Checklist({
                   {item.title}
                   <span className="sr-only">{item.done ? '（已完成）' : '（待完成）'}</span>
                 </div>
-                {item.description ? <p className="checklist__desc">{item.description}</p> : null}
+                {item.description ? <div className="checklist__desc">{item.description}</div> : null}
               </div>
               {item.done ? null : item.action ? <div className="checklist__action">{item.action}</div> : null}
             </li>

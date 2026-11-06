@@ -35,8 +35,8 @@ import {
 } from '../lib/format';
 import { RANGE_VALUES, readPreference, writePreference } from '../lib/storage';
 import type { RangeValue } from '../lib/storage';
-import { checklistProgress, checklistVisible } from '../lib/checklist';
-import { backfillOverviewMessage } from '../lib/runtimeRefresh';
+import { checklistProgress, checklistVisible, nextChecklistDismissed } from '../lib/checklist';
+import { BackfillMeter } from '../components/domain/BackfillMeter';
 import { navigate } from '../lib/route';
 import {
   dataStatusView,
@@ -174,8 +174,9 @@ export function OverviewPage({
   const [fillPage, setFillPage] = useState(0);
   const checklist = checklistProgress(runtime, agent);
   useEffect(() => {
-    if (checklist.knownComplete) writePreference('checklist-dismissed', '1');
-    else if (checklist.knownIncomplete) writePreference('checklist-dismissed', '0');
+    const next = nextChecklistDismissed(checklist);
+    if (next === null) return;
+    writePreference('checklist-dismissed', next ? '1' : '0');
   }, [checklist.knownComplete, checklist.knownIncomplete]);
   const positions = useSelection<Position>();
   const fills = useSelection<Fill>();
@@ -315,16 +316,6 @@ export function OverviewPage({
   const tushareDone = tushareView !== null && tushareView.kind === 'ok';
   const marketEodDone = marketEodView !== null && marketEodView.kind === 'ok';
   const market = runtime.market;
-  const backfillMessage = backfillOverviewMessage(market, runtime.error !== null);
-  const backfillDescription =
-    backfillMessage.diagnosticCode === null ? (
-      backfillMessage.text
-    ) : (
-      <>
-        {backfillMessage.text}
-        <code className="backfill-diagnostic__code">{backfillMessage.diagnosticCode}</code>
-      </>
-    );
   const researchConfigured =
     agent.status !== null && agent.status.default_model !== null && agent.status.budget.state === 'configured';
 
@@ -378,8 +369,8 @@ export function OverviewPage({
     {
       id: 'history-backfill',
       title: '完成历史行情补录',
-      description: backfillDescription,
-      done: backfillMessage.complete,
+      description: <BackfillMeter market={market} runtimeUnreadable={runtime.error !== null} />,
+      done: market !== null && market.backfillComplete === true,
       action: runtimeAction('checklist-action-backfill'),
     },
     {
