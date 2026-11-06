@@ -563,9 +563,12 @@ export function RuntimePanel({
     const service = serviceView(health);
     const supervisor = supervisorView(current.supervisor);
     const collector = collectorView(current, backfillRunning);
-    const backfillView: StatusView = !marketInitialized
-      ? statusView('attention', '需要处理', '请先完成行情采集初始化')
-      : statusView(backfillViewModel.tone, backfillViewModel.title, backfillViewModel.text);
+    // A fresh rejected report stays on the badge. The init hint only covers
+    // the case where this read did not explicitly fail warehouse verification.
+    const backfillView: StatusView =
+      !marketInitialized && backfillViewModel.verification !== 'rejected'
+        ? statusView('attention', '需要处理', '请先完成行情采集初始化')
+        : statusView(backfillViewModel.tone, backfillViewModel.title, backfillViewModel.text);
     const backfillDisabled = busy !== null || backfillRunning || !marketInitialized;
 
     const setupContent = (
