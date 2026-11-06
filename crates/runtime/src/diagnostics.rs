@@ -12,6 +12,7 @@ pub const ISSUES_URL: &str = "https://github.com/handFOOLed/Stratide/issues";
 /// report a healthy service as unavailable.
 pub fn collect(layout: &Layout, service: Value) -> Result<Value, &'static str> {
     let config = layout.config();
+    let config_error = config.as_ref().err().cloned();
     let state = crate::state::SupervisorState::read(&layout.state_path());
     let autostart = crate::autostart::status();
     let python = python_status(layout);
@@ -36,7 +37,7 @@ pub fn collect(layout: &Layout, service: Value) -> Result<Value, &'static str> {
         "data_root": layout.data.to_string_lossy(),
         "logs_dir": layout.logs.to_string_lossy(),
         "port": config.as_ref().map(|config| config.port).unwrap_or(0),
-        "config_error": config.err(),
+        "config_error": config_error,
         "setup_complete": setup_complete,
         "autostart": autostart,
         "supervisor": {
@@ -92,7 +93,7 @@ fn python_status(layout: &Layout) -> Value {
         "-c",
         "import sys,sqlite3,ctypes,zoneinfo;print(sys.version.split()[0])",
     ]);
-    match crate::run_capture(command, std::time::Duration::from_secs(10)) {
+    match crate::run_capture(command, std::time::Duration::from_secs(4)) {
         Ok((Some(0), stdout, _)) => json!({
             "state":"READY",
             "path":path.to_string_lossy(),
@@ -111,7 +112,7 @@ fn python_status(layout: &Layout) -> Value {
 fn wsl_status(configured: Option<&crate::WslSettings>) -> Value {
     let mut command = Command::new("wsl.exe");
     command.args(["--list", "--quiet"]);
-    let mut value = match crate::run_capture(command, std::time::Duration::from_secs(8)) {
+    let mut value = match crate::run_capture(command, std::time::Duration::from_secs(4)) {
         Ok((Some(0), stdout, _)) => {
             let text = crate::win::decode_output(&stdout);
             let distros: Vec<String> = text
@@ -167,11 +168,12 @@ fn timesfm_status(layout: &Layout, wsl: &Value, configured_wsl: Option<&crate::W
     let wsl_ready = wsl.get("state").and_then(Value::as_str) == Some("READY");
     let configured = wsl.get("configured").and_then(Value::as_bool) == Some(true);
     let probe = configured_wsl.and_then(|settings| crate::wsl_probe::matching(layout, settings));
+    let probe_at = probe.as_ref().map(|record| record.probed_at.clone());
+    let probe_present = probe.is_some();
     let (state, reason) = if configured {
-        if probe.as_ref().is_some_and(|record| record.state == "READY") {
-            ("READY", None)
-        } else if let Some(record) = probe {
-            (
+        match probe.as_ref() {
+            Some(record) if record.state == "READY" => ("READY", None),
+            Some(record) => (
                 "CONFIGURED",
                 Some(
                     record
@@ -179,9 +181,8 @@ fn timesfm_status(layout: &Layout, wsl: &Value, configured_wsl: Option<&crate::W
                         .clone()
                         .unwrap_or_else(|| "WSL_PROBE_FAILED".into()),
                 ),
-            )
-        } else {
-            ("CONFIGURED", Some("WSL_PROBE_REQUIRED".into()))
+            ),
+            None => ("CONFIGURED", Some("WSL_PROBE_REQUIRED".into())),
         }
     } else if wsl_ready {
         (
@@ -201,8 +202,8 @@ fn timesfm_status(layout: &Layout, wsl: &Value, configured_wsl: Option<&crate::W
         "worker_state_present": worker_state.is_dir(),
         "agent_binding_present": binding.is_file(),
         "reason": reason,
-        "probe_at": probe.as_ref().map(|record| record.probed_at.clone()),
-        "note": if configured && probe.is_none() {
+        "probe_at": probe_at,
+        "note": if configured && !probe_present {
             "已保存 WSL 入口；请点“检查状态”执行真实前置/模型/隔离探针。未通过时研究保持 BLOCKED，EOD 采集继续。"
         } else if configured {
             "本地预测引擎入口已保存；最近一次检查结果见上方状态。"
@@ -229,7 +230,7 @@ fn credential_status(layout: &Layout) -> Value {
         ])
         .env("STRATIDE_STATE_ROOT", &layout.data)
         .env("PYTHONUTF8", "1");
-    match crate::run_capture(command, std::time::Duration::from_secs(10)) {
+    match crate::run_capture(command, std::time::Duration::from_secs(4)) {
         Ok((Some(0), stdout, _)) => match serde_json::from_slice::<Value>(&stdout) {
             Ok(value) => value,
             Err(_) => json!({"state":"UNKNOWN","reason":"CREDENTIAL_HELPER_INVALID"}),
@@ -374,5 +375,51 @@ mod tests {
         let timesfm = super::timesfm_status(&layout, &wsl_json, Some(&wsl));
         assert_eq!(timesfm["state"], "READY");
         assert!(timesfm["reason"].is_null());
+        assert!(timesfm["probe_at"].is_string());
+    }
+
+    #[test]
+    fn configured_without_probe_still_requires_check() {
+        use crate::WslSettings;
+        let tmp = tempfile::tempdir().unwrap();
+        let layout = layout(tmp.path());
+        let wsl = WslSettings {
+            distribution: "Ubuntu-24.04".into(),
+            workspace: "/home/stratide".into(),
+            python: None,
+            model: None,
+        };
+        let wsl_json = json!({"state":"READY","configured": true});
+        let timesfm = super::timesfm_status(&layout, &wsl_json, Some(&wsl));
+        assert_eq!(timesfm["state"], "CONFIGURED");
+        assert_eq!(timesfm["reason"], "WSL_PROBE_REQUIRED");
+    }
+
+    #[test]
+    fn blocked_probe_surfaces_reason_without_move_bug() {
+        use crate::WslSettings;
+        let tmp = tempfile::tempdir().unwrap();
+        let layout = layout(tmp.path());
+        std::fs::create_dir_all(&layout.data.join("state")).unwrap();
+        let wsl = WslSettings {
+            distribution: "Ubuntu-24.04".into(),
+            workspace: "/home/stratide".into(),
+            python: None,
+            model: None,
+        };
+        crate::wsl_probe::write(
+            &layout,
+            crate::wsl_probe::WslProbeRecord::new(
+                &wsl,
+                "BLOCKED",
+                Some("TIMESFM_WSL_VENV_MISSING".into()),
+            ),
+        )
+        .expect("write probe");
+        let wsl_json = json!({"state":"READY","configured": true});
+        let timesfm = super::timesfm_status(&layout, &wsl_json, Some(&wsl));
+        assert_eq!(timesfm["state"], "CONFIGURED");
+        assert_eq!(timesfm["reason"], "TIMESFM_WSL_VENV_MISSING");
+        assert!(timesfm["probe_at"].is_string());
     }
 }

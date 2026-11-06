@@ -7,12 +7,70 @@
 use crate::{App, Reply};
 use serde_json::{json, Value};
 use std::process::Command;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 use stratide_runtime::Layout;
 use tiny_http::Request;
 
-static STATUS_CACHE: Mutex<Option<(Instant, Value)>> = Mutex::new(None);
+struct StatusCacheState {
+    value: Value,
+    built_at: Instant,
+}
+
+static STATUS_CACHE: Mutex<Option<StatusCacheState>> = Mutex::new(None);
+static STATUS_REFRESHING: AtomicBool = AtomicBool::new(false);
+
+const STATUS_STALE_AFTER: Duration = Duration::from_secs(4);
+const STATUS_SERVE_MAX_AGE: Duration = Duration::from_secs(120);
+
+fn collect_status(app: &App, layout: &Layout) -> Result<Value, &'static str> {
+    let service = json!({"healthy": true, "instance_id": app.instance_id(),
+        "pid": std::process::id().to_string()});
+    stratide_runtime::diagnostics::collect(layout, service)
+}
+
+fn store_status_cache(value: Value) {
+    if let Ok(mut cache) = STATUS_CACHE.lock() {
+        *cache = Some(StatusCacheState {
+            value,
+            built_at: Instant::now(),
+        });
+    }
+}
+
+fn schedule_status_refresh(app: &App, layout: &Layout) {
+    let stale = STATUS_CACHE
+        .lock()
+        .ok()
+        .and_then(|cache| cache.as_ref().map(|entry| entry.built_at.elapsed() > STATUS_STALE_AFTER))
+        .unwrap_or(true);
+    if !stale {
+        return;
+    }
+    if STATUS_REFRESHING
+        .compare_exchange(false, true, Ordering::Acquire, Ordering::Relaxed)
+        .is_err()
+    {
+        return;
+    }
+    let layout = layout.clone();
+    let instance_id = app.instance_id().to_string();
+    let pid = std::process::id();
+    std::thread::spawn(move || {
+        let service = json!({"healthy": true, "instance_id": instance_id, "pid": pid.to_string()});
+        if let Ok(value) = stratide_runtime::diagnostics::collect(&layout, service) {
+            store_status_cache(value);
+        }
+        STATUS_REFRESHING.store(false, Ordering::Release);
+    });
+}
+
+fn refresh_status_cache_sync(app: &App, layout: &Layout) -> Result<(), &'static str> {
+    let value = collect_status(app, layout)?;
+    store_status_cache(value);
+    Ok(())
+}
 
 pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
     let error = |status: u16, code: &str| app.error(status, code, code);
@@ -103,7 +161,22 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
             _ => Err(error(404, "RUNTIME_ROUTE_NOT_FOUND")),
         }
     })();
-    invalidate();
+    if result.is_ok() {
+        match path.as_str() {
+            "/api/runtime/wsl"
+            | "/api/runtime/wsl-detect"
+            | "/api/runtime/wsl-probe"
+            | "/api/runtime/tushare-token"
+            | "/api/runtime/market"
+            | "/api/runtime/setup-complete"
+            | "/api/runtime/autostart" => {
+                let _ = refresh_status_cache_sync(app, &layout);
+            }
+            _ => invalidate(),
+        }
+    } else {
+        invalidate();
+    }
     match result {
         Ok(reply) => reply,
         Err(reply) => reply,
@@ -111,18 +184,23 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
 }
 
 fn status(app: &App, layout: &Layout) -> Result<Value, &'static str> {
-    let mut cache = STATUS_CACHE.lock().map_err(|_| "RUNTIME_STATUS_BUSY")?;
-    if let Some((at, value)) = cache.as_ref() {
-        if at.elapsed() < Duration::from_secs(4) {
-            return Ok(value.clone());
+    if let Ok(cache) = STATUS_CACHE.lock() {
+        if let Some(entry) = cache.as_ref() {
+            if entry.built_at.elapsed() <= STATUS_SERVE_MAX_AGE {
+                let value = entry.value.clone();
+                drop(cache);
+                schedule_status_refresh(app, layout);
+                return Ok(value);
+            }
         }
     }
-    // This handler runs inside the service, so it is online by definition.
-    let service = json!({"healthy": true, "instance_id": app.instance_id(),
-        "pid": std::process::id().to_string()});
-    let value = stratide_runtime::diagnostics::collect(layout, service)?;
-    *cache = Some((Instant::now(), value.clone()));
-    Ok(value)
+    refresh_status_cache_sync(app, layout)?;
+    STATUS_CACHE
+        .lock()
+        .map_err(|_| "RUNTIME_STATUS_BUSY")?
+        .as_ref()
+        .map(|entry| entry.value.clone())
+        .ok_or("RUNTIME_STATUS_EMPTY")
 }
 
 fn invalidate() {

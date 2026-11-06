@@ -5,6 +5,7 @@ import {
   dependencyStatusView,
   failureReasonText,
   humanReasonText,
+  overallSystemStatus,
   protectionStatusView,
   researchStatusView,
   researchTaskName,
@@ -64,6 +65,31 @@ test('dependency states map to unified states, including the local prediction en
   assert.equal(dependencyStatusView('market_eod', 'NOT_CONFIGURED', null, null).kind, 'unset');
   assert.equal(dependencyStatusView('tushare_credential', 'MISSING', null, null).kind, 'attention');
   assert.equal(dependencyStatusView('python', 'READY', null, null).kind, 'ok');
+});
+
+test('overall status counts persisted timesfm ready toward 7/7', () => {
+  const runtime = {
+    service: { healthy: true },
+    supervisor: { status: 'RUNNING', reason: 'OK' },
+    dependencies: {
+      python: { state: 'READY' },
+      wsl: { state: 'READY', configured: true },
+      timesfm: { state: 'READY' },
+      tushare_credential: { state: 'READY' },
+      market_eod: { state: 'INITIALIZED' },
+      paper_account: { state: 'CONFIGURED' },
+      agent: { state: 'RUNNING' },
+    },
+  };
+  const overall = overallSystemStatus({
+    serviceOnline: true,
+    healthChecking: false,
+    healthErrorCode: null,
+    runtime,
+    runtimeErrorCode: null,
+  });
+  assert.equal(overall.readyCount, 7);
+  assert.equal(overall.problems.length, 0);
 });
 
 test('supervisor display avoids STARTING badge with OK running copy', () => {
