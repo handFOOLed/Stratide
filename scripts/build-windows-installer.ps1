@@ -131,7 +131,7 @@ if (Test-Path -LiteralPath $notices) { Copy-Item -LiteralPath $notices -Destinat
 $pythonVersion = (& (Join-Path $payload 'runtime\python\python.exe') -c "import sys;print(sys.version.split()[0])").Trim()
 if ($LASTEXITCODE -ne 0) { throw 'BUNDLED_PYTHON_SMOKE_FAILED' }
 $commit = (git -C $root rev-parse HEAD).Trim()
-$dirty = if ((git -C $root status --porcelain).Trim()) { '-dirty' } else { '' }
+$dirty = if ((git -C $root status --porcelain)) { '-dirty' } else { '' }
 $buildInfo = [ordered]@{
   product = 'Stratide'
   version = $Version
