@@ -94,9 +94,12 @@ jobs:
             throw "ISCC_BANNER_MISSING length=$length"
           }
           $detected = '6.7.4'
+          # ISCC /? exits 1. Clear it so the Actions pwsh wrapper does not fail the step.
+          $global:LASTEXITCODE = 0
           "ISCC_EXE=$iscc" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           "INNO_SETUP_VERSION=$detected" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           Write-Host "ISCC $iscc version=$detected bytes=$length"
+          exit 0
 
       - name: Fetch pinned CPython and tzdata
         run: |
