@@ -43,13 +43,10 @@
 2. 首次打开阅读并确认本地使用协议；在 **设置**中配置 Tushare 数据源。
 3. 如需自动研究，连接已有的 WSL2 / TimesFM 环境，再配置 AI 服务与费用预算。
 4. 在 **总览**、**AI 研究**和**交易记录**中查看行情、研究任务和模拟账户。
-
 **[完整使用指南 →](docs/USER_GUIDE.md)**
-
-> `main` 源码目前为 **0.3.1**。GitHub Releases 中已核实的公开安装附件是 **0.3.0-rc2**；0.3.1 安装包已由开发者在本机构建，但尚未在 Releases 中核实上传。需要当前源码版本请参考 [Windows 构建指南](docs/WINDOWS_INSTALL.md#从源码构建)。
 
 ## Documentation
 
 [使用指南](docs/USER_GUIDE.md) · [安装与升级](docs/WINDOWS_INSTALL.md) · [系统架构](docs/ARCHITECTURE_OVERVIEW.md) · [技术参考](docs/README.md) · [故障排查](docs/KNOWN_LIMITATIONS.md)
 
-<sub>Stratide 仅提供本地研究与模拟交易，不连接真实券商或执行真钱订单。模拟表现不构成投资建议。</sub>
+<sub>Stratide致力于打造轻量自动化交易平台，风险需要用户自行评估并承担。</sub>
