@@ -39,10 +39,11 @@ if ($size -lt 8MB) { throw "INSTALLER_TOO_SMALL $size" }
 
 $issText = Get-Content -LiteralPath $iss -Raw
 if ($issText -notmatch 'SetupIconFile=\.\.\\assets\\brand\\stratide\.ico') { throw 'SETUP_ICON_FILE' }
+if ($issText -notmatch 'UninstallDisplayIcon=\{app\}\\stratide\.ico') { throw 'UNINSTALL_ICON' }
 $iconLines = @(Select-String -LiteralPath $iss -Pattern 'IconFilename:' )
 if ($iconLines.Count -lt 1) { throw 'NO_SHORTCUT_ICON' }
 foreach ($line in $iconLines) {
-  if ($line.Line -notmatch 'IconFilename:\s*\{app\}\\stratide\.ico') { throw "SHORTCUT_ICON $($line.Line)" }
+  if ($line.Line -notmatch 'IconFilename:\s*"\{app\}\\stratide\.ico"') { throw "SHORTCUT_ICON $($line.Line)" }
 }
 $buildScript = Get-Content -LiteralPath (Join-Path $root 'scripts\build-windows-installer.ps1') -Raw
 if ($buildScript -notmatch 'installer\\Stratide\.iss') { throw 'BUILD_DOES_NOT_USE_ISS' }

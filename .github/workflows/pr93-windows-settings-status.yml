@@ -13,6 +13,10 @@ on:
       - apps/stratided/**
       - apps/dashboard/**
       - crates/runtime/**
+      - scripts/build-windows-installer.ps1
+      - scripts/verify-windows-installer-identity.ps1
+      - installer/Stratide.iss
+      - assets/brand/stratide.ico
   push:
     branches: [cursor/settings-status-wsl-health-474a]
     paths:
@@ -20,6 +24,10 @@ on:
       - apps/stratided/**
       - apps/dashboard/**
       - crates/runtime/**
+      - scripts/build-windows-installer.ps1
+      - scripts/verify-windows-installer-identity.ps1
+      - installer/Stratide.iss
+      - assets/brand/stratide.ico
 
 concurrency:
   group: pr93-windows-settings-${{ github.workflow }}-${{ github.ref }}
