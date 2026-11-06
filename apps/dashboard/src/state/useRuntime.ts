@@ -3,21 +3,15 @@ import { ApiError, friendlyError } from '../lib/api';
 import { loadRuntimeStatus, runtimeAction } from '../lib/runtime';
 import type { RuntimeStatus } from '../lib/runtime';
 import { runtimeStatusPollIntervalMs } from '../lib/runtimePoll';
+import {
+  createRuntimeRefreshLocks,
+  marketSummaryFrom,
+  refreshRuntimeSnapshot,
+} from '../lib/runtimeRefresh';
+import type { MarketSummary } from '../lib/runtimeRefresh';
 import { useDocumentVisible, useInterval } from '../lib/hooks';
 
-export interface MarketSummary {
-  /** 仓库中已就绪的交易日总数（可能大于目标 84）。 */
-  sessionsReady: number;
-  /** 补录目标（通常 84 个交易日）。 */
-  targetSessions: number;
-  /** 还差多少个交易日才补完；0 表示完成。 */
-  remaining: number;
-  lastSuccessfulDate: string | null;
-  gaps: number;
-  backfillRunning: boolean;
-  /** 补录是否已完成：以 remaining==0 为准，而不是 sessionsReady/84。 */
-  backfillComplete: boolean;
-}
+export type { MarketSummary };
 
 export interface RuntimeState {
   status: RuntimeStatus | null;
@@ -31,6 +25,7 @@ export interface RuntimeState {
 /**
  * 本机后台运行状态（服务 + 依赖 + 行情补录进度）。
  * 只读：所有操作仍由“系统与诊断”页显式触发。
+ * 状态轮询与行情摘要分锁：慢的 market 请求不能跳过下一次 runtime status。
  */
 export function useRuntime(): RuntimeState {
   const [status, setStatus] = useState<RuntimeStatus | null>(null);
@@ -40,57 +35,45 @@ export function useRuntime(): RuntimeState {
   const [market, setMarket] = useState<MarketSummary | null>(null);
   const mounted = useRef(true);
   const controller = useRef<AbortController | null>(null);
-  const inFlight = useRef(false);
+  const locks = useRef(createRuntimeRefreshLocks());
   const visible = useDocumentVisible();
 
   const refresh = useCallback((silent = false) => {
-    if (inFlight.current) return;
-    inFlight.current = true;
+    if (locks.current.statusBusy) return;
     controller.current?.abort();
     const next = new AbortController();
     controller.current = next;
     if (!silent) setChecking(true);
-    loadRuntimeStatus(next.signal)
-      .then(async (value) => {
+    void refreshRuntimeSnapshot(locks.current, {
+      loadStatus: () => loadRuntimeStatus(next.signal),
+      loadMarket: async () => {
+        const [backfill, summary] = await Promise.all([
+          runtimeAction<{ running?: boolean; progress?: { sessions?: number; sessions_ready?: number; remaining?: number } | null }>('market', { action: 'backfill-state' }),
+          runtimeAction<{ last_successful_date?: string | null; gaps?: unknown[]; sessions_ready?: number }>('market', { action: 'status' }),
+        ]);
+        return marketSummaryFrom(backfill, summary);
+      },
+      onStatus: (value) => {
         if (!mounted.current) return;
         setStatus(value);
         setError(null);
         setCheckedAt(Date.now());
-        // 行情仓库可能尚未初始化，读不到补录进度是诚实的“未配置”状态，
-        // 不应把整块系统状态标成读取失败。
-        try {
-          const [backfill, summary] = await Promise.all([
-            runtimeAction<{ running?: boolean; progress?: { sessions?: number; sessions_ready?: number; remaining?: number } | null }>('market', { action: 'backfill-state' }),
-            runtimeAction<{ last_successful_date?: string | null; gaps?: unknown[]; sessions_ready?: number }>('market', { action: 'status' }),
-          ]);
-          if (!mounted.current) return;
-          const progress = backfill.progress ?? null;
-          const sessionsReady = progress?.sessions_ready ?? summary.sessions_ready ?? 0;
-          const remaining = progress?.remaining ?? 0;
-          setMarket({
-            sessionsReady,
-            targetSessions: progress?.sessions ?? 84,
-            remaining,
-            lastSuccessfulDate: summary.last_successful_date ?? null,
-            gaps: summary.gaps?.length ?? 0,
-            backfillRunning: backfill.running === true,
-            // 没有进度记录时不能当作“补录完成”。
-            backfillComplete: progress !== null && progress.remaining === 0 && backfill.running !== true,
-          });
-        } catch {
-          if (mounted.current) setMarket(null);
-        }
-      })
-      .catch((caught: unknown) => {
+        setChecking(false);
+      },
+      onStatusError: (caught: unknown) => {
         if (!mounted.current) return;
+        setChecking(false);
         const failure = friendlyError(caught);
         if (failure.code === 'ABORTED') return;
         setError(failure);
-      })
-      .finally(() => {
-        inFlight.current = false;
-        if (mounted.current) setChecking(false);
-      });
+      },
+      onMarket: (value) => {
+        if (mounted.current) setMarket(value);
+      },
+      onMarketMiss: () => {
+        if (mounted.current) setMarket(null);
+      },
+    });
   }, []);
 
   useEffect(() => {
