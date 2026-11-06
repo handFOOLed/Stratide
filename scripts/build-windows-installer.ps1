@@ -15,7 +15,7 @@ See docs/WINDOWS_INSTALL.md for a clean-machine build walkthrough.
 #>
 [CmdletBinding()]
 param(
-  [string]$Version = '0.3.0',
+  [string]$Version = '0.3.1',
   [switch]$SkipBuild,
   [string]$Iscc,
   [string]$PythonEmbedZip,
