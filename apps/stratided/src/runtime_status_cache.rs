@@ -109,8 +109,8 @@ pub fn should_refresh_background() -> bool {
     stale
 }
 
-pub fn try_begin_background_refresh() -> bool {
-    if !should_refresh_background() {
+pub fn try_begin_background_refresh(force: bool) -> bool {
+    if !force && !should_refresh_background() {
         return false;
     }
     STATUS_REFRESHING

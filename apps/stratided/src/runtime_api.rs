@@ -22,8 +22,16 @@ fn collect_status_light(app: &App, layout: &Layout) -> Result<Value, &'static st
     stratide_runtime::diagnostics::collect_light(layout, service)
 }
 
+fn diagnostics_slow_collect_enabled() -> bool {
+    std::env::var("STRATIDE_DIAGNOSTICS_SLEEP_MS")
+        .ok()
+        .and_then(|raw| raw.parse::<u64>().ok())
+        .is_some_and(|ms| ms > 0)
+}
+
 fn schedule_status_refresh(app: &App, layout: &Layout) {
-    if !runtime_status_cache::try_begin_background_refresh() {
+    let stale = runtime_status_cache::should_refresh_background() || diagnostics_slow_collect_enabled();
+    if !stale || !runtime_status_cache::try_begin_background_refresh(stale) {
         return;
     }
     let layout = layout.clone();

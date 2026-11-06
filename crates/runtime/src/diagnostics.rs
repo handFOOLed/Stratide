@@ -80,7 +80,7 @@ pub fn collect_light(layout: &Layout, service: Value) -> Result<Value, &'static 
     let config = layout.config();
     let config_error = config.as_ref().err().cloned();
     let state = crate::state::SupervisorState::read(&layout.state_path());
-    let autostart = crate::autostart::status();
+    let autostart = crate::autostart::status_light();
     let configured_wsl = config.as_ref().ok().and_then(|config| config.wsl.as_ref());
     let wsl = wsl_status_light(configured_wsl);
     let setup_complete = layout.runtime.join("setup-complete").is_file();
