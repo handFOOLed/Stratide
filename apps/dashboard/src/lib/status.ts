@@ -250,6 +250,13 @@ export function failureReasonText(value: string | null | undefined): string {
   return humanReasonText(value) ?? '原因未记录';
 }
 
+/** 费用未确认时仍展示已保存的具体原因，避免只剩一句核对调用记录。 */
+export function uncertainOutcomeText(reason: string | null | undefined): string {
+  const specific = humanReasonText(reason);
+  if (specific === null || specific === '') return '结果或费用尚未确认，请核对调用记录';
+  return specific + '。结果或费用尚未确认，请核对调用记录';
+}
+
 export function taskStatusView(status: string, reason: string | null, conclusion: string | null): StatusView {
   switch (status) {
     case 'queued':
@@ -266,7 +273,7 @@ export function taskStatusView(status: string, reason: string | null, conclusion
     case 'blocked':
       return statusView('attention', '已被阻止', failureReasonText(reason));
     case 'outcome_uncertain':
-      return statusView('attention', '结果未确认', '结果或费用尚未确认，请核对调用记录');
+      return statusView('attention', '结果未确认', uncertainOutcomeText(reason));
     case 'cancelled':
       return statusView('unset', '已取消');
     case 'skipped':

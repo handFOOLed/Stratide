@@ -147,6 +147,15 @@ fn active_grant(c: &Connection, now: DateTime<Utc>) -> Result<Grant> {
 pub fn is_model(m: &Model) -> bool {
     m.kind == POLICY
 }
+
+/// True only when no standing grant version has been recorded. A revoked
+/// grant still has a version and must not be minted again from a page load.
+pub fn standing_grant_absent(agent: &Agent) -> bool {
+    let Ok(connection) = agent.store().connect() else {
+        return false;
+    };
+    matches!(get::<u64>(&connection, CURRENT_GRANT), Ok(None))
+}
 pub fn is_input(i: &InputSummary) -> bool {
     i.scopes.iter().any(|s| s == POLICY)
 }
@@ -191,6 +200,13 @@ pub fn validate_model(m: &Model) -> Result<()> {
         "MARKET_MODEL_INVALID",
     )
 }
+/// Scopes used only when the settings card asks whether the market model
+/// can be authorized. This is not an input, and `authorize` still requires
+/// the task's real scopes to be exactly this pair.
+pub fn display_authorization_scopes() -> Vec<String> {
+    vec![rp::SCOPE.into(), POLICY.into()]
+}
+
 pub fn authorize(m: &Model, scopes: &[String], budget: Option<&Budget>) -> Result<()> {
     validate_model(m)?;
     ensure(
@@ -438,7 +454,9 @@ fn parent(c: &Connection, ctx: &Context) -> Result<(cpu::Plan, Value)> {
             && ctx.config_sha256 == r["config_sha256"]
             && hash(encoded.as_bytes()) == ctx.parent_result_sha256
             && plan.frozen.as_of.parse::<DateTime<Utc>>().ok()
-                == r["as_of"].as_str().and_then(|value| value.parse::<DateTime<Utc>>().ok())
+                == r["as_of"]
+                    .as_str()
+                    .and_then(|value| value.parse::<DateTime<Utc>>().ok())
             && plan.history.is_some()
             && plan.frozen.input_mode == "historical_research_only",
         "MARKET_PARENT_BINDING",
@@ -865,6 +883,15 @@ pub fn call(p: Prepared) -> crate::provider::Outcome {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn display_scopes_are_the_market_contract_pair() {
+        assert_eq!(
+            display_authorization_scopes(),
+            vec![rp::SCOPE.to_string(), POLICY.to_string()]
+        );
+    }
+
     pub(super) fn transport(ctx: &Context) -> Result<(reqwest::blocking::Client, reqwest::Url)> {
         let (_, c) = crate::local_fusion::connection()?;
         assert_eq!(run(&c, &ctx.source_day)?["data_mode"], "synthetic_test");

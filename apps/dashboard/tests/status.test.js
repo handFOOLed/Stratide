@@ -33,6 +33,11 @@ test('task status uses only the five unified states and never renders raw enums'
   assert.equal(taskStatusView('failed', 'UNKNOWN_NEW_CODE', null).reason, '原因未记录');
   assert.equal(taskStatusView('mystery_state', null, null).label, '状态未知');
   assert.equal(taskStatusView('cancelled', null, null).kind, 'unset');
+  const uncertain = taskStatusView('outcome_uncertain', 'MARKET_PROVIDER_RESPONSE_REJECTED_NO_RETRY', null);
+  assert.equal(uncertain.label, '结果未确认');
+  assert.match(uncertain.reason, /云端返回内容被拒绝/);
+  assert.match(uncertain.reason, /结果或费用尚未确认/);
+  assert.equal(taskStatusView('outcome_uncertain', null, null).reason, '结果或费用尚未确认，请核对调用记录');
 });
 
 test('known production reasons are translated; unknown codes stay in diagnostics', () => {

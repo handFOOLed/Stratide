@@ -176,8 +176,12 @@ function taskOutcomeText(task: AgentTask): string {
       const reason = reasonTextOf(task.reason, task.reason_text);
       return reason === '原因未记录' ? '已被阻止，原因未记录' : reason;
     }
-    case 'outcome_uncertain':
-      return '结果或费用尚未确认，请核对调用记录';
+    case 'outcome_uncertain': {
+      const specific = reasonTextOrNull(task.reason, task.reason_text);
+      return specific === null || specific === ''
+        ? '结果或费用尚未确认，请核对调用记录'
+        : specific + '。结果或费用尚未确认，请核对调用记录';
+    }
     case 'queued':
       return '等待开始';
     case 'running':
