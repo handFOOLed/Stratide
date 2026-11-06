@@ -15,7 +15,8 @@ pub fn collect(layout: &Layout, service: Value) -> Result<Value, &'static str> {
     let state = crate::state::SupervisorState::read(&layout.state_path());
     let autostart = crate::autostart::status();
     let python = python_status(layout);
-    let wsl = wsl_status(config.as_ref().ok().and_then(|config| config.wsl.as_ref()));
+    let configured_wsl = config.as_ref().ok().and_then(|config| config.wsl.as_ref());
+    let wsl = wsl_status(configured_wsl);
     let credential = credential_status(layout);
     let market = market_status(layout);
     let paper = paper_status(layout);
@@ -53,7 +54,7 @@ pub fn collect(layout: &Layout, service: Value) -> Result<Value, &'static str> {
         "dependencies": {
             "python": python,
             "wsl": wsl,
-            "timesfm": timesfm_status(layout, &wsl),
+            "timesfm": timesfm_status(layout, &wsl, configured_wsl),
             "tushare_credential": credential,
             "market_eod": market,
             "paper_account": paper,
@@ -156,7 +157,7 @@ fn wsl_status(configured: Option<&crate::WslSettings>) -> Value {
     value
 }
 
-fn timesfm_status(layout: &Layout, wsl: &Value) -> Value {
+fn timesfm_status(layout: &Layout, wsl: &Value, configured_wsl: Option<&crate::WslSettings>) -> Value {
     let worker_state = layout.data.join("state").join("timesfm-cpu");
     let binding = layout
         .data
@@ -165,14 +166,49 @@ fn timesfm_status(layout: &Layout, wsl: &Value) -> Value {
         .join("agent-binding.json");
     let wsl_ready = wsl.get("state").and_then(Value::as_str) == Some("READY");
     let configured = wsl.get("configured").and_then(Value::as_bool) == Some(true);
+    let probe = configured_wsl.and_then(|settings| crate::wsl_probe::matching(layout, settings));
+    let (state, reason) = if configured {
+        if probe.as_ref().is_some_and(|record| record.state == "READY") {
+            ("READY", None)
+        } else if let Some(record) = probe {
+            (
+                "CONFIGURED",
+                Some(
+                    record
+                        .reason
+                        .clone()
+                        .unwrap_or_else(|| "WSL_PROBE_FAILED".into()),
+                ),
+            )
+        } else {
+            ("CONFIGURED", Some("WSL_PROBE_REQUIRED".into()))
+        }
+    } else if wsl_ready {
+        (
+            "EXTERNAL_WSL_WORKSPACE_REQUIRED",
+            Some("TIMESFM_CPU_REQUIRES_THE_EXISTING_LINUX_WORKSPACE_ISOLATION".into()),
+        )
+    } else {
+        (
+            "BLOCKED_MISSING_RUNTIME",
+            Some("TIMESFM_CPU_REQUIRES_THE_EXISTING_LINUX_WORKSPACE_ISOLATION".into()),
+        )
+    };
     json!({
-        "state": if configured { "CONFIGURED" } else if wsl_ready { "EXTERNAL_WSL_WORKSPACE_REQUIRED" } else { "BLOCKED_MISSING_RUNTIME" },
+        "state": state,
         "wsl_ready": wsl_ready,
         "configured": configured,
         "worker_state_present": worker_state.is_dir(),
         "agent_binding_present": binding.is_file(),
-        "reason": if configured { "WSL_PROBE_REQUIRED" } else { "TIMESFM_CPU_REQUIRES_THE_EXISTING_LINUX_WORKSPACE_ISOLATION" },
-        "note": if configured { "已保存 WSL 入口；使用“检测 WSL Worker”执行真实前置/模型/隔离探针。未通过时研究保持 BLOCKED，EOD 采集继续。" } else { "未配置 WSL 时研究保持 BLOCKED；不会下载或打包模型。" },
+        "reason": reason,
+        "probe_at": probe.as_ref().map(|record| record.probed_at.clone()),
+        "note": if configured && probe.is_none() {
+            "已保存 WSL 入口；请点“检查状态”执行真实前置/模型/隔离探针。未通过时研究保持 BLOCKED，EOD 采集继续。"
+        } else if configured {
+            "本地预测引擎入口已保存；最近一次检查结果见上方状态。"
+        } else {
+            "未配置 WSL 时研究保持 BLOCKED；不会下载或打包模型。"
+        },
         "billing": "LOCAL_NO_BILLING",
     })
 }
@@ -315,5 +351,28 @@ mod tests {
         std::fs::create_dir_all(&layout.app).unwrap();
         std::fs::write(layout.app.join("BUILD_INFO.json"), b"{broken").unwrap();
         assert_eq!(build_info(&layout), Err("BUILD_INFO_INVALID"));
+    }
+
+    #[test]
+    fn persisted_wsl_probe_marks_timesfm_ready() {
+        use crate::WslSettings;
+        let tmp = tempfile::tempdir().unwrap();
+        let layout = layout(tmp.path());
+        std::fs::create_dir_all(&layout.data.join("state")).unwrap();
+        let wsl = WslSettings {
+            distribution: "Ubuntu-24.04".into(),
+            workspace: "/home/stratide".into(),
+            python: None,
+            model: None,
+        };
+        crate::wsl_probe::write(
+            &layout,
+            crate::wsl_probe::WslProbeRecord::new(&wsl, "READY", None),
+        )
+        .expect("write probe");
+        let wsl_json = json!({"state":"READY","configured": true});
+        let timesfm = super::timesfm_status(&layout, &wsl_json, Some(&wsl));
+        assert_eq!(timesfm["state"], "READY");
+        assert!(timesfm["reason"].is_null());
     }
 }

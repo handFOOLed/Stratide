@@ -18,7 +18,7 @@ import {
   humanReasonText,
   overallSystemStatus,
   statusView,
-  supervisorStatusView,
+  supervisorDisplayView,
 } from '../../lib/status';
 import type { StatusView } from '../../lib/status';
 import { runtimeAction, setSetupComplete } from '../../lib/runtime';
@@ -73,14 +73,6 @@ const DEPENDENCY_REASONS: Record<string, string> = {
   CREDENTIAL_HELPER_MISSING: '缺少凭据检查组件，请重新安装 Stratide',
   CREDENTIAL_HELPER_INVALID: '无法检查 Tushare 访问令牌，请重新保存',
   TIMESFM_CPU_REQUIRES_THE_EXISTING_LINUX_WORKSPACE_ISOLATION: '尚未设置本地预测引擎；行情采集不受影响',
-};
-
-const SUPERVISOR_REASONS: Record<string, string> = {
-  OK: '后台任务运行正常',
-  EOD_OPERATOR_MISSING: '安装目录缺少行情采集组件，请重新安装 Stratide',
-  RUNTIME_CONFIG_INVALID: '运行配置无效，请检查安装',
-  EOD_WATCH_START_FAILED: '行情自动采集未能启动，请重新启动 Stratide',
-  WINDOWS_JOB_ASSIGN_FAILED: '后台进程启动受限，请重新启动 Stratide',
 };
 
 const ACTION_REASONS: Record<string, string> = {
@@ -160,7 +152,9 @@ function dependencyView(key: DependencyKey, dependency: DependencyStatus): Statu
       return statusView(
         'ok',
         base.label,
-        dependency.configured === true ? 'WSL 环境可用；本地预测引擎设置已保存' : 'WSL 环境可用；本地预测引擎尚未设置',
+        dependency.configured === true
+          ? 'WSL 环境可用；本地预测引擎设置已保存（请点“检查状态”确认引擎可用）'
+          : 'WSL 环境可用；本地预测引擎尚未设置',
       );
     }
     return statusView('ok', base.label, DEPENDENCY_OK[key]);
@@ -173,14 +167,7 @@ function dependencyView(key: DependencyKey, dependency: DependencyStatus): Statu
 }
 
 function supervisorView(supervisor: RuntimeStatus['supervisor']): StatusView {
-  const base = supervisorStatusView(supervisor.status, supervisor.reason === '' ? null : supervisor.reason);
-  if (base.reason !== undefined) return base;
-  const reason = supervisor.reason === '' ? null : reasonText(supervisor.reason, SUPERVISOR_REASONS);
-  if (reason !== null) return statusView(base.kind, base.label, reason);
-  if (base.kind === 'ok') return statusView('ok', base.label, '后台任务运行正常');
-  if (base.kind === 'attention' || base.kind === 'error') return statusView(base.kind, base.label, '失败，原因未记录');
-  if (supervisor.status === 'NOT_STARTED') return statusView('unset', base.label, '后台任务尚未启动');
-  return base;
+  return supervisorDisplayView(supervisor.status, supervisor.reason);
 }
 
 function collectorView(status: RuntimeStatus, backfillRunning: boolean): StatusView {
@@ -306,13 +293,23 @@ export function RuntimePanel({
     setWslLoaded(true);
   }, [status, wslLoaded]);
 
-  const act = async (name: string, path: string, body: Record<string, unknown>, success: string): Promise<boolean> => {
+  const act = async (
+    name: string,
+    path: string,
+    body: Record<string, unknown>,
+    success: string,
+    afterSuccess?: () => Promise<void>,
+  ): Promise<boolean> => {
     setBusy(name);
     setActionError(null);
     try {
       await runtimeAction(path, body);
       push({ title: success, tone: 'success' });
-      runtime.refresh();
+      if (afterSuccess !== undefined) {
+        await afterSuccess();
+      } else {
+        runtime.refresh();
+      }
       return true;
     } catch (caught) {
       const code = caught instanceof ApiError ? caught.code : 'RUNTIME_ACTION_FAILED';
@@ -340,7 +337,7 @@ export function RuntimePanel({
           setWslLoaded(true);
         }
         push({ title: '已检测到本地预测引擎，设置已自动保存', tone: 'success' });
-        runtime.refresh();
+        await probeWsl();
       } else {
         push({ title: '未检测到本地预测引擎', description: '行情采集不受影响；也可以在下方手动填写。', tone: 'warning' });
       }
@@ -732,7 +729,15 @@ export function RuntimePanel({
                   variant="secondary"
                   disabled={busy !== null}
                   loading={busy === 'wsl'}
-                  onClick={() => void act('wsl', 'wsl', { ...wslForm }, '本地预测引擎设置已保存')}
+                  onClick={() =>
+                    void act(
+                      'wsl',
+                      'wsl',
+                      { ...wslForm },
+                      '本地预测引擎设置已保存',
+                      probeWsl,
+                    )
+                  }
                 >
                   保存设置
                 </Button>

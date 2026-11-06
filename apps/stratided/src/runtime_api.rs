@@ -369,6 +369,7 @@ fn store_wsl(layout: &Layout, wsl: stratide_runtime::WslSettings) -> Result<bool
         // intact; a restart with the old entry only restarts the same watch.
         stratide_runtime::state::atomic_write(&layout.watch_restart_path(), b"{}".to_vec())
             .map_err(|_| layout_error(409, "WATCH_RESTART_REQUEST_FAILED"))?;
+        stratide_runtime::wsl_probe::clear(layout);
     }
     config.wsl = Some(wsl);
     config
@@ -473,11 +474,26 @@ fn probe_wsl(layout: &Layout) -> Result<Reply, Reply> {
         Err(_) => json!({"state": "BLOCKED", "error_code": "WSL_PROBE_FAILED"}),
     };
     let ready = value.get("state").and_then(Value::as_str) == Some("READY");
+    let reason = if ready {
+        None
+    } else {
+        value
+            .get("error_code")
+            .and_then(Value::as_str)
+            .map(str::to_string)
+            .or_else(|| Some("WSL_PROBE_FAILED".into()))
+    };
+    let record = stratide_runtime::wsl_probe::WslProbeRecord::new(
+        &wsl,
+        if ready { "READY" } else { "BLOCKED" },
+        reason.clone(),
+    );
+    let _ = stratide_runtime::wsl_probe::write(layout, record);
     Ok(layout_envelope(
         200,
         json!({
             "state": if ready { "READY" } else { "BLOCKED" },
-            "reason": if ready { Value::Null } else { value.get("error_code").cloned().unwrap_or_else(|| json!("WSL_PROBE_FAILED")) },
+            "reason": if ready { Value::Null } else { json!(reason) },
             "probe": value,
         }),
     ))

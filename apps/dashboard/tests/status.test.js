@@ -8,6 +8,7 @@ import {
   protectionStatusView,
   researchStatusView,
   researchTaskName,
+  supervisorDisplayView,
   taskStatusView,
 } from '../src/lib/status.ts';
 import { countText, currencySymbol, formatMicroMoney } from '../src/lib/format.ts';
@@ -54,10 +55,25 @@ test('trade protection never treats a missing risk record as safe', () => {
 });
 
 test('dependency states map to unified states, including the local prediction engine', () => {
-  assert.equal(dependencyStatusView('timesfm', 'CONFIGURED', null, null).kind, 'attention');
+  assert.equal(dependencyStatusView('timesfm', 'CONFIGURED', 'WSL_PROBE_REQUIRED', null).kind, 'attention');
+  assert.match(
+    dependencyStatusView('timesfm', 'CONFIGURED', 'WSL_PROBE_REQUIRED', null).reason,
+    /需要先检测/,
+  );
+  assert.equal(dependencyStatusView('timesfm', 'READY', null, null).kind, 'ok');
   assert.equal(dependencyStatusView('market_eod', 'NOT_CONFIGURED', null, null).kind, 'unset');
   assert.equal(dependencyStatusView('tushare_credential', 'MISSING', null, null).kind, 'attention');
   assert.equal(dependencyStatusView('python', 'READY', null, null).kind, 'ok');
+});
+
+test('supervisor display avoids STARTING badge with OK running copy', () => {
+  const starting = supervisorDisplayView('STARTING', 'OK');
+  assert.equal(starting.kind, 'progress');
+  assert.equal(starting.label, '正在启动');
+  assert.match(starting.reason, /健康检查/);
+  const running = supervisorDisplayView('RUNNING', 'OK');
+  assert.equal(running.kind, 'ok');
+  assert.equal(running.reason, '后台任务运行正常');
 });
 
 test('research status reports a blocked latest task instead of claiming normal', () => {

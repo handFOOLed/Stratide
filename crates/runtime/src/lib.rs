@@ -11,6 +11,7 @@ pub mod health;
 pub mod log;
 pub mod state;
 pub mod win;
+pub mod wsl_probe;
 
 pub use config::{RuntimeConfig, WslSettings};
 pub use health::{HealthData, ProbeError};
