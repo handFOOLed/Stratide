@@ -71,12 +71,15 @@ pub fn publish_if_not_superseded(
     if generation() > generation_at_start {
         return false;
     }
-    let next_generation = STATUS_GENERATION.fetch_add(1, Ordering::AcqRel) + 1;
-    if epoch() != captured_epoch || generation() > generation_at_start {
-        return false;
-    }
     if let Ok(mut cache) = STATUS_CACHE.lock() {
-        if epoch() != captured_epoch || generation() > generation_at_start {
+        if epoch() != captured_epoch {
+            return false;
+        }
+        if generation() > generation_at_start {
+            return false;
+        }
+        let next_generation = STATUS_GENERATION.fetch_add(1, Ordering::AcqRel) + 1;
+        if epoch() != captured_epoch {
             return false;
         }
         store_locked(&mut cache, value, captured_epoch, next_generation);
