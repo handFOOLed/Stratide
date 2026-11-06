@@ -83,14 +83,18 @@ jobs:
             $iscc = Join-Path $env:LOCALAPPDATA 'Programs\Inno Setup 6\ISCC.exe'
           }
           if (-not (Test-Path -LiteralPath $iscc)) { throw 'ISCC_NOT_FOUND' }
-          $innoInfo = (Get-Item -LiteralPath $iscc).VersionInfo
-          $productVersion = $innoInfo.ProductVersion.Trim()
-          $fileVersion = $innoInfo.FileVersion.Trim()
-          if ($productVersion -notlike '6.7.4*') {
-            throw "INNO_VERSION file=$fileVersion product=$productVersion length=$((Get-Item -LiteralPath $iscc).Length)"
+          $length = (Get-Item -LiteralPath $iscc).Length
+          if ($length -lt 500KB) { throw "ISCC_TOO_SMALL $length" }
+          $PSNativeCommandUseErrorActionPreference = $false
+          $help = & $iscc '/?' 2>&1 | Out-String
+          Write-Host $help
+          if ($help -notmatch 'Inno Setup' -or $help -notmatch '6\.7\.4') {
+            throw "ISCC_BANNER_MISSING length=$length"
           }
+          $detected = '6.7.4'
           "ISCC_EXE=$iscc" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-          Write-Host "ISCC $iscc product=$productVersion file=$fileVersion"
+          "INNO_SETUP_VERSION=$detected" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "ISCC $iscc version=$detected bytes=$length"
 
       - name: Fetch pinned CPython and tzdata
         run: |

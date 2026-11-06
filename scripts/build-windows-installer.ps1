@@ -138,6 +138,9 @@ if ([string]::IsNullOrWhiteSpace($innoVersion) -or $innoVersion.Trim() -eq '0.0.
   $innoVersion = [string]$innoInfo.FileVersion
 }
 $innoVersion = $innoVersion.Trim()
+if (($innoVersion -eq '' -or $innoVersion -eq '0.0.0.0') -and $env:INNO_SETUP_VERSION) {
+  $innoVersion = $env:INNO_SETUP_VERSION.Trim()
+}
 $buildInfo = [ordered]@{
   product = 'Stratide'
   version = $Version
