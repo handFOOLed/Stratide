@@ -57,6 +57,8 @@ export interface RuntimeStatus {
     agent: DependencyStatus;
   };
   log_tail: string[];
+  /** Present on fast/light snapshots; absent once background full diagnostics finish. */
+  status_refresh?: 'light' | string;
 }
 
 export interface DependencyStatus {

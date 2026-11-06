@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError, friendlyError } from '../lib/api';
 import { loadRuntimeStatus, runtimeAction } from '../lib/runtime';
 import type { RuntimeStatus } from '../lib/runtime';
+import { runtimeStatusPollIntervalMs } from '../lib/runtimePoll';
 import { useDocumentVisible, useInterval } from '../lib/hooks';
 
 export interface MarketSummary {
@@ -101,7 +102,7 @@ export function useRuntime(): RuntimeState {
     };
   }, [refresh]);
 
-  useInterval(() => refresh(true), visible ? 30_000 : null);
+  useInterval(() => refresh(true), runtimeStatusPollIntervalMs(status, visible));
 
   return { status, error, checking, checkedAt, market, refresh: () => refresh() };
 }
