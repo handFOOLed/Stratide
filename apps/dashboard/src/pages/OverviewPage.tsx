@@ -36,7 +36,7 @@ import {
 import { RANGE_VALUES, readPreference, writePreference } from '../lib/storage';
 import type { RangeValue } from '../lib/storage';
 import { checklistProgress, checklistVisible } from '../lib/checklist';
-import { backfillReadFailure } from '../lib/runtimeRefresh';
+import { backfillOverviewMessage } from '../lib/runtimeRefresh';
 import { navigate } from '../lib/route';
 import {
   dataStatusView,
@@ -315,25 +315,16 @@ export function OverviewPage({
   const tushareDone = tushareView !== null && tushareView.kind === 'ok';
   const marketEodDone = marketEodView !== null && marketEodView.kind === 'ok';
   const market = runtime.market;
-  const backfillDone = market !== null && market.backfillComplete;
+  const backfillMessage = backfillOverviewMessage(market, runtime.error !== null);
   const backfillDescription =
-    market === null
-      ? runtime.error === null
-        ? '正在读取历史行情补录进度'
-        : '无法读取历史行情补录进度'
-      : market.backfillComplete
-        ? '历史行情已就绪（' + String(market.sessionsReady) + ' 个交易日）'
-        : market.backfillRunning
-          ? market.remaining === null
-            ? '历史行情补录已开始'
-            : '历史行情补录中：待补齐 ' + String(market.remaining) + ' 个交易日'
-          : market.statusError !== null
-            ? backfillReadFailure(market.statusError).hint + ' 诊断码 ' + market.statusError
-            : !market.statusKnown
-              ? '正在读取历史行情补录进度'
-              : market.sessionsReady > 0
-                ? '历史行情补录尚未完成：待补齐 ' + String(market.remaining ?? market.gaps ?? 0) + ' 个交易日'
-                : '历史行情补录尚未开始（目标 ' + String(market.targetSessions) + ' 个交易日）';
+    backfillMessage.diagnosticCode === null ? (
+      backfillMessage.text
+    ) : (
+      <>
+        {backfillMessage.text}
+        <code className="backfill-diagnostic__code">{backfillMessage.diagnosticCode}</code>
+      </>
+    );
   const researchConfigured =
     agent.status !== null && agent.status.default_model !== null && agent.status.budget.state === 'configured';
 
@@ -388,7 +379,7 @@ export function OverviewPage({
       id: 'history-backfill',
       title: '完成历史行情补录',
       description: backfillDescription,
-      done: backfillDone,
+      done: backfillMessage.complete,
       action: runtimeAction('checklist-action-backfill'),
     },
     {

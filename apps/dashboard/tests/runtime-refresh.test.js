@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  backfillOverviewMessage,
   backfillReadFailure,
   createRuntimeRefreshLocks,
   marketSummaryFrom,
@@ -172,6 +173,44 @@ test('a stale warehouse completion is overlaid and then dropped', () => {
   assert.equal(recovered.statusError, null);
   assert.equal(recovered.statusFailures, 0);
   assert.equal(recovered.statusStale, false);
+});
+
+test('overview copy keeps the diagnostic code out of the sentence', () => {
+  const failed = marketSummaryFrom(
+    { running: false, progress: null },
+    null,
+    'MARKET_STATUS_TIMEOUT',
+  );
+  const once = mergeMarketRead(null, failed);
+  const fresh = backfillOverviewMessage(once, false);
+  assert.equal(fresh.complete, false);
+  assert.equal(fresh.diagnosticCode, 'MARKET_STATUS_TIMEOUT');
+  assert.match(fresh.text, /超时/);
+  assert.equal(fresh.text.includes('MARKET_STATUS_TIMEOUT'), false);
+
+  const confirmed = marketSummaryFrom(
+    { running: false, progress: null },
+    { sessions_ready: 84, gaps: [], coverage_complete: true },
+  );
+  const stale = mergeMarketRead(mergeMarketRead(confirmed, failed), failed);
+  const aged = backfillOverviewMessage(stale, false);
+  assert.equal(stale.statusStale, true);
+  assert.equal(aged.complete, false);
+  assert.equal(aged.text, '行情进度无法读取，请稍后重试。');
+  assert.equal(aged.diagnosticCode, 'MARKET_STATUS_TIMEOUT');
+  assert.equal(aged.text.includes('已就绪'), false);
+
+  const progressDone = marketSummaryFrom(
+    { running: false, progress: { sessions: 84, sessions_ready: 84, remaining: 0 } },
+    null,
+    'MARKET_STATUS_TIMEOUT',
+  );
+  const staleProgress = mergeMarketRead(mergeMarketRead(confirmed, progressDone), progressDone);
+  const stillUnconfirmed = backfillOverviewMessage(staleProgress, false);
+  assert.equal(staleProgress.backfillComplete, true);
+  assert.equal(staleProgress.statusStale, true);
+  assert.equal(stillUnconfirmed.complete, false);
+  assert.equal(stillUnconfirmed.text, '行情进度无法读取，请稍后重试。');
 });
 
 test('an idle warehouse failure keeps a stable diagnostic code', () => {

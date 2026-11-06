@@ -5,7 +5,7 @@ import { countText } from '../../lib/format';
 export interface ChecklistItem {
   id: string;
   title: string;
-  description?: string;
+  description?: ReactNode;
   done: boolean;
   /** 需要处理的入口（可选）。 */
   action?: ReactNode;

@@ -550,7 +550,9 @@ export function RuntimePanel({
   const copyText = JSON.stringify(diagnosticsData, null, 2);
 
   const backfillRunning = runtime.market !== null && runtime.market.backfillRunning;
-  const backfillComplete = runtime.market !== null && runtime.market.backfillComplete;
+  // A stale status is not a confirmed warehouse, even if an older progress file said the target was filled.
+  const backfillComplete =
+    runtime.market !== null && runtime.market.backfillComplete && !runtime.market.statusStale;
   const backfillTarget = runtime.market === null ? BACKFILL_TARGET : runtime.market.targetSessions;
   const sessionsReady = runtime.market === null ? 0 : runtime.market.sessionsReady;
   const knownRemaining = runtime.market === null ? null : runtime.market.remaining;

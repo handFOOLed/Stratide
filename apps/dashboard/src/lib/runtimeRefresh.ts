@@ -120,6 +120,72 @@ export function backfillReadFailure(code: string): { hint: string; diagnosticCod
   return { hint, diagnosticCode: code };
 }
 
+export interface BackfillOverviewMessage {
+  text: string;
+  /** Shown apart from the sentence, in the muted diagnostic style. */
+  diagnosticCode: string | null;
+  complete: boolean;
+}
+
+/**
+ * Checklist copy for the merged market summary. A stale read is not a
+ * confirmed warehouse: the sentence says it cannot be read, and the code
+ * stays out of that sentence.
+ */
+export function backfillOverviewMessage(
+  market: MarketSummary | null,
+  runtimeUnreadable: boolean,
+): BackfillOverviewMessage {
+  if (market === null) {
+    return {
+      text: runtimeUnreadable ? '无法读取历史行情补录进度' : '正在读取历史行情补录进度',
+      diagnosticCode: null,
+      complete: false,
+    };
+  }
+  if (market.backfillRunning) {
+    return {
+      text:
+        market.remaining === null
+          ? '历史行情补录已开始'
+          : '历史行情补录中：待补齐 ' + String(market.remaining) + ' 个交易日',
+      diagnosticCode: null,
+      complete: false,
+    };
+  }
+  const confirmed = market.backfillComplete && !market.statusStale;
+  if (market.statusError !== null && !confirmed) {
+    const failure = backfillReadFailure(market.statusError);
+    return {
+      text: market.statusStale ? '行情进度无法读取，请稍后重试。' : failure.hint,
+      diagnosticCode: failure.diagnosticCode,
+      complete: false,
+    };
+  }
+  if (confirmed) {
+    return {
+      text: '历史行情已就绪（' + String(market.sessionsReady) + ' 个交易日）',
+      diagnosticCode: null,
+      complete: true,
+    };
+  }
+  if (!market.statusKnown) {
+    return { text: '正在读取历史行情补录进度', diagnosticCode: null, complete: false };
+  }
+  if (market.sessionsReady > 0) {
+    return {
+      text: '历史行情补录尚未完成：待补齐 ' + String(market.remaining ?? market.gaps ?? 0) + ' 个交易日',
+      diagnosticCode: null,
+      complete: false,
+    };
+  }
+  return {
+    text: '历史行情补录尚未开始（目标 ' + String(market.targetSessions) + ' 个交易日）',
+    diagnosticCode: null,
+    complete: false,
+  };
+}
+
 export interface RuntimeRefreshLocks {
   statusBusy: boolean;
   marketBusy: boolean;

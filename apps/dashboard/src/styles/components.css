@@ -2475,6 +2475,10 @@ a.health-bar__item:hover { background: var(--surface-hover); }
   font-size: var(--fs-xs);
   line-height: var(--lh-base);
 }
+.checklist__desc .backfill-diagnostic__code {
+  display: block;
+  margin-top: 2px;
+}
 .checklist__action { flex: 0 0 auto; }
 
 /* 诊断信息折叠区（默认收起，带复制按钮） */
