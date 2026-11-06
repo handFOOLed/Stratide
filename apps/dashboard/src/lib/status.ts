@@ -92,7 +92,10 @@ const REASON_TEXT: Record<string, string> = {
   UPDATE_CHECK_FAILED: '检查更新失败',
   WSL_DETECT_FAILED: '自动检测未完成',
   WSL_PROBE_FAILED: '本地预测引擎检测未完成',
+  WSL_PROBE_PERSIST_FAILED: '本地预测引擎检查结果未能保存，请重试',
+  WSL_DETECT_SUPERSEDED: '自动检测已过期（设置已变更），请重试或刷新状态',
   WSL_PROBE_REQUIRED: '需要先检测本地预测引擎',
+  WSL_RUNTIME_UNAVAILABLE: 'WSL 当前不可用或未验证，本地预测引擎不能标为就绪',
   TIMESFM_WSL_NOT_CONFIGURED: '尚未配置本地预测引擎',
   TIMESFM_WSL_CONFIG_INCOMPLETE: '本地预测引擎配置不完整',
   TIMESFM_WSL_UNAVAILABLE: '无法调用 WSL，本地预测不可用',
@@ -357,7 +360,11 @@ export function dependencyStatusView(
   // 少数依赖的同一 state 含义不同：AI 研究服务/模拟账户未配置是“未设置”，
   // 而 Tushare 凭据缺失是“需要处理”（不补就采集不到数据）。
   if (key === 'timesfm' && state === 'CONFIGURED') {
-    return statusView('attention', '需要处理', '已保存本地预测引擎入口，需检测后确认可用');
+    return statusView(
+      'attention',
+      '需要处理',
+      humanReasonText(reason) ?? '已保存本地预测引擎入口，请点“检查状态”确认可用',
+    );
   }
   if ((key === 'market_eod' || key === 'paper_account' || key === 'agent') && (state === 'NOT_CONFIGURED' || state === 'MISSING')) {
     return statusView('unset', '未设置', humanReasonText(reason) ?? note ?? undefined);
@@ -572,6 +579,39 @@ export function supervisorStatusView(status: string, reason: string | null): Sta
     default:
       return statusView('unset', '状态未知');
   }
+}
+
+const SUPERVISOR_PROGRESS_REASON: Record<string, string> = {
+  STARTING: '服务进程已启动，正在等待健康检查',
+  STOPPING: '正在停止后台服务',
+};
+
+const SUPERVISOR_OK_REASON: Record<string, string> = {
+  OK: '后台任务运行正常',
+};
+
+/** Map supervisor status + reason to badge + one-line copy; avoids STARTING + OK mismatch. */
+export function supervisorDisplayView(status: string, reason: string): StatusView {
+  const base = supervisorStatusView(status, reason === '' ? null : reason);
+  const progressReason = SUPERVISOR_PROGRESS_REASON[status];
+  if (progressReason !== undefined) {
+    return statusView(base.kind, base.label, progressReason);
+  }
+  const mapped = reason === '' ? null : humanReasonText(reason) ?? SUPERVISOR_OK_REASON[reason] ?? null;
+  if (mapped !== null && base.kind !== 'ok') {
+    return statusView(base.kind, base.label, mapped);
+  }
+  if (base.kind === 'ok') {
+    return statusView('ok', base.label, SUPERVISOR_OK_REASON[reason] ?? '后台任务运行正常');
+  }
+  if (base.reason !== undefined) return base;
+  if (base.kind === 'attention' || base.kind === 'error') {
+    return statusView(base.kind, base.label, failureReasonText(reason));
+  }
+  if (status === 'NOT_STARTED') {
+    return statusView('unset', base.label, '后台任务尚未启动');
+  }
+  return base;
 }
 
 export interface DataStatusInput {

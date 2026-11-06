@@ -2,6 +2,7 @@ pub mod agent_api;
 pub mod desktop;
 pub mod paper_view;
 pub mod runtime_api;
+pub mod runtime_status_cache;
 pub mod snapshot;
 
 use serde_json::{json, Value};
@@ -405,6 +406,22 @@ fn respond(req: Request, reply: Reply) {
             std::thread::sleep(std::time::Duration::from_millis(250));
             std::process::exit(0);
         });
+    }
+}
+
+#[cfg(test)]
+mod concurrent_http_tests {
+    use super::{App, Assets};
+    use std::sync::Arc;
+    use stratide_research::Agent;
+
+    fn assert_send<T: Send>() {}
+
+    #[test]
+    fn per_request_thread_handles_are_send() {
+        assert_send::<Arc<App>>();
+        assert_send::<Arc<Assets>>();
+        assert_send::<Arc<Agent>>();
     }
 }
 

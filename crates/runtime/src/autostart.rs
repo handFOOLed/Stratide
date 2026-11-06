@@ -39,6 +39,17 @@ pub fn status() -> AutostartStatus {
     }
 }
 
+/// Non-blocking autostart projection for `/api/runtime/status` light snapshots.
+pub fn status_light() -> AutostartStatus {
+    AutostartStatus {
+        task_name: crate::SUPERVISOR_TASK.to_string(),
+        exists: false,
+        enabled: false,
+        mechanism: "LIGHT".into(),
+        detail: "DEFERRED_TO_BACKGROUND_REFRESH".into(),
+    }
+}
+
 pub fn set_enabled(launcher: &Path, enabled: bool) -> Result<AutostartStatus, String> {
     let current = status();
     if current.exists && current.mechanism == "TASK_SCHEDULER" {

@@ -1,0 +1,68 @@
+# Narrow Windows MSVC regression for Draft PR #93 (settings / WSL status reliability).
+# Public repo: standard windows-latest runners only; no secrets, cache, or artifacts.
+name: PR93 Windows settings status
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/pr93-windows-settings-status.yml
+      - apps/stratided/**
+      - apps/dashboard/**
+      - crates/runtime/**
+  push:
+    branches: [cursor/settings-status-wsl-health-474a]
+    paths:
+      - .github/workflows/pr93-windows-settings-status.yml
+      - apps/stratided/**
+      - apps/dashboard/**
+      - crates/runtime/**
+
+concurrency:
+  group: pr93-windows-settings-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  windows-msvc-regression:
+    name: MSVC check and regressions
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rust stable (MSVC)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Whole-service stratided type-check (all targets)
+        shell: bash
+        run: cargo check -p stratided --all-targets --locked
+
+      - name: stratide-runtime unit tests
+        shell: bash
+        run: cargo test -p stratide-runtime --locked
+
+      - name: stratided runtime_status_cache unit tests
+        shell: bash
+        run: cargo test -p stratided runtime_status_cache --locked -- --test-threads=1
+
+      - name: stratided runtime_status_health integration
+        shell: bash
+        run: cargo test -p stratided --test runtime_status_health --locked
+
+      - name: Dashboard typecheck, build, status tests
+        shell: bash
+        working-directory: apps/dashboard
+        run: |
+          npm ci
+          npm run typecheck
+          npm run build
+          npm test
