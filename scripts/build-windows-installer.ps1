@@ -132,6 +132,12 @@ $pythonVersion = (& (Join-Path $payload 'runtime\python\python.exe') -c "import 
 if ($LASTEXITCODE -ne 0) { throw 'BUNDLED_PYTHON_SMOKE_FAILED' }
 $commit = (git -C $root rev-parse HEAD).Trim()
 $dirty = if ((git -C $root status --porcelain)) { '-dirty' } else { '' }
+$innoInfo = (Get-Item -LiteralPath $isccPath).VersionInfo
+$innoVersion = [string]$innoInfo.ProductVersion
+if ([string]::IsNullOrWhiteSpace($innoVersion) -or $innoVersion.Trim() -eq '0.0.0.0') {
+  $innoVersion = [string]$innoInfo.FileVersion
+}
+$innoVersion = $innoVersion.Trim()
 $buildInfo = [ordered]@{
   product = 'Stratide'
   version = $Version
@@ -139,7 +145,7 @@ $buildInfo = [ordered]@{
   built_at = (Get-Date).ToUniversalTime().ToString('o')
   python = $pythonVersion
   architecture = 'x64'
-  inno_setup = (Get-Item -LiteralPath $isccPath).VersionInfo.FileVersion
+  inno_setup = $innoVersion
   paper_only = $true
   live_broker = $false
   unsigned = $true

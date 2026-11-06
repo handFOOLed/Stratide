@@ -75,7 +75,7 @@ jobs:
             '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-','/ALLUSERS',"/LOG=$log"
           ) -Wait -PassThru
           if ($proc.ExitCode -ne 0) {
-            if (Test-Path -LiteralPath $log) { Get-Content -LiteralPath $log -Tail 50 }
+            if (Test-Path -LiteralPath $log) { Get-Content -LiteralPath $log -Tail 80 }
             throw "INNO_INSTALL_FAILED exit=$($proc.ExitCode)"
           }
           $iscc = Join-Path ${env:ProgramFiles(x86)} 'Inno Setup 6\ISCC.exe'
@@ -83,10 +83,14 @@ jobs:
             $iscc = Join-Path $env:LOCALAPPDATA 'Programs\Inno Setup 6\ISCC.exe'
           }
           if (-not (Test-Path -LiteralPath $iscc)) { throw 'ISCC_NOT_FOUND' }
-          $fileVersion = (Get-Item -LiteralPath $iscc).VersionInfo.FileVersion
-          if ($fileVersion -notlike '6.7.4*') { throw "INNO_VERSION $fileVersion" }
+          $innoInfo = (Get-Item -LiteralPath $iscc).VersionInfo
+          $productVersion = $innoInfo.ProductVersion.Trim()
+          $fileVersion = $innoInfo.FileVersion.Trim()
+          if ($productVersion -notlike '6.7.4*') {
+            throw "INNO_VERSION file=$fileVersion product=$productVersion length=$((Get-Item -LiteralPath $iscc).Length)"
+          }
           "ISCC_EXE=$iscc" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-          Write-Host "ISCC $iscc version $fileVersion"
+          Write-Host "ISCC $iscc product=$productVersion file=$fileVersion"
 
       - name: Fetch pinned CPython and tzdata
         run: |
