@@ -11,6 +11,6 @@
 | M2 | Agent、TimesFM、DeepSeek、Dashboard | [M2 索引](ARCHIVE.md#research--m2) |
 | M3 | 全市场、研究、组合、Windows 安装 | [M3 索引](ARCHIVE.md#product--m3) |
 
-[完整工程日志与测试证据 →](evidence/README.md)
+[原 2026-11-05 工程状态完整存档](STATUS_HISTORY.md) · [完整工程日志与测试证据 →](evidence/README.md)
 
 > 原有 PR 文档内的“当前 / Draft / 待合并”描述属于其当时的交付状态。Accepted ADR 保留为历史决策依据，但不等于所有规划中的实盘功能已经实现。

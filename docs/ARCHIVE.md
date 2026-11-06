@@ -68,4 +68,4 @@
 
 ## 其他资料
 
-[Paper 路线图](PAPER_TRADING_ROADMAP.md) · [架构草案](ARCHITECTURE.md) · [自动化复盘](AUTOMATION_RELIABILITY.md) · [ADR](adr/README.md) · [Evidence](evidence/README.md)
+[Paper 路线图](PAPER_TRADING_ROADMAP.md) · [架构草案](ARCHITECTURE.md) · [原状态日志](STATUS_HISTORY.md) · [自动化复盘](AUTOMATION_RELIABILITY.md) · [ADR](adr/README.md) · [Evidence](evidence/README.md)
