@@ -5,36 +5,24 @@ import { acceptConsent } from '../lib/consent';
 
 const SECTIONS: Array<{ title: string; body: string }> = [
   {
-    title: '只在本机、只做模拟',
-    body: '软件只在本机运行，不连接券商、不能下真实订单。所有成交都是模拟假设，不是真实交易。',
+    title: '只做模拟',
+    body: '软件只在这台电脑上运行，不连接券商，不能下真实的单。模拟成交和盈亏不代表真实赚钱。',
   },
   {
     title: '模拟账户',
-    body: '开户即使用 ¥100,000 模拟本金，最多同时持有 2 只，单票上限 ¥20,000。日亏损 2% 或回撤 10% 会自动阻止新的模拟下单。',
+    body: '起始资金 ¥100,000。最多同时持有 2 只股票，单只最多 ¥20,000。当天亏损达到 2%，或从高点回撤达到 10%，就停止新的模拟下单。',
   },
   {
-    title: 'AI 研究',
-    body: '当你启用 AI 研究后，会把最多 8 个证券、84 个交易日的行情摘要与风险预测发送给 DeepSeek 官方（api.deepseek.com），仅用于策略研究。不会发送账户余额、真实持仓、账本、密钥或原始行情文件。',
+    title: '研究会发出去什么',
+    body: '全市场研究最多带 8 只股票、84 个交易日的行情摘要，以及本机风险预测，发到 api.deepseek.com，只用于研究。不发送账户余额、真实持仓、成交账本、密钥，也不发送原始行情文件。',
   },
   {
-    title: '费用上限',
-    body: '云端调用硬上限为 ¥5/日、¥100/月。超出即暂停研究，不影响行情采集与交易保护。',
+    title: '费用有上限',
+    body: '云端研究每天最多 ¥5，每月最多 ¥100。到顶就停止新的研究，不影响本机行情和交易保护。',
   },
   {
-    title: '行情数据',
-    body: 'Tushare 数据按个人本地许可使用，只在本机保存与计算，不转发、不再分发。',
-  },
-  {
-    title: '密钥与安全',
-    body: 'API Key 只保存在 Windows 凭据管理器；页面不回显，日志不记录。',
-  },
-  {
-    title: '风险提示',
-    body: '模拟成交与历史回测不代表未来收益，也不构成投资建议。软件不保证盈利，也不保证最大亏损。',
-  },
-  {
-    title: '如何停止',
-    body: '想停止新的云端研究，可在本机设置中撤销同意；卸载时默认保留已有数据。',
+    title: '行情密钥留在本机',
+    body: 'Tushare 密钥只在这台电脑上使用，不转发给云端。密钥放在 Windows 凭据管理器里，页面不显示，日志也不记录。',
   },
 ];
 
@@ -58,10 +46,8 @@ export function AgreementPage() {
     <div className="agreement">
       <div className="agreement__card">
         <p className="agreement__eyebrow">Stratide · 首次使用</p>
-        <h1 className="agreement__title">开始之前，只有这一页</h1>
-        <p className="agreement__lead">
-          这是一份一次性的说明与授权。同意后，软件不会再弹出任何许可或审批。
-        </p>
+        <h1 className="agreement__title">使用前请先看这几条</h1>
+        <p className="agreement__lead">点一次「同意并继续」，这页就不会再出现。</p>
         <div className="agreement__sections">
           {SECTIONS.map((section) => (
             <section key={section.title}>
