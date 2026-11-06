@@ -16,4 +16,4 @@ Workflow **PR93 Windows settings status** on `windows-latest` runs:
 - `cargo test -p stratided --test runtime_status_health --locked`
 - `npm ci && npm run typecheck && npm run build && npm test` in `apps/dashboard`
 
-Latest green MSVC run (PR #93): https://github.com/handFOOLed/Stratide/actions/runs/42157924442 @ `0ed8556` (19 runtime + 4 cache + 1 health + dashboard).
+Latest green MSVC run (PR #93): https://github.com/handFOOLed/Stratide/actions/runs/42160159527 @ `82e674b`.
