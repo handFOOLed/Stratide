@@ -49,7 +49,7 @@
 pwsh -NoProfile -File scripts/build-windows-installer.ps1 -Version 0.3.1
 ```
 
-**必须显式传入 `-Version 0.3.1`**：截至 PR #91，脚本默认参数仍是 `0.3.0`。
+目前脚本默认构建版本已更新为 `0.3.1`。发布时仍建议显式传入 `-Version`，并核对安装包文件名、`BUILD_INFO` 与实际二进制的版本一致。
 
 脚本会重新构建 Rust release 二进制与 Dashboard，然后由 Inno Setup 输出：
 
