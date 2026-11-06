@@ -12,7 +12,7 @@ export interface ChecklistItem {
 }
 
 /**
- * 上手清单：完成一项打勾；全部完成后整块自动折叠为一行。
+ * 上手清单：完成一项打勾。总览在每一项都已确认完成时整块隐藏。
  * 内容必须来自真实状态，不得写死进度。
  */
 export function Checklist({
