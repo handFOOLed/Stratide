@@ -1,5 +1,9 @@
 # Stratide UI 设计系统与信息架构
 
+> **工程参考**：本页含原阶段协议或设计；当前已交付能力请以 0.3.1 源码为准。
+>
+> [文档中心](README.md) · [当前版本](STATUS.md) · [架构总览](ARCHITECTURE_OVERVIEW.md)
+
 > 适用范围：M2-PR03（Issue #23）之后的前端。实现位于 [apps/dashboard](../apps/dashboard)。Paper/Agent API、Risk Kernel、Ledger、预算 Gate 与 Accepted ADR 均未改写。**本版为 2026-10-29 Owner 首轮体验后的第二轮精修记录**：桌面单屏首页、资产曲线刻度与平滑、字号基线、成交详情层级、传统设置结构、DeepSeek Usage 风格背景、排序闪线与侧栏档案入口。
 
 ## 1. 目标与边界

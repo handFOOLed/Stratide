@@ -1,5 +1,9 @@
 # Stratide 界面术语表（唯一口径）
 
+> **工程参考**：本页含原阶段协议或设计；当前已交付能力请以 0.3.1 源码为准。
+>
+> [文档中心](README.md) · [当前版本](STATUS.md) · [架构总览](ARCHITECTURE_OVERVIEW.md)
+
 > 本文件是 Stratide 面向普通投资者界面的唯一术语来源。代码中的常量集合见
 > `apps/dashboard/src/lib/copy.ts`（`TERMS`），状态词与后端枚举映射见
 > `apps/dashboard/src/lib/status.ts`。新增或修改界面文案前先查本表；同义词、

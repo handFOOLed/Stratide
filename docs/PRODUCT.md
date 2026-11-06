@@ -1,5 +1,9 @@
 # Product Definition — agreed principles and historical decisions
 
+> **工程参考**：本页含原阶段协议或设计；当前已交付能力请以 0.3.1 源码为准。
+>
+> [文档中心](README.md) · [当前版本](STATUS.md) · [架构总览](ARCHITECTURE_OVERVIEW.md)
+
 > **当前产品状态｜2026-11-05**：Stratide V2/Windows 0.3.0 已可作为个人本地 Paper 研究与模拟软件使用；PR #86/#87/#88/#89 已合并。日常使用见 [USER_GUIDE](USER_GUIDE.md)，工程状态见 [STATUS](STATUS.md)，运行前提/验证细节见 [KNOWN_LIMITATIONS](KNOWN_LIMITATIONS.md)。曾经的“#85 正在交付”“DeepSeek 只管 UI”及“N100 接下来就实施”等都只是历史计划。新的模块需 Owner 另行决定。Accepted ADRs 保留原文，未赋予真实券商/真钱交易权限。
 
 Status: **agreed product principles**, not a profitability claim.

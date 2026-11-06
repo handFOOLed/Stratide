@@ -1,5 +1,9 @@
 # Dashboard V1 只读 API
 
+> **工程参考**：本页含原阶段协议或设计；当前已交付能力请以 0.3.1 源码为准。
+>
+> [文档中心](README.md) · [当前版本](STATUS.md) · [架构总览](ARCHITECTURE_OVERVIEW.md)
+
 ## Issue #77：当前账户与研究扩展
 
 `GET /api/v1/{account,equity,positions,strategies,fills,orders}` 读取显式 `--paper-ledger` 的当前 Paper 账本。未配置时返回 409 `CURRENT_PAPER_ACCOUNT_UNCONFIGURED`；所选历史报告不会替代当前 NAV。原 `GET /api/{account,...}` 保持所选报告语义；同时配置时历史页仍读原报告。显式 synthetic 演示始终保留合成标记。账本写入者保持原 SQLite EXCLUSIVE 生命周期；写入尚未退出时读取可失败，不能用旧报告冒充新数据。

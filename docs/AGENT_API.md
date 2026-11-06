@@ -1,5 +1,9 @@
 # Agent V1 本机 API
 
+> **工程参考**：本页含原阶段协议或设计；当前已交付能力请以 0.3.1 源码为准。
+>
+> [文档中心](README.md) · [当前版本](STATUS.md) · [架构总览](ARCHITECTURE_OVERVIEW.md)
+
 ## Issue #77：本地审批与通知
 
 沿用本节本机同源检查与 v1 信封。`GET inbox` 返回原 Agent DB 中的审批和已结束任务通知：`notifications[]` 含 `id/status/reason/at/read/name/conclusion/provider_id/kind`——`name` 是任务名，`conclusion` 是已完成任务的 `research.hypothesis`（截断到 500 字符，无结果时为 null），`provider_id=market-research-status` 的阻断记录 `kind=research_blocked_notice`，其余为 `research_task`；顶层 `unread_count`（JSON 数字）统计全部已结束且未标记已读的任务数，不受返回 50 条窗口限制。`GET operations` 列本机配置的固定研究；`GET prompts` 仅返回版本化安全内置 Prompt，不含上下文/凭据。以下路径均加 `/api/agent/`：
