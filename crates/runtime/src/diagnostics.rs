@@ -613,7 +613,11 @@ mod tests {
             crate::wsl_probe::WslProbeRecord::new(&wsl, "READY", None),
         )
         .expect("write probe");
-        let wsl_json = json!({"state":"READY","configured": true});
+        let wsl_json = json!({
+            "state":"READY",
+            "configured": true,
+            "distributions":["Ubuntu-24.04"],
+        });
         let timesfm = super::timesfm_status(&layout, &wsl_json, Some(&wsl));
         assert_eq!(timesfm["state"], "READY");
         assert!(timesfm["reason"].is_null());
