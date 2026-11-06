@@ -755,7 +755,7 @@ fn layout_error(status: u16, code: &str) -> Reply {
 #[cfg(test)]
 mod tests {
     use super::setup_completed;
-    use super::{post_mutates_status_snapshot, store_wsl};
+    use super::{post_mutates_status_snapshot, post_skips_status_write_lock, store_wsl};
     use serde_json::json;
     use stratide_runtime::{Layout, WslSettings, wsl_probe};
 
