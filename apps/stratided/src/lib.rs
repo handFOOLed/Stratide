@@ -410,6 +410,22 @@ fn respond(req: Request, reply: Reply) {
 }
 
 #[cfg(test)]
+mod concurrent_http_tests {
+    use super::{App, Assets};
+    use std::sync::Arc;
+    use stratide_research::Agent;
+
+    fn assert_send<T: Send>() {}
+
+    #[test]
+    fn per_request_thread_handles_are_send() {
+        assert_send::<Arc<App>>();
+        assert_send::<Arc<Assets>>();
+        assert_send::<Arc<Agent>>();
+    }
+}
+
+#[cfg(test)]
 mod current_account_tests {
     use super::*;
     #[test]

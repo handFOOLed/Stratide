@@ -8,13 +8,13 @@ use crate::{App, Reply};
 use crate::runtime_status_cache::{self, SERVE_MAX_AGE};
 use serde_json::{json, Value};
 use std::process::Command;
-use std::sync::Mutex;
+use std::sync::RwLock;
 use std::time::Duration;
 use stratide_runtime::Layout;
 use tiny_http::Request;
 
 /// Serialize dependency-changing runtime POST handlers (config, probe, market, …).
-static RUNTIME_WRITE: Mutex<()> = Mutex::new(());
+static RUNTIME_WRITE: RwLock<()> = RwLock::new(());
 
 fn collect_status_light(app: &App, layout: &Layout) -> Result<Value, &'static str> {
     let service = json!({"healthy": true, "instance_id": app.instance_id(),
@@ -30,10 +30,11 @@ fn schedule_status_refresh(app: &App, layout: &Layout) {
     let instance_id = app.instance_id().to_string();
     let pid = std::process::id();
     let captured_epoch = runtime_status_cache::epoch();
+    let generation_at_start = runtime_status_cache::generation();
     std::thread::spawn(move || {
         let service = json!({"healthy": true, "instance_id": instance_id, "pid": pid.to_string()});
         if let Ok(value) = stratide_runtime::diagnostics::collect(&layout, service) {
-            runtime_status_cache::publish_if_current(value, captured_epoch);
+            runtime_status_cache::publish_if_not_superseded(value, captured_epoch, generation_at_start);
         }
         runtime_status_cache::end_background_refresh();
     });
@@ -115,9 +116,10 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
         Ok(value) => value,
         Err(_) => return error(400, "JSON_INVALID"),
     };
-    let _mutation = RUNTIME_WRITE
-        .lock()
-        .map_err(|_| error(503, "RUNTIME_WRITE_BUSY"))?;
+    let _mutation = match RUNTIME_WRITE.write() {
+        Ok(guard) => guard,
+        Err(_) => return error(503, "RUNTIME_WRITE_BUSY"),
+    };
     runtime_status_cache::bump_epoch();
     let affects_status = matches!(
         path.as_str(),
@@ -160,18 +162,19 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
 }
 
 fn status(app: &App, layout: &Layout) -> Result<Value, &'static str> {
+    let _read = RUNTIME_WRITE
+        .read()
+        .map_err(|_| "RUNTIME_STATUS_BUSY")?;
     if let Some(value) = runtime_status_cache::cached_value(SERVE_MAX_AGE) {
+        drop(_read);
         schedule_status_refresh(app, layout);
         return Ok(value);
     }
     let light = collect_status_light(app, layout)?;
     runtime_status_cache::publish(light.clone());
+    drop(_read);
     schedule_status_refresh(app, layout);
     Ok(light)
-}
-
-fn invalidate() {
-    runtime_status_cache::invalidate_cache();
 }
 
 fn autostart(app: &App, layout: &Layout, body: &Value) -> Result<Reply, Reply> {

@@ -143,6 +143,8 @@ fn run() -> Result<(), String> {
     let assets = std::sync::Arc::new(assets);
     let agent = agent.map(std::sync::Arc::new);
     for req in server.incoming_requests() {
+        // Local loopback only; bounded by single-user desktop load. Each request owns
+        // its thread so long runtime probes cannot block `/api/health`.
         let app = std::sync::Arc::clone(&app);
         let assets = std::sync::Arc::clone(&assets);
         let agent = agent.as_ref().map(std::sync::Arc::clone);
