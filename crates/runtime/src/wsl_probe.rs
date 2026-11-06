@@ -127,13 +127,20 @@ mod tests {
             model: None,
         };
         let record = WslProbeRecord::new(&wsl, "READY", None);
+        std::fs::create_dir_all(&layout.data).unwrap();
+        // Block `data/state/` as a directory on all platforms (file at that path).
         std::fs::write(layout.data.join("state"), b"").unwrap();
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;
-            let mut perms = std::fs::metadata(layout.data.join("state")).unwrap().permissions();
+            let blocked = layout.data.join("state-blocked");
+            std::fs::create_dir_all(&blocked).unwrap();
+            let mut perms = std::fs::metadata(&blocked).unwrap().permissions();
             perms.set_mode(0o500);
-            std::fs::set_permissions(layout.data.join("state"), perms).unwrap();
+            std::fs::set_permissions(&blocked, perms).unwrap();
+            let mut blocked_layout = layout.clone();
+            blocked_layout.data = blocked;
+            assert!(write(&blocked_layout, record.clone()).is_err());
         }
         assert!(write(&layout, record).is_err());
     }
