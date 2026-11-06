@@ -54,6 +54,59 @@ fn publish_light_snapshot(app: &App, layout: &Layout) -> Result<(), Reply> {
     Ok(())
 }
 
+fn market_action<'a>(body: &'a Value) -> Option<&'a str> {
+    body.get("action").and_then(Value::as_str)
+}
+
+/// POST routes that change dependency/status truth and must invalidate cached snapshots.
+pub(crate) fn post_mutates_status_snapshot(path: &str, body: &Value) -> bool {
+    match path {
+        "/api/runtime/market" => matches!(
+            market_action(body),
+            Some("init" | "enable" | "disable" | "backfill")
+        ),
+        "/api/runtime/wsl"
+        | "/api/runtime/wsl-detect"
+        | "/api/runtime/wsl-probe"
+        | "/api/runtime/tushare-token"
+        | "/api/runtime/setup-complete"
+        | "/api/runtime/autostart" => true,
+        _ => false,
+    }
+}
+
+fn post_skips_status_write_lock(path: &str, body: &Value) -> bool {
+    path == "/api/runtime/wsl-probe"
+        || (path == "/api/runtime/market"
+            && matches!(market_action(body), Some("status" | "backfill-state")))
+        || matches!(
+            path,
+            "/api/runtime/open-folder" | "/api/runtime/update-check" | "/api/runtime/shutdown"
+        )
+}
+
+fn finish_status_mutation(
+    app: &App,
+    layout: &Layout,
+    path: &str,
+    body: &Value,
+    result: Result<Reply, Reply>,
+) -> Reply {
+    match result {
+        Ok(reply) => {
+            if post_mutates_status_snapshot(path, body) {
+                let _ = publish_light_snapshot(app, layout);
+                schedule_status_refresh(app, layout);
+            }
+            reply
+        }
+        Err(reply) => {
+            let _ = publish_light_snapshot(app, layout);
+            reply
+        }
+    }
+}
+
 pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
     let error = |status: u16, code: &str| app.error(status, code, code);
     let single = |name: &'static str| {
@@ -124,31 +177,13 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
         Ok(value) => value,
         Err(_) => return error(400, "JSON_INVALID"),
     };
-    let _mutation = match RUNTIME_WRITE.write() {
-        Ok(guard) => guard,
-        Err(_) => return error(503, "RUNTIME_WRITE_BUSY"),
-    };
-    runtime_status_cache::bump_epoch();
-    let affects_status = matches!(
-        path.as_str(),
-        "/api/runtime/wsl"
-            | "/api/runtime/wsl-detect"
-            | "/api/runtime/wsl-probe"
-            | "/api/runtime/tushare-token"
-            | "/api/runtime/market"
-            | "/api/runtime/setup-complete"
-            | "/api/runtime/autostart"
-    );
-    let result = (|| -> Result<Reply, Reply> {
-        match path.as_str() {
-            "/api/runtime/autostart" => autostart(app, &layout, &body),
-            "/api/runtime/tushare-token" => tushare_token(&layout, &body),
+    if path == "/api/runtime/wsl-probe" {
+        return probe_wsl(app, &layout);
+    }
+    if post_skips_status_write_lock(&path, &body) {
+        let result = match path.as_str() {
             "/api/runtime/market" => market(&layout, &body),
-            "/api/runtime/wsl" => configure_wsl(&layout, &body),
-            "/api/runtime/wsl-detect" => detect_wsl(&layout),
-            "/api/runtime/wsl-probe" => probe_wsl(app, &layout),
             "/api/runtime/open-folder" => open_folder(&layout, &body),
-            "/api/runtime/setup-complete" => setup_complete(&layout, &body),
             "/api/runtime/update-check" => update_check(&layout),
             "/api/runtime/shutdown" => {
                 let mut reply = app.envelope(200, json!({"state": "STOPPING"}), Value::Null);
@@ -156,17 +191,32 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
                 Ok(reply)
             }
             _ => Err(error(404, "RUNTIME_ROUTE_NOT_FOUND")),
+        };
+        return match result {
+            Ok(reply) => reply,
+            Err(reply) => reply,
+        };
+    }
+    let _mutation = match RUNTIME_WRITE.write() {
+        Ok(guard) => guard,
+        Err(_) => return error(503, "RUNTIME_WRITE_BUSY"),
+    };
+    runtime_status_cache::invalidate_cache();
+    let path_string = path.clone();
+    let result = (|| -> Result<Reply, Reply> {
+        match path_string.as_str() {
+            "/api/runtime/autostart" => autostart(app, &layout, &body),
+            "/api/runtime/tushare-token" => tushare_token(&layout, &body),
+            "/api/runtime/market" => market(&layout, &body),
+            "/api/runtime/wsl" => configure_wsl(&layout, &body),
+            "/api/runtime/wsl-detect" => detect_wsl(&layout),
+            "/api/runtime/open-folder" => open_folder(&layout, &body),
+            "/api/runtime/setup-complete" => setup_complete(&layout, &body),
+            "/api/runtime/update-check" => update_check(&layout),
+            _ => Err(error(404, "RUNTIME_ROUTE_NOT_FOUND")),
         }
     })();
-    if result.is_ok() && affects_status {
-        schedule_status_refresh(app, &layout);
-    } else if result.is_err() {
-        runtime_status_cache::invalidate_cache();
-    }
-    match result {
-        Ok(reply) => reply,
-        Err(reply) => reply,
-    }
+    finish_status_mutation(app, &layout, &path, &body, result)
 }
 
 fn status(app: &App, layout: &Layout) -> Result<Value, &'static str> {
@@ -419,16 +469,16 @@ fn store_wsl(layout: &Layout, wsl: stratide_runtime::WslSettings) -> Result<bool
         .map_err(|_| layout_error(409, "RUNTIME_CONFIG_INVALID"))?;
     let restart = config.wsl.as_ref() != Some(&wsl);
     if restart {
-        // Written before the config so a failed request leaves the old entry
-        // intact; a restart with the old entry only restarts the same watch.
         stratide_runtime::state::atomic_write(&layout.watch_restart_path(), b"{}".to_vec())
             .map_err(|_| layout_error(409, "WATCH_RESTART_REQUEST_FAILED"))?;
-        stratide_runtime::wsl_probe::clear(layout);
     }
     config.wsl = Some(wsl);
     config
         .save(&layout.config_path)
         .map_err(|_| layout_error(409, "RUNTIME_CONFIG_WRITE_FAILED"))?;
+    if restart {
+        stratide_runtime::wsl_probe::clear(layout);
+    }
     Ok(restart)
 }
 
@@ -492,7 +542,14 @@ fn detect_wsl(layout: &Layout) -> Result<Reply, Reply> {
     ))
 }
 
-fn probe_wsl(app: &App, layout: &Layout) -> Result<Reply, Reply> {
+fn probe_wsl(app: &App, layout: &Layout) -> Reply {
+    match probe_wsl_inner(app, layout) {
+        Ok(reply) => reply,
+        Err(reply) => reply,
+    }
+}
+
+fn probe_wsl_inner(app: &App, layout: &Layout) -> Result<Reply, Reply> {
     let config = layout
         .config()
         .map_err(|_| layout_error(409, "RUNTIME_CONFIG_INVALID"))?;
@@ -542,10 +599,16 @@ fn probe_wsl(app: &App, layout: &Layout) -> Result<Reply, Reply> {
         if ready { "READY" } else { "BLOCKED" },
         reason.clone(),
     );
+    let _write = RUNTIME_WRITE
+        .write()
+        .map_err(|_| layout_error(503, "RUNTIME_WRITE_BUSY"))?;
+    runtime_status_cache::invalidate_cache();
     stratide_runtime::wsl_probe::write(layout, record).map_err(|_| {
         layout_error(409, "WSL_PROBE_PERSIST_FAILED")
     })?;
     publish_light_snapshot(app, layout)?;
+    drop(_write);
+    schedule_status_refresh(app, layout);
     Ok(layout_envelope(
         200,
         json!({
@@ -622,7 +685,9 @@ fn layout_error(status: u16, code: &str) -> Reply {
 #[cfg(test)]
 mod tests {
     use super::setup_completed;
+    use super::{post_mutates_status_snapshot, store_wsl};
     use serde_json::json;
+    use stratide_runtime::{Layout, WslSettings, wsl_probe};
 
     #[test]
     fn setup_body_defaults_to_complete_and_only_boolean_can_revoke() {
@@ -631,5 +696,97 @@ mod tests {
         assert_eq!(setup_completed(&json!({"completed": false})), Ok(false));
         assert_eq!(setup_completed(&json!({"completed": "false"})), Err(()));
         assert_eq!(setup_completed(&json!({"completed": null})), Err(()));
+    }
+
+    #[test]
+    fn readonly_market_status_does_not_mutate_status_snapshot() {
+        assert!(!post_mutates_status_snapshot(
+            "/api/runtime/market",
+            &json!({"action": "status"})
+        ));
+        assert!(!post_mutates_status_snapshot(
+            "/api/runtime/market",
+            &json!({"action": "backfill-state"})
+        ));
+        assert!(post_mutates_status_snapshot(
+            "/api/runtime/market",
+            &json!({"action": "init", "start_date": "20240101"})
+        ));
+    }
+
+    #[test]
+    fn store_wsl_keeps_probe_when_config_write_fails() {
+        let tmp = tempfile::tempdir().unwrap();
+        let home = tmp.path();
+        std::fs::create_dir_all(home.join("runtime")).unwrap();
+        std::fs::create_dir_all(home.join("data/state")).unwrap();
+        let config_path = home.join("runtime.json");
+        std::fs::write(
+            &config_path,
+            br#"{"schema_version":1,"port":8710,"data_root":"data","python":null,"wsl":{"distribution":"Ubuntu-24.04","workspace":"/home/a"}}"#,
+        )
+        .unwrap();
+        let layout = Layout {
+            home: home.to_path_buf(),
+            app: home.join("app"),
+            data: home.join("data"),
+            runtime: home.join("runtime"),
+            logs: home.join("logs"),
+            config_path: config_path.clone(),
+            version: "0.0.0-test".into(),
+        };
+        let wsl = WslSettings {
+            distribution: "Ubuntu-24.04".into(),
+            workspace: "/home/a".into(),
+            python: None,
+            model: None,
+        };
+        wsl_probe::write(
+            &layout,
+            wsl_probe::WslProbeRecord::new(&wsl, "READY", None),
+        )
+        .expect("probe");
+        mark_readonly(&config_path);
+        let changed = WslSettings {
+            workspace: "/home/b".into(),
+            ..wsl
+        };
+        assert!(store_wsl(&layout, changed).is_err());
+        assert!(wsl_probe::path(&layout).is_file());
+        clear_readonly(&config_path);
+    }
+
+    fn mark_readonly(path: &std::path::Path) {
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mut perms = std::fs::metadata(path).unwrap().permissions();
+            perms.set_mode(0o444);
+            std::fs::set_permissions(path, perms).unwrap();
+        }
+        #[cfg(windows)]
+        {
+            std::process::Command::new("attrib")
+                .args(["+R", &path.to_string_lossy()])
+                .status()
+                .expect("attrib +R");
+        }
+    }
+
+    fn clear_readonly(path: &std::path::Path) {
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mut perms = std::fs::metadata(path).unwrap().permissions();
+            perms.set_mode(0o644);
+            std::fs::set_permissions(path, perms).unwrap();
+        }
+        #[cfg(windows)]
+        {
+            std::process::Command::new("attrib")
+                .args(["-R", &path.to_string_lossy()])
+                .status()
+                .expect("attrib -R");
+        }
     }
 }

@@ -42,8 +42,12 @@ pub fn invalidate_cache() {
 }
 
 pub fn cached_value(max_age: Duration) -> Option<Value> {
+    let current_epoch = epoch();
     let cache = STATUS_CACHE.lock().ok()?;
     let entry = cache.as_ref()?;
+    if entry.epoch != current_epoch {
+        return None;
+    }
     if entry.built_at.elapsed() > max_age {
         return None;
     }
@@ -136,19 +140,25 @@ mod tests {
     }
 
     #[test]
+    fn cached_value_ignored_after_epoch_bump_without_publish() {
+        reset_test_state();
+        publish(serde_json::json!({"marker": "before-config-change"}));
+        bump_epoch();
+        assert!(cached_value(SERVE_MAX_AGE).is_none());
+    }
+
+    #[test]
     fn stale_epoch_refresh_cannot_overwrite_newer_cache() {
         reset_test_state();
         let old_epoch = epoch();
         publish_if_not_superseded(serde_json::json!({"generation": "old"}), old_epoch, 0);
         bump_epoch();
+        assert!(cached_value(SERVE_MAX_AGE).is_none());
         assert!(!publish_if_not_superseded(
             serde_json::json!({"generation": "stale-background"}),
             old_epoch,
             0
         ));
-        let cached = cached_value(SERVE_MAX_AGE).expect("cache");
-        assert_eq!(cached["generation"], "old");
-        bump_epoch();
         publish(serde_json::json!({"generation": "new"}));
         let cached = cached_value(SERVE_MAX_AGE).expect("cache");
         assert_eq!(cached["generation"], "new");

@@ -469,6 +469,35 @@ mod tests {
     }
 
     #[test]
+    fn expired_persisted_probe_does_not_mark_timesfm_ready() {
+        use crate::WslSettings;
+        let tmp = tempfile::tempdir().unwrap();
+        let layout = layout(tmp.path());
+        std::fs::create_dir_all(&layout.data.join("state")).unwrap();
+        let wsl = WslSettings {
+            distribution: "Ubuntu-24.04".into(),
+            workspace: "/home/stratide".into(),
+            python: None,
+            model: None,
+        };
+        crate::wsl_probe::write(
+            &layout,
+            crate::wsl_probe::WslProbeRecord {
+                schema_version: 1,
+                probed_at: "2020-01-01T00:00:00+00:00".into(),
+                fingerprint: crate::wsl_probe::fingerprint(&wsl),
+                state: "READY".into(),
+                reason: None,
+            },
+        )
+        .expect("write probe");
+        let wsl_json = json!({"state":"READY","configured": true});
+        let timesfm = super::timesfm_status(&layout, &wsl_json, Some(&wsl));
+        assert_eq!(timesfm["state"], "CONFIGURED");
+        assert_eq!(timesfm["reason"], "WSL_PROBE_REQUIRED");
+    }
+
+    #[test]
     fn persisted_wsl_probe_marks_timesfm_ready() {
         use crate::WslSettings;
         let tmp = tempfile::tempdir().unwrap();

@@ -2,8 +2,12 @@
 use crate::{Layout, WslSettings};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
+use std::time::Duration;
 
 const PROBE_FILE: &str = "timesfm-wsl-probe.json";
+
+/// READY/BLOCKED probe records older than this are not trusted for dependency status.
+pub const TRUST_MAX_AGE: Duration = Duration::from_secs(7 * 24 * 3600);
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -24,6 +28,20 @@ impl WslProbeRecord {
             fingerprint: fingerprint(wsl),
             state: state.into(),
             reason,
+        }
+    }
+
+    pub fn is_trusted(&self) -> bool {
+        if self.schema_version != 1 {
+            return false;
+        }
+        let Ok(at) = chrono::DateTime::parse_from_rfc3339(&self.probed_at) else {
+            return false;
+        };
+        let age = chrono::Utc::now().signed_duration_since(at.with_timezone(&chrono::Utc));
+        match age.to_std() {
+            Ok(elapsed) => elapsed <= TRUST_MAX_AGE,
+            Err(_) => false,
         }
     }
 }
@@ -69,11 +87,13 @@ pub fn clear(layout: &Layout) {
 
 pub fn matching(layout: &Layout, wsl: &WslSettings) -> Option<WslProbeRecord> {
     let record = read(layout)?;
-    if record.fingerprint == fingerprint(wsl) {
-        Some(record)
-    } else {
-        None
+    if record.fingerprint != fingerprint(wsl) {
+        return None;
     }
+    if !record.is_trusted() {
+        return None;
+    }
+    Some(record)
 }
 
 #[cfg(test)]
@@ -91,6 +111,27 @@ mod tests {
             config_path: root.join("runtime.json"),
             version: "0.0.0-test".into(),
         }
+    }
+
+    #[test]
+    fn expired_probe_record_is_not_matching() {
+        let tmp = tempfile::tempdir().unwrap();
+        let layout = layout(tmp.path());
+        let wsl = WslSettings {
+            distribution: "Ubuntu-24.04".into(),
+            workspace: "/home/stratide".into(),
+            python: None,
+            model: None,
+        };
+        let record = WslProbeRecord {
+            schema_version: 1,
+            probed_at: "2020-01-01T00:00:00+00:00".into(),
+            fingerprint: fingerprint(&wsl),
+            state: "READY".into(),
+            reason: None,
+        };
+        write(&layout, record).expect("write probe");
+        assert!(matching(&layout, &wsl).is_none());
     }
 
     #[test]
