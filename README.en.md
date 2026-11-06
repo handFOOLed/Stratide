@@ -1,22 +1,28 @@
 <div align="center">
 
-# Stratide
+<h1>Stratide</h1>
 
-**A-share research, from market data to paper portfolio.**
+<p><strong>A-share research, from market data to paper portfolio.</strong></p>
+<p>A local-first workstation for end-of-day data, automated research, and paper-trading observation.</p>
 
-A local-first workstation for end-of-day data, automated research, and paper-trading observation.
+<p>
+<a href="docs/WINDOWS_INSTALL.md"><img alt="Windows 11" src="https://img.shields.io/badge/Windows-11-101923?style=flat-square" /></a>
+<a href="docs/STATUS.md"><img alt="Source v0.3.1" src="https://img.shields.io/badge/source-v0.3.1-0B746D?style=flat-square" /></a>
+<a href="docs/KNOWN_LIMITATIONS.md"><img alt="Paper only" src="https://img.shields.io/badge/trading-Paper%20Only-242B37?style=flat-square" /></a>
+</p>
 
-[![Windows 11](https://img.shields.io/badge/Windows-11-101923?style=flat-square)](docs/WINDOWS_INSTALL.md)
-[![Source](https://img.shields.io/badge/source-v0.3.1-0B746D?style=flat-square)](docs/STATUS.md)
-[![Paper Only](https://img.shields.io/badge/trading-Paper%20Only-242B37?style=flat-square)](docs/KNOWN_LIMITATIONS.md)
-
-[**Downloads**](https://github.com/handFOOLed/Stratide/releases) · [**Getting started**](docs/USER_GUIDE.md) · [Docs](docs/README.md) · [简体中文](README.md)
+<p>
+<a href="https://github.com/handFOOLed/Stratide/releases"><strong>Downloads</strong></a> ·
+<a href="docs/USER_GUIDE.md"><strong>Getting started</strong></a> ·
+<a href="docs/README.md">Docs</a> ·
+<a href="README.md">简体中文</a>
+</p>
 
 <a href="docs/ui-evidence/after/04-overview-1440-dark.png">
-  <img src="docs/ui-evidence/after/04-overview-1440-dark.png" width="880" alt="Stratide dark dashboard preview" />
+<img src="docs/ui-evidence/after/04-overview-1440-dark.png" width="880" alt="Stratide dashboard preview" />
 </a>
 
-<sub>UI preview with demonstration data, not an investment-performance claim</sub>
+<p><sub>UI preview with demonstration data, not an investment-performance claim</sub></p>
 
 </div>
 

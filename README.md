@@ -1,22 +1,28 @@
 <div align="center">
 
-# Stratide
+<h1>Stratide</h1>
 
-**A-share research, from market data to paper portfolio.**
+<p><strong>A-share research, from market data to paper portfolio.</strong></p>
+<p>一个本地运行、自动研究、持续观察的 A 股 Paper Trading 工作台。</p>
 
-一个本地运行、自动研究、持续观察的 A 股 Paper Trading 工作台。
+<p>
+<a href="docs/WINDOWS_INSTALL.md"><img alt="Windows 11" src="https://img.shields.io/badge/Windows-11-101923?style=flat-square" /></a>
+<a href="docs/STATUS.md"><img alt="Source v0.3.1" src="https://img.shields.io/badge/source-v0.3.1-0B746D?style=flat-square" /></a>
+<a href="docs/KNOWN_LIMITATIONS.md"><img alt="Paper only" src="https://img.shields.io/badge/trading-Paper%20Only-242B37?style=flat-square" /></a>
+</p>
 
-[![Windows 11](https://img.shields.io/badge/Windows-11-101923?style=flat-square)](docs/WINDOWS_INSTALL.md)
-[![Source](https://img.shields.io/badge/source-v0.3.1-0B746D?style=flat-square)](docs/STATUS.md)
-[![Paper Only](https://img.shields.io/badge/trading-Paper%20Only-242B37?style=flat-square)](docs/KNOWN_LIMITATIONS.md)
-
-[**下载安装**](https://github.com/handFOOLed/Stratide/releases) · [**快速开始**](docs/USER_GUIDE.md) · [文档](docs/README.md) · [English](README.en.md)
+<p>
+<a href="https://github.com/handFOOLed/Stratide/releases"><strong>下载安装</strong></a> ·
+<a href="docs/USER_GUIDE.md"><strong>快速开始</strong></a> ·
+<a href="docs/README.md">文档</a> ·
+<a href="README.en.md">English</a>
+</p>
 
 <a href="docs/ui-evidence/after/04-overview-1440-dark.png">
-  <img src="docs/ui-evidence/after/04-overview-1440-dark.png" width="880" alt="Stratide Dashboard 深色界面预览" />
+<img src="docs/ui-evidence/after/04-overview-1440-dark.png" width="880" alt="Stratide Dashboard 深色界面预览" />
 </a>
 
-<sub>Dashboard 界面预览 · 截图使用演示数据，不代表实际投资收益</sub>
+<p><sub>Dashboard 界面预览 · 截图使用演示数据，不代表实际投资收益</sub></p>
 
 </div>
 
