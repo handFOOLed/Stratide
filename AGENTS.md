@@ -1,8 +1,10 @@
 # AGENTS.md — Stratide 工程与协作规则
 
-> **现行基线｜2026-11-05**：Stratide V2 / Windows 0.3.0 已可安装使用，四个 M3 模块分别由 PR #86/#87/#88/#89 **全部合并至 `main`**。当前没有已授权的下一模块开发任务；未来先由 Owner 确认 Issue/范围，再创建独立 Draft PR。用户操作见 [使用教程](docs/USER_GUIDE.md)；工程现状见 [STATUS](docs/STATUS.md)；运行前提与验证边界见 [KNOWN_LIMITATIONS](docs/KNOWN_LIMITATIONS.md)。
+> **现行基线｜2026-11-06**：Stratide V2 / Windows 0.3.1 已可安装使用，四个 M3 模块分别由 PR #86/#87/#88/#89 **全部合并至 `main`**。当前没有已授权的下一模块开发任务；未来先由 Owner 确认 Issue/范围，再创建独立 Draft PR。用户操作见 [使用教程](docs/USER_GUIDE.md)；工程现状见 [STATUS](docs/STATUS.md)；运行前提与验证边界见 [KNOWN_LIMITATIONS](docs/KNOWN_LIMITATIONS.md)。
 
 > 原 #22/#23 的 UI/后端角色分工，以及 #85 “DeepSeek 正在实施 Windows 安装”均为**历史安排**。安全边界、独立审查、Owner 明确授权合并的原则仍有效；N100/实盘后续另行决策。
+
+[文档中心](docs/README.md) · [当前版本](docs/STATUS.md) · [系统架构](docs/ARCHITECTURE_OVERVIEW.md)
 
 ## 工程协作
 
