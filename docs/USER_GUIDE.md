@@ -8,7 +8,7 @@
 
 ## 01 · 安装并打开
 
-1. 在 [GitHub Releases](https://github.com/handFOOLed/Stratide/releases) 选择**实际已发布**的安装文件，检查文件名对应版本后运行安装向导。`main` 已是 0.3.1，但如 Releases 尚未上传 0.3.1，请先参见 [构建说明](WINDOWS_INSTALL.md#从源码构建)。
+1. 在 [GitHub Releases v0.3.2](https://github.com/handFOOLed/Stratide/releases/tag/v0.3.2) 下载 `Stratide-Setup-0.3.2-x64.exe`，用同页的 `SHA256SUMS.txt` 核对后再运行安装向导。安装包未签名，Windows SmartScreen 可能提示未知发布者。
 2. 保留默认安装和数据目录，除非你明确要迁移现有数据。
 3. 双击桌面 **Stratide**：启动器会复用或启动本地服务，并在默认浏览器打开 Dashboard。
 4. 首次运行会显示使用说明与授权页；阅读其中的**模拟账户设置、AI 数据接收方、费用与风险**后，再自行选择是否同意继续。

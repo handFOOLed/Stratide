@@ -31,6 +31,6 @@
 
 ## 验证边界与工程证据
 
-0.3.1 源码已合并 [PR #90](https://github.com/handFOOLed/Stratide/pull/90) 的 UI 和自动化修复，以及 [PR #91](https://github.com/handFOOLed/Stratide/pull/91) 的安装构建脚本修复。开发者报告在隔离数据副本上运行过本地 TimesFM → 云研究 → 冻结候选等定向测试；这**不等同于**在每台 Windows 机器上验证过连续多日真实市场收益/完整模拟成交。
+0.3.1 源码已合并 [PR #90](https://github.com/handFOOLed/Stratide/pull/90) 的 UI 和自动化修复，以及 [PR #91](https://github.com/handFOOLed/Stratide/pull/91) 的安装构建脚本修复。0.3.2 在此基础上合并 [PR #93](https://github.com/handFOOLed/Stratide/pull/93)：WSL 探测结果写入本地状态，本地服务状态不再因完整诊断被慢请求挡住而闪红。开发者报告在隔离数据副本上运行过本地 TimesFM → 云研究 → 冻结候选等定向测试；这**不等同于**在每台 Windows 机器上验证过连续多日真实市场收益/完整模拟成交，也不能代替 Owner 本机的真实 WSL2 设置页确认。
 
 详见 [Automation Reliability](AUTOMATION_RELIABILITY.md)、[证据目录](evidence/README.md)、[项目状态](STATUS.md)。

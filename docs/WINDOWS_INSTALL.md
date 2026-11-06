@@ -8,12 +8,12 @@
 
 | 内容 | 当前状态 |
 | :--- | :--- |
-| `main` 源码 | **0.3.1**（PR [#91](https://github.com/handFOOLed/Stratide/pull/91)） |
-| 已核实的公开 Release 附件 | **0.3.0-rc2** |
-| 0.3.1 安装包 | 开发者已报告本机构建成功；**尚未在 GitHub Releases 中核实附件上传** |
+| `main` 源码 | **0.3.2**（含 PR [#93](https://github.com/handFOOLed/Stratide/pull/93)） |
+| 公开 Release | **[v0.3.2](https://github.com/handFOOLed/Stratide/releases/tag/v0.3.2)**：`Stratide-Setup-0.3.2-x64.exe` 与 `SHA256SUMS.txt` |
+| 签名 | 未签名。SmartScreen 可能提示未知发布者；只从该 Release 下载并核对 SHA256 |
 | 系统 | Windows 11 x64，当前用户安装 |
 
-因此，**不要只根据 README 的源码版本假定 Releases 里已经有相应安装包**。若要运行最新 0.3.1 源码，可按本文下方构建。
+安装包内不写入本安装包自己的 SHA256（避免文档与文件互相包含）。请以 Release 上的 `SHA256SUMS.txt` 为准。上一版 [v0.3.1](https://github.com/handFOOLed/Stratide/releases/tag/v0.3.1) 安装包 SHA256 为 `70589BDFD7EDDA5622584AC4E117A2A51F2179815450945DED244FC587BAA615`（32,671,816 bytes）。
 
 ## 首次安装
 
@@ -46,26 +46,20 @@
 在仓库根目录运行：
 
 ```powershell
-pwsh -NoProfile -File scripts/build-windows-installer.ps1 -Version 0.3.1
+pwsh -NoProfile -File scripts/build-windows-installer.ps1 -Version 0.3.2
 ```
 
-目前脚本默认构建版本已更新为 `0.3.1`。发布时仍建议显式传入 `-Version`，并核对安装包文件名、`BUILD_INFO` 与实际二进制的版本一致。
+脚本默认版本是 `0.3.2`。发布时仍显式传入 `-Version`，并核对安装包文件名、`BUILD_INFO` 与实际二进制一致。公开附件由 `.github/workflows/windows-release.yml` 在推送 `v*` 标签后，于 `windows-latest` 上执行同一脚本并上传 Release。
 
 脚本会重新构建 Rust release 二进制与 Dashboard，然后由 Inno Setup 输出：
 
 ```text
 dist/installer/
-├─ Stratide-Setup-0.3.1-x64.exe
+├─ Stratide-Setup-0.3.2-x64.exe
 └─ SHA256SUMS.txt
 ```
 
-PR #91 开发者报告的安装包为 **32,671,816 bytes**，SHA256：
-
-```text
-70589BDFD7EDDA5622584AC4E117A2A51F2179815450945DED244FC587BAA615
-```
-
-该哈希是**开发者报告**，不是仓库目前已验证的 Release 附件；自行重新构建或重打包可能产生不同 SHA。请以拿到的实际文件计算值为准。
+自行重新构建或重打包会产生不同 SHA。请以 Release 附件和其中的 `SHA256SUMS.txt` 为准，不要沿用旧版哈希。
 
 ## 验证
 
@@ -74,7 +68,7 @@ PR #91 开发者报告的安装包为 **32,671,816 bytes**，SHA256：
 pwsh -NoProfile -File scripts/test-windows-product.ps1 -Port 8794
 
 # 检查下载文件的哈希
-Get-FileHash -Algorithm SHA256 "Stratide-Setup-0.3.1-x64.exe"
+Get-FileHash -Algorithm SHA256 "Stratide-Setup-0.3.2-x64.exe"
 ```
 
 首次运行的接口权限、自动研究、T+1 Paper 假设、系统要求和已知技术边界集中在 [问题排查](KNOWN_LIMITATIONS.md)。项目为个人本地 **Paper-only** 应用；不连接券商执行真实资金订单。

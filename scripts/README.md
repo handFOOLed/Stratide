@@ -7,14 +7,14 @@
 ## Windows release
 
 ```powershell
-# 必须显式传 -Version，否则脚本默认仍为 0.3.0
-pwsh -NoProfile -File scripts/build-windows-installer.ps1 -Version 0.3.1
+# 发布时显式传入 -Version，与标签一致。脚本默认值是 0.3.2。
+pwsh -NoProfile -File scripts/build-windows-installer.ps1 -Version 0.3.2
 
 # 不使用正式账户数据的本地产品测试
 pwsh -NoProfile -File scripts/test-windows-product.ps1 -Port 8794
 ```
 
-产物保存在 `dist/installer/`，**不会自动上传 GitHub Releases**。构建依赖、版本及 SHA 详见 [安装手册](../docs/WINDOWS_INSTALL.md)。
+产物保存在 `dist/installer/`。公开附件由 `.github/workflows/windows-release.yml` 在标签 `v*` 推送时构建并上传到 GitHub Releases。构建依赖、版本及校验方式详见 [安装手册](../docs/WINDOWS_INSTALL.md)。
 
 ## Core tools
 

@@ -7,7 +7,7 @@
 
 <p>
 <a href="docs/WINDOWS_INSTALL.md"><kbd>Windows 11</kbd></a>
-<a href="docs/STATUS.md"><kbd>Source v0.3.1</kbd></a>
+<a href="docs/STATUS.md"><kbd>Source v0.3.2</kbd></a>
 <a href="docs/KNOWN_LIMITATIONS.md"><kbd>Paper only</kbd></a>
 </p>
 
