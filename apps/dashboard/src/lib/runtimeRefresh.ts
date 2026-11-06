@@ -72,7 +72,16 @@ export function downloadPercent(ready: number | null, target: number | null): nu
 
 function coverageFlag(summary: MarketStatusSnapshot | null): boolean | null {
   if (summary === null || summary.coverage_complete === undefined) return null;
-  return summary.coverage_complete === true;
+  if (summary.coverage_complete === true) return true;
+  if (summary.coverage_complete === false) return false;
+  // A present but non-boolean flag is malformed. It is not a pass and not a
+  // confirmed warehouse rejection.
+  return null;
+}
+
+function gapCount(summary: MarketStatusSnapshot | null): number | null {
+  if (summary === null) return null;
+  return Array.isArray(summary.gaps) ? summary.gaps.length : null;
 }
 
 /**
@@ -91,10 +100,12 @@ export function warehouseVerification(
   if (!statusKnown) return 'unknown';
   if (coverageComplete === false) return 'rejected';
   if (running) return 'unknown';
+  if (targetSessions <= 0) return 'unknown';
   if (
     coverageComplete === true &&
-    (reportSessions ?? 0) >= targetSessions &&
-    (gaps ?? 0) === 0
+    reportSessions !== null &&
+    reportSessions >= targetSessions &&
+    gaps === 0
   ) {
     return 'verified';
   }
@@ -108,12 +119,13 @@ export function marketSummaryFrom(
 ): MarketSummary {
   const progress = backfill.progress ?? null;
   const progressSessions = finiteCount(progress?.sessions_ready);
-  const progressTarget = finiteCount(progress?.sessions);
   const progressRemaining = progress === null ? null : finiteCount(progress.remaining);
   const reportSessions = summary === null ? null : finiteCount(summary.sessions_ready);
-  const target = progressTarget ?? 84;
+  // Product window is 84. progress.sessions is not a target: 0 or a short
+  // outlier must not make coverage=true verify with too few report sessions.
+  const target = 84;
   const coverageComplete = coverageFlag(summary);
-  const gaps = summary === null ? null : summary.gaps?.length ?? 0;
+  const gaps = gapCount(summary);
   const running = backfill.running === true;
   const statusKnown = summary !== null;
   const verification = warehouseVerification(

@@ -99,6 +99,78 @@ test('partial download with coverage_complete false stays incomplete', () => {
   assert.equal(checklistFor(market).knownIncomplete, true);
 });
 
+test('coverage true does not verify when the report count or gaps are missing or malformed', () => {
+  const missingSessions = marketSummaryFrom(fullProgress, { gaps: [], coverage_complete: true });
+  assert.equal(missingSessions.backfillComplete, false);
+  assert.equal(missingSessions.verification, 'unknown');
+
+  const badSessions = marketSummaryFrom(fullProgress, {
+    sessions_ready: Number.NaN,
+    gaps: [],
+    coverage_complete: true,
+  });
+  assert.equal(badSessions.reportSessions, null);
+  assert.equal(badSessions.backfillComplete, false);
+
+  const negativeSessions = marketSummaryFrom(fullProgress, {
+    sessions_ready: -1,
+    gaps: [],
+    coverage_complete: true,
+  });
+  assert.equal(negativeSessions.backfillComplete, false);
+
+  const missingGaps = marketSummaryFrom(fullProgress, { sessions_ready: 84, coverage_complete: true });
+  assert.equal(missingGaps.gaps, null);
+  assert.equal(missingGaps.backfillComplete, false);
+  assert.equal(missingGaps.verification, 'unknown');
+
+  const malformedGaps = marketSummaryFrom(fullProgress, {
+    sessions_ready: 84,
+    gaps: { length: 0 },
+    coverage_complete: true,
+  });
+  assert.equal(malformedGaps.backfillComplete, false);
+
+  const malformedFlag = marketSummaryFrom(fullProgress, {
+    sessions_ready: 84,
+    gaps: [],
+    coverage_complete: 'true',
+  });
+  assert.equal(malformedFlag.coverageComplete, null);
+  assert.equal(malformedFlag.verification, 'unknown');
+  assert.equal(malformedFlag.backfillComplete, false);
+  assert.equal(backfillPresentation(malformedFlag, false).text.includes('已就绪'), false);
+});
+
+test('a zero progress target does not block a fresh report that is actually complete', () => {
+  const market = marketSummaryFrom(
+    { running: false, progress: { sessions: 0, sessions_ready: 0, remaining: 0 } },
+    { sessions_ready: 84, gaps: [], coverage_complete: true },
+  );
+  assert.equal(market.targetSessions, 84);
+  assert.equal(market.backfillComplete, true);
+  assert.equal(market.downloadPercent, 100);
+});
+
+test('a zero or short progress target cannot verify a thin coverage=true report', () => {
+  for (const sessions of [0, 1, -5]) {
+    const market = marketSummaryFrom(
+      { running: false, progress: { sessions, sessions_ready: sessions, remaining: 0 } },
+      { sessions_ready: 1, gaps: [], coverage_complete: true },
+    );
+    assert.equal(market.targetSessions, 84);
+    assert.equal(market.backfillComplete, false);
+    assert.equal(market.verification, 'unknown');
+  }
+  const outlierReady = marketSummaryFrom(
+    { running: false, progress: { sessions: 0, sessions_ready: 10000, remaining: 0 } },
+    { sessions_ready: 84, gaps: [], coverage_complete: false },
+  );
+  assert.equal(outlierReady.backfillComplete, false);
+  assert.equal(outlierReady.downloadPercent, 100);
+  assert.equal(backfillPresentation(outlierReady, false).text.includes('已就绪'), false);
+});
+
 test('missing coverage flag is not verified even at 84/84', () => {
   const market = marketSummaryFrom(fullProgress, { sessions_ready: 84, gaps: [] });
   assert.equal(market.coverageComplete, null);
@@ -208,7 +280,7 @@ test('a running job is not complete even when the progress file and an old true 
   assert.equal(checklistFor(runningTrue).knownIncomplete, true);
 });
 
-test('settings and checklist meters render the conflict without calling it ready', async () => {
+test('BackfillMeter and ProgressBar render the conflict without calling it ready', async () => {
   const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), '.render-tmp');
   mkdirSync(dir, { recursive: true });
   const outfile = path.join(dir, 'render.js');

@@ -78,23 +78,26 @@ export function useRuntime(): RuntimeState {
         }
       },
       onStatus: (value) => {
-        if (!mounted.current) return;
+        if (!mounted.current || next.signal.aborted) return;
         setStatus(value);
         setError(null);
         setCheckedAt(Date.now());
         setChecking(false);
       },
       onStatusError: (caught: unknown) => {
-        if (!mounted.current) return;
+        if (!mounted.current || next.signal.aborted) return;
         setChecking(false);
         const failure = friendlyError(caught);
         if (failure.code === 'ABORTED') return;
         setError(failure);
       },
       onMarket: (value) => {
+        // A newer refresh aborts this controller. Drop the result even if the
+        // response already arrived, so a cancelled true cannot publish.
+        if (!mounted.current || next.signal.aborted) return;
         const merged = mergeMarketRead(marketRef.current, value);
         marketRef.current = merged;
-        if (mounted.current) setMarket(merged);
+        setMarket(merged);
       },
       onMarketMiss: () => {
         // ABORTED (unmount or a newer poll) keeps the last summary. A real

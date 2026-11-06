@@ -404,10 +404,16 @@
   font-variant-numeric: tabular-nums;
 }
 
+.backfill__text,
 .backfill__count-note {
   margin: 0;
   color: var(--text-faint);
   font-size: var(--fs-2xs);
+}
+
+.backfill__text {
+  color: var(--text);
+  font-size: var(--fs-sm);
 }
 
 .backfill__meta {

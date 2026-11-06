@@ -1,5 +1,8 @@
 # Narrow Windows MSVC regression for Draft PR #93 (settings / WSL status reliability).
-# Public repo: standard windows-latest runners only; no secrets, cache, or artifacts.
+# Public repo: standard windows-latest runners only; no secrets and no cache.
+# The regression job uploads nothing. A second job, only on the install-bug branch,
+# builds an unsigned installer and uploads it as an Actions artifact. It does not
+# publish a GitHub Release or push a tag.
 name: PR93 Windows settings status
 
 on:
@@ -66,3 +69,110 @@ jobs:
           npm run typecheck
           npm run build
           npm test
+
+  # Exact-head unsigned installer for this draft branch only. contents stays
+  # read-only, so this job cannot create a Release. actions:write is only for
+  # the test artifact.
+  windows-installer-artifact:
+    name: Unsigned installer artifact
+    needs: windows-msvc-regression
+    if: github.event_name == 'pull_request' && github.head_ref == 'cursor/round1-install-bugs-b2d0'
+    runs-on: windows-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Checkout exact pull request head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+
+      - name: Rust stable (MSVC)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Inno Setup 6.7.4
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $dest = Join-Path $env:RUNNER_TEMP 'innosetup-6.7.4.exe'
+          $expected = 'A549929319F9120716677C685535CA4671E4B937B5FDC87E2585F32D8EB30E8C'
+          curl.exe -fL --retry 5 --retry-delay 2 -o $dest https://github.com/jrsoftware/issrc/releases/download/is-6_7_4/innosetup-6.7.4.exe
+          if ($LASTEXITCODE -ne 0) { throw "INNO_DOWNLOAD_FAILED exit=$LASTEXITCODE" }
+          $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $dest).Hash.ToUpperInvariant()
+          if ($hash -ne $expected) { throw "INNO_HASH_MISMATCH $hash" }
+          $log = Join-Path $env:RUNNER_TEMP 'inno-install.log'
+          $proc = Start-Process -FilePath $dest -ArgumentList @(
+            '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-','/ALLUSERS',"/LOG=$log"
+          ) -Wait -PassThru
+          if ($proc.ExitCode -ne 0) {
+            if (Test-Path -LiteralPath $log) { Get-Content -LiteralPath $log -Tail 80 }
+            throw "INNO_INSTALL_FAILED exit=$($proc.ExitCode)"
+          }
+          $iscc = Join-Path ${env:ProgramFiles(x86)} 'Inno Setup 6\ISCC.exe'
+          if (-not (Test-Path -LiteralPath $iscc)) {
+            $iscc = Join-Path $env:LOCALAPPDATA 'Programs\Inno Setup 6\ISCC.exe'
+          }
+          if (-not (Test-Path -LiteralPath $iscc)) { throw 'ISCC_NOT_FOUND' }
+          "ISCC_EXE=$iscc" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "INNO_SETUP_VERSION=6.7.4" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Fetch pinned CPython and tzdata
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $tools = Join-Path $env:GITHUB_WORKSPACE '..\.tools'
+          New-Item -ItemType Directory -Force -Path $tools | Out-Null
+          $pythonZip = Join-Path $tools 'python-embed.zip'
+          $tzdata = Join-Path $tools 'tzdata.whl'
+          curl.exe -fL --retry 5 --retry-delay 2 -o $pythonZip https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip
+          if ($LASTEXITCODE -ne 0) { throw "PYTHON_DOWNLOAD_FAILED exit=$LASTEXITCODE" }
+          curl.exe -fL --retry 5 --retry-delay 2 -o $tzdata https://files.pythonhosted.org/packages/0a/66/9a06c2227fedfd4919f0eaaa8b94377d9730882a7e4f95823c9a331ab5e1/tzdata-2026.6-py2.py3-none-any.whl
+          if ($LASTEXITCODE -ne 0) { throw "TZDATA_DOWNLOAD_FAILED exit=$LASTEXITCODE" }
+          $pythonHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $pythonZip).Hash.ToUpperInvariant()
+          $tzHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $tzdata).Hash.ToUpperInvariant()
+          if ($pythonHash -ne '4ACBED6DD1C744B0376E3B1CF57CE906F9DC9E95E68824584C8099A63025A3C3') {
+            throw "PYTHON_EMBED_HASH_MISMATCH $pythonHash"
+          }
+          if ($tzHash -ne '0A10EEC6E13EF16B627FABED9A5F2BA61A62B1C67F327305F4E7E412A70B4AEC') {
+            throw "TZDATA_HASH_MISMATCH $tzHash"
+          }
+
+      - name: Read source version
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $version = (Get-Content -LiteralPath apps/dashboard/package.json -Raw | ConvertFrom-Json).version
+          if ($version -ne '0.3.2') { throw "REFUSING_VERSION_CHANGE $version" }
+          "SOURCE_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "SOURCE_SHA=${{ github.event.pull_request.head.sha }}" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          pwsh -NoProfile -File scripts/build-windows-installer.ps1 -Version $env:SOURCE_VERSION
+          if ($LASTEXITCODE -ne 0) { throw "INSTALLER_BUILD_FAILED exit=$LASTEXITCODE" }
+
+      - name: Check identity, icon resources, and shortcut wiring
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          pwsh -NoProfile -File scripts/verify-windows-installer-identity.ps1 -SourceSha $env:SOURCE_SHA -Version $env:SOURCE_VERSION
+          if ($LASTEXITCODE -ne 0) { throw "INSTALLER_IDENTITY_FAILED exit=$LASTEXITCODE" }
+
+      - name: Upload unsigned installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stratide-windows-installer-${{ github.event.pull_request.head.sha }}
+          if-no-files-found: error
+          path: |
+            dist/installer/*.exe
+            dist/installer/SHA256SUMS.txt
+            dist/app/BUILD_INFO.json

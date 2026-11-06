@@ -757,6 +757,7 @@ export function RuntimePanel({
                 {backfillViewModel.downloadPercent === null ? '—' : backfillViewModel.downloadPercent + '%'}
               </span>
             </div>
+            {backfillView.reason ? <p className="backfill__text">{backfillView.reason}</p> : null}
             {backfillViewModel.countText ? (
               <p className="backfill__count-note" data-testid="backfill-count">
                 {backfillViewModel.countText}
