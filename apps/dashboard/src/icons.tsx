@@ -275,15 +275,8 @@ export function Icon({
 
 export function BrandMark({ size = 30 }: { size?: number }) {
   return (
-    <span className="brand-mark" style={{ width: size, height: size, borderRadius: size * 0.3 }}>
-      <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
-        <path
-          d="M4 15h4v-4h4V7h4M4 5v10h12"
-          stroke="currentColor"
-          strokeWidth="1.9"
-          strokeLinecap="round"
-        />
-      </svg>
+    <span className="brand-mark" style={{ width: size, height: size }}>
+      <img src="/favicon.ico" alt="" width={size} height={size} />
     </span>
   );
 }

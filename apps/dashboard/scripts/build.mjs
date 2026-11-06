@@ -39,8 +39,14 @@ if (result.error) {
 }
 if (result.status !== 0) process.exit(result.status ?? 1);
 
+const favicon = path.join(root, '../../assets/brand/stratide.ico');
+if (!existsSync(favicon)) {
+  console.error('构建失败：缺少 assets/brand/stratide.ico');
+  process.exit(1);
+}
 for (const [from, to] of [
   [path.join(root, 'index.html'), path.join(dist, 'index.html')],
+  [favicon, path.join(dist, 'favicon.ico')],
 ]) copyFileSync(from, to);
 
 if (!existsSync(path.join(dist, 'assets', 'app.css'))) {

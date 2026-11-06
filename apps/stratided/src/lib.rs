@@ -133,6 +133,17 @@ impl Assets {
             files.insert(url, (mime, snapshot::read_bounded(&dir.join(name))
                 .map_err(|_| "缺少前端构建：先执行 npm --prefix apps/dashboard ci 和 npm --prefix apps/dashboard run build".to_string())?));
         }
+        let favicon = dir.join("favicon.ico");
+        if favicon.is_file() {
+            files.insert(
+                "/favicon.ico",
+                (
+                    "image/x-icon",
+                    snapshot::read_bounded(&favicon)
+                        .map_err(|_| "favicon.ico 无法读取".to_string())?,
+                ),
+            );
+        }
         Ok(Self(files))
     }
 }
