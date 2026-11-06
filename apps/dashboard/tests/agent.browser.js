@@ -134,14 +134,17 @@ test('通知：真实任务通知、全部标为已读、查看任务跳转并�
   await expect(page.locator('.notice-row').filter({ hasText: name }).first()).toContainText('已完成');
   await expect(page.getByText(/\d+ 条未读/).first()).toBeVisible();
 
-  const markAll = page.getByRole('button', { name: /全部标为已读|标记本页已读/ });
-  await markAll.click();
-  await expect(markAll).toBeDisabled();
-  await expect(page.locator('.notice-row[data-read="true"]')).toHaveCount(await page.locator('.notice-row').count());
-  await expect(page.getByText('全部已读', { exact: true })).toBeVisible();
-
   await page.locator('.notice-row').filter({ hasText: name }).first().getByRole('button', { name: '查看任务' }).click();
   await expect(page).toHaveURL(/#agents$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('AI 研究');
   await expect(page.locator('[data-testid="task-row"]').filter({ hasText: name }).first()).toBeVisible();
+
+  await page.goto(AGENT + '/#notifications');
+  const markAll = page.getByRole('button', { name: /全部标为已读|标记本页已读/ });
+  await markAll.click();
+  await expect(page.locator('.notice-row').filter({ hasText: name })).toHaveCount(0);
+  await expect(page.getByText('全部已读', { exact: true })).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('通知');
+  await expect(page.locator('.notice-row').filter({ hasText: name })).toHaveCount(0);
 });
