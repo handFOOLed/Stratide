@@ -616,6 +616,49 @@ sys.exit(9)
         self.assertEqual(self.w.query(A,B,trade_date=A),before)
 
 
+class IdleWalCheckpoint(unittest.TestCase):
+    def test_checkpoint_if_idle_truncates_a_leftover_wal(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            warehouse = h.Warehouse(root)
+            (root / "writer.lock").write_bytes(b"0")
+            db = sqlite3.connect(warehouse.path)
+            db.execute("PRAGMA journal_mode=WAL")
+            db.execute("PRAGMA wal_autocheckpoint=0")
+            db.execute("CREATE TABLE probe(x INTEGER)")
+            db.execute("INSERT INTO probe VALUES (1)")
+            db.commit()
+            wal = Path(str(warehouse.path) + "-wal")
+            self.assertGreater(wal.stat().st_size, 0)
+            warehouse.checkpoint_if_idle()
+            self.assertEqual(wal.stat().st_size, 0)
+            self.assertEqual(db.execute("SELECT x FROM probe").fetchone()[0], 1)
+            db.close()
+
+    def test_checkpoint_if_idle_does_not_create_a_database(self):
+        with tempfile.TemporaryDirectory() as raw:
+            warehouse = h.Warehouse(Path(raw))
+            warehouse.checkpoint_if_idle()
+            self.assertFalse(warehouse.path.exists())
+
+    def test_checkpoint_if_idle_reports_a_busy_lock(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            warehouse = h.Warehouse(root)
+            (root / "writer.lock").write_bytes(b"0")
+            db = sqlite3.connect(warehouse.path)
+            db.execute("PRAGMA journal_mode=WAL")
+            db.execute("PRAGMA wal_autocheckpoint=0")
+            db.execute("CREATE TABLE probe(x INTEGER)")
+            db.execute("INSERT INTO probe VALUES (1)")
+            db.commit()
+            with h.writer_lock(root):
+                with self.assertRaises(h.WarehouseError) as caught:
+                    warehouse.checkpoint_if_idle()
+            self.assertEqual(str(caught.exception), "WAREHOUSE_WRITER_BUSY")
+            db.close()
+
+
 def fingerprint(root):
     return {str(p.relative_to(root)):(p.stat().st_size,p.stat().st_mtime_ns,hashlib.sha256(p.read_bytes()).hexdigest())
             for p in root.rglob("*") if p.is_file()}

@@ -7,11 +7,16 @@
 export interface MarketSummary {
   sessionsReady: number;
   targetSessions: number;
-  remaining: number;
+  /** Null when the progress file has no remaining count and status has not arrived. */
+  remaining: number | null;
   lastSuccessfulDate: string | null;
-  gaps: number;
+  gaps: number | null;
   backfillRunning: boolean;
   backfillComplete: boolean;
+  /** True only after a successful market status read. */
+  statusKnown: boolean;
+  /** Set when status failed. A busy warehouse is not the same as “still reading”. */
+  statusError: string | null;
 }
 
 export interface MarketBackfillState {
@@ -25,18 +30,31 @@ export interface MarketStatusSnapshot {
   sessions_ready?: number;
 }
 
-export function marketSummaryFrom(backfill: MarketBackfillState, summary: MarketStatusSnapshot): MarketSummary {
+export function marketSummaryFrom(
+  backfill: MarketBackfillState,
+  summary: MarketStatusSnapshot | null,
+  statusError: string | null = null,
+): MarketSummary {
   const progress = backfill.progress ?? null;
-  const sessionsReady = progress?.sessions_ready ?? summary.sessions_ready ?? 0;
-  const remaining = progress?.remaining ?? 0;
+  const sessionsReady = progress?.sessions_ready ?? summary?.sessions_ready ?? 0;
+  const gaps = summary === null ? null : summary.gaps?.length ?? 0;
+  const running = backfill.running === true;
+  const progressDone = progress !== null && progress.remaining === 0 && !running;
+  // A finished warehouse can exist without a progress file (the file is removed
+  // with the request). Empty gaps plus a non-zero ready count is completion.
+  const warehouseDone =
+    summary !== null && (summary.sessions_ready ?? 0) > 0 && (summary.gaps?.length ?? 0) === 0 && !running;
+  const remaining = progress?.remaining ?? (warehouseDone ? 0 : null);
   return {
     sessionsReady,
     targetSessions: progress?.sessions ?? 84,
     remaining,
-    lastSuccessfulDate: summary.last_successful_date ?? null,
-    gaps: summary.gaps?.length ?? 0,
-    backfillRunning: backfill.running === true,
-    backfillComplete: progress !== null && progress.remaining === 0 && backfill.running !== true,
+    lastSuccessfulDate: summary?.last_successful_date ?? null,
+    gaps,
+    backfillRunning: running,
+    backfillComplete: progressDone || warehouseDone,
+    statusKnown: summary !== null,
+    statusError: summary !== null ? null : statusError,
   };
 }
 

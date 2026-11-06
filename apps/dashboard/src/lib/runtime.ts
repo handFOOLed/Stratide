@@ -89,6 +89,7 @@ async function read<T>(path: string, init: RequestInit): Promise<T> {
   try {
     response = await fetch(path, init);
   } catch {
+    if (init.signal?.aborted) throw new ApiError('ABORTED', 'ABORTED', 0);
     throw new ApiError('OFFLINE', '无法连接本地服务；后台可能已停止。', 0);
   }
   let payload: EnvelopeShape<T>;
@@ -116,16 +117,28 @@ export async function loadRuntimeStatus(signal?: AbortSignal): Promise<RuntimeSt
   });
 }
 
-export async function runtimeAction<T>(path: string, body: Record<string, unknown> = {}): Promise<T> {
-  return read<T>('/api/runtime/' + path, {
-    method: 'POST',
-    credentials: 'omit',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
+export async function runtimeAction<T>(
+  path: string,
+  body: Record<string, unknown> = {},
+  options: { timeoutMs?: number } = {},
+): Promise<T> {
+  const controller = new AbortController();
+  const timer =
+    options.timeoutMs === undefined ? null : setTimeout(() => controller.abort(), options.timeoutMs);
+  try {
+    return await read<T>('/api/runtime/' + path, {
+      method: 'POST',
+      credentials: 'omit',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } finally {
+    if (timer !== null) clearTimeout(timer);
+  }
 }
 
 export interface SetupCompleteResult {

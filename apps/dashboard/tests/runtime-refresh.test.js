@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   createRuntimeRefreshLocks,
+  marketSummaryFrom,
   refreshRuntimeSnapshot,
 } from '../src/lib/runtimeRefresh.ts';
 
@@ -81,4 +82,48 @@ test('an in-flight runtime status request is not stacked', async () => {
   assert.equal(locks.statusBusy, true);
   releaseStatus();
   assert.equal(await first, 'ok');
+});
+
+test('market summary keeps backfill progress when warehouse status fails', () => {
+  const summary = marketSummaryFrom(
+    { running: true, progress: { sessions: 84, sessions_ready: 10, remaining: 74 } },
+    null,
+    'MARKET_COMMAND_FAILED_1_WAREHOUSE_WRITER_BUSY',
+  );
+  assert.equal(summary.backfillRunning, true);
+  assert.equal(summary.backfillComplete, false);
+  assert.equal(summary.sessionsReady, 10);
+  assert.equal(summary.remaining, 74);
+  assert.equal(summary.statusKnown, false);
+  assert.match(summary.statusError, /WAREHOUSE_WRITER_BUSY/);
+});
+
+test('market summary is complete from a finished progress file', () => {
+  const summary = marketSummaryFrom(
+    { running: false, progress: { sessions: 84, sessions_ready: 84, remaining: 0 } },
+    null,
+    'MARKET_STATUS_UNAVAILABLE',
+  );
+  assert.equal(summary.backfillRunning, false);
+  assert.equal(summary.backfillComplete, true);
+  assert.equal(summary.remaining, 0);
+});
+
+test('market summary is complete when the warehouse has sessions and no gaps', () => {
+  const summary = marketSummaryFrom(
+    { running: false, progress: null },
+    { sessions_ready: 84, gaps: [], last_successful_date: '20261105' },
+  );
+  assert.equal(summary.backfillComplete, true);
+  assert.equal(summary.statusKnown, true);
+  assert.equal(summary.statusError, null);
+  assert.equal(summary.sessionsReady, 84);
+});
+
+test('market summary is not complete when status is missing and backfill is idle', () => {
+  const summary = marketSummaryFrom({ running: false, progress: null }, null, null);
+  assert.equal(summary.backfillComplete, false);
+  assert.equal(summary.backfillRunning, false);
+  assert.equal(summary.statusKnown, false);
+  assert.equal(summary.remaining, null);
 });

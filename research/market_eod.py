@@ -680,6 +680,13 @@ def cli(argv=None):
                 # A blocked or incomplete attempt is retried, not hammered.
                 time.sleep(300 if result.get("state") in ("BLOCKED", "NETWORK_OUTCOME_UNKNOWN") else 30)
         else:
+            if args.action == "status":
+                # Status stays readonly. A free lock plus a dirty WAL is recovery,
+                # not a license to read an uncheckpointed snapshot.
+                try:
+                    market.checkpoint_if_idle()
+                except Error:
+                    pass
             result = market.report()
             if args.action == "verify":
                 with market.read(inspect_raw_paths=False) as db:

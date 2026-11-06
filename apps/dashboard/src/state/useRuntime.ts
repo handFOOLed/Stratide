@@ -47,11 +47,24 @@ export function useRuntime(): RuntimeState {
     void refreshRuntimeSnapshot(locks.current, {
       loadStatus: () => loadRuntimeStatus(next.signal),
       loadMarket: async () => {
-        const [backfill, summary] = await Promise.all([
-          runtimeAction<{ running?: boolean; progress?: { sessions?: number; sessions_ready?: number; remaining?: number } | null }>('market', { action: 'backfill-state' }),
-          runtimeAction<{ last_successful_date?: string | null; gaps?: unknown[]; sessions_ready?: number }>('market', { action: 'status' }),
-        ]);
-        return marketSummaryFrom(backfill, summary);
+        // backfill-state is a local file read. status opens the warehouse and
+        // can fail or sit on the server's 60s limit while a writer holds the
+        // lock. Publish the file result even when status does not return.
+        const backfill = await runtimeAction<{
+          running?: boolean;
+          progress?: { sessions?: number; sessions_ready?: number; remaining?: number } | null;
+        }>('market', { action: 'backfill-state' }, { timeoutMs: 8000 });
+        try {
+          const summary = await runtimeAction<{
+            last_successful_date?: string | null;
+            gaps?: unknown[];
+            sessions_ready?: number;
+          }>('market', { action: 'status' }, { timeoutMs: 8000 });
+          return marketSummaryFrom(backfill, summary, null);
+        } catch (caught) {
+          const code = caught instanceof ApiError ? caught.code : 'MARKET_STATUS_UNAVAILABLE';
+          return marketSummaryFrom(backfill, null, code);
+        }
       },
       onStatus: (value) => {
         if (!mounted.current) return;
@@ -71,7 +84,8 @@ export function useRuntime(): RuntimeState {
         if (mounted.current) setMarket(value);
       },
       onMarketMiss: () => {
-        if (mounted.current) setMarket(null);
+        // Keep the last summary. Clearing it is what left the badge on
+        // “正在读取” after a later status poll failed.
       },
     });
   }, []);

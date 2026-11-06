@@ -179,6 +179,13 @@ function collectorView(status: RuntimeStatus, backfillRunning: boolean): StatusV
   return statusView('attention', '未运行', '行情自动采集当前未运行，后台会自动重启');
 }
 
+function backfillStatusHint(code: string): string {
+  if (code.includes('WAREHOUSE_WRITER_BUSY') || code.includes('WRITER_ACTIVE')) {
+    return '行情库正在写入，进度会在写入结束后更新。';
+  }
+  return '行情进度暂时读不到，可稍后重试。';
+}
+
 function serviceView(health: HealthState): StatusView {
   if (health.error !== null) return statusView('error', '出错', humanReasonText(health.error.code) ?? '失败，原因未记录');
   if (health.data === null) return statusView('progress', '正在检查');
@@ -548,14 +555,13 @@ export function RuntimePanel({
   const backfillComplete = runtime.market !== null && runtime.market.backfillComplete;
   const backfillTarget = runtime.market === null ? BACKFILL_TARGET : runtime.market.targetSessions;
   const sessionsReady = runtime.market === null ? 0 : runtime.market.sessionsReady;
+  const knownRemaining = runtime.market === null ? null : runtime.market.remaining;
   const displayRemaining =
-    runtime.market === null
-      ? 0
-      : runtime.market.remaining > 0
-        ? runtime.market.remaining
-        : backfillComplete
-          ? 0
-          : runtime.market.gaps;
+    knownRemaining !== null && knownRemaining > 0
+      ? knownRemaining
+      : backfillComplete
+        ? 0
+        : runtime.market?.gaps ?? 0;
   const backfillDone = backfillComplete && sessionsReady > 0;
 
   const renderSections = (current: RuntimeStatus) => {
@@ -573,12 +579,22 @@ export function RuntimePanel({
       : runtime.market === null
         ? statusView('progress', '正在读取')
         : backfillRunning
-          ? statusView('progress', '进行中', '待补齐 ' + displayRemaining + ' 个交易日（目标 ' + backfillTarget + ' 个交易日）')
+          ? statusView(
+              'progress',
+              '进行中',
+              knownRemaining === null
+                ? '历史行情补录已开始'
+                : '待补齐 ' + displayRemaining + ' 个交易日（目标 ' + backfillTarget + ' 个交易日）',
+            )
           : backfillDone
             ? statusView('ok', '已完成', '历史行情已就绪（' + sessionsReady + ' 个交易日）')
-            : sessionsReady === 0
-              ? statusView('unset', '尚未开始', '尚未补录（目标 ' + backfillTarget + ' 个交易日）')
-              : statusView('unset', '尚未完成', '待补齐 ' + displayRemaining + ' 个交易日（目标 ' + backfillTarget + ' 个交易日）');
+            : runtime.market.statusError !== null
+              ? statusView('attention', '无法读取', backfillStatusHint(runtime.market.statusError))
+              : !runtime.market.statusKnown
+                ? statusView('progress', '正在读取')
+                : sessionsReady === 0
+                  ? statusView('unset', '尚未开始', '尚未补录（目标 ' + backfillTarget + ' 个交易日）')
+                  : statusView('unset', '尚未完成', '待补齐 ' + displayRemaining + ' 个交易日（目标 ' + backfillTarget + ' 个交易日）');
     const backfillTotal = sessionsReady + displayRemaining;
     const progressValue =
       backfillDone ? 100 : backfillTotal === 0 ? 0 : Math.min(100, (sessionsReady / backfillTotal) * 100);

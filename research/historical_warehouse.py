@@ -424,6 +424,31 @@ class Warehouse:
                     no_links(path)
                     if path.is_dir():pending.append(path)
 
+    def checkpoint_if_idle(self):
+        """Apply a leftover WAL when no writer holds the lock.
+
+        A killed writer can leave a non-empty WAL. Readonly status then refuses
+        the file (WRITER_ACTIVE_OR_RECOVERY_REQUIRED) instead of reading a stale
+        main database, and the dashboard has nothing to show. This does not read
+        that snapshot: it takes the same exclusive lock a writer uses, checkpoints,
+        and returns. A busy lock raises WAREHOUSE_WRITER_BUSY.
+        """
+        wal = Path(str(self.path) + "-wal")
+        try:
+            if not self.path.is_file() or not (self.root / "writer.lock").is_file():
+                return
+            if not wal.is_file() or wal.stat().st_size == 0:
+                return
+        except OSError:
+            return
+        self.check_paths(descendants=False)
+        with writer_lock(self.root):
+            db = connection(self.path)
+            try:
+                db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+            finally:
+                db.close()
+
     @contextlib.contextmanager
     def write(self):
         self.check_paths(descendants=True)
