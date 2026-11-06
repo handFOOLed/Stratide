@@ -18,16 +18,10 @@ export function checklistProgress(runtime: RuntimeState, agent: AgentState): Che
   const dependencies = runtime.status === null ? null : runtime.status.dependencies;
   const tushare = dependencies === null ? null : dependencies.tushare_credential;
   const marketEod = dependencies === null ? null : dependencies.market_eod;
-  const tushareView =
-    tushare === null
-      ? null
-      : dependencyStatusView('tushare_credential', tushare.state, tushare.reason ?? null, tushare.note ?? null);
-  const marketEodView =
-    marketEod === null
-      ? null
-      : dependencyStatusView('market_eod', marketEod.state, marketEod.reason ?? null, marketEod.note ?? null);
-  const tushareDone = tushareView !== null && tushareView.kind === 'ok';
-  const marketEodDone = marketEodView !== null && marketEodView.kind === 'ok';
+  const tushareProgress = dependencyProgress('tushare_credential', tushare);
+  const marketEodProgress = dependencyProgress('market_eod', marketEod);
+  const tushareDone = tushareProgress === 'done';
+  const marketEodDone = marketEodProgress === 'done';
   const market = runtime.market;
   const backfillDone = market !== null && market.backfillComplete;
   const backfillKnown =
@@ -37,8 +31,8 @@ export function checklistProgress(runtime: RuntimeState, agent: AgentState): Che
     agent.status !== null && agent.status.default_model !== null && agent.status.budget.state === 'configured';
   const knownIncomplete =
     (setupKnown && !setupDone) ||
-    (tushareView !== null && !tushareDone) ||
-    (marketEodView !== null && !marketEodDone) ||
+    tushareProgress === 'gap' ||
+    marketEodProgress === 'gap' ||
     (backfillKnown && !backfillDone) ||
     (agent.status !== null && !researchConfigured);
   const knownComplete =
@@ -50,6 +44,18 @@ export function checklistProgress(runtime: RuntimeState, agent: AgentState): Che
     agent.status !== null &&
     researchConfigured;
   return { knownComplete, knownIncomplete };
+}
+
+type DependencyRecord = { state: string; reason?: string | null; note?: string | null } | null;
+
+/** A deferred light-status check is unknown, not a gap. A missing credential is a gap. */
+function dependencyProgress(
+  key: 'tushare_credential' | 'market_eod',
+  dependency: DependencyRecord,
+): 'done' | 'gap' | 'unknown' {
+  if (dependency === null || dependency.reason === 'CREDENTIAL_CHECK_DEFERRED') return 'unknown';
+  const view = dependencyStatusView(key, dependency.state, dependency.reason ?? null, dependency.note ?? null);
+  return view.kind === 'ok' ? 'done' : 'gap';
 }
 
 export function checklistVisible(progress: ChecklistProgress, dismissed: boolean): boolean {

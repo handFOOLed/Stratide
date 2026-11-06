@@ -36,6 +36,7 @@ import {
 import { RANGE_VALUES, readPreference, writePreference } from '../lib/storage';
 import type { RangeValue } from '../lib/storage';
 import { checklistProgress, checklistVisible } from '../lib/checklist';
+import { backfillReadFailure } from '../lib/runtimeRefresh';
 import { navigate } from '../lib/route';
 import {
   dataStatusView,
@@ -327,7 +328,7 @@ export function OverviewPage({
             ? '历史行情补录已开始'
             : '历史行情补录中：待补齐 ' + String(market.remaining) + ' 个交易日'
           : market.statusError !== null
-            ? '行情进度暂时读不到，可稍后重试'
+            ? backfillReadFailure(market.statusError).hint + ' 诊断码 ' + market.statusError
             : !market.statusKnown
               ? '正在读取历史行情补录进度'
               : market.sessionsReady > 0

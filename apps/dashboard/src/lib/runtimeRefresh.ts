@@ -58,6 +58,17 @@ export function marketSummaryFrom(
   };
 }
 
+/** Chinese hint plus the stable API/client code. The code stays visible after a failed idle read. */
+export function backfillReadFailure(code: string): { hint: string; diagnosticCode: string } {
+  let hint = '行情进度暂时读不到，可稍后重试。';
+  if (code.includes('WAREHOUSE_WRITER_BUSY') || code.includes('WRITER_ACTIVE')) {
+    hint = '行情库正在写入，进度会在写入结束后更新。';
+  } else if (code.includes('TIMEOUT')) {
+    hint = '行情库空闲检查超时，进度还没有读到。';
+  }
+  return { hint, diagnosticCode: code };
+}
+
 export interface RuntimeRefreshLocks {
   statusBusy: boolean;
   marketBusy: boolean;

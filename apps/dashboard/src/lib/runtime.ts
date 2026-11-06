@@ -120,11 +120,17 @@ export async function loadRuntimeStatus(signal?: AbortSignal): Promise<RuntimeSt
 export async function runtimeAction<T>(
   path: string,
   body: Record<string, unknown> = {},
-  options: { timeoutMs?: number } = {},
+  options: { timeoutMs?: number; timeoutCode?: string } = {},
 ): Promise<T> {
   const controller = new AbortController();
+  let timedOut = false;
   const timer =
-    options.timeoutMs === undefined ? null : setTimeout(() => controller.abort(), options.timeoutMs);
+    options.timeoutMs === undefined
+      ? null
+      : setTimeout(() => {
+          timedOut = true;
+          controller.abort();
+        }, options.timeoutMs);
   try {
     return await read<T>('/api/runtime/' + path, {
       method: 'POST',
@@ -136,6 +142,12 @@ export async function runtimeAction<T>(
       body: JSON.stringify(body),
       signal: controller.signal,
     });
+  } catch (error) {
+    if (timedOut) {
+      const code = options.timeoutCode ?? 'REQUEST_TIMEOUT';
+      throw new ApiError(code, code, 0);
+    }
+    throw error;
   } finally {
     if (timer !== null) clearTimeout(timer);
   }

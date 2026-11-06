@@ -21,6 +21,7 @@ import {
   supervisorDisplayView,
 } from '../../lib/status';
 import type { StatusView } from '../../lib/status';
+import { backfillReadFailure } from '../../lib/runtimeRefresh';
 import { runtimeAction, setSetupComplete } from '../../lib/runtime';
 import type { DependencyStatus, RuntimeStatus, WslProbeResult } from '../../lib/runtime';
 import { ApiError } from '../../lib/api';
@@ -179,12 +180,6 @@ function collectorView(status: RuntimeStatus, backfillRunning: boolean): StatusV
   return statusView('attention', '未运行', '行情自动采集当前未运行，后台会自动重启');
 }
 
-function backfillStatusHint(code: string): string {
-  if (code.includes('WAREHOUSE_WRITER_BUSY') || code.includes('WRITER_ACTIVE')) {
-    return '行情库正在写入，进度会在写入结束后更新。';
-  }
-  return '行情进度暂时读不到，可稍后重试。';
-}
 
 function serviceView(health: HealthState): StatusView {
   if (health.error !== null) return statusView('error', '出错', humanReasonText(health.error.code) ?? '失败，原因未记录');
@@ -548,6 +543,7 @@ export function RuntimePanel({
           },
     wsl_probe: wslProbe === null ? null : { state: wslProbe.state, reason: wslProbe.reason },
     last_action_error: actionError,
+    market_status_error: runtime.market?.statusError ?? null,
   };
   const copyText = JSON.stringify(diagnosticsData, null, 2);
 
@@ -589,7 +585,7 @@ export function RuntimePanel({
           : backfillDone
             ? statusView('ok', '已完成', '历史行情已就绪（' + sessionsReady + ' 个交易日）')
             : runtime.market.statusError !== null
-              ? statusView('attention', '无法读取', backfillStatusHint(runtime.market.statusError))
+              ? statusView('attention', '无法读取', backfillReadFailure(runtime.market.statusError).hint)
               : !runtime.market.statusKnown
                 ? statusView('progress', '正在读取')
                 : sessionsReady === 0
@@ -791,7 +787,11 @@ export function RuntimePanel({
               {runtime.market !== null && runtime.market.lastSuccessfulDate !== null ? (
                 <span>最近更新：{formatDay(runtime.market.lastSuccessfulDate)}</span>
               ) : null}
-
+              {runtime.market !== null && runtime.market.statusError !== null ? (
+                <span data-testid="backfill-diagnostic-code">
+                  诊断码 {backfillReadFailure(runtime.market.statusError).diagnosticCode}
+                </span>
+              ) : null}
             </div>
             <div className="runtime-actions">
               <Button

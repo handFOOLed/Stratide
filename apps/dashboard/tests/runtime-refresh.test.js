@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  backfillReadFailure,
   createRuntimeRefreshLocks,
   marketSummaryFrom,
   refreshRuntimeSnapshot,
@@ -118,6 +119,18 @@ test('market summary is complete when the warehouse has sessions and no gaps', (
   assert.equal(summary.statusKnown, true);
   assert.equal(summary.statusError, null);
   assert.equal(summary.sessionsReady, 84);
+});
+
+test('an idle warehouse failure keeps a stable diagnostic code', () => {
+  const busy = backfillReadFailure('MARKET_COMMAND_FAILED_1_WRITER_ACTIVE_OR_RECOVERY_REQUIRED');
+  assert.equal(busy.diagnosticCode, 'MARKET_COMMAND_FAILED_1_WRITER_ACTIVE_OR_RECOVERY_REQUIRED');
+  assert.match(busy.hint, /正在写入/);
+  const timeout = backfillReadFailure('MARKET_STATUS_TIMEOUT');
+  assert.equal(timeout.diagnosticCode, 'MARKET_STATUS_TIMEOUT');
+  assert.match(timeout.hint, /超时/);
+  const other = backfillReadFailure('MARKET_COMMAND_FAILED_1_CREDENTIAL_UNAVAILABLE');
+  assert.equal(other.diagnosticCode, 'MARKET_COMMAND_FAILED_1_CREDENTIAL_UNAVAILABLE');
+  assert.match(other.hint, /暂时读不到/);
 });
 
 test('market summary is not complete when status is missing and backfill is idle', () => {

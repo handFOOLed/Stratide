@@ -49,21 +49,29 @@ export function useRuntime(): RuntimeState {
       loadMarket: async () => {
         // backfill-state is a local file read. status opens the warehouse and
         // can fail or sit on the server's 60s limit while a writer holds the
-        // lock. Publish the file result even when status does not return.
-        const backfill = await runtimeAction<{
-          running?: boolean;
-          progress?: { sessions?: number; sessions_ready?: number; remaining?: number } | null;
-        }>('market', { action: 'backfill-state' }, { timeoutMs: 8000 });
+        // lock. Either failure still publishes a summary so the badge cannot
+        // stay on “正在读取”.
         try {
-          const summary = await runtimeAction<{
-            last_successful_date?: string | null;
-            gaps?: unknown[];
-            sessions_ready?: number;
-          }>('market', { action: 'status' }, { timeoutMs: 8000 });
-          return marketSummaryFrom(backfill, summary, null);
+          const backfill = await runtimeAction<{
+            running?: boolean;
+            progress?: { sessions?: number; sessions_ready?: number; remaining?: number } | null;
+          }>('market', { action: 'backfill-state' }, { timeoutMs: 8000, timeoutCode: 'MARKET_BACKFILL_STATE_TIMEOUT' });
+          try {
+            const summary = await runtimeAction<{
+              last_successful_date?: string | null;
+              gaps?: unknown[];
+              sessions_ready?: number;
+            }>('market', { action: 'status' }, { timeoutMs: 8000, timeoutCode: 'MARKET_STATUS_TIMEOUT' });
+            return marketSummaryFrom(backfill, summary, null);
+          } catch (caught) {
+            if (caught instanceof ApiError && caught.code === 'ABORTED') throw caught;
+            const code = caught instanceof ApiError ? caught.code : 'MARKET_STATUS_UNAVAILABLE';
+            return marketSummaryFrom(backfill, null, code);
+          }
         } catch (caught) {
+          if (caught instanceof ApiError && caught.code === 'ABORTED') throw caught;
           const code = caught instanceof ApiError ? caught.code : 'MARKET_STATUS_UNAVAILABLE';
-          return marketSummaryFrom(backfill, null, code);
+          return marketSummaryFrom({ running: false, progress: null }, null, code);
         }
       },
       onStatus: (value) => {
