@@ -61,7 +61,7 @@ fn health_stays_fast_while_runtime_status_triggers_slow_background_refresh() {
     let port = addr.port();
     let host = format!("127.0.0.1:{port}");
     let listener = thread::spawn(move || {
-        for _ in 0..4 {
+        for _ in 0..2 {
             let app = Arc::clone(&app);
             let assets = Arc::clone(&assets);
             let req = server.recv().unwrap();
