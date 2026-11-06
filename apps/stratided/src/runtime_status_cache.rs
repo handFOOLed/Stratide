@@ -151,6 +151,14 @@ mod tests {
     }
 
     #[test]
+    fn fresh_light_cache_is_not_stale_until_after_stale_after() {
+        reset_test_state();
+        publish(serde_json::json!({"marker": "light-only"}));
+        assert!(!should_refresh_background());
+        assert!(!pending_full_refresh());
+    }
+
+    #[test]
     fn invalidate_cache_requests_prompt_full_refresh() {
         reset_test_state();
         publish(serde_json::json!({"marker": "fresh-light"}));

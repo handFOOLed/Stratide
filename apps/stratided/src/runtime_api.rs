@@ -29,6 +29,11 @@ fn diagnostics_slow_collect_enabled() -> bool {
         .is_some_and(|ms| ms > 0)
 }
 
+/// Whether `/api/runtime/status` should force a background full collect after serving.
+pub(crate) fn status_refresh_force_after_serve(cache_hit: bool, pending_full: bool) -> bool {
+    !cache_hit || pending_full
+}
+
 fn schedule_status_refresh(app: &App, layout: &Layout, force_full: bool) {
     let force = force_full
         || runtime_status_cache::pending_full_refresh()
@@ -237,14 +242,15 @@ fn status(app: &App, layout: &Layout) -> Result<Value, &'static str> {
         schedule_status_refresh(
             app,
             layout,
-            runtime_status_cache::pending_full_refresh(),
+            status_refresh_force_after_serve(true, runtime_status_cache::pending_full_refresh()),
         );
         return Ok(value);
     }
     let light = collect_status_light(app, layout)?;
     runtime_status_cache::publish(light.clone());
     drop(_read);
-    schedule_status_refresh(app, layout, runtime_status_cache::pending_full_refresh());
+    // Cold cache: light placeholders must not block the first full collect until STALE_AFTER.
+    schedule_status_refresh(app, layout, true);
     Ok(light)
 }
 
@@ -499,24 +505,61 @@ fn store_wsl(layout: &Layout, wsl: stratide_runtime::WslSettings) -> Result<bool
 /// and store it, so a new user never has to type a worktree path.
 fn detect_wsl(app: &App, layout: &Layout) -> Reply {
     match detect_wsl_inner(layout) {
-        Ok(DetectOutcome::NotFound) => layout_envelope(
+        Ok(DetectOutcome::NotFound(_)) => layout_envelope(
             200,
             json!({"state": "NOT_FOUND", "reason": "LOCAL_MODEL_NOT_FOUND"}),
         ),
-        Ok(DetectOutcome::Found(wsl)) => match detect_wsl_persist(app, layout, wsl) {
-            Ok(reply) => reply,
-            Err(reply) => reply,
-        },
+        Ok(DetectOutcome::Found { wsl, context }) => {
+            match detect_wsl_persist(app, layout, wsl, &context) {
+                Ok(reply) => reply,
+                Err(reply) => reply,
+            }
+        }
         Err(reply) => reply,
     }
 }
 
 enum DetectOutcome {
-    NotFound,
-    Found(stratide_runtime::WslSettings),
+    NotFound(DetectContext),
+    Found {
+        wsl: stratide_runtime::WslSettings,
+        context: DetectContext,
+    },
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct DetectContext {
+    epoch_at_start: u64,
+    config_fingerprint_at_start: Option<String>,
+}
+
+impl DetectContext {
+    pub(crate) fn capture(layout: &Layout) -> Self {
+        Self {
+            epoch_at_start: runtime_status_cache::epoch(),
+            config_fingerprint_at_start: layout
+                .config()
+                .ok()
+                .and_then(|config| config.wsl.as_ref())
+                .map(|wsl| stratide_runtime::wsl_probe::fingerprint(wsl)),
+        }
+    }
+}
+
+pub(crate) fn detect_commit_allowed(layout: &Layout, context: &DetectContext) -> bool {
+    if runtime_status_cache::epoch() != context.epoch_at_start {
+        return false;
+    }
+    let current = layout
+        .config()
+        .ok()
+        .and_then(|config| config.wsl.as_ref())
+        .map(|wsl| stratide_runtime::wsl_probe::fingerprint(wsl));
+    current == context.config_fingerprint_at_start
 }
 
 fn detect_wsl_inner(layout: &Layout) -> Result<DetectOutcome, Reply> {
+    let context = DetectContext::capture(layout);
     let script = layout.app.join("scripts").join("timesfm-cpu.py");
     if !script.is_file() {
         return Err(layout_error(409, "TIMESFM_CLI_MISSING"));
@@ -542,38 +585,46 @@ fn detect_wsl_inner(layout: &Layout) -> Result<DetectOutcome, Reply> {
         Err(_) => return Err(layout_error(504, "WSL_DETECT_FAILED")),
     };
     let Some(detected) = value.get("wsl").filter(|entry| entry.is_object()) else {
-        return Ok(DetectOutcome::NotFound);
+        return Ok(DetectOutcome::NotFound(context));
     };
-    Ok(DetectOutcome::Found(stratide_runtime::WslSettings {
-        distribution: detected
-            .get("distribution")
-            .and_then(Value::as_str)
-            .unwrap_or_default()
-            .to_string(),
-        workspace: detected
-            .get("workspace")
-            .and_then(Value::as_str)
-            .unwrap_or_default()
-            .to_string(),
-        python: detected
-            .get("python")
-            .and_then(Value::as_str)
-            .map(str::to_string),
-        model: detected
-            .get("model")
-            .and_then(Value::as_str)
-            .map(str::to_string),
-    }))
+    Ok(DetectOutcome::Found {
+        wsl: stratide_runtime::WslSettings {
+            distribution: detected
+                .get("distribution")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_string(),
+            workspace: detected
+                .get("workspace")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_string(),
+            python: detected
+                .get("python")
+                .and_then(Value::as_str)
+                .map(str::to_string),
+            model: detected
+                .get("model")
+                .and_then(Value::as_str)
+                .map(str::to_string),
+        },
+        context,
+    })
 }
 
 fn detect_wsl_persist(
     app: &App,
     layout: &Layout,
     wsl: stratide_runtime::WslSettings,
+    context: &DetectContext,
 ) -> Result<Reply, Reply> {
     let _write = RUNTIME_WRITE
         .write()
         .map_err(|_| layout_error(503, "RUNTIME_WRITE_BUSY"))?;
+    if !detect_commit_allowed(layout, context) {
+        drop(_write);
+        return Err(layout_error(409, "WSL_DETECT_SUPERSEDED"));
+    }
     runtime_status_cache::invalidate_cache();
     let result = (|| -> Result<Reply, Reply> {
         let restart = store_wsl(layout, wsl.clone())?;
@@ -755,7 +806,11 @@ fn layout_error(status: u16, code: &str) -> Reply {
 #[cfg(test)]
 mod tests {
     use super::setup_completed;
-    use super::{post_mutates_status_snapshot, post_skips_status_write_lock, store_wsl};
+    use super::{
+        detect_commit_allowed, post_mutates_status_snapshot, post_skips_status_write_lock,
+        status_refresh_force_after_serve, store_wsl, DetectContext,
+    };
+    use crate::runtime_status_cache;
     use serde_json::json;
     use stratide_runtime::{Layout, WslSettings, wsl_probe};
 
@@ -766,6 +821,36 @@ mod tests {
         assert_eq!(setup_completed(&json!({"completed": false})), Ok(false));
         assert_eq!(setup_completed(&json!({"completed": "false"})), Err(()));
         assert_eq!(setup_completed(&json!({"completed": null})), Err(()));
+    }
+
+    #[test]
+    fn cold_status_serve_forces_full_refresh_even_when_cache_is_fresh() {
+        assert!(status_refresh_force_after_serve(false, false));
+        assert!(!status_refresh_force_after_serve(true, false));
+        assert!(status_refresh_force_after_serve(true, true));
+    }
+
+    #[test]
+    fn detect_commit_rejects_when_owner_saved_during_autodetect() {
+        let tmp = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(tmp.path().join("runtime")).unwrap();
+        std::fs::write(
+            tmp.path().join("runtime.json"),
+            br#"{"schema_version":1,"port":8710,"data_root":"data","python":null,"wsl":{"distribution":"Ubuntu-24.04","workspace":"/home/a"}}"#,
+        )
+        .unwrap();
+        let layout = Layout {
+            home: tmp.path().to_path_buf(),
+            app: tmp.path().join("app"),
+            data: tmp.path().join("data"),
+            runtime: tmp.path().join("runtime"),
+            logs: tmp.path().join("logs"),
+            config_path: tmp.path().join("runtime.json"),
+            version: "0.0.0-test".into(),
+        };
+        let context = DetectContext::capture(&layout);
+        runtime_status_cache::invalidate_cache();
+        assert!(!detect_commit_allowed(&layout, &context));
     }
 
     #[test]
