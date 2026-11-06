@@ -8,6 +8,7 @@ static STATUS_EPOCH: AtomicU64 = AtomicU64::new(0);
 static STATUS_GENERATION: AtomicU64 = AtomicU64::new(0);
 static STATUS_CACHE: Mutex<Option<StatusCacheState>> = Mutex::new(None);
 static STATUS_REFRESHING: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static PENDING_FULL_REFRESH: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 
 pub const STALE_AFTER: Duration = Duration::from_secs(4);
 pub const SERVE_MAX_AGE: Duration = Duration::from_secs(120);
@@ -36,9 +37,18 @@ pub fn bump_epoch() -> u64 {
 
 pub fn invalidate_cache() {
     bump_epoch();
+    PENDING_FULL_REFRESH.store(true, Ordering::Release);
     if let Ok(mut cache) = STATUS_CACHE.lock() {
         *cache = None;
     }
+}
+
+pub fn pending_full_refresh() -> bool {
+    PENDING_FULL_REFRESH.load(Ordering::Acquire)
+}
+
+pub fn clear_pending_full_refresh() {
+    PENDING_FULL_REFRESH.store(false, Ordering::Release);
 }
 
 pub fn cached_value(max_age: Duration) -> Option<Value> {
@@ -134,9 +144,20 @@ mod tests {
         STATUS_EPOCH.store(0, Ordering::Release);
         STATUS_GENERATION.store(0, Ordering::Release);
         STATUS_REFRESHING.store(false, Ordering::Release);
+        clear_pending_full_refresh();
         if let Ok(mut cache) = STATUS_CACHE.lock() {
             *cache = None;
         }
+    }
+
+    #[test]
+    fn invalidate_cache_requests_prompt_full_refresh() {
+        reset_test_state();
+        publish(serde_json::json!({"marker": "fresh-light"}));
+        assert!(!pending_full_refresh());
+        invalidate_cache();
+        assert!(pending_full_refresh());
+        assert!(cached_value(SERVE_MAX_AGE).is_none());
     }
 
     #[test]

@@ -85,6 +85,17 @@ pub fn clear(layout: &Layout) {
     }
 }
 
+pub fn fingerprint_matches_layout(layout: &Layout, expected: &str) -> bool {
+    let config = match layout.config() {
+        Ok(config) => config,
+        Err(_) => return false,
+    };
+    let Some(wsl) = config.wsl else {
+        return false;
+    };
+    fingerprint(wsl) == expected
+}
+
 pub fn matching(layout: &Layout, wsl: &WslSettings) -> Option<WslProbeRecord> {
     let record = read(layout)?;
     if record.fingerprint != fingerprint(wsl) {
@@ -111,6 +122,27 @@ mod tests {
             config_path: root.join("runtime.json"),
             version: "0.0.0-test".into(),
         }
+    }
+
+    #[test]
+    fn fingerprint_matches_layout_reflects_current_config() {
+        let tmp = tempfile::tempdir().unwrap();
+        let layout = layout(tmp.path());
+        std::fs::create_dir_all(tmp.path().join("runtime")).unwrap();
+        std::fs::write(
+            tmp.path().join("runtime.json"),
+            br#"{"schema_version":1,"port":8710,"data_root":"data","python":null,"wsl":{"distribution":"Ubuntu-24.04","workspace":"/home/a"}}"#,
+        )
+        .unwrap();
+        let wsl = WslSettings {
+            distribution: "Ubuntu-24.04".into(),
+            workspace: "/home/a".into(),
+            python: None,
+            model: None,
+        };
+        let fp = fingerprint(&wsl);
+        assert!(fingerprint_matches_layout(&layout, &fp));
+        assert!(!fingerprint_matches_layout(&layout, "stale|fp"));
     }
 
     #[test]

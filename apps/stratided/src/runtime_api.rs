@@ -29,10 +29,16 @@ fn diagnostics_slow_collect_enabled() -> bool {
         .is_some_and(|ms| ms > 0)
 }
 
-fn schedule_status_refresh(app: &App, layout: &Layout) {
-    let stale = runtime_status_cache::should_refresh_background() || diagnostics_slow_collect_enabled();
-    if !stale || !runtime_status_cache::try_begin_background_refresh(stale) {
+fn schedule_status_refresh(app: &App, layout: &Layout, force_full: bool) {
+    let force = force_full
+        || runtime_status_cache::pending_full_refresh()
+        || diagnostics_slow_collect_enabled();
+    let stale = force || runtime_status_cache::should_refresh_background();
+    if !stale || !runtime_status_cache::try_begin_background_refresh(force) {
         return;
+    }
+    if force {
+        runtime_status_cache::clear_pending_full_refresh();
     }
     let layout = layout.clone();
     let instance_id = app.instance_id().to_string();
@@ -77,6 +83,7 @@ pub(crate) fn post_mutates_status_snapshot(path: &str, body: &Value) -> bool {
 
 fn post_skips_status_write_lock(path: &str, body: &Value) -> bool {
     path == "/api/runtime/wsl-probe"
+        || path == "/api/runtime/wsl-detect"
         || (path == "/api/runtime/market"
             && matches!(market_action(body), Some("status" | "backfill-state")))
         || matches!(
@@ -96,7 +103,7 @@ fn finish_status_mutation(
         Ok(reply) => {
             if post_mutates_status_snapshot(path, body) {
                 let _ = publish_light_snapshot(app, layout);
-                schedule_status_refresh(app, layout);
+                schedule_status_refresh(app, layout, true);
             }
             reply
         }
@@ -180,6 +187,9 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
     if path == "/api/runtime/wsl-probe" {
         return probe_wsl(app, &layout);
     }
+    if path == "/api/runtime/wsl-detect" {
+        return detect_wsl(app, &layout);
+    }
     if post_skips_status_write_lock(&path, &body) {
         let result = match path.as_str() {
             "/api/runtime/market" => market(&layout, &body),
@@ -209,7 +219,6 @@ pub fn reply(app: &App, req: &mut Request, port: u16) -> Reply {
             "/api/runtime/tushare-token" => tushare_token(&layout, &body),
             "/api/runtime/market" => market(&layout, &body),
             "/api/runtime/wsl" => configure_wsl(&layout, &body),
-            "/api/runtime/wsl-detect" => detect_wsl(&layout),
             "/api/runtime/open-folder" => open_folder(&layout, &body),
             "/api/runtime/setup-complete" => setup_complete(&layout, &body),
             "/api/runtime/update-check" => update_check(&layout),
@@ -225,13 +234,17 @@ fn status(app: &App, layout: &Layout) -> Result<Value, &'static str> {
         .map_err(|_| "RUNTIME_STATUS_BUSY")?;
     if let Some(value) = runtime_status_cache::cached_value(SERVE_MAX_AGE) {
         drop(_read);
-        schedule_status_refresh(app, layout);
+        schedule_status_refresh(
+            app,
+            layout,
+            runtime_status_cache::pending_full_refresh(),
+        );
         return Ok(value);
     }
     let light = collect_status_light(app, layout)?;
     runtime_status_cache::publish(light.clone());
     drop(_read);
-    schedule_status_refresh(app, layout);
+    schedule_status_refresh(app, layout, runtime_status_cache::pending_full_refresh());
     Ok(light)
 }
 
@@ -484,7 +497,26 @@ fn store_wsl(layout: &Layout, wsl: stratide_runtime::WslSettings) -> Result<bool
 
 /// One-click local model discovery: find an existing WSL venv + TimesFM model
 /// and store it, so a new user never has to type a worktree path.
-fn detect_wsl(layout: &Layout) -> Result<Reply, Reply> {
+fn detect_wsl(app: &App, layout: &Layout) -> Reply {
+    match detect_wsl_inner(layout) {
+        Ok(DetectOutcome::NotFound) => layout_envelope(
+            200,
+            json!({"state": "NOT_FOUND", "reason": "LOCAL_MODEL_NOT_FOUND"}),
+        ),
+        Ok(DetectOutcome::Found(wsl)) => match detect_wsl_persist(app, layout, wsl) {
+            Ok(reply) => reply,
+            Err(reply) => reply,
+        },
+        Err(reply) => reply,
+    }
+}
+
+enum DetectOutcome {
+    NotFound,
+    Found(stratide_runtime::WslSettings),
+}
+
+fn detect_wsl_inner(layout: &Layout) -> Result<DetectOutcome, Reply> {
     let script = layout.app.join("scripts").join("timesfm-cpu.py");
     if !script.is_file() {
         return Err(layout_error(409, "TIMESFM_CLI_MISSING"));
@@ -510,12 +542,9 @@ fn detect_wsl(layout: &Layout) -> Result<Reply, Reply> {
         Err(_) => return Err(layout_error(504, "WSL_DETECT_FAILED")),
     };
     let Some(detected) = value.get("wsl").filter(|entry| entry.is_object()) else {
-        return Ok(layout_envelope(
-            200,
-            json!({"state": "NOT_FOUND", "reason": "LOCAL_MODEL_NOT_FOUND"}),
-        ));
+        return Ok(DetectOutcome::NotFound);
     };
-    let wsl = stratide_runtime::WslSettings {
+    Ok(DetectOutcome::Found(stratide_runtime::WslSettings {
         distribution: detected
             .get("distribution")
             .and_then(Value::as_str)
@@ -534,12 +563,38 @@ fn detect_wsl(layout: &Layout) -> Result<Reply, Reply> {
             .get("model")
             .and_then(Value::as_str)
             .map(str::to_string),
-    };
-    let restart = store_wsl(layout, wsl.clone())?;
-    Ok(layout_envelope(
-        200,
-        json!({"state": "FOUND", "watch_restart": restart, "wsl": wsl}),
-    ))
+    }))
+}
+
+fn detect_wsl_persist(
+    app: &App,
+    layout: &Layout,
+    wsl: stratide_runtime::WslSettings,
+) -> Result<Reply, Reply> {
+    let _write = RUNTIME_WRITE
+        .write()
+        .map_err(|_| layout_error(503, "RUNTIME_WRITE_BUSY"))?;
+    runtime_status_cache::invalidate_cache();
+    let result = (|| -> Result<Reply, Reply> {
+        let restart = store_wsl(layout, wsl.clone())?;
+        Ok(layout_envelope(
+            200,
+            json!({"state": "FOUND", "watch_restart": restart, "wsl": wsl}),
+        ))
+    })();
+    match result {
+        Ok(reply) => {
+            let _ = publish_light_snapshot(app, layout);
+            drop(_write);
+            schedule_status_refresh(app, layout, true);
+            Ok(reply)
+        }
+        Err(reply) => {
+            let _ = publish_light_snapshot(app, layout);
+            drop(_write);
+            Err(reply)
+        }
+    }
 }
 
 fn probe_wsl(app: &App, layout: &Layout) -> Reply {
@@ -556,6 +611,8 @@ fn probe_wsl_inner(app: &App, layout: &Layout) -> Result<Reply, Reply> {
     let Some(wsl) = config.wsl else {
         return Err(layout_error(409, "WSL_NOT_CONFIGURED"));
     };
+    let fingerprint_at_start = stratide_runtime::wsl_probe::fingerprint(&wsl);
+    let epoch_at_start = runtime_status_cache::epoch();
     let script = layout.app.join("scripts").join("timesfm-cpu.py");
     if !script.is_file() {
         return Err(layout_error(409, "TIMESFM_CLI_MISSING"));
@@ -584,8 +641,8 @@ fn probe_wsl_inner(app: &App, layout: &Layout) -> Result<Reply, Reply> {
         }
         Err(_) => json!({"state": "BLOCKED", "error_code": "WSL_PROBE_FAILED"}),
     };
-    let ready = value.get("state").and_then(Value::as_str) == Some("READY");
-    let reason = if ready {
+    let mut ready = value.get("state").and_then(Value::as_str) == Some("READY");
+    let mut reason = if ready {
         None
     } else {
         value
@@ -594,6 +651,13 @@ fn probe_wsl_inner(app: &App, layout: &Layout) -> Result<Reply, Reply> {
             .map(str::to_string)
             .or_else(|| Some("WSL_PROBE_FAILED".into()))
     };
+    if ready {
+        let wsl_live = stratide_runtime::diagnostics::wsl_status(Some(&wsl));
+        if !stratide_runtime::diagnostics::wsl_runtime_ready(&wsl_live, Some(&wsl)) {
+            ready = false;
+            reason = Some("WSL_RUNTIME_UNAVAILABLE".into());
+        }
+    }
     let record = stratide_runtime::wsl_probe::WslProbeRecord::new(
         &wsl,
         if ready { "READY" } else { "BLOCKED" },
@@ -602,13 +666,19 @@ fn probe_wsl_inner(app: &App, layout: &Layout) -> Result<Reply, Reply> {
     let _write = RUNTIME_WRITE
         .write()
         .map_err(|_| layout_error(503, "RUNTIME_WRITE_BUSY"))?;
+    if runtime_status_cache::epoch() != epoch_at_start
+        || !stratide_runtime::wsl_probe::fingerprint_matches_layout(layout, &fingerprint_at_start)
+    {
+        drop(_write);
+        return Err(layout_error(409, "WSL_PROBE_CONFIG_CHANGED"));
+    }
     runtime_status_cache::invalidate_cache();
     stratide_runtime::wsl_probe::write(layout, record).map_err(|_| {
         layout_error(409, "WSL_PROBE_PERSIST_FAILED")
     })?;
     publish_light_snapshot(app, layout)?;
     drop(_write);
-    schedule_status_refresh(app, layout);
+    schedule_status_refresh(app, layout, true);
     Ok(layout_envelope(
         200,
         json!({
@@ -696,6 +766,14 @@ mod tests {
         assert_eq!(setup_completed(&json!({"completed": false})), Ok(false));
         assert_eq!(setup_completed(&json!({"completed": "false"})), Err(()));
         assert_eq!(setup_completed(&json!({"completed": null})), Err(()));
+    }
+
+    #[test]
+    fn wsl_detect_route_skips_write_lock_while_probing() {
+        assert!(post_skips_status_write_lock(
+            "/api/runtime/wsl-detect",
+            &json!({})
+        ));
     }
 
     #[test]

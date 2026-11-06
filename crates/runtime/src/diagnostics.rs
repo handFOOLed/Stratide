@@ -142,7 +142,11 @@ fn python_status_light(layout: &Layout) -> Value {
 
 fn wsl_status_light(configured: Option<&crate::WslSettings>) -> Value {
     let mut value = if configured.is_some() {
-        json!({"state":"READY","configured": true})
+        json!({
+            "state":"UNVERIFIED",
+            "configured": true,
+            "note":"WSL 可用性在后台刷新或检测时校验；未验证前不会把 TimesFM 标为 READY。",
+        })
     } else {
         json!({"state":"UNAVAILABLE","configured": false, "reason":"TIMESFM_CPU_REQUIRES_THE_EXISTING_LINUX_WORKSPACE_ISOLATION"})
     };
@@ -223,7 +227,7 @@ fn python_status(layout: &Layout) -> Value {
     }
 }
 
-fn wsl_status(configured: Option<&crate::WslSettings>) -> Value {
+pub fn wsl_status(configured: Option<&crate::WslSettings>) -> Value {
     let mut command = Command::new("wsl.exe");
     command.args(["--list", "--quiet"]);
     let mut value = match crate::run_capture(command, std::time::Duration::from_secs(4)) {
@@ -269,7 +273,48 @@ fn wsl_status(configured: Option<&crate::WslSettings>) -> Value {
             json!(configured.map(|settings| settings.model_path())),
         );
     }
+    apply_configured_distro_check(&mut value, configured);
     value
+}
+
+/// Whether live WSL runtime is usable for the configured distribution.
+pub fn wsl_runtime_ready(wsl: &Value, configured: Option<&crate::WslSettings>) -> bool {
+    if wsl.get("state").and_then(Value::as_str) != Some("READY") {
+        return false;
+    }
+    let Some(configured) = configured else {
+        return true;
+    };
+    let Some(distros) = wsl.get("distributions").and_then(Value::as_array) else {
+        return false;
+    };
+    distros
+        .iter()
+        .any(|entry| entry.as_str() == Some(configured.distribution.as_str()))
+}
+
+fn apply_configured_distro_check(value: &mut Value, configured: Option<&crate::WslSettings>) {
+    let Some(configured) = configured else {
+        return;
+    };
+    if value.get("state").and_then(Value::as_str) != Some("READY") {
+        return;
+    }
+    let Some(distros) = value.get("distributions").and_then(Value::as_array) else {
+        return;
+    };
+    let present = distros
+        .iter()
+        .any(|entry| entry.as_str() == Some(configured.distribution.as_str()));
+    if !present {
+        *value = json!({
+            "state":"UNAVAILABLE",
+            "reason":"WSL_DISTRIBUTION_NOT_FOUND",
+            "configured": true,
+            "distribution": configured.distribution,
+            "distributions": distros,
+        });
+    }
 }
 
 fn timesfm_status(layout: &Layout, wsl: &Value, configured_wsl: Option<&crate::WslSettings>) -> Value {
@@ -279,14 +324,18 @@ fn timesfm_status(layout: &Layout, wsl: &Value, configured_wsl: Option<&crate::W
         .join("state")
         .join("risk-portfolio")
         .join("agent-binding.json");
-    let wsl_ready = wsl.get("state").and_then(Value::as_str) == Some("READY");
+    let wsl_ready = wsl_runtime_ready(wsl, configured_wsl);
     let configured = wsl.get("configured").and_then(Value::as_bool) == Some(true);
     let probe = configured_wsl.and_then(|settings| crate::wsl_probe::matching(layout, settings));
     let probe_at = probe.as_ref().map(|record| record.probed_at.clone());
     let probe_present = probe.is_some();
     let (state, reason) = if configured {
         match probe.as_ref() {
-            Some(record) if record.state == "READY" => ("READY", None),
+            Some(record) if record.state == "READY" && wsl_ready => ("READY", None),
+            Some(record) if record.state == "READY" && !wsl_ready => (
+                "CONFIGURED",
+                Some("WSL_RUNTIME_UNAVAILABLE".into()),
+            ),
             Some(record) => (
                 "CONFIGURED",
                 Some(
@@ -466,6 +515,56 @@ mod tests {
         std::fs::create_dir_all(&layout.app).unwrap();
         std::fs::write(layout.app.join("BUILD_INFO.json"), b"{broken").unwrap();
         assert_eq!(build_info(&layout), Err("BUILD_INFO_INVALID"));
+    }
+
+    #[test]
+    fn persisted_probe_ready_requires_live_wsl_runtime() {
+        use crate::WslSettings;
+        let tmp = tempfile::tempdir().unwrap();
+        let layout = layout(tmp.path());
+        std::fs::create_dir_all(&layout.data.join("state")).unwrap();
+        let wsl = WslSettings {
+            distribution: "Ubuntu-24.04".into(),
+            workspace: "/home/stratide".into(),
+            python: None,
+            model: None,
+        };
+        crate::wsl_probe::write(
+            &layout,
+            crate::wsl_probe::WslProbeRecord::new(&wsl, "READY", None),
+        )
+        .expect("write probe");
+        let wsl_json = json!({
+            "state":"UNAVAILABLE",
+            "configured": true,
+            "reason":"WSL_EXIT_1",
+        });
+        let timesfm = super::timesfm_status(&layout, &wsl_json, Some(&wsl));
+        assert_eq!(timesfm["state"], "CONFIGURED");
+        assert_eq!(timesfm["reason"], "WSL_RUNTIME_UNAVAILABLE");
+    }
+
+    #[test]
+    fn wsl_runtime_ready_requires_configured_distribution_in_list() {
+        use crate::WslSettings;
+        let wsl = WslSettings {
+            distribution: "Ubuntu-24.04".into(),
+            workspace: "/home/stratide".into(),
+            python: None,
+            model: None,
+        };
+        let ready = json!({
+            "state":"READY",
+            "distributions":["Debian"],
+            "configured": true,
+        });
+        assert!(!super::wsl_runtime_ready(&ready, Some(&wsl)));
+        let matching = json!({
+            "state":"READY",
+            "distributions":["Ubuntu-24.04"],
+            "configured": true,
+        });
+        assert!(super::wsl_runtime_ready(&matching, Some(&wsl)));
     }
 
     #[test]
