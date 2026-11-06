@@ -24,6 +24,10 @@ const SECTIONS: Array<{ title: string; body: string }> = [
     title: '行情密钥留在本机',
     body: 'Tushare 密钥只在这台电脑上使用，不转发给云端。密钥放在 Windows 凭据管理器里，页面不显示，日志也不记录。',
   },
+  {
+    title: '这不是投资建议',
+    body: '模拟结果不能当成买卖建议。不想继续云端研究时，可以在设置里关掉自动研究。',
+  },
 ];
 
 export function AgreementPage() {

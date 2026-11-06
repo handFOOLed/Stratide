@@ -180,7 +180,7 @@ function taskOutcomeText(task: AgentTask): string {
       const specific = reasonTextOrNull(task.reason, task.reason_text);
       return specific === null || specific === ''
         ? '结果或费用尚未确认，请核对调用记录'
-        : specific + '。结果或费用尚未确认，请核对调用记录';
+        : specific + '。费用待核对';
     }
     case 'queued':
       return '等待开始';

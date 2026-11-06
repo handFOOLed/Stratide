@@ -487,7 +487,7 @@ export function OverviewPage({
       ) : null}
 
       {showChecklist ? (
-        <Checklist items={checklistItems} open onToggle={() => undefined} />
+        <Checklist items={checklistItems} />
       ) : null}
 
       {protectionExpanded ? (

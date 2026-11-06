@@ -17,6 +17,10 @@ export interface MarketSummary {
   statusKnown: boolean;
   /** Set when status failed. A busy warehouse is not the same as “still reading”. */
   statusError: string | null;
+  /** Consecutive status reads that did not confirm the warehouse. */
+  statusFailures: number;
+  /** True after repeated unconfirmed reads. A previous completion is no longer claimed. */
+  statusStale: boolean;
 }
 
 export interface MarketBackfillState {
@@ -28,7 +32,12 @@ export interface MarketStatusSnapshot {
   last_successful_date?: string | null;
   gaps?: unknown[];
   sessions_ready?: number;
+  /** Backend flag: calendar covers the configured window and the target session count is ready. */
+  coverage_complete?: boolean;
 }
+
+/** Failures before a previously confirmed completion is dropped. */
+export const MARKET_STATUS_STALE_POLLS = 2;
 
 export function marketSummaryFrom(
   backfill: MarketBackfillState,
@@ -36,18 +45,27 @@ export function marketSummaryFrom(
   statusError: string | null = null,
 ): MarketSummary {
   const progress = backfill.progress ?? null;
+  const target = progress?.sessions ?? 84;
   const sessionsReady = progress?.sessions_ready ?? summary?.sessions_ready ?? 0;
   const gaps = summary === null ? null : summary.gaps?.length ?? 0;
   const running = backfill.running === true;
-  const progressDone = progress !== null && progress.remaining === 0 && !running;
-  // A finished warehouse can exist without a progress file (the file is removed
-  // with the request). Empty gaps plus a non-zero ready count is completion.
+  const progressDone =
+    progress !== null &&
+    progress.remaining === 0 &&
+    !running &&
+    (progress.sessions_ready ?? 0) >= (progress.sessions ?? target);
+  // Empty gaps are not completion. report() sets coverage_complete only when
+  // the calendar covers the configured window and sessions_ready meets the target.
   const warehouseDone =
-    summary !== null && (summary.sessions_ready ?? 0) > 0 && (summary.gaps?.length ?? 0) === 0 && !running;
+    summary !== null &&
+    !running &&
+    summary.coverage_complete === true &&
+    (summary.sessions_ready ?? 0) >= target &&
+    (summary.gaps?.length ?? 0) === 0;
   const remaining = progress?.remaining ?? (warehouseDone ? 0 : null);
   return {
     sessionsReady,
-    targetSessions: progress?.sessions ?? 84,
+    targetSessions: target,
     remaining,
     lastSuccessfulDate: summary?.last_successful_date ?? null,
     gaps,
@@ -55,6 +73,39 @@ export function marketSummaryFrom(
     backfillComplete: progressDone || warehouseDone,
     statusKnown: summary !== null,
     statusError: summary !== null ? null : statusError,
+    statusFailures: 0,
+    statusStale: false,
+  };
+}
+
+/**
+ * Keep the last confirmed session counts across a failed status read.
+ * A completion that came only from the warehouse report is dropped at once.
+ * After MARKET_STATUS_STALE_POLLS the read is marked stale. A progress file
+ * from this read can still prove completion when it met the target.
+ */
+export function mergeMarketRead(previous: MarketSummary | null, incoming: MarketSummary): MarketSummary {
+  if (incoming.statusKnown && incoming.statusError === null) {
+    return { ...incoming, statusFailures: 0, statusStale: false };
+  }
+  const statusFailures = (previous?.statusFailures ?? 0) + 1;
+  const kept = previous ?? incoming;
+  // A progress file from this read can still prove completion. A previous
+  // warehouse report cannot: its coverage flag was not reconfirmed.
+  const progressConfirmed =
+    incoming.remaining === 0 && !incoming.backfillRunning && incoming.sessionsReady >= incoming.targetSessions;
+  return {
+    sessionsReady: incoming.remaining !== null || incoming.backfillRunning ? incoming.sessionsReady : kept.sessionsReady,
+    targetSessions: incoming.targetSessions || kept.targetSessions,
+    remaining: incoming.remaining !== null ? incoming.remaining : kept.remaining,
+    lastSuccessfulDate: incoming.lastSuccessfulDate ?? kept.lastSuccessfulDate,
+    gaps: incoming.gaps ?? kept.gaps,
+    backfillRunning: incoming.backfillRunning,
+    backfillComplete: progressConfirmed,
+    statusKnown: false,
+    statusError: incoming.statusError,
+    statusFailures,
+    statusStale: statusFailures >= MARKET_STATUS_STALE_POLLS,
   };
 }
 

@@ -4,6 +4,7 @@ import {
   backfillReadFailure,
   createRuntimeRefreshLocks,
   marketSummaryFrom,
+  mergeMarketRead,
   refreshRuntimeSnapshot,
 } from '../src/lib/runtimeRefresh.ts';
 
@@ -99,7 +100,7 @@ test('market summary keeps backfill progress when warehouse status fails', () =>
   assert.match(summary.statusError, /WAREHOUSE_WRITER_BUSY/);
 });
 
-test('market summary is complete from a finished progress file', () => {
+test('market summary is complete from a finished progress file that met the target', () => {
   const summary = marketSummaryFrom(
     { running: false, progress: { sessions: 84, sessions_ready: 84, remaining: 0 } },
     null,
@@ -110,15 +111,67 @@ test('market summary is complete from a finished progress file', () => {
   assert.equal(summary.remaining, 0);
 });
 
-test('market summary is complete when the warehouse has sessions and no gaps', () => {
+test('a progress file with remaining 0 but too few sessions is not complete', () => {
+  const summary = marketSummaryFrom(
+    { running: false, progress: { sessions: 84, sessions_ready: 10, remaining: 0 } },
+    null,
+    'MARKET_STATUS_UNAVAILABLE',
+  );
+  assert.equal(summary.backfillComplete, false);
+});
+
+test('market summary is complete only when coverage is explicit and the target is met', () => {
   const summary = marketSummaryFrom(
     { running: false, progress: null },
-    { sessions_ready: 84, gaps: [], last_successful_date: '20261105' },
+    { sessions_ready: 84, gaps: [], last_successful_date: '20261105', coverage_complete: true },
   );
   assert.equal(summary.backfillComplete, true);
   assert.equal(summary.statusKnown, true);
   assert.equal(summary.statusError, null);
   assert.equal(summary.sessionsReady, 84);
+
+  const short = marketSummaryFrom(
+    { running: false, progress: null },
+    { sessions_ready: 10, gaps: [], coverage_complete: false },
+  );
+  assert.equal(short.backfillComplete, false);
+
+  const uncovered = marketSummaryFrom(
+    { running: false, progress: null },
+    { sessions_ready: 84, gaps: [], coverage_complete: false },
+  );
+  assert.equal(uncovered.backfillComplete, false);
+});
+
+test('a stale warehouse completion is overlaid and then dropped', () => {
+  const confirmed = marketSummaryFrom(
+    { running: false, progress: null },
+    { sessions_ready: 84, gaps: [], last_successful_date: '20261105', coverage_complete: true },
+  );
+  const failed = marketSummaryFrom(
+    { running: false, progress: null },
+    null,
+    'MARKET_COMMAND_FAILED_1_WRITER_ACTIVE_OR_RECOVERY_REQUIRED',
+  );
+  const once = mergeMarketRead(confirmed, failed);
+  assert.equal(once.statusError, failed.statusError);
+  assert.equal(once.sessionsReady, 84);
+  assert.equal(once.lastSuccessfulDate, '20261105');
+  assert.equal(once.backfillComplete, false);
+  assert.equal(once.statusStale, false);
+  assert.equal(once.statusKnown, false);
+
+  const twice = mergeMarketRead(once, failed);
+  assert.equal(twice.statusStale, true);
+  assert.equal(twice.backfillComplete, false);
+  assert.equal(twice.statusError, failed.statusError);
+  assert.equal(twice.sessionsReady, 84);
+
+  const recovered = mergeMarketRead(twice, confirmed);
+  assert.equal(recovered.backfillComplete, true);
+  assert.equal(recovered.statusError, null);
+  assert.equal(recovered.statusFailures, 0);
+  assert.equal(recovered.statusStale, false);
 });
 
 test('an idle warehouse failure keeps a stable diagnostic code', () => {

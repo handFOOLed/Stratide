@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "node tests/model.test.js && node tests/status.test.js && node tests/runtime-poll.test.js && node tests/runtime-refresh.test.js && node tests/checklist.test.js",
+    "test": "node tests/model.test.js && node tests/status.test.js && node tests/runtime-poll.test.js && node tests/runtime-refresh.test.js && node tests/runtime-action.test.js && node tests/checklist.test.js && node tests/notices.test.js",
     "test:browser": "playwright test"
   },
   "dependencies": {

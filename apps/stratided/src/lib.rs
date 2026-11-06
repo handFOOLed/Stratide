@@ -144,6 +144,17 @@ impl Assets {
                 ),
             );
         }
+        let mark = dir.join("brand-mark.png");
+        if mark.is_file() {
+            files.insert(
+                "/brand-mark.png",
+                (
+                    "image/png",
+                    snapshot::read_bounded(&mark)
+                        .map_err(|_| "brand-mark.png 无法读取".to_string())?,
+                ),
+            );
+        }
         Ok(Self(files))
     }
 }

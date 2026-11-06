@@ -6,6 +6,7 @@ import { runtimeStatusPollIntervalMs } from '../lib/runtimePoll';
 import {
   createRuntimeRefreshLocks,
   marketSummaryFrom,
+  mergeMarketRead,
   refreshRuntimeSnapshot,
 } from '../lib/runtimeRefresh';
 import type { MarketSummary } from '../lib/runtimeRefresh';
@@ -36,6 +37,7 @@ export function useRuntime(): RuntimeState {
   const mounted = useRef(true);
   const controller = useRef<AbortController | null>(null);
   const locks = useRef(createRuntimeRefreshLocks());
+  const marketRef = useRef<MarketSummary | null>(null);
   const visible = useDocumentVisible();
 
   const refresh = useCallback((silent = false) => {
@@ -55,13 +57,14 @@ export function useRuntime(): RuntimeState {
           const backfill = await runtimeAction<{
             running?: boolean;
             progress?: { sessions?: number; sessions_ready?: number; remaining?: number } | null;
-          }>('market', { action: 'backfill-state' }, { timeoutMs: 8000, timeoutCode: 'MARKET_BACKFILL_STATE_TIMEOUT' });
+          }>('market', { action: 'backfill-state' }, { timeoutMs: 8000, timeoutCode: 'MARKET_BACKFILL_STATE_TIMEOUT', signal: next.signal });
           try {
             const summary = await runtimeAction<{
               last_successful_date?: string | null;
               gaps?: unknown[];
               sessions_ready?: number;
-            }>('market', { action: 'status' }, { timeoutMs: 8000, timeoutCode: 'MARKET_STATUS_TIMEOUT' });
+              coverage_complete?: boolean;
+            }>('market', { action: 'status' }, { timeoutMs: 8000, timeoutCode: 'MARKET_STATUS_TIMEOUT', signal: next.signal });
             return marketSummaryFrom(backfill, summary, null);
           } catch (caught) {
             if (caught instanceof ApiError && caught.code === 'ABORTED') throw caught;
@@ -89,11 +92,13 @@ export function useRuntime(): RuntimeState {
         setError(failure);
       },
       onMarket: (value) => {
-        if (mounted.current) setMarket(value);
+        const merged = mergeMarketRead(marketRef.current, value);
+        marketRef.current = merged;
+        if (mounted.current) setMarket(merged);
       },
       onMarketMiss: () => {
-        // Keep the last summary. Clearing it is what left the badge on
-        // “正在读取” after a later status poll failed.
+        // ABORTED (unmount or a newer poll) keeps the last summary. A real
+        // status failure returns a summary and is aged in mergeMarketRead.
       },
     });
   }, []);

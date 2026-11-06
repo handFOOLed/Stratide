@@ -2417,8 +2417,6 @@ a.health-bar__item:hover { background: var(--surface-hover); }
   text-align: left;
   cursor: default;
 }
-.checklist--done .checklist__head { cursor: pointer; }
-.checklist--done .checklist__head:hover { background: var(--surface-hover); }
 .checklist__title {
   display: inline-flex;
   align-items: center;
@@ -2432,8 +2430,6 @@ a.health-bar__item:hover { background: var(--surface-hover); }
   font-size: var(--fs-sm);
   font-variant-numeric: tabular-nums;
 }
-.checklist__chevron { color: var(--text-muted); transition: transform var(--motion-hover) var(--ease-out); }
-.checklist--done .checklist__head[aria-expanded="true"] .checklist__chevron { transform: rotate(180deg); }
 .checklist__items {
   display: flex;
   flex-direction: column;

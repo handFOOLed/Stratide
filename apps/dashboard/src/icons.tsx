@@ -273,10 +273,10 @@ export function Icon({
   );
 }
 
-export function BrandMark({ size = 30 }: { size?: number }) {
+export function BrandMark({ size = 32 }: { size?: number }) {
   return (
     <span className="brand-mark" style={{ width: size, height: size }}>
-      <img src="/favicon.ico" alt="" width={size} height={size} />
+      <img src="/brand-mark.png" alt="" width={size} height={size} />
     </span>
   );
 }

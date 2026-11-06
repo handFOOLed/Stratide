@@ -12,6 +12,7 @@ import type { Inbox, Notice } from '../lib/workspace';
 import { friendlyError } from '../lib/api';
 import { countText, formatDateTime } from '../lib/format';
 import { notificationTitle, taskStatusView } from '../lib/status';
+import { visibleNotices } from '../lib/notices';
 import { navigate } from '../lib/route';
 import type { AgentState } from '../state/useAgent';
 import { useInterval } from '../lib/hooks';
@@ -71,7 +72,7 @@ export function NotificationsPage({ agent, titleRef }: { agent: AgentState; titl
   };
 
   const stored = inbox?.notifications ?? [];
-  const notifications = stored.filter((notice) => !notice.read);
+  const notifications = visibleNotices(stored);
   const pageUnread = notifications;
   const totalUnread = inbox === null ? 0 : inbox.unread_count;
   const allUnreadMarked = pageUnread.length > 0 && pageUnread.length === totalUnread;

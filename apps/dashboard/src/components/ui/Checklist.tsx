@@ -18,25 +18,15 @@ export interface ChecklistItem {
 export function Checklist({
   items,
   title = '上手清单',
-  onToggle,
-  open,
 }: {
   items: ChecklistItem[];
   title?: string;
-  onToggle: () => void;
-  open: boolean;
 }) {
   const doneCount = items.filter((item) => item.done).length;
   const allDone = doneCount === items.length;
   return (
     <section className={'checklist card' + (allDone ? ' checklist--done' : '')}>
-      <button
-        type="button"
-        className="checklist__head"
-        aria-expanded={allDone ? open : true}
-        onClick={onToggle}
-        disabled={!allDone}
-      >
+      <div className="checklist__head">
         <span className="checklist__title">
           <Icon name={allDone ? 'check' : 'list'} size={16} />
           {title}
@@ -44,10 +34,8 @@ export function Checklist({
         <span className="checklist__progress">
           {allDone ? '已完成' : countText(doneCount, '项') + ' / ' + countText(items.length, '项')}
         </span>
-        {allDone ? <Icon name="chevron-down" size={14} className="checklist__chevron" /> : null}
-      </button>
-      {allDone && !open ? null : (
-        <ol className="checklist__items">
+      </div>
+      <ol className="checklist__items">
           {items.map((item) => (
             <li key={item.id} className={'checklist__item' + (item.done ? ' checklist__item--done' : '')}>
               <span className="checklist__mark" aria-hidden="true">
@@ -63,8 +51,7 @@ export function Checklist({
               {item.done ? null : item.action ? <div className="checklist__action">{item.action}</div> : null}
             </li>
           ))}
-        </ol>
-      )}
+      </ol>
     </section>
   );
 }

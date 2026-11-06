@@ -1,4 +1,4 @@
-import { ApiError } from './api';
+import { ApiError } from './api.ts';
 
 export interface ChildStatus {
   pid: number;
@@ -120,9 +120,14 @@ export async function loadRuntimeStatus(signal?: AbortSignal): Promise<RuntimeSt
 export async function runtimeAction<T>(
   path: string,
   body: Record<string, unknown> = {},
-  options: { timeoutMs?: number; timeoutCode?: string } = {},
+  options: { timeoutMs?: number; timeoutCode?: string; signal?: AbortSignal } = {},
 ): Promise<T> {
   const controller = new AbortController();
+  const onOuterAbort = () => controller.abort();
+  if (options.signal) {
+    if (options.signal.aborted) controller.abort();
+    else options.signal.addEventListener('abort', onOuterAbort);
+  }
   let timedOut = false;
   const timer =
     options.timeoutMs === undefined
@@ -143,6 +148,8 @@ export async function runtimeAction<T>(
       signal: controller.signal,
     });
   } catch (error) {
+    // Navigation and a replaced poll are ABORTED. The 8s timer is a timeout.
+    if (options.signal?.aborted) throw new ApiError('ABORTED', 'ABORTED', 0);
     if (timedOut) {
       const code = options.timeoutCode ?? 'REQUEST_TIMEOUT';
       throw new ApiError(code, code, 0);
@@ -150,6 +157,7 @@ export async function runtimeAction<T>(
     throw error;
   } finally {
     if (timer !== null) clearTimeout(timer);
+    options.signal?.removeEventListener('abort', onOuterAbort);
   }
 }
 

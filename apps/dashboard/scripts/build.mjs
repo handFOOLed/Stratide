@@ -40,13 +40,15 @@ if (result.error) {
 if (result.status !== 0) process.exit(result.status ?? 1);
 
 const favicon = path.join(root, '../../assets/brand/stratide.ico');
-if (!existsSync(favicon)) {
-  console.error('构建失败：缺少 assets/brand/stratide.ico');
+const mark = path.join(root, '../../assets/brand/stratide-mark.png');
+if (!existsSync(favicon) || !existsSync(mark)) {
+  console.error('构建失败：缺少 assets/brand/stratide.ico 或 stratide-mark.png');
   process.exit(1);
 }
 for (const [from, to] of [
   [path.join(root, 'index.html'), path.join(dist, 'index.html')],
   [favicon, path.join(dist, 'favicon.ico')],
+  [mark, path.join(dist, 'brand-mark.png')],
 ]) copyFileSync(from, to);
 
 if (!existsSync(path.join(dist, 'assets', 'app.css'))) {

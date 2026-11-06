@@ -544,6 +544,8 @@ export function RuntimePanel({
     wsl_probe: wslProbe === null ? null : { state: wslProbe.state, reason: wslProbe.reason },
     last_action_error: actionError,
     market_status_error: runtime.market?.statusError ?? null,
+    market_status_failures: runtime.market?.statusFailures ?? 0,
+    market_status_stale: runtime.market?.statusStale ?? false,
   };
   const copyText = JSON.stringify(diagnosticsData, null, 2);
 
@@ -592,8 +594,14 @@ export function RuntimePanel({
                   ? statusView('unset', '尚未开始', '尚未补录（目标 ' + backfillTarget + ' 个交易日）')
                   : statusView('unset', '尚未完成', '待补齐 ' + displayRemaining + ' 个交易日（目标 ' + backfillTarget + ' 个交易日）');
     const backfillTotal = sessionsReady + displayRemaining;
-    const progressValue =
-      backfillDone ? 100 : backfillTotal === 0 ? 0 : Math.min(100, (sessionsReady / backfillTotal) * 100);
+    const unconfirmed = runtime.market?.statusError != null && !backfillComplete;
+    const progressValue = backfillDone
+      ? 100
+      : unconfirmed
+        ? Math.min(99, backfillTarget === 0 ? 0 : (sessionsReady / backfillTarget) * 100)
+        : backfillTotal === 0
+          ? 0
+          : Math.min(100, (sessionsReady / backfillTotal) * 100);
     const backfillDisabled = busy !== null || backfillRunning || !marketInitialized;
 
     const setupContent = (
@@ -788,8 +796,10 @@ export function RuntimePanel({
                 <span>最近更新：{formatDay(runtime.market.lastSuccessfulDate)}</span>
               ) : null}
               {runtime.market !== null && runtime.market.statusError !== null ? (
-                <span data-testid="backfill-diagnostic-code">
-                  诊断码 {backfillReadFailure(runtime.market.statusError).diagnosticCode}
+                <span className="backfill-diagnostic" data-testid="backfill-diagnostic-code">
+                  <code className="backfill-diagnostic__code">
+                    {backfillReadFailure(runtime.market.statusError).diagnosticCode}
+                  </code>
                 </span>
               ) : null}
             </div>

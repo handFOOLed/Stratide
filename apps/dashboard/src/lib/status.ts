@@ -250,11 +250,11 @@ export function failureReasonText(value: string | null | undefined): string {
   return humanReasonText(value) ?? '原因未记录';
 }
 
-/** 费用未确认时仍展示已保存的具体原因，避免只剩一句核对调用记录。 */
+/** 有具体原因时只保留原因，并附一句费用待核对。没有原因时才用整句核对提示。 */
 export function uncertainOutcomeText(reason: string | null | undefined): string {
   const specific = humanReasonText(reason);
   if (specific === null || specific === '') return '结果或费用尚未确认，请核对调用记录';
-  return specific + '。结果或费用尚未确认，请核对调用记录';
+  return specific + '。费用待核对';
 }
 
 export function taskStatusView(status: string, reason: string | null, conclusion: string | null): StatusView {
