@@ -1,5 +1,9 @@
 # 自动化可用性修复记录（2026-11-06）
 
+> **工程资料**：本页包含已发生的诊断或实现记录，不代替产品手册与当前源码。
+>
+> [文档中心](README.md) · [当前版本](STATUS.md) · [架构总览](ARCHITECTURE_OVERVIEW.md)
+
 > Owner 要求“产品真正自动化可用”，并允许修改后端。本文件记录真实安装的阻断原因、
 > 修复、在隔离数据副本上的端到端验证、以及仍然存在的诚实限制。
 > 独立只读诊断报告见 [`evidence/automation/independent-diagnosis.md`](evidence/automation/independent-diagnosis.md)。

@@ -1,5 +1,9 @@
 > **历史架构访谈记录（已归档为参考，不是当前实施指令）。** 本文中的“尚未开发 M0”“Terra 合并”“Web/Agent 待完成纸面阶段后才开工”等旧描述均不再代表 `main` 或 Owner 当前分工；请读 [STATUS](STATUS.md)、[AGENTS](../AGENTS.md)、[当前路线](PAPER_TRADING_ROADMAP.md) 和 [DeepSeek 交接](UI_HANDOFF_DEEPSEEK.md)。原讨论不删除，以保留设计决策脉络。
 
+> **历史参考**：本文记录旧阶段的实验、规划和问题清单；“当前/Draft”以当时版本为准。
+>
+> [文档中心](README.md) · [当前版本](STATUS.md) · [架构总览](ARCHITECTURE_OVERVIEW.md)
+
 # Grill-with-docs — Stratide architecture interrogation
 
 ## Brief for Codex

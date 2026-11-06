@@ -1,5 +1,9 @@
 # V1 收尾 A：本地风险评价、前向证据与 FusionResearcherV1
 
+> **历史参考**：本文记录旧阶段的实验、规划和问题清单；“当前/Draft”以当时版本为准。
+>
+> [文档中心](README.md) · [当前版本](STATUS.md) · [架构总览](ARCHITECTURE_OVERVIEW.md)
+
 对应 [Issue #76](https://github.com/handFOOLed/Stratide/issues/76)。基于 PR #75 合并后的 main `d557aa1cd721df66accdddbe7b22afb184736ecc`，WSL Ubuntu ext4 独立工作树；Core-only、单人、唯一 Draft PR。[预先冻结的协议](V1_EVALUATION_PROTOCOL.md)与[配置](../config/risk-evaluation-v1.json)先于本期评价提交。
 
 ## 运行与读取

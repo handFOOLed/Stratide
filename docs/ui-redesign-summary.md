@@ -1,5 +1,9 @@
 # UI 产品化改造总结（按页面）
 
+> **历史参考**：本文记录旧阶段的实验、规划和问题清单；“当前/Draft”以当时版本为准。
+>
+> [文档中心](README.md) · [当前版本](STATUS.md) · [架构总览](ARCHITECTURE_OVERVIEW.md)
+
 > 基线：`70b2828`（feat/ui-product-ux 起点）。本轮只改前端展示层：文案、布局、
 > 交互、组件与样式；未改后端 API、数据语义、风控与账本逻辑。术语口径见
 > `docs/UI_TERMINOLOGY.md`；截图见 `docs/ui-evidence/README.md`；

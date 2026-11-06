@@ -1,5 +1,9 @@
 # 前端产品化：遗留问题与已知限制
 
+> **历史参考**：本文记录旧阶段的实验、规划和问题清单；“当前/Draft”以当时版本为准。
+>
+> [文档中心](README.md) · [当前版本](STATUS.md) · [架构总览](ARCHITECTURE_OVERVIEW.md)
+
 > 本轮改造完成后的诚实清单：哪些已解决、哪些依赖后端、哪些属于本轮范围外。
 > 对应交付：`docs/ui-copy-audit.md`、`docs/UI_TERMINOLOGY.md`、
 > `docs/UI_BACKEND_REQUIREMENTS.md`、`docs/ui-redesign-summary.md`。

@@ -1,5 +1,9 @@
 # DeepSeek — Stratide UI/UX 历史交接规范
 
+> **历史参考**：本文记录旧阶段的实验、规划和问题清单；“当前/Draft”以当时版本为准。
+>
+> [文档中心](README.md) · [当前版本](STATUS.md) · [架构总览](ARCHITECTURE_OVERVIEW.md)
+
 > **2026-11-05 历史文档说明**：DeepSeek 负责的 #85 完整 Windows 安装模块已经通过 [PR #89](https://github.com/handFOOLed/Stratide/pull/89) 合并；本文的 UI-only 角色、以前的交接阶段与“当前实现中”的表述只代表旧项目时期。普通使用者请看 [USER_GUIDE](USER_GUIDE.md)，新开发任务请看 [AGENTS](../AGENTS.md) 和 [STATUS](STATUS.md)。保留设计历史，不重新触发开发。
 
 > 本文件为 **Owner 2026-10-29 最新 UI 职责与验收要求**。执行入口：[Issue #23](https://github.com/handFOOLed/Stratide/issues/23)；需求讨论参考 [PR #15 Q01–Q69](https://github.com/handFOOLed/Stratide/pull/15)，若其早期开发顺序与本文件冲突，以本轮 Owner 明确决定为准。**先完成 #22 的 Agent 功能与接口，再开始正式 UI 实施。**

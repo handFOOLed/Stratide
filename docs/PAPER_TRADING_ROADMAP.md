@@ -1,5 +1,9 @@
 # Stratide Paper 阶段路线图（历史背景归档）
 
+> **历史参考**：本文记录旧阶段的实验、规划和问题清单；“当前/Draft”以当时版本为准。
+>
+> [文档中心](README.md) · [当前版本](STATUS.md) · [架构总览](ARCHITECTURE_OVERVIEW.md)
+
 > **现行进度｜2026-11-05**：V2/Windows 0.3.0 四模块已由 PR #86/#87/#88/#89 合并，可用版使用方式请看 [使用教程](USER_GUIDE.md)。本文只归档旧 Paper/V1 研发顺序，原“当前 #85”“Draft”均为历史称谓。当前状态见 [STATUS](STATUS.md)，运行边界见 [KNOWN_LIMITATIONS](KNOWN_LIMITATIONS.md)；后续新任务由 Owner 确定。
 
 **2026-11-04 / #77 产品集成已实装（Draft）：** [V1 本地产品闭环](V1_COMPLETION.md) 已达到工程收尾，含当前/历史独立来源、原研究/任务/预算、审批通知、假设成交与 Windows 恢复。Owner 合并决定仍待进行。#10/#17 缺证据与真实交易资格保持原判定；N100/Linux 服务器化暂缓，不计本次 Done。后续真实观察不得由合成测试补齐。[本地检查](evidence/v1-closeout-b/README.md)。
