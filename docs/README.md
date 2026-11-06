@@ -1,19 +1,36 @@
-# Stratide 文档中心
+# Documentation
 
-从 [GitHub 首页](../README.md) 进入软件。
+[← Stratide](../README.md) · [Getting started](USER_GUIDE.md) · [Project status](STATUS.md)
 
-## 使用软件
+一个入口对应一个目的。日常使用不需要阅读 Rust、SQLite 或内部 Worker 协议。
 
-- [完整使用教程](USER_GUIDE.md)：下载、安装、启动、首次配置、日常操作、升级与卸载。
-- [Windows 安装与升级手册](WINDOWS_INSTALL.md)：目录、运行时依赖、登录自启和构建产物。
-- [故障排查与已知限制](KNOWN_LIMITATIONS.md)：环境、数据/模型条件、BLOCKED/NO_FILL、开发阶段验证状态。
+## 使用
 
-## 产品与工程
+| 文档 | 你会找到什么 |
+| :--- | :--- |
+| **[快速上手 / 使用指南](USER_GUIDE.md)** | 首次启动、行情、AI 研究、模拟账户与日常操作 |
+| **[Windows 安装与更新](WINDOWS_INSTALL.md)** | 安装、迁移、升级、卸载、开发者构建 |
+| **[问题排查](KNOWN_LIMITATIONS.md)** | 常见错误、运行前提、已知边界 |
 
-- [当前状态与版本记录](STATUS.md)
-- [产品原则](PRODUCT.md) · [工程协作规则](../AGENTS.md)
-- [V2 模块 A：全市场 EOD](M3_PR01.md) · [模块 B：TimesFM / DeepSeek](M3_PR02.md) · [模块 C：Paper 账户](M3_PR03.md) · [模块 D：Windows 产品](M3_PR04.md)
-- [Dashboard 开发说明](../apps/dashboard/README.md) · [研究 Agent API](AGENT_API.md)
-- [持续优化清单](OPTIMIZATION_BACKLOG.md) · [设计决策 ADR](adr/) · [历史测试与工程证据](evidence/)
+## 了解 Stratide
 
-历史 PR/Issue 的“Draft/当前任务”文字可能是当时的快照；软件当前使用入口请优先看 [使用教程](USER_GUIDE.md)，验收范围详见 [已知限制](KNOWN_LIMITATIONS.md)。
+| 文档 | 内容 |
+| :--- | :--- |
+| [系统架构](ARCHITECTURE_OVERVIEW.md) | 简明系统关系图、数据与交易边界 |
+| [项目状态](STATUS.md) | 当前源码版本、发布状态与模块里程碑 |
+| [产品原则](PRODUCT.md) | 历史产品决策及约束 |
+| [设计系统](UI_DESIGN_SYSTEM.md) | Dashboard 视觉与组件规范 |
+
+## 开发与维护
+
+| 类别 | 文档 |
+| :--- | :--- |
+| 开发协作 | [AGENTS.md](../AGENTS.md) · [Dashboard](../apps/dashboard/README.md) · [工具脚本](../scripts/README.md) · [本机配置](../config/README.md) |
+| API | [Dashboard API](DASHBOARD_API.md) · [Research Agent API](AGENT_API.md) |
+| 可信执行与研究 | [Risk Policy](RISK_POLICY.md) · [技术记录](TECHNICAL_NOTES.md) · [架构草案](ARCHITECTURE.md) |
+| 优化候选 | [Backlog](OPTIMIZATION_BACKLOG.md) |
+| 决策记录 | [ADR 索引](adr/README.md) |
+| 验收资料 | [Evidence 索引](evidence/README.md) |
+| 历史项目 | [M0–M3 开发档案](ARCHIVE.md) · [历程](PROJECT_HISTORY.md) |
+
+> 旧 PR 文档和接受的 ADR 是按发生时点保留的证据，不代表目前的产品版本或已上线功能。请以本索引和 [STATUS](STATUS.md) 为准。

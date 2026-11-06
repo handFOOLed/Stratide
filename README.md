@@ -1,43 +1,49 @@
-**简体中文** | [English](README.en.md)
+<div align="center">
 
 # Stratide
 
-**面向 Windows 11 的本地 A 股盘后研究与自动 Paper 模拟交易系统。**
+**A-share research, from market data to paper portfolio.**
 
-Stratide 将市场行情采集、TimesFM 本地时序预测、受控 DeepSeek 策略研究、风险管理与 Paper 交易整合到一个 Dashboard。它可以在 Windows 用户登录后自动运行，也可以通过桌面快捷方式双击启动。
+一个本地运行、自动研究、持续观察的 A 股 Paper Trading 工作台。
 
-## 核心功能
+[![Windows 11](https://img.shields.io/badge/Windows-11-101923?style=flat-square)](docs/WINDOWS_INSTALL.md)
+[![Source](https://img.shields.io/badge/source-v0.3.1-0B746D?style=flat-square)](docs/STATUS.md)
+[![Paper Only](https://img.shields.io/badge/trading-Paper%20Only-242B37?style=flat-square)](docs/KNOWN_LIMITATIONS.md)
 
-- **盘后市场数据**：Tushare A 股市场证券池、增量 EOD 采集、数据完整性与来源追踪。
-- **自动研究**：全市场轻量筛选 → 本地 WSL2/CPU TimesFM → 按授权使用 DeepSeek 生成并冻结策略候选。
-- **多证券 Paper 模拟**：共享现金、持仓、手续费与风控账本；T+1 盘后基于冻结意图进行事后假设成交。
-- **一体化 Dashboard**：查看行情、研究任务、组合、交易、预算、审批通知与后台状态。
-- **Windows 桌面体验**：安装包、桌面快捷方式、单实例后台服务、可选登录自启、数据保留式升级/卸载。
+[**下载安装**](https://github.com/handFOOLed/Stratide/releases) · [**快速开始**](docs/USER_GUIDE.md) · [文档](docs/README.md) · [English](README.en.md)
 
-## 快速开始
+<a href="docs/ui-evidence/after/04-overview-1440-dark.png">
+  <img src="docs/ui-evidence/after/04-overview-1440-dark.png" width="880" alt="Stratide Dashboard 深色界面预览" />
+</a>
 
-1. 在 [GitHub Releases](https://github.com/handFOOLed/Stratide/releases) 下载 `Stratide-Setup-0.3.0-x64.exe`，按向导安装。
-2. **双击桌面 Stratide 图标**；软件会启动或复用本地服务，并在默认浏览器打开 Dashboard。
-3. 进入 **设置 → 运行与安装**，保存 Tushare Token、初始化并启用 EOD 数据采集。
-4. 如需自动研究，在同一页面配置已有 WSL2 TimesFM 并点击「检测 WSL Worker」；随后按 **设置 → 权限与安全** 中的 Owner 流程启用研究、独立数据外发授权与预算。
-5. 如需自动 Paper 模拟，在既有 Owner 流程中配置或绑定 Paper 账户、风险与策略，再按需启用 Windows 登录自启。
+<sub>Dashboard 界面预览 · 截图使用演示数据，不代表实际投资收益</sub>
 
-详细步骤与高级配置入口见 **[完整使用教程](docs/USER_GUIDE.md)**。第一次使用只想查看界面和状态时，可以先不启用付费研究或模拟交易。
+</div>
 
-## 文档
+## 从数据到决策，一处完成
 
-| 你想了解的内容 | 入口 |
-| --- | --- |
-| 从安装到日常使用 | [使用教程](docs/USER_GUIDE.md) |
-| 安装、升级、卸载 | [Windows 安装手册](docs/WINDOWS_INSTALL.md) |
-| 错误提示、系统要求与运行边界 | [故障排查与已知限制](docs/KNOWN_LIMITATIONS.md) |
-| 项目进度与工程证据 | [当前状态](docs/STATUS.md) |
-| 代码、架构、历史文档 | [文档中心](docs/README.md) |
+| Market | Research | Portfolio |
+| :--- | :--- | :--- |
+| **可信盘后行情** | **本地 TimesFM + 云端 AI** | **自动 Paper 模拟** |
+| A 股证券池、增量 EOD、数据质量与来源记录。 | 先筛选，再对有限候选进行时序研究与受控 DeepSeek 分析。 | 同一个现金与风险账本，记录冻结意图、假设成交和持仓变化。 |
 
-## 项目说明
+<div align="center">
+  <img src="docs/ui-evidence/after/26-ai-research-1440-dark.png" width="720" alt="Stratide AI 研究界面预览" />
+</div>
 
-- 当前版本：**Stratide V2 / Windows 0.3.0**，四个工程模块均已合入 `main`（[PR #86](https://github.com/handFOOLed/Stratide/pull/86) · [#87](https://github.com/handFOOLed/Stratide/pull/87) · [#88](https://github.com/handFOOLed/Stratide/pull/88) · [#89](https://github.com/handFOOLed/Stratide/pull/89)）。
-- **Paper-only**：不连接真实券商、不以真实资金下单。真实市场数据云端外发需要单独授权，模型研究不能绕过本地风险控制。
-- 本项目为个人使用场景构建；涉及交易与投资的决定由使用者自行承担。
+## Get started
 
-开发者可从 [AGENTS.md](AGENTS.md) 和 [docs/README.md](docs/README.md) 开始了解系统内部结构。
+1. 从 [Releases](https://github.com/handFOOLed/Stratide/releases) 查看**已上传**的 Windows 安装包，安装后双击桌面 **Stratide**。
+2. 首次打开阅读并确认本地使用协议；在 **设置**中配置 Tushare 数据源。
+3. 如需自动研究，连接已有的 WSL2 / TimesFM 环境，再配置 AI 服务与费用预算。
+4. 在 **总览**、**AI 研究**和**交易记录**中查看行情、研究任务和模拟账户。
+
+**[完整使用指南 →](docs/USER_GUIDE.md)**
+
+> `main` 源码目前为 **0.3.1**。GitHub Releases 中已核实的公开安装附件是 **0.3.0-rc2**；0.3.1 安装包已由开发者在本机构建，但尚未在 Releases 中核实上传。需要当前源码版本请参考 [Windows 构建指南](docs/WINDOWS_INSTALL.md#从源码构建)。
+
+## Documentation
+
+[使用指南](docs/USER_GUIDE.md) · [安装与升级](docs/WINDOWS_INSTALL.md) · [系统架构](docs/ARCHITECTURE_OVERVIEW.md) · [技术参考](docs/README.md) · [故障排查](docs/KNOWN_LIMITATIONS.md)
+
+<sub>Stratide 仅提供本地研究与模拟交易，不连接真实券商或执行真钱订单。模拟表现不构成投资建议。</sub>

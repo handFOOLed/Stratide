@@ -1,105 +1,36 @@
-# Stratide 当前状态｜Windows V2 / 0.3.0
+# Project status
 
-> **产品状态（2026-11-05）**：Stratide V2 已可作为 **Windows 11 本地 Paper 模拟交易与研究软件**安装、打开和配置。用户入口：[使用教程](USER_GUIDE.md) · [Windows 安装手册](WINDOWS_INSTALL.md) · [故障排查与已知限制](KNOWN_LIMITATIONS.md)。
+[← 文档](README.md) · [安装](WINDOWS_INSTALL.md) · [项目历程](PROJECT_HISTORY.md)
 
-## V2 模块交付
+**Stratide V2 · Windows · Paper-only**
 
-| 模块 | 已合并交付 | 主要能力 |
-| --- | --- | --- |
-| A / #82 | [PR #86](https://github.com/handFOOLed/Stratide/pull/86) · `cf86668b` | 市场证券池、增量 EOD、来源与覆盖质量 |
-| B / #83 | [PR #87](https://github.com/handFOOLed/Stratide/pull/87) · `1677bed3` | TimesFM/Naive/EWMA、受控 DeepSeek 研究、冻结候选与统一预算 |
-| C / #84 | [PR #88](https://github.com/handFOOLed/Stratide/pull/88) · `9a6a6ede` | 多证券共享 Paper 风控/现金/账本、T+1 事后假设成交与恢复 |
-| D / #85 | [PR #89](https://github.com/handFOOLed/Stratide/pull/89) · `a736bf0d` | Windows 安装包、单实例后台、可选登录自启、桌面双击 Dashboard、WSL2 TimesFM 自动桥接 |
+| 项目 | 当前状态 |
+| :--- | :--- |
+| 源码版本 | **0.3.1**，`main` 已合并 [PR #91](https://github.com/handFOOLed/Stratide/pull/91) |
+| 公开下载 | 已核实的 Releases 附件为 **v0.3.0-rc2**；0.3.1 发布附件尚未核实 |
+| 本地安装 | Windows 11 x64 · 单实例 Launcher / Dashboard |
+| 研究 | Tushare EOD、WSL2 TimesFM、受控 DeepSeek |
+| 交易 | 多证券、统一 Ledger 的 **Paper 模拟** |
+| 运行验证 | 开发者报告已做隔离测试；真实连续运行与收益资格需单独观察 |
 
-**以上四个工程模块均已合入 `main`。** 原 #85 的 Draft 开发状态已经结束；下一项工程任务须经 Owner 另行确定，不沿用旧文档中的“当前实施 #74/#84/#85”指令。
+## 已合并的工作
 
-## 使用与能力边界
+| 阶段 | PR | 交付 |
+| :--- | :--- | :--- |
+| Market | [#86](https://github.com/handFOOLed/Stratide/pull/86) | 全市场增量 EOD 与来源快照 |
+| Research | [#87](https://github.com/handFOOLed/Stratide/pull/87) | TimesFM + 有范围限制的 DeepSeek 研究 |
+| Paper | [#88](https://github.com/handFOOLed/Stratide/pull/88) | 多证券 Paper 账本与 T+1 事后假设 |
+| Desktop | [#89](https://github.com/handFOOLed/Stratide/pull/89) | Windows 安装、单实例与 WSL2 桥 |
+| Usability | [#90](https://github.com/handFOOLed/Stratide/pull/90) | 首次自动初始化、Dashboard 与后台研究可靠性 |
+| Release | [#91](https://github.com/handFOOLed/Stratide/pull/91) | 0.3.1 版本标记与构建修复 |
 
-- **可以使用**：下载安装包、双击打开 Dashboard、在设置页配置行情与已有 WSL2 TimesFM、按授权运行已有研究/模拟交易链。个人用户日常操作入口为 [完整使用教程](USER_GUIDE.md)。
-- **始终 Paper-only**：无实盘券商报单。模拟账户通过原 Owner 配置建立/绑定；T 日固定意图和 T+1 日线的 `EX_POST_OPEN_ASSUMPTION` 不是实时开盘成交。
-- **默认安全配置**：真实行情及派生摘要外发 DeepSeek 需单独授权；原 Agent 费用上限 CNY ¥5/日、¥100/月；研究和 Paper 均受数据质量、风险与交易日时点门禁限制。
-- **验证层级**：PR #89 开发者报告已实现真实 WSL2 CPU 模型推理/安装态 payload 验证；原开发沙箱中，部分 Windows 普通会话安装、登录自启、卸载与完整真实行情/云付费/Paper 长期 E2E 仍标 `NOT_RUN`。产品可使用不等于这些功能都已完成独立现场验收。所有技术前提和验证范围单独列于 [已知限制](KNOWN_LIMITATIONS.md)，原证据见 [M3-PR04 Evidence](evidence/m3-pr04/README.md)。
+## 下一步
 
-## 工程与历史文档
+当前版本可以作为本地研究/模拟工具使用。接下来应在实际 Windows 环境观察行情与研究任务是否按交易日推进，并确认下一次 Release 附件与源码版本一致。
 
-[文档中心](README.md) · [产品原则](PRODUCT.md) · [工程规则](../AGENTS.md) · [M3-PR04](M3_PR04.md) · [优化清单](OPTIMIZATION_BACKLOG.md)
+- 用户操作：[使用指南](USER_GUIDE.md)
+- 公开发行与校验：[Windows 安装](WINDOWS_INSTALL.md)
+- 技术边界：[问题排查](KNOWN_LIMITATIONS.md)
+- 历史实施记录：[项目历程](PROJECT_HISTORY.md) · [验收证据](evidence/README.md)
 
-以下内容为早期研发记录，按照当时的日期保留原始“Draft / 当前”叙述，**不再作为 V2 现行状态或开发任务依据**。历史验收/财务证据不做追溯性修改。
-
----
-
-## 历史工程记录（按原时间保留）
-**2026-11-05 / PR #88 R1 修复：** 新增 Owner 单独批准的未核验公司行为 Paper 假设路径，真实 EOD schema 可经原 Runner/CLI/唯一 Ledger 产生模拟成交；昨收/因子异常仍 NO_FILL。新增无交易估值恢复事件，未知 NAV 可跨日恢复且保留亏损/回撤/人工锁；容量明确为整批共享，可选 Paper 导入异常不终止 EOD watch。开发者定向回归，未改 Owner 设置/未新增真实行情调用，仍 Draft 未合并。[R1 证据](evidence/m3-pr03/R1.md)。
-
-**2026-11-05 / #84（本分支 Draft 开发交付）：** [M3-PR03](M3_PR03.md) 基于 main `1677bed3`，新增原 Ledger 内多证券原子批次、Owner 冻结固定金额 Paper 假设政策、T+1 日历/实收确认、NO_FILL/到期与 Dashboard 溯源。研究旧资格不变，真实源缺公司行为/精确规则仍 NO_FILL；仅合成工程验证，不是独立验收，未开启 Owner 自动化、未新增真实行情/付费调用，不自行合并。
-
-**2026-11-04 / PR #86 R1：** 目录范围缺失/已知证券异常消失不再因目录内行情比例 100% 而 READY；新增交易所范围证据、前版目录对照和独立研究门禁，Dashboard 分开显示目录范围与目录内行情覆盖。停复牌统一显式 S/R 查询，缺任一类型的成功证据即受阻。仅合成定向修复，仍为同一 Draft，真实采集/模型/Paper 成交均为 0。[说明](M3_PR01.md)。
-
-**2026-11-04 / #82（Draft 开发交付）：** [M3-PR01](M3_PR01.md) 增加全市场日期证券池、EOD 按日批量增量、原 journal/单写者恢复、可信覆盖双分母、CLI 和只读 Dashboard；复用 V1/V2 及 TimesFM source gate。合成定向验证，不声明真实全市场已采集；当前真实接口权限未新实测，BSE 不支持研究准入，PIT/Paper/Live 不升级。
-
-**2026-11-04 / PR #80 R1 P1 修复：** Paper 意图改为单业务事件/单事务；缺源批次到冻结的确认截止后整批 NO_FILL、清预留，不生成价格/成交/NAV，旧未冻结订单也有到期恢复入口。[R1 本地定向验证](evidence/v1-closeout-b/r1-fix.md)。产品范围仍是 Owner CLI JSON + 单证券假设撮合，非研究候选自动转单；来源时间/公司行为是 Owner 声明，PIT/开盘实收/交易资格不升级。保持同一 Draft，未独立验收或自行合并。
-
-**2026-11-04 / #77（本期 Draft）：V1_ENGINEERING_COMPLETE。** 已实装当前 Paper 账本 v1 只读接口与历史报告分离、原本地 CPU/Fusion/OOS/Registry 集成、持久审批/通知、前日冻结的 EOD Paper 假设成交、UI 精修及 Windows 启停/基础备份恢复。[操作与真实限制](V1_COMPLETION.md) / [本地绿测](evidence/v1-closeout-b/README.md)。这是开发者自测状态，未自行 Ready/merge，不等于独立验收；#10/#17 保持开放，PIT/开盘实收 NOT_VERIFIED、交易资格 BLOCKED。N100 暂缓，不计 V1 门槛；下方旧状态保留原发生时间。
-
-**2026-11-04 / #76 / PR #78 R1 修复：** 新增[冻结风险评价、前向只读审计与 FusionResearcherV1](V1_EVALUATION.md)，修复受控结论/未信任假说隔离及冻结门槛结构性不可达的报告；[本地绿测简报](evidence/v1-closeout-a/r1-fix.md)。按更新后的 #19/#76，个人模式无需强制大包证据或外部固定 HEAD 验收，由 Owner 决定合并，开发者不自行 Ready/merge。#10/#17 的缺口限制 PIT/开盘实收/已验证可交易声明，不阻挡工程交付、EOD Paper 或 Dashboard 集成；真实外发禁令、¥5/日 ¥100/月和 Paper-only 保持。本 PR 不新增 Paper 成交路径；#77 负责后续集成。下方旧条目保留发生时状态。
-
-**2026-11-04 / PR #75 R2：** 修复 Rust historical 当日收盘的盘后时点门禁；上海 16:00 边界和日期/时区一致性反证通过。历史 13/13、research Rust 71/71、旧 CPU 11 pass + 1 skip；真实 task 9 / Registry / report/verify 通过，0 新云/行情调用。[R2 证据](evidence/m2-pr20/r2/README.md)。保持 Draft，待固定 HEAD 复审。
-
-**2026-11-04 / PR #75 R1：** 历史模型 pin、完整纯 UNKNOWN opportunities、版本/未用字段已严格校验；来源索引改为证券+日期引用原 SHA，真实三证券 252 条来源绑定与 task 8 复核通过。57 个重算 SHA 反例先红后绿，历史套件 12/12、Rust 204/204，预算/授权/真实外发边界保持。[修复证据](evidence/m2-pr20/r1/README.md)。仍为 Draft，待新固定 HEAD 复审，未 Ready/merge。
-
-**2026-11-03 / #74 / M2-PR20（本分支 Draft）：** 基于最新 main `971eb4ba90507142b1d32ca80af2d15859790933`（含已合并 PR #60/#70/#72），[真实历史 → 本地 TimesFM](M2_PR20.md) 已实际跑通三证券 84 会话 → CPU → 原 Agent task 6 / Registry / report/verify。真实因子变化与缺口样本 BLOCKED；原 calls/预算/授权未变，新市场请求/云调用/计费为 0，真实风险外发 `REAL_MARKET_DATA_EGRESS_DENIED`。数据仍 PARTIAL、PIT 未验证，Paper/Live 禁止，N100 未验收。[本期开发证据](evidence/m2-pr20/README.md)。以下旧条目保留其发生时的状态，本段是当前增量。
-
-**2026-11-03 / #69 / PR #70 Linux R1：** 基于最新 main `b62c1171d8503e1f21e4b470847944c6fbe8dbf4`（PR #68 已合并），新增 [M2-PR18 本地 TimesFM 2.5 CPU](M2_PR18.md)，默认 OFF、独立 Worker、原任务/RiskExpertResult/Naive/EWMA，无新增计费或交易权限。开发/真实模型/Linux/N100 的实际验证状态分别记录于 [m2-pr18 evidence](evidence/m2-pr18/README.md)，N100 尚未验收；本分支保持 Draft。WSL2 Ubuntu ext4 已完成 Linux 隔离 4/4、0 skipped，真实 CPU 生产闭环、calls=0 与 Linux 16 点压力矩阵；[R1 命令/指标/回归限制](evidence/m2-pr18/linux-r1/README.md)。下方既有模块开发证据保留。
-
-> 截至 2026-11-03，基于开始时最新 `main e24f30f69b12fa303221ccd4fc6b8ea9084dc989`，PR #66 已合并；附本分支 #67 DeepSeek HTTPS 开发状态。这是**当前实现快照**，不是实盘承诺。Owner 已决定 **Core-first、UI-later**：后续核心功能先用 CLI/持久报告验收，最后按 PR #28 设计体系统一集成 UI。
-
-## 已实现
-
-| 领域 | 实际状态 | 证据 |
-| --- | --- | --- |
-| M2-PR20 真实历史本地风险（本分支 Draft） | #74：显式 1–8 证券、前缀冻结/单位/版本/来源与质量，原 TimesFM CPU/任务/Registry；真实正常与拒绝样本及零云调用验证。ENGINEERING_PASS，PIT/样本外优势/前向资格不升级 | [操作](M2_PR20.md) / [证据](evidence/m2-pr20/README.md) |
-| M2-PR17 DeepSeek HTTPS（本分支 Draft） | #67：`ds4.1flash` → 官方 `deepseek-flash`；原 CNY Agent/Budget、受控密钥、纯合成输入、显式一次开关、PR15/PR62 研究闭环。默认 OFF；本次真实请求 `REAL_PROVIDER_NOT_RUN_OWNER_AUTHORIZATION_MISSING`，0 实际费用/真实密钥正文读取/新行情，不解锁 Paper/Live | [操作](M2_PR17.md) / [开发证据](evidence/m2-pr17/README.md) |
-| M2-PR16 云端结构化提案接线（PR #66 已合并） | #65：显式 recorded source → 原 Owner Rust 任务/统一预算 → PR15 强类型 AST/冻结/归档 → PR62 多候选三成本；loopback、预算/撤销/取消/崩溃/未知和篡改反证。该期真实 Provider BLOCKED，0 外发/付费/新行情/Token，不解锁交易 | [契约/操作](M2_PR16.md) / [原开发证据](evidence/m2-pr16/README.md) |
-| M2-PR15 自主策略研究闭环（PR #64 已合并） | #63：受限 AST、本地确定性四类提案、冻结实验与开发段反馈、PR62 同源多候选评测和匹配基准、持久失败/恢复及只读研究 Inbox 契约。原真实五年运行与开发证据保留；0 新行情/Token/云模型/付费，不解锁交易 | [契约/操作](M2_PR15.md) / [原开发证据](evidence/m2-pr15/README.md) |
-| M2-PR14 多股票历史研究 V1（PR #62 已合并） | #61：只读处理 1212 会话 / 25569182 规范行，实测 5774 代码、5387 代码曾入研究子集；三策略/三基准、三成本情景及重置 Walk-forward，541 秒 / 267.5 MiB，12 项定向自测。三规则未建立相对等权优势；历史 PIT、可成交性仍未验证，研究指数不是账户 NAV 或 Paper/Live 准入 | [契约/操作](M2_PR14.md) / [原开发证据](evidence/m2-pr14/README.md) |
-| M2-PR13 历史 sidecar V2（PR #60 已合并） | #59：2000 积分现有账号，四接口各 1212 日期已落地，6068 次原请求；因子 1212 日旧 PARTIAL 标签保留且不再推断数字 cap，限价 33 日 PARTIAL。历史市场覆盖仍未验证；持久预算/断点续传、只读版本查询和冻结锚点复权 | [契约/操作](M2_PR13.md) / [实际证据](evidence/m2-pr13/README.md) / [增量修复](evidence/m2-pr13/r1/README.md) |
-| M2-PR12 历史仓库 V1（PR #58 已合并） | #57：独立本地证券目录/日历/未复权日线；1212 日期、6347781 行，1201 COMPLETE / 11 PARTIAL。历史身份/BSE 日历/PIT 仍未核实；4.54 GB 本地旧库保留 | [契约/操作](M2_PR12.md) / [实际证据](evidence/m2-pr12/README.md) |
-| M0 Paper 内核 | Rust Risk Kernel、单账户 SQLite 事件账本、保守模拟撮合、确定性重放及六报告 | [PR #2](https://github.com/handFOOLed/Stratide/pull/2) / [#4](https://github.com/handFOOLed/Stratide/pull/4) / [#6](https://github.com/handFOOLed/Stratide/pull/6) |
-| 真实来源前向 EOD | **observe-only** 独立 journal；10/28、10/29 两个有效日，`EOD_CONTINUITY_VERIFIED`；0 策略提案/成交 | [#10 独立结论](https://github.com/handFOOLed/Stratide/issues/10#issuecomment-6512598875) |
-| 历史探索性回测 | 600000.SH，2026-07-17—10-28，68 个交易日、3 笔模拟成交；初始 ¥100,000，末 NAV ¥99,966.51，**不是可交易盈利证据** | [PR #12](https://github.com/handFOOLed/Stratide/pull/12) |
-| 研究评价 | 固定策略、时间隔离与成本/基准评价；研究结论 `INSUFFICIENT_EVIDENCE` | [PR #14](https://github.com/handFOOLed/Stratide/pull/14) |
-| 历史数据阻断审计 | 三处价格连续性断点；缺公司行为及早期费用可信依据，长窗口 `DATA_BLOCKED`，新增支持日 0 | [PR #18](https://github.com/handFOOLed/Stratide/pull/18) |
-| Web Dashboard V1 | **已合并**：127.0.0.1 本地只读 Rust API + Web 总览、持仓、订单/成交、资产表现；只读取 Owner 指定的已发布单份六报告，更新需重启 | [PR #21](https://github.com/handFOOLed/Stratide/pull/21) / [使用方法](../apps/dashboard/README.md) |
-| Agent V1 | **已在 main**：持久研究任务、日/月 Budget Gate、受控文本 Provider、本机 fake、EOD 去重、API；含 PR #27 状态归因修复，真实 Provider 仍未验证 | [操作](M2_PR02.md) / [API](AGENT_API.md) |
-| UI 视觉基准 | PR #28 已合并，确立设计体系；不代表全部核心功能完成 | [PR #28](https://github.com/handFOOLed/Stratide/pull/28) |
-| 候选冻结与历史评价 | PR #30 已合并；#31 A/B 双线分别独立 PASS；研究不足、长窗口 DATA_BLOCKED 和资格默认拒绝继续有效 | [#31 最终 B 结论](https://github.com/handFOOLed/Stratide/issues/31#issuecomment-6512910618) / [操作](M2_PR04.md) |
-| EOD 研究快照 | PR #33 已合并，#32 完成；既有 observer 离线只读核验、原子持久发布、状态与只读消费 | [操作](M2_PR05.md) / [原自测](evidence/m2-pr05/README.md) |
-| 显式 Fake Agent 闭环 | PR #35 已合并；EOD 快照 → 本地 fake 持久任务 → 候选研究来源；原手动路径不自动调度，scope 禁止云 Provider，资格默认拒绝 | [操作](M2_PR06.md) / [原自测](evidence/m2-pr06/README.md) |
-| EOD 自动研究与归档（PR #44 已合并） | Owner 本机 opt-in，默认 OFF，前台 once/watch、原 Agent 唯一日任务/fake 调用、同源跨实例归属、自动候选归档和恢复；LOCAL_FAKE_ONLY / RESEARCH_ONLY | [操作](M2_PR07.md) / [自测](evidence/m2-pr07/README.md) |
-| 候选审阅与评价闭环（PR #46 已合并） | #45：只读 Inbox → Owner 显式固定模板关联 → 原 freeze/evaluate → 持久可复核报告；含 DATA_BLOCKED、内容复用及四节点恢复；68 日研究不足、资格始终拒绝 | [操作](M2_PR08.md) / [自测](evidence/m2-pr08/README.md) |
-| Forward EOD Shadow V1（PR #48 已合并） | #47：Owner 本地启停、固定 SMA5/20、来源/时点门禁、唯一不可回填日志与只读复算；原双目录 22 日 synthetic E2E / 并发 / 三节点恢复证据保留；旧真实源日预热不足 | [操作](M1_PR10.md) / [原自测](evidence/m1-pr10/README.md) |
-| 自动 EOD Operator V1（PR #50 已合并） | #49：一次配置/启用，前台每日采集 → Snapshot → Shadow/可选 Fake、原证据恢复、持久停用及只读审计；15:15 检查、16:00 正式采集的授权回退分支，未知/失败槽不重发 | [操作](M2_PR09.md) / [原证据](evidence/m2-pr09/README.md) |
-| Time-Series + Fusion V1（PR #52 已合并） | #51：原 Snapshot 冻结 → Naive/EWMA + 独立可替换本地时序 Adapter → 原 Rust Agent/Budget Fusion fake → 原 Registry/Inbox；双 25 日 synthetic E2E。精确任务领取、实际任务 reserve/dispatch 来源复核及失效 queued 终态已并入 main `1b2c903`。默认 OFF，真实时序/云未授权 | [操作/边界](M2_PR10.md) / [原开发自测](evidence/m2-pr10/README.md) / [P1 修复证据](evidence/m2-pr10/p1/README.md) |
-| M1-PR11 前向研究资格 V1（PR #54 已合并） | #53：原 observer/PR33/PR38 只读 → 当日公司行为覆盖证据 → 逐日 21 会话收据 → 原 PR52 实际任务双门禁；完整 synthetic 正反 E2E。真实仍只有两日且缺 feed 覆盖/已过期，结果 BLOCKED；研究资格最多 ALLOW_RESEARCH_ONLY，历史 PIT 和交易权限不提升 | [契约/CLI](M1_PR11.md) / [原自测及真实审计](evidence/m1-pr11/README.md) |
-| Cloud Risk Expert + Autonomous Portfolio V1（PR #56 已合并） | #55：BigQuery TimesFM 2.5 + DeepSeek flash 的生产请求/解析、原 Rust 任务与统一预算、Naive/EWMA、严格股票/现金目标组合及原 Registry/Inbox。recorded/loopback 三股票及全现金合成闭环；无真实云调用，真实数据与 BigQuery 费用上界仍 BLOCKED | [契约/CLI](M2_PR11.md) / [开发自测](evidence/m2-pr11/README.md) |
-
-| 现金分红模型 V1（PR #40 已合并） | 登记权益→应收/扣税负债→到账，ledger v4 / NAV / Risk / 七报告 / Python独立算法 / 双基准；仅隔离 synthetic CLI | [CASH_DIVIDEND_V1](M1_PR08.md) / [原自测](evidence/m1-pr08/README.md) |
-| 历史分红情景桥接 V1（PR #42 已合并） | 原冻结历史行情 + PR38 原证据 + 独立假设 → 原 SMA5/20 / v4 / 七报告 / 独立算法 / 双基准；77 会话 EXPLORATORY_EX_POST，真实准入 DENIED、PIT 新增 0 天 | [模块操作](M1_PR09.md) / [原自测](evidence/m1-pr09/README.md) |
-
-## 仍未实现 / 未验证
-
-- **M1-PR07B / PR #38 已合并：** [公司行为证据包](M1_PR07B.md) 保留真实 12/19 字段和 `FACTS_PARTIAL / historical_pit=NOT_VERIFIED / ELIGIBILITY_DENIED`。原证据中的 `ACCOUNTING_NOT_IMPLEMENTED` 是冻结历史快照；PR #40 已实现隔离现金分红模型，真实账户税务、到账、递延负债、PIT 和开盘仍未验证。
-- **真实 Provider**：PR #72 已验证显式授权的 synthetic 风险 → DeepSeek；本期只读复验原成功 task 4。真实市场/账户数据外发仍未授权，本地历史任务明确拒绝。新增功能无需同步 UI。
-- **真正连续的前向 Paper 成交/NAV**：现有两日 forward 是 observe-only；#47 只增加 NO_ORDERS Shadow 模块，真实 21 日观察尚未累积。[#10](https://github.com/handFOOLed/Stratide/issues/10) 的 `OPENING_SOURCE=BLOCKED / NOT VERIFIED`，可信开盘/费用门槛未解锁。历史回放不能计作 forward，EOD 连续性 PASS 不等于 M1 完成。
-- **真实公司行为处理和历史 PIT 认证**：未完成；隔离模型通过不能开放真实历史长窗口。真实券商、实盘资金、公共 Web、无人值守策略自动部署均未获授权。
-- [PR #15](https://github.com/handFOOLed/Stratide/pull/15) 是尚未合并的 Q01–Q69 访谈**设计参考**，其中“Web/Agent 推迟到 paper 之后”的旧排序已被 Owner [Issue #19](https://github.com/handFOOLed/Stratide/issues/19) 取代。
-
-## 历史执行顺序（2026-11-03，当时有效，现已被 #85 替代）
-
-
-
-1. **Sol / #74：** 真实历史数据与质量 → 本地 TimesFM 核心闭环，单个 Draft PR；开发者验证已完成，等待固定 HEAD 审查与 Owner 明确合并授权。
-2. **后续独立 Issue：** 预冻结样本外协议并比较 Naive/EWMA；继续真实前向 EOD。历史 PIT、公司行为、开盘与 N100 真机限制保留。
-3. **核心完成后：** 再按 PR #28 设计统一集成 UI，本期不改 Dashboard。
-
-所有任务由 Owner 定范围。Sol/DeepSeek 不自行合并；ChatGPT 对固定 HEAD 做风险分级审查，Owner 明确批准后 SHA 锁定合并。高风险预算/凭据/财务改动需针对性独立反证；不将开发者自测冒充独立验收。流程现行补充见 [AGENTS.md](../AGENTS.md)，原 [ADR-037](adr/0037-observable-paper-trading-first-and-independent-review-gates.md) 保留历史决策，待显式协调新版验收规则。
+没有新的开发模块被默认授权；历史任务/ADR 记录不应被误读为当前已启用的券商或实盘交易功能。
