@@ -180,8 +180,8 @@ test('全局术语巡检：11 个页面主界面禁用词 0、表格对齐、主
 
 test('首次使用协议页：独立页面、只有一个主操作、移动端不溢出', async ({ page }) => {
   await page.goto(AGREEMENT + '/#overview');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('开始之前，只有这一页');
-  await expect(page.getByRole('heading', { level: 2 })).toHaveCount(8);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('使用前请先看这几条');
+  await expect(page.getByRole('heading', { level: 2 })).toHaveCount(6);
   await expect(page.getByRole('button', { name: '同意并继续' })).toBeVisible();
   await expect(page.locator('.sidebar')).toHaveCount(0);
   await expect(page.locator('.page-frame')).toHaveCount(0);

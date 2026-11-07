@@ -48,11 +48,11 @@
 .agreement__sections {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 22px;
 }
 
 .agreement__sections h2 {
-  margin: 0 0 4px;
+  margin: 0 0 6px;
   font-size: 15px;
 }
 

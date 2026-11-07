@@ -22,10 +22,22 @@ import type { ConsentState } from './lib/consent';
 export function App() {
   const route = useRoute();
   const [consent, setConsent] = useState<ConsentState | null>(null);
+  const [consentUnreadable, setConsentUnreadable] = useState(false);
   useEffect(() => {
+    let alive = true;
     readConsent()
-      .then(setConsent)
-      .catch(() => setConsent(null));
+      .then((value) => {
+        if (!alive) return;
+        setConsent(value);
+        setConsentUnreadable(false);
+      })
+      .catch(() => {
+        if (!alive) return;
+        setConsentUnreadable(true);
+      });
+    return () => {
+      alive = false;
+    };
   }, []);
   const paper = usePaperData('selected_report');
   const current = usePaperData('current');
@@ -96,6 +108,16 @@ export function App() {
       break;
   }
 
+  if (consentUnreadable) {
+    return (
+      <div className="agreement agreement--loading" role="alert">
+        <p>还没读到本机须知记录。请确认本机服务已启动，然后刷新页面。</p>
+        <button type="button" onClick={() => window.location.reload()}>
+          重试
+        </button>
+      </div>
+    );
+  }
   if (consent === null) {
     return <div className="agreement agreement--loading" role="status">正在读取本机设置…</div>;
   }

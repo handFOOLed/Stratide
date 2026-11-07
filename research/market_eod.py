@@ -22,6 +22,9 @@ h = side.v1
 require, Error = h.require, h.WarehouseError
 canonical, sha = h.canonical, h.sha
 VERSION = "market-day-snapshot-v1"
+# Product backfill window. report() will not call this window complete just
+# because the stored calendar has no gap rows.
+BACKFILL_TARGET_SESSIONS = 84
 TZ = dt.timezone(dt.timedelta(hours=8))
 FIELDS = {**h.FIELDS, **{a: side.FIELDS[a] for a in ("adj_factor", "suspend_d", "daily_basic")}}
 PERMISSION = "Owner Issue #82 / existing Tushare account / local personal EOD research"
@@ -29,6 +32,22 @@ GOOD = ("OK", "EMPTY", "TRUNCATION_SUSPECTED")
 SAFE = dict(historical_pit_status="NOT_VERIFIED", opening_source="BLOCKED",
             paper_allowed=False, live_allowed=False, cloud_egress=False)
 RULES = "crates/contracts/src/paper.rs; research/timesfm_cpu/history.py (identity only; no trading admission)"
+
+
+def coverage_complete(sessions_ready, gaps, calendar_dates, start_date, today, target=BACKFILL_TARGET_SESSIONS):
+    """True only when the stored calendar covers the configured window and every open day is ready.
+
+    An empty gap list is not enough: the calendar may only contain the days
+    already downloaded, while the 84-session target is still missing.
+    """
+    dates = [day for day in calendar_dates if day]
+    if not dates or not start_date or not today:
+        return False
+    earliest, latest = min(dates), max(dates)
+    covers = earliest <= start_date and latest >= today
+    return covers and len(gaps) == 0 and sessions_ready >= target
+
+
 DDL = """
 CREATE TABLE IF NOT EXISTS market_control(id INTEGER PRIMARY KEY CHECK(id=1),config TEXT NOT NULL,
  config_sha TEXT NOT NULL,enabled INTEGER NOT NULL);
@@ -572,16 +591,23 @@ class Market(h.Warehouse):
             run = db.execute("SELECT status,started,ended FROM runs WHERE kind='market-eod' ORDER BY id DESC LIMIT 1").fetchone()
             latest = snapshots[-1] if snapshots else None
             by_date = {s["source_day"]: s for s in snapshots}
+            today = instant(h.now()).astimezone(TZ).strftime("%Y%m%d")
             calendar = {r["cal_date"]: r["is_open"] for r in self.latest_objects(db, "trade_cal") if r["exchange"] == "SSE"}
             gaps = [dict(source_day=date, missing=len(by_date[date]["missing_symbols"]) if date in by_date else None,
                          blockers=by_date[date]["blockers"] if date in by_date else ["NO_FROZEN_MARKET_SNAPSHOT"])
-                    for date in sorted(calendar) if calendar[date] == "1" and date <= instant(h.now()).astimezone(TZ).strftime("%Y%m%d") and
+                    for date in sorted(calendar) if calendar[date] == "1" and date <= today and
                     (date not in by_date or by_date[date]["state"] != "READY")]
             ready_sessions = sum(
                 1 for date in dates
                 if self.load_snapshot(db, date)["state"] == "READY")
+            calendar_dates = sorted(calendar)
             return dict(version=VERSION, state=run["status"] if run else "NOT_COLLECTED", enabled=enabled,
-                        sessions_ready=ready_sessions, **SAFE,
+                        sessions_ready=ready_sessions,
+                        coverage_complete=coverage_complete(
+                            ready_sessions, gaps, calendar_dates, config["start_date"], today),
+                        calendar_earliest=calendar_dates[0] if calendar_dates else None,
+                        configured_start=config["start_date"],
+                        **SAFE,
                         data_mode=config["data_mode"], config=config, last_run=dict(run) if run else None,
                         last_successful_date=max((s["source_day"] for s in snapshots if s["state"] == "READY"), default=None),
                         latest=latest, gaps=gaps,
@@ -631,7 +657,7 @@ def cli(argv=None):
     parser.add_argument("--rpm", type=int, default=10)
     parser.add_argument("--min-coverage-bps", type=int, default=10000)
     parser.add_argument("--credential-source", choices=("auto", "existing-tushare-mcp-config"), default="auto")
-    parser.add_argument("--sessions", type=int, default=84)
+    parser.add_argument("--sessions", type=int, default=BACKFILL_TARGET_SESSIONS)
     parser.add_argument("--rounds", type=int, default=6)
     args = parser.parse_args(argv)
     try:
@@ -680,6 +706,11 @@ def cli(argv=None):
                 # A blocked or incomplete attempt is retried, not hammered.
                 time.sleep(300 if result.get("state") in ("BLOCKED", "NETWORK_OUTCOME_UNKNOWN") else 30)
         else:
+            if args.action == "status":
+                # Status stays readonly. A busy lock or a checkpoint that does
+                # not finish must fail with that code. Swallowing it and calling
+                # report() mixes "writer busy" with a stale or half-read snapshot.
+                market.checkpoint_if_idle()
             result = market.report()
             if args.action == "verify":
                 with market.read(inspect_raw_paths=False) as db:

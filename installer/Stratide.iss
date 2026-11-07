@@ -35,7 +35,8 @@ SolidCompression=yes
 WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
-UninstallDisplayIcon={app}\stratide-launcher.exe
+SetupIconFile=..\assets\brand\stratide.ico
+UninstallDisplayIcon={app}\stratide.ico
 UninstallDisplayName={#AppName} {#AppVersion}
 UsePreviousAppDir=yes
 CloseApplications=no
@@ -60,19 +61,20 @@ Name: "autostart"; Description: "登录 Windows 后自动启动 Stratide 后台�
 
 [Files]
 Source: "{#SourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\assets\brand\stratide.ico"; DestDir: "{app}"; DestName: "stratide.ico"; Flags: ignoreversion
 
 #if TestMode != "1"
 [Icons]
-Name: "{group}\Stratide"; Filename: "{app}\stratide-launcher.exe"; WorkingDir: "{app}"; Comment: "打开本地 Dashboard"
-Name: "{group}\停止 Stratide 后台"; Filename: "{app}\stratide-launcher.exe"; Parameters: "--home ""{code:GetHomeDir}"" --stop"; WorkingDir: "{app}"
-Name: "{group}\启用登录自启"; Filename: "{app}\stratide-launcher.exe"; Parameters: "--home ""{code:GetHomeDir}"" --autostart enable"; WorkingDir: "{app}"
-Name: "{group}\停用登录自启"; Filename: "{app}\stratide-launcher.exe"; Parameters: "--home ""{code:GetHomeDir}"" --autostart disable"; WorkingDir: "{app}"
-Name: "{group}\打开数据目录"; Filename: "{app}\stratide-launcher.exe"; Parameters: "--home ""{code:GetHomeDir}"" --open-data"; WorkingDir: "{app}"
-Name: "{group}\打开日志目录"; Filename: "{app}\stratide-launcher.exe"; Parameters: "--home ""{code:GetHomeDir}"" --open-logs"; WorkingDir: "{app}"
-Name: "{group}\删除本地数据…"; Filename: "{app}\stratide-launcher.exe"; Parameters: "--home ""{code:GetHomeDir}"" --delete-user-data"; WorkingDir: "{app}"
+Name: "{group}\Stratide"; Filename: "{app}\stratide-launcher.exe"; WorkingDir: "{app}"; IconFilename: "{app}\stratide.ico"; Comment: "打开本地 Dashboard"
+Name: "{group}\停止 Stratide 后台"; Filename: "{app}\stratide-launcher.exe"; Parameters: "--home ""{code:GetHomeDir}"" --stop"; WorkingDir: "{app}"; IconFilename: "{app}\stratide.ico"
+Name: "{group}\启用登录自启"; Filename: "{app}\stratide-launcher.exe"; Parameters: "--home ""{code:GetHomeDir}"" --autostart enable"; WorkingDir: "{app}"; IconFilename: "{app}\stratide.ico"
+Name: "{group}\停用登录自启"; Filename: "{app}\stratide-launcher.exe"; Parameters: "--home ""{code:GetHomeDir}"" --autostart disable"; WorkingDir: "{app}"; IconFilename: "{app}\stratide.ico"
+Name: "{group}\打开数据目录"; Filename: "{app}\stratide-launcher.exe"; Parameters: "--home ""{code:GetHomeDir}"" --open-data"; WorkingDir: "{app}"; IconFilename: "{app}\stratide.ico"
+Name: "{group}\打开日志目录"; Filename: "{app}\stratide-launcher.exe"; Parameters: "--home ""{code:GetHomeDir}"" --open-logs"; WorkingDir: "{app}"; IconFilename: "{app}\stratide.ico"
+Name: "{group}\删除本地数据…"; Filename: "{app}\stratide-launcher.exe"; Parameters: "--home ""{code:GetHomeDir}"" --delete-user-data"; WorkingDir: "{app}"; IconFilename: "{app}\stratide.ico"
 Name: "{group}\安装与升级说明"; Filename: "{app}\docs\WINDOWS_INSTALL.md"
 Name: "{group}\卸载 Stratide"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\Stratide"; Filename: "{app}\stratide-launcher.exe"; WorkingDir: "{app}"; Tasks: desktopicon
+Name: "{autodesktop}\Stratide"; Filename: "{app}\stratide-launcher.exe"; WorkingDir: "{app}"; IconFilename: "{app}\stratide.ico"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\stratide-launcher.exe"; Parameters: "--home ""{code:GetHomeDir}"""; Description: "立即打开 Stratide"; Flags: nowait postinstall skipifsilent

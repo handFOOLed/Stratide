@@ -32,7 +32,7 @@ export interface EnvelopeResult<T> {
   envelope: Envelope<T>;
   status: number;
 }
-import { failureReasonText, humanReasonText } from './status';
+import { failureReasonText, humanReasonText } from './status.ts';
 
 /** 后端原因码 → 一句人话；未知代码不展示原始枚举，只写“原因未记录”。 */
 export function humanReason(value: string | null): string {

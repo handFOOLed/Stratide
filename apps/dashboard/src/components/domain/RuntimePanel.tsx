@@ -21,6 +21,7 @@ import {
   supervisorDisplayView,
 } from '../../lib/status';
 import type { StatusView } from '../../lib/status';
+import { backfillPresentation } from '../../lib/runtimeRefresh';
 import { runtimeAction, setSetupComplete } from '../../lib/runtime';
 import type { DependencyStatus, RuntimeStatus, WslProbeResult } from '../../lib/runtime';
 import { ApiError } from '../../lib/api';
@@ -178,6 +179,7 @@ function collectorView(status: RuntimeStatus, backfillRunning: boolean): StatusV
   if (status.supervisor.watch !== null) return statusView('ok', '正常', '每个交易日收盘后自动采集');
   return statusView('attention', '未运行', '行情自动采集当前未运行，后台会自动重启');
 }
+
 
 function serviceView(health: HealthState): StatusView {
   if (health.error !== null) return statusView('error', '出错', humanReasonText(health.error.code) ?? '失败，原因未记录');
@@ -541,22 +543,15 @@ export function RuntimePanel({
           },
     wsl_probe: wslProbe === null ? null : { state: wslProbe.state, reason: wslProbe.reason },
     last_action_error: actionError,
+    market_status_error: runtime.market?.statusError ?? null,
+    market_status_failures: runtime.market?.statusFailures ?? 0,
+    market_status_stale: runtime.market?.statusStale ?? false,
   };
   const copyText = JSON.stringify(diagnosticsData, null, 2);
 
   const backfillRunning = runtime.market !== null && runtime.market.backfillRunning;
-  const backfillComplete = runtime.market !== null && runtime.market.backfillComplete;
-  const backfillTarget = runtime.market === null ? BACKFILL_TARGET : runtime.market.targetSessions;
-  const sessionsReady = runtime.market === null ? 0 : runtime.market.sessionsReady;
-  const displayRemaining =
-    runtime.market === null
-      ? 0
-      : runtime.market.remaining > 0
-        ? runtime.market.remaining
-        : backfillComplete
-          ? 0
-          : runtime.market.gaps;
-  const backfillDone = backfillComplete && sessionsReady > 0;
+  const backfillViewModel = backfillPresentation(runtime.market, false);
+  const backfillDone = backfillViewModel.complete;
 
   const renderSections = (current: RuntimeStatus) => {
     const criticalReady = CRITICAL_DEPENDENCIES.every(
@@ -568,20 +563,12 @@ export function RuntimePanel({
     const service = serviceView(health);
     const supervisor = supervisorView(current.supervisor);
     const collector = collectorView(current, backfillRunning);
-    const backfillView: StatusView = !marketInitialized
-      ? statusView('attention', '需要处理', '请先完成行情采集初始化')
-      : runtime.market === null
-        ? statusView('progress', '正在读取')
-        : backfillRunning
-          ? statusView('progress', '进行中', '待补齐 ' + displayRemaining + ' 个交易日（目标 ' + backfillTarget + ' 个交易日）')
-          : backfillDone
-            ? statusView('ok', '已完成', '历史行情已就绪（' + sessionsReady + ' 个交易日）')
-            : sessionsReady === 0
-              ? statusView('unset', '尚未开始', '尚未补录（目标 ' + backfillTarget + ' 个交易日）')
-              : statusView('unset', '尚未完成', '待补齐 ' + displayRemaining + ' 个交易日（目标 ' + backfillTarget + ' 个交易日）');
-    const backfillTotal = sessionsReady + displayRemaining;
-    const progressValue =
-      backfillDone ? 100 : backfillTotal === 0 ? 0 : Math.min(100, (sessionsReady / backfillTotal) * 100);
+    // A fresh rejected report stays on the badge. The init hint only covers
+    // the case where this read did not explicitly fail warehouse verification.
+    const backfillView: StatusView =
+      !marketInitialized && backfillViewModel.verification !== 'rejected'
+        ? statusView('attention', '需要处理', '请先完成行情采集初始化')
+        : statusView(backfillViewModel.tone, backfillViewModel.title, backfillViewModel.text);
     const backfillDisabled = busy !== null || backfillRunning || !marketInitialized;
 
     const setupContent = (
@@ -767,15 +754,30 @@ export function RuntimePanel({
             <div className="backfill__head">
               <StatusBadge status={backfillView} />
               <span className="backfill__count" data-testid="backfill-progress">
-                {backfillView.reason ?? '—'}
+                {backfillViewModel.downloadPercent === null ? '—' : backfillViewModel.downloadPercent + '%'}
               </span>
             </div>
-            <ProgressBar value={progressValue} label="历史补录进度" />
+            {backfillView.reason ? <p className="backfill__text">{backfillView.reason}</p> : null}
+            {backfillViewModel.countText ? (
+              <p className="backfill__count-note" data-testid="backfill-count">
+                {backfillViewModel.countText}
+              </p>
+            ) : null}
+            <ProgressBar
+              value={backfillViewModel.downloadPercent}
+              indeterminate={backfillViewModel.downloadPercent === null}
+              tone={backfillViewModel.complete ? 'default' : 'warning'}
+              label={backfillViewModel.complete ? '历史补录已校验' : '历史补录下载进度'}
+            />
             <div className="backfill__meta">
               {runtime.market !== null && runtime.market.lastSuccessfulDate !== null ? (
                 <span>最近更新：{formatDay(runtime.market.lastSuccessfulDate)}</span>
               ) : null}
-
+              {backfillViewModel.diagnosticCode !== null ? (
+                <span className="backfill-diagnostic" data-testid="backfill-diagnostic-code">
+                  <code className="backfill-diagnostic__code">{backfillViewModel.diagnosticCode}</code>
+                </span>
+              ) : null}
             </div>
             <div className="runtime-actions">
               <Button

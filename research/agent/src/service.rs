@@ -251,8 +251,18 @@ impl Agent {
         if let Some(models) = result["models"].as_array_mut() {
             let c = self.store().connect()?;
             for (view, model) in models.iter_mut().zip(&settings.models) {
+                // Status projection only. Dispatch still authorizes the task
+                // input. The dashboard summary scopes are owner_task (plus
+                // optional paper/history scopes), which the market model
+                // correctly rejects. Showing that rejection on the settings
+                // card made a valid standing grant look unauthorized.
+                let authorize_scopes = if crate::market_research::is_model(model) {
+                    crate::market_research::display_authorization_scopes()
+                } else {
+                    scopes.clone()
+                };
                 let authorization = model
-                    .authorize(&scopes, settings.budget.as_ref())
+                    .authorize(&authorize_scopes, settings.budget.as_ref())
                     .err()
                     .map(|e| e.0)
                     .unwrap_or("authorized".into());
