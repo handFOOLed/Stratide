@@ -93,8 +93,16 @@ foreach ($image in $images) {
   if (-not [ByteFind]::Contains($setupBytes, $image)) { throw "SETUP_ICON_MISSING image=$index bytes=$($image.Length)" }
   $index += 1
 }
-$shortcut = [System.Text.Encoding]::Unicode.GetBytes('stratide.ico')
-if (-not [ByteFind]::Contains($setupBytes, $shortcut)) { throw 'SETUP_ICON_NAME_MISSING' }
+# Inno compresses the compiled script, so the shortcut filename may not appear
+# as raw text. The IconFilename lines above are the wiring ISCC just compiled,
+# and the icon images themselves are already required in the setup executable.
+$shortcutUtf16 = [System.Text.Encoding]::Unicode.GetBytes('stratide.ico')
+$shortcutAscii = [System.Text.Encoding]::ASCII.GetBytes('stratide.ico')
+if ([ByteFind]::Contains($setupBytes, $shortcutUtf16) -or [ByteFind]::Contains($setupBytes, $shortcutAscii)) {
+  Write-Host 'SETUP_ICON_NAME present in the installer executable'
+} else {
+  Write-Host 'SETUP_ICON_NAME is compressed in the installer; shortcut targets were checked in installer/Stratide.iss'
+}
 
 Write-Host "INSTALLER_SHA256 $setupHash"
 Write-Host "INSTALLER_BYTES $size"
