@@ -139,10 +139,23 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $dest = Join-Path $env:RUNNER_TEMP 'innosetup-6.7.4.exe'
           $expected = 'A549929319F9120716677C685535CA4671E4B937B5FDC87E2585F32D8EB30E8C'
-          curl.exe -fL --retry 5 --retry-delay 2 -o $dest https://github.com/jrsoftware/issrc/releases/download/is-6_7_4/innosetup-6.7.4.exe
-          if ($LASTEXITCODE -ne 0) { throw "INNO_DOWNLOAD_FAILED exit=$LASTEXITCODE" }
-          $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $dest).Hash.ToUpperInvariant()
-          if ($hash -ne $expected) { throw "INNO_HASH_MISMATCH $hash" }
+          # The release HTML URL has been returning HTTP 504. The immutable
+          # asset API redirects to release-assets.githubusercontent.com. Hash
+          # is checked before the installer is executed. No token is sent.
+          $urls = @(
+            'https://api.github.com/repos/jrsoftware/issrc/releases/assets/686086859',
+            'https://github.com/jrsoftware/issrc/releases/download/is-6_7_4/innosetup-6.7.4.exe'
+          )
+          $downloaded = $false
+          foreach ($url in $urls) {
+            if (Test-Path -LiteralPath $dest) { Remove-Item -LiteralPath $dest -Force }
+            curl.exe -fL --retry 4 --retry-all-errors --retry-delay 3 -H "Accept: application/octet-stream" -H "X-GitHub-Api-Version: 2022-11-28" -o $dest $url
+            if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $dest)) { continue }
+            $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $dest).Hash.ToUpperInvariant()
+            if ($hash -eq $expected) { $downloaded = $true; break }
+            Remove-Item -LiteralPath $dest -Force
+          }
+          if (-not $downloaded) { throw "INNO_DOWNLOAD_FAILED expected=$expected" }
           $log = Join-Path $env:RUNNER_TEMP 'inno-install.log'
           $proc = Start-Process -FilePath $dest -ArgumentList @(
             '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-','/ALLUSERS',"/LOG=$log"
