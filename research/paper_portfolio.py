@@ -76,12 +76,21 @@ def default_policy(market):
         if item is not None:
             universe.append(item)
     m.require(0 < len(universe) <= DEFAULT_POLICY["universe_limit"], "PAPER_UNIVERSE_UNAVAILABLE")
-    from_day = int(day)
-    fees = [dict(DEFAULT_TARIFF, instrument=item, valid_from=from_day, valid_through=20991231)
+    return policy_body(universe, day)
+
+
+def policy_body(universe, from_day):
+    """The ledger Policy document default_policy submits.
+
+    universe items are {market, code}. fees follow FeeSchedule field names and
+    integer fen, which is what status later returns inside book["policy"].
+    """
+    day = int(from_day)
+    fees = [dict(DEFAULT_TARIFF, instrument=item, valid_from=day, valid_through=20991231)
             for item in universe]
-    policy = dict(
+    return dict(
         version=POLICY_VERSION,
-        universe=universe,
+        universe=list(universe),
         target_value=DEFAULT_POLICY["target_value"],
         max_positions=DEFAULT_POLICY["max_positions"],
         max_daily_orders=DEFAULT_POLICY["max_daily_orders"],
@@ -99,7 +108,6 @@ def default_policy(market):
         approve_fixed_baseline=True,
         automatic=True,
     )
-    return policy
 
 
 def ensure_policy(market):

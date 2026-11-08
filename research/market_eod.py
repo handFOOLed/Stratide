@@ -662,6 +662,115 @@ def watch_log_line(result):
     return logged
 
 
+# Active eod-watch logs stay at this size. An already-huge file, such as one
+# left by an older build, is renamed aside once and never deleted.
+WATCH_LOG_CAP = 8 * 1024 * 1024
+WATCH_LOG_PRESERVE_ABOVE = 32 * 1024 * 1024
+
+
+def roll_captured_log(path, cap=WATCH_LOG_CAP, preserve_above=WATCH_LOG_PRESERVE_ABOVE):
+    """Cap one captured log without deleting an already oversized file.
+
+    `name.preserved` and any later `name.preserved-<n>` are kept. Only a
+    previous bounded segment (`name.1`) at or below preserve_above is removed.
+    """
+    path = Path(path)
+    if not path.is_file() or path.stat().st_size < cap:
+        return
+    size = path.stat().st_size
+    preserved = Path(str(path) + ".preserved")
+    if size > preserve_above:
+        if not preserved.exists():
+            path.rename(preserved)
+        else:
+            path.rename(Path(f"{path}.preserved-{time.time_ns()}"))
+        return
+    rotated = Path(str(path) + ".1")
+    if rotated.exists():
+        if rotated.stat().st_size > preserve_above:
+            rotated.rename(Path(f"{path}.preserved-{time.time_ns()}"))
+        else:
+            rotated.unlink()
+    path.rename(rotated)
+
+
+class BoundedLog:
+    """stdout/stderr replacement for the long-running market watch process.
+
+    print and traceback keep writing. Crossing the cap rotates the file first,
+    so a blocked-snapshot line is not dropped to make the file smaller.
+    """
+
+    def __init__(self, fd, path, cap=WATCH_LOG_CAP, preserve_above=WATCH_LOG_PRESERVE_ABOVE):
+        self.fd = fd
+        self.path = Path(path)
+        self.cap = cap
+        self.preserve_above = preserve_above
+
+    def fileno(self):
+        return self.fd
+
+    def flush(self):
+        return None
+
+    def write(self, data):
+        if isinstance(data, bytes):
+            text = data.decode("utf-8", "replace")
+        else:
+            text = str(data)
+        self.make_room()
+        os.write(self.fd, text.encode("utf-8"))
+        return len(text)
+
+    def make_room(self):
+        if not self.path.is_file() or self.path.stat().st_size < self.cap:
+            return
+        held = os.dup(self.fd)
+        os.close(self.fd)
+        try:
+            roll_captured_log(self.path, self.cap, self.preserve_above)
+            flags = os.O_CREAT | os.O_APPEND | os.O_WRONLY
+            if hasattr(os, "O_BINARY"):
+                flags |= os.O_BINARY
+            opened = os.open(self.path, flags, 0o644)
+            # open often reuses the descriptor we just closed. dup2 onto the
+            # same number is a no-op, and closing it would drop the new file.
+            if opened != self.fd:
+                os.dup2(opened, self.fd)
+                os.close(opened)
+        except OSError:
+            os.dup2(held, self.fd)
+        finally:
+            os.close(held)
+
+
+def bind_watch_logs():
+    """Point this process's stdout and stderr at the captured watch files.
+
+    The supervisor passes the paths. A console or test stream has no path and
+    is left alone. launcher.log uses a different 8MiB rotator that deletes its
+    previous segment; these watch files do not.
+    """
+    for env_name, stream_name in (
+            ("STRATIDE_EOD_WATCH_STDOUT", "stdout"),
+            ("STRATIDE_EOD_WATCH_STDERR", "stderr")):
+        path = os.environ.get(env_name)
+        if not path:
+            continue
+        current = getattr(sys, stream_name)
+        try:
+            fd = os.dup(current.fileno())
+        except (AttributeError, OSError):
+            continue
+        # Drop the inherited handle. The BoundedLog owns the duplicate, so a
+        # later close of the original stream cannot rename-lock the file or
+        # close a recycled descriptor.
+        current.close()
+        bounded = BoundedLog(fd, path)
+        bounded.make_room()
+        setattr(sys, stream_name, bounded)
+
+
 def optional_paper_step(market, phase):
     # Include import/initialization in the optional boundary. Explicit process
     # stops (BaseException) still leave the foreground watch immediately.
@@ -698,6 +807,12 @@ def cli(argv=None):
         elif args.action == "backfill":
             result = market.backfill_rounds(args.sessions, args.rounds, token_source=args.credential_source)
         elif args.action in ("once", "watch"):
+            # Repeating output is this loop's one status line, plus stderr from
+            # an unexpected paper/research fault or a worker bridge. `once`
+            # prints the full result a single time below and is not capped.
+            # The legacy non-market operator watch is not what the launcher starts.
+            if args.action == "watch":
+                bind_watch_logs()
             while True:
                 result = market.once(token_source=args.credential_source)
                 # First successful collection enables the default simulated policy

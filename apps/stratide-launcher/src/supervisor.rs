@@ -650,8 +650,15 @@ impl Supervisor {
                 .env_remove("STRATIDE_WSL_PYTHON")
                 .env_remove("STRATIDE_WSL_MODEL");
         }
-        let stdout = append_log(&self.layout.logs.join("eod-watch.out.log"))?;
-        let stderr = append_log(&self.layout.logs.join("eod-watch.err.log"))?;
+        let stdout_path = self.layout.logs.join("eod-watch.out.log");
+        let stderr_path = self.layout.logs.join("eod-watch.err.log");
+        // The watch process caps these files itself. An already oversized log
+        // is renamed to *.preserved and is not deleted.
+        command
+            .env("STRATIDE_EOD_WATCH_STDOUT", &stdout_path)
+            .env("STRATIDE_EOD_WATCH_STDERR", &stderr_path);
+        let stdout = append_log(&stdout_path)?;
+        let stderr = append_log(&stderr_path)?;
         command.stdout(stdout).stderr(stderr);
         win::hide_console(&mut command);
         let mut child = match command.spawn() {

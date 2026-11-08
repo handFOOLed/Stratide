@@ -15,6 +15,9 @@ on:
       - crates/runtime/**
       - scripts/build-windows-installer.ps1
       - scripts/verify-windows-installer-identity.ps1
+      - scripts/test-paper-portfolio.py
+      - research/**
+      - apps/stratide-launcher/**
       - installer/Stratide.iss
       - assets/brand/stratide.ico
   push:
@@ -26,6 +29,9 @@ on:
       - crates/runtime/**
       - scripts/build-windows-installer.ps1
       - scripts/verify-windows-installer-identity.ps1
+      - scripts/test-paper-portfolio.py
+      - research/**
+      - apps/stratide-launcher/**
       - installer/Stratide.iss
       - assets/brand/stratide.ico
 
@@ -77,6 +83,28 @@ jobs:
           npm run typecheck
           npm run build
           npm test
+
+      - name: Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Paper watch log and snapshot regressions
+        shell: bash
+        run: |
+          python -m unittest \
+            scripts.test-paper-portfolio.Tests.test_missing_snapshot_stays_blocked_and_handler_does_not_crash \
+            scripts.test-paper-portfolio.Tests.test_cli_snapshot_missing_reports_blocked_without_nameerror \
+            scripts.test-paper-portfolio.Tests.test_watch_log_uses_real_screen_and_policy_shapes \
+            scripts.test-paper-portfolio.Tests.test_watch_log_cap_keeps_existing_file_and_later_errors \
+            scripts.test-paper-portfolio.Tests.test_watch_missing_snapshot_prints_code_not_handler_crash_or_bulk \
+            scripts.test-paper-portfolio.Tests.test_research_fault_does_not_skip_paper_confirmation_or_collection \
+            scripts.test-paper-portfolio.Tests.test_optional_paper_import_failure_keeps_watch_polling_and_stop_propagates \
+            scripts.test-market-eod.MarketTests.test_watch_disabled_but_unreadable_agent_does_not_stop_collection \
+            scripts.test-market-eod.MarketTests.test_watch_enabled_agent_write_failure_does_not_stop_collection \
+            scripts.test-market-eod.MarketTests.test_watch_worker_failure_does_not_stop_collection \
+            scripts.test-market-eod.MarketTests.test_once_research_failure_keeps_successful_eod_result \
+            scripts.test-market-eod.MarketTests.test_watch_explicit_stop_from_research_still_propagates
 
   # Exact-head unsigned installer for this draft branch only. contents stays
   # read-only, so this job cannot create a Release. actions:write is only for
@@ -174,6 +202,53 @@ jobs:
           $ErrorActionPreference = 'Stop'
           pwsh -NoProfile -File scripts/verify-windows-installer-identity.ps1 -SourceSha $env:SOURCE_SHA -Version $env:SOURCE_VERSION
           if ($LASTEXITCODE -ne 0) { throw "INSTALLER_IDENTITY_FAILED exit=$LASTEXITCODE" }
+
+      # Isolated runner temp only. Silent install does not launch the app.
+      # No token, no provider call, no WSL, and no data outside RUNNER_TEMP.
+      - name: Install and status smoke in runner temp
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $root = Join-Path $env:RUNNER_TEMP 'stratide-install-smoke'
+          $app = Join-Path $root 'app'
+          $home = Join-Path $root 'home'
+          $data = Join-Path $root 'data'
+          New-Item -ItemType Directory -Force -Path $app, $home, $data | Out-Null
+          $setup = Get-ChildItem -LiteralPath dist/installer -Filter *.exe | Select-Object -First 1
+          if (-not $setup) { throw 'SETUP_EXE_MISSING' }
+          $log = Join-Path $root 'install.log'
+          $args = @(
+            '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',
+            '/MERGETASKS=!desktopicon',
+            "/DIR=$app","/HOME=$home","/DATA=$data","/LOG=$log"
+          )
+          $proc = Start-Process -FilePath $setup.FullName -ArgumentList $args -Wait -PassThru
+          if ($proc.ExitCode -ne 0) {
+            if (Test-Path -LiteralPath $log) { Get-Content -LiteralPath $log -Tail 80 }
+            throw "INSTALL_SMOKE_FAILED exit=$($proc.ExitCode)"
+          }
+          $infoPath = Join-Path $app 'BUILD_INFO.json'
+          if (-not (Test-Path -LiteralPath $infoPath)) { throw 'INSTALLED_BUILD_INFO_MISSING' }
+          $info = Get-Content -LiteralPath $infoPath -Raw | ConvertFrom-Json
+          if ($info.commit -ne $env:SOURCE_SHA) { throw "INSTALLED_COMMIT_MISMATCH $($info.commit)" }
+          if ($info.version -ne $env:SOURCE_VERSION) { throw "INSTALLED_VERSION_MISMATCH $($info.version)" }
+          if ($info.unsigned -ne $true -or $info.paper_only -ne $true -or $info.live_broker -ne $false) {
+            throw 'INSTALLED_IDENTITY_FLAGS'
+          }
+          $launcher = Join-Path $app 'stratide-launcher.exe'
+          if (-not (Test-Path -LiteralPath $launcher)) { throw 'LAUNCHER_MISSING' }
+          $status = Join-Path $root 'status.json'
+          & $launcher --home $home --status --status-file $status --quiet
+          if ($LASTEXITCODE -ne 0) { throw "STATUS_SMOKE_FAILED exit=$LASTEXITCODE" }
+          $body = Get-Content -LiteralPath $status -Raw | ConvertFrom-Json
+          $gotHome = [IO.Path]::GetFullPath([string]$body.layout.home)
+          $wantHome = [IO.Path]::GetFullPath($home)
+          if ($gotHome -ne $wantHome) { throw "STATUS_HOME_MISMATCH $gotHome" }
+          if ($body.health.healthy -eq $true) { throw 'STATUS_SMOKE_UNEXPECTED_HEALTHY' }
+          $running = Get-Process -Name stratided,stratide-launcher -ErrorAction SilentlyContinue |
+            Where-Object { $_.Path -like "$app*" }
+          if ($running) { throw 'SMOKE_LEFT_A_PROCESS' }
+          "INSTALL_SMOKE_OK commit=$($info.commit) home=$home"
 
       - name: Upload unsigned installer artifact
         uses: actions/upload-artifact@v4
