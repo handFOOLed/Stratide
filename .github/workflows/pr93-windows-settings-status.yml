@@ -211,16 +211,16 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $root = Join-Path $env:RUNNER_TEMP 'stratide-install-smoke'
           $app = Join-Path $root 'app'
-          $home = Join-Path $root 'home'
-          $data = Join-Path $root 'data'
-          New-Item -ItemType Directory -Force -Path $app, $home, $data | Out-Null
+          $smokeHome = Join-Path $root 'home'
+          $smokeData = Join-Path $root 'data'
+          New-Item -ItemType Directory -Force -Path $app, $smokeHome, $smokeData | Out-Null
           $setup = Get-ChildItem -LiteralPath dist/installer -Filter *.exe | Select-Object -First 1
           if (-not $setup) { throw 'SETUP_EXE_MISSING' }
           $log = Join-Path $root 'install.log'
           $args = @(
             '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',
             '/MERGETASKS=!desktopicon',
-            "/DIR=$app","/HOME=$home","/DATA=$data","/LOG=$log"
+            "/DIR=$app","/HOME=$smokeHome","/DATA=$smokeData","/LOG=$log"
           )
           $proc = Start-Process -FilePath $setup.FullName -ArgumentList $args -Wait -PassThru
           if ($proc.ExitCode -ne 0) {
@@ -238,17 +238,17 @@ jobs:
           $launcher = Join-Path $app 'stratide-launcher.exe'
           if (-not (Test-Path -LiteralPath $launcher)) { throw 'LAUNCHER_MISSING' }
           $status = Join-Path $root 'status.json'
-          & $launcher --home $home --status --status-file $status --quiet
+          & $launcher --home $smokeHome --status --status-file $status --quiet
           if ($LASTEXITCODE -ne 0) { throw "STATUS_SMOKE_FAILED exit=$LASTEXITCODE" }
           $body = Get-Content -LiteralPath $status -Raw | ConvertFrom-Json
           $gotHome = [IO.Path]::GetFullPath([string]$body.layout.home)
-          $wantHome = [IO.Path]::GetFullPath($home)
+          $wantHome = [IO.Path]::GetFullPath($smokeHome)
           if ($gotHome -ne $wantHome) { throw "STATUS_HOME_MISMATCH $gotHome" }
           if ($body.health.healthy -eq $true) { throw 'STATUS_SMOKE_UNEXPECTED_HEALTHY' }
           $running = Get-Process -Name stratided,stratide-launcher -ErrorAction SilentlyContinue |
             Where-Object { $_.Path -like "$app*" }
           if ($running) { throw 'SMOKE_LEFT_A_PROCESS' }
-          "INSTALL_SMOKE_OK commit=$($info.commit) home=$home"
+          "INSTALL_SMOKE_OK commit=$($info.commit) home=$smokeHome"
 
       - name: Upload unsigned installer artifact
         uses: actions/upload-artifact@v4
