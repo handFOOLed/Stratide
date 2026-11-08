@@ -251,8 +251,18 @@ jobs:
           $launcher = Join-Path $app 'stratide-launcher.exe'
           if (-not (Test-Path -LiteralPath $launcher)) { throw 'LAUNCHER_MISSING' }
           $status = Join-Path $root 'status.json'
-          & $launcher --home $smokeHome --status --status-file $status --quiet
-          if ($LASTEXITCODE -ne 0) { throw "STATUS_SMOKE_FAILED exit=$LASTEXITCODE" }
+          # The launcher is a Windows subsystem binary. The call operator does
+          # not record its exit code, so wait on the process handle instead.
+          # --status only reads layout and health. It does not start the watch.
+          $statusProc = Start-Process -FilePath $launcher -ArgumentList @(
+            '--home', $smokeHome, '--status', '--status-file', $status, '--quiet'
+          ) -Wait -PassThru -WindowStyle Hidden
+          if ($statusProc.ExitCode -ne 0) {
+            "STATUS_FILE_PRESENT=$(Test-Path -LiteralPath $status)"
+            "RUNTIME_PRESENT=$(Test-Path -LiteralPath (Join-Path $smokeHome 'runtime.json'))"
+            if (Test-Path -LiteralPath $log) { Get-Content -LiteralPath $log -Tail 40 }
+            throw "STATUS_SMOKE_FAILED exit=$($statusProc.ExitCode)"
+          }
           $body = Get-Content -LiteralPath $status -Raw | ConvertFrom-Json
           $gotHome = [IO.Path]::GetFullPath([string]$body.layout.home)
           $wantHome = [IO.Path]::GetFullPath($smokeHome)
