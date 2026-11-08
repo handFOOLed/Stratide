@@ -290,25 +290,28 @@ class Tests(unittest.TestCase):
                 flags|=os.O_BINARY
             fd=os.open(path,flags)
             log=m.BoundedLog(fd,path,cap=cap,preserve_above=preserve_above)
-            log.make_room()
-            preserved=Path(str(path)+".preserved")
-            self.assertEqual(preserved.read_bytes(),marker)
-            error="PAPER_MARKET_SNAPSHOT_MISSING\n"
-            for i in range(30):
-                log.write("y"*800+f"\n{i}\n")
-            log.write(error)
-            self.assertEqual(preserved.read_bytes(),marker)
-            self.assertFalse(any(item.name.startswith("eod-watch.out.log.preserved-") for item in Path(tmp).iterdir()))
-            active=path.read_text(encoding="utf-8") if path.is_file() else ""
-            rotated=Path(str(path)+".1")
-            rolled=rotated.read_text(encoding="utf-8") if rotated.is_file() else ""
-            self.assertIn("PAPER_MARKET_SNAPSHOT_MISSING",active+rolled)
-            self.assertNotIn("OWNER-LOG-MARKER",active+rolled)
-            self.assertLess(path.stat().st_size,cap+1200)
-            if rotated.is_file():
-                self.assertLessEqual(rotated.stat().st_size,preserve_above)
-            self.assertLess(sum(item.stat().st_size for item in Path(tmp).iterdir() if item.name!="eod-watch.out.log.preserved"),
-                            cap+preserve_above+2000)
+            try:
+                log.make_room()
+                preserved=Path(str(path)+".preserved")
+                self.assertEqual(preserved.read_bytes(),marker)
+                error="PAPER_MARKET_SNAPSHOT_MISSING\n"
+                for i in range(30):
+                    log.write("y"*800+f"\n{i}\n")
+                log.write(error)
+                self.assertEqual(preserved.read_bytes(),marker)
+                self.assertFalse(any(item.name.startswith("eod-watch.out.log.preserved-") for item in Path(tmp).iterdir()))
+                active=path.read_text(encoding="utf-8") if path.is_file() else ""
+                rotated=Path(str(path)+".1")
+                rolled=rotated.read_text(encoding="utf-8") if rotated.is_file() else ""
+                self.assertIn("PAPER_MARKET_SNAPSHOT_MISSING",active+rolled)
+                self.assertNotIn("OWNER-LOG-MARKER",active+rolled)
+                self.assertLess(path.stat().st_size,cap+1200)
+                if rotated.is_file():
+                    self.assertLessEqual(rotated.stat().st_size,preserve_above)
+                self.assertLess(sum(item.stat().st_size for item in Path(tmp).iterdir() if item.name!="eod-watch.out.log.preserved"),
+                                cap+preserve_above+2000)
+            finally:
+                os.close(log.fd)
 
     def test_watch_missing_snapshot_prints_code_not_handler_crash_or_bulk(self):
         day="20261108"

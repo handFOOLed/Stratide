@@ -725,23 +725,27 @@ class BoundedLog:
     def make_room(self):
         if not self.path.is_file() or self.path.stat().st_size < self.cap:
             return
-        held = os.dup(self.fd)
+        # Windows refuses to rename a file that still has a handle. Close
+        # every descriptor we hold, then reopen. A duplicate kept for rollback
+        # would itself block the rename.
         os.close(self.fd)
         try:
             roll_captured_log(self.path, self.cap, self.preserve_above)
-            flags = os.O_CREAT | os.O_APPEND | os.O_WRONLY
-            if hasattr(os, "O_BINARY"):
-                flags |= os.O_BINARY
-            opened = os.open(self.path, flags, 0o644)
-            # open often reuses the descriptor we just closed. dup2 onto the
-            # same number is a no-op, and closing it would drop the new file.
-            if opened != self.fd:
-                os.dup2(opened, self.fd)
-                os.close(opened)
         except OSError:
-            os.dup2(held, self.fd)
-        finally:
-            os.close(held)
+            self._reopen()
+            return
+        self._reopen()
+
+    def _reopen(self):
+        flags = os.O_CREAT | os.O_APPEND | os.O_WRONLY
+        if hasattr(os, "O_BINARY"):
+            flags |= os.O_BINARY
+        opened = os.open(self.path, flags, 0o644)
+        # open often reuses the descriptor we just closed. dup2 onto the
+        # same number is a no-op, and closing it would drop the new file.
+        if opened != self.fd:
+            os.dup2(opened, self.fd)
+            os.close(opened)
 
 
 def bind_watch_logs():
