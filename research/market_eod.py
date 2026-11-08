@@ -634,6 +634,34 @@ class Market(h.Warehouse):
                         sources={api: sorted(rows.values(), key=canonical) for api, rows in parts.items()})
 
 
+def watch_log_line(result):
+    """One repeating watch status line, without the bulk that fills the log.
+
+    Screen rejection rows and the per-symbol policy universe/fees remain in
+    their stores. Counts and the small selected list stay visible. This does
+    not change the research or paper decision that was just made.
+    """
+    logged = dict(result)
+    research = logged.get("research")
+    if isinstance(research, dict) and isinstance(research.get("screen"), dict):
+        screen = dict(research["screen"])
+        rejected = screen.get("rejected")
+        if isinstance(rejected, list):
+            screen["rejected_count"] = len(rejected)
+            del screen["rejected"]
+        logged["research"] = dict(research, screen=screen)
+    policy_status = logged.get("paper_policy")
+    if isinstance(policy_status, dict) and isinstance(policy_status.get("policy"), dict):
+        inner = dict(policy_status["policy"])
+        for key in ("universe", "fees"):
+            rows = inner.get(key)
+            if isinstance(rows, list):
+                inner[key + "_count"] = len(rows)
+                del inner[key]
+        logged["paper_policy"] = dict(policy_status, policy=inner)
+    return logged
+
+
 def optional_paper_step(market, phase):
     # Include import/initialization in the optional boundary. Explicit process
     # stops (BaseException) still leave the foreground watch immediately.
@@ -680,8 +708,12 @@ def cli(argv=None):
                     if paper_portfolio.binding_path().is_file():
                         result["paper_policy"] = paper_portfolio.ensure_policy(market)
                 except Exception as error:
-                    import traceback
-                    traceback.print_exc(file=sys.stderr)
+                    # A missing snapshot is a closed gate, not a crash. Keep the
+                    # code in the status line and leave the traceback for faults
+                    # that are not already a warehouse reason.
+                    if not isinstance(error, Error):
+                        import traceback
+                        traceback.print_exc(file=sys.stderr)
                     result["paper_policy"] = dict(
                         state="BLOCKED", reason="PAPER_POLICY_ENSURE_FAILED",
                         detail=dict(type=type(error).__name__, message=str(error)[:200]))
@@ -702,7 +734,7 @@ def cli(argv=None):
                 result["paper_decision"] = optional_paper_step(market, "freeze")
                 if args.action == "once":
                     break
-                print(json.dumps(result, ensure_ascii=False), flush=True)
+                print(json.dumps(watch_log_line(result), ensure_ascii=False), flush=True)
                 # A blocked or incomplete attempt is retried, not hammered.
                 time.sleep(300 if result.get("state") in ("BLOCKED", "NETWORK_OUTCOME_UNKNOWN") else 30)
         else:

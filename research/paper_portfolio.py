@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 
 import market_eod as m
 import market_research as mr
@@ -343,11 +344,15 @@ def once(market, phase="all"):
 def optional_step(market, phase):
     # Independent operational failure boundary, after durable collection. Never
     # infer that an uncertain ledger commit failed; next poll reads it first.
+    # A known warehouse code stays BLOCKED with that code. It is not a snapshot
+    # and it is not a success. Repeating the traceback every poll only fills
+    # eod-watch.err.log. Unexpected faults still keep a local traceback.
     try:
         return once(market, phase)
     except Exception as error:
-        import traceback
-        traceback.print_exc(file=sys.stderr)
+        if not isinstance(error, m.Error):
+            import traceback
+            traceback.print_exc(file=sys.stderr)
         return dict(state="BLOCKED", reason="PAPER_LOCAL_INPUT_OR_LEDGER_UNAVAILABLE",
                     detail=dict(type=type(error).__name__, message=str(error)[:200]))
 
