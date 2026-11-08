@@ -16,6 +16,7 @@ on:
       - scripts/build-windows-installer.ps1
       - scripts/verify-windows-installer-identity.ps1
       - scripts/test-paper-portfolio.py
+      - scripts/test-market-eod.py
       - research/**
       - apps/stratide-launcher/**
       - installer/Stratide.iss
@@ -30,6 +31,7 @@ on:
       - scripts/build-windows-installer.ps1
       - scripts/verify-windows-installer-identity.ps1
       - scripts/test-paper-portfolio.py
+      - scripts/test-market-eod.py
       - research/**
       - apps/stratide-launcher/**
       - installer/Stratide.iss
