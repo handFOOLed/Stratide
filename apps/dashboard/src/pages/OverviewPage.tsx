@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode, Ref } from 'react';
 import { PageHeader, PageMeta, MetaSep } from '../components/ui/PageHeader';
 import { Card, CardBody, CardHead } from '../components/ui/Card';
@@ -35,6 +35,8 @@ import {
 } from '../lib/format';
 import { RANGE_VALUES, readPreference, writePreference } from '../lib/storage';
 import type { RangeValue } from '../lib/storage';
+import { checklistProgress, checklistVisible, nextChecklistDismissed } from '../lib/checklist';
+import { BackfillMeter } from '../components/domain/BackfillMeter';
 import { navigate } from '../lib/route';
 import {
   dataStatusView,
@@ -170,7 +172,12 @@ export function OverviewPage({
   const [range, setRange] = useState<RangeValue>(() => readPreference('range', '30D', RANGE_VALUES));
   const [positionPage, setPositionPage] = useState(0);
   const [fillPage, setFillPage] = useState(0);
-  const [checklistExpanded, setChecklistExpanded] = useState(false);
+  const checklist = checklistProgress(runtime, agent);
+  useEffect(() => {
+    const next = nextChecklistDismissed(checklist);
+    if (next === null) return;
+    writePreference('checklist-dismissed', next ? '1' : '0');
+  }, [checklist.knownComplete, checklist.knownIncomplete]);
   const positions = useSelection<Position>();
   const fills = useSelection<Fill>();
 
@@ -309,19 +316,6 @@ export function OverviewPage({
   const tushareDone = tushareView !== null && tushareView.kind === 'ok';
   const marketEodDone = marketEodView !== null && marketEodView.kind === 'ok';
   const market = runtime.market;
-  const backfillDone = market !== null && market.backfillComplete;
-  const backfillDescription =
-    market === null
-      ? runtime.error === null
-        ? '正在读取历史行情补录进度'
-        : '无法读取历史行情补录进度'
-      : market.backfillComplete
-        ? '历史行情已就绪（' + String(market.sessionsReady) + ' 个交易日）'
-        : market.backfillRunning
-          ? '历史行情补录中：待补齐 ' + String(market.remaining) + ' 个交易日'
-        : market.sessionsReady > 0 || market.remaining > 0
-          ? '历史行情补录尚未完成：待补齐 ' + String(market.remaining) + ' 个交易日'
-          : '历史行情补录尚未开始（目标 ' + String(market.targetSessions) + ' 个交易日）';
   const researchConfigured =
     agent.status !== null && agent.status.default_model !== null && agent.status.budget.state === 'configured';
 
@@ -375,8 +369,8 @@ export function OverviewPage({
     {
       id: 'history-backfill',
       title: '完成历史行情补录',
-      description: backfillDescription,
-      done: backfillDone,
+      description: <BackfillMeter market={market} runtimeUnreadable={runtime.error !== null} />,
+      done: market !== null && market.backfillComplete === true,
       action: runtimeAction('checklist-action-backfill'),
     },
     {
@@ -402,8 +396,8 @@ export function OverviewPage({
       ),
     },
   ];
-  const checklistDone = checklistItems.every((item) => item.done);
-  const checklistOpen = !checklistDone || checklistExpanded;
+  const checklistDismissed = readPreference('checklist-dismissed', '0', ['0', '1'] as const) === '1';
+  const showChecklist = checklistVisible(checklist, checklistDismissed);
 
   const positionPageCount = Math.max(1, Math.ceil(sortedPositions.length / PAGE_SIZE));
   const currentPositionPage = Math.min(positionPage, positionPageCount - 1);
@@ -474,13 +468,9 @@ export function OverviewPage({
         </Callout>
       ) : null}
 
-      <Checklist
-        items={checklistItems}
-        open={checklistOpen}
-        onToggle={() => {
-          if (checklistDone) setChecklistExpanded((current) => !current);
-        }}
-      />
+      {showChecklist ? (
+        <Checklist items={checklistItems} />
+      ) : null}
 
       {protectionExpanded ? (
         <Card className="overview-protection-card" data-testid="protection-alert">

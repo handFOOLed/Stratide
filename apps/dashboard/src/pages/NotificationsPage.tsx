@@ -12,6 +12,7 @@ import type { Inbox, Notice } from '../lib/workspace';
 import { friendlyError } from '../lib/api';
 import { countText, formatDateTime } from '../lib/format';
 import { notificationTitle, taskStatusView } from '../lib/status';
+import { visibleNotices } from '../lib/notices';
 import { navigate } from '../lib/route';
 import type { AgentState } from '../state/useAgent';
 import { useInterval } from '../lib/hooks';
@@ -70,8 +71,9 @@ export function NotificationsPage({ agent, titleRef }: { agent: AgentState; titl
     navigate({ page: 'agents' });
   };
 
-  const notifications = inbox?.notifications ?? [];
-  const pageUnread = notifications.filter((notice) => !notice.read);
+  const stored = inbox?.notifications ?? [];
+  const notifications = visibleNotices(stored);
+  const pageUnread = notifications;
   const totalUnread = inbox === null ? 0 : inbox.unread_count;
   const allUnreadMarked = pageUnread.length > 0 && pageUnread.length === totalUnread;
 
@@ -83,11 +85,13 @@ export function NotificationsPage({ agent, titleRef }: { agent: AgentState; titl
         <CardHead
           title="研究通知"
           subtitle={
-            notifications.length === 0
+            inbox === null
               ? '研究任务结束后，结果会出现在这里'
               : totalUnread > 0
                 ? countText(totalUnread, '条') + '未读'
-                : '全部已读'
+                : stored.length > 0
+                  ? '全部已读'
+                  : '研究任务结束后，结果会出现在这里'
           }
           actions={
             <Button
@@ -104,7 +108,13 @@ export function NotificationsPage({ agent, titleRef }: { agent: AgentState; titl
         {inbox === null ? (
           <p className="muted notice-loading">正在读取通知…</p>
         ) : notifications.length === 0 ? (
-          <EmptyState compact icon="notifications" title={EMPTY.noticesTitle} description={EMPTY.noticesBody} />
+          stored.length > 0 ? (
+            <p className="muted notice-loading">
+              {totalUnread > 0 ? '本页没有未读通知。' : '已读通知不再显示。'}
+            </p>
+          ) : (
+            <EmptyState compact icon="notifications" title={EMPTY.noticesTitle} description={EMPTY.noticesBody} />
+          )
         ) : (
           <ul className="notice-list" aria-label="研究通知">
             {notifications.map((notice) => {

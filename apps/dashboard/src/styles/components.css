@@ -1291,6 +1291,20 @@
   background: var(--danger);
 }
 
+.progress--indeterminate {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--surface-sunken),
+    var(--surface-sunken) 6px,
+    var(--border-faint) 6px,
+    var(--border-faint) 8px
+  );
+}
+
+.progress__bar--indeterminate {
+  width: 0;
+}
+
 /* ---------- Key/value ---------- */
 .kv {
   display: grid;
@@ -2417,8 +2431,6 @@ a.health-bar__item:hover { background: var(--surface-hover); }
   text-align: left;
   cursor: default;
 }
-.checklist--done .checklist__head { cursor: pointer; }
-.checklist--done .checklist__head:hover { background: var(--surface-hover); }
 .checklist__title {
   display: inline-flex;
   align-items: center;
@@ -2432,8 +2444,6 @@ a.health-bar__item:hover { background: var(--surface-hover); }
   font-size: var(--fs-sm);
   font-variant-numeric: tabular-nums;
 }
-.checklist__chevron { color: var(--text-muted); transition: transform var(--motion-hover) var(--ease-out); }
-.checklist--done .checklist__head[aria-expanded="true"] .checklist__chevron { transform: rotate(180deg); }
 .checklist__items {
   display: flex;
   flex-direction: column;
@@ -2478,6 +2488,27 @@ a.health-bar__item:hover { background: var(--surface-hover); }
   color: var(--text-muted);
   font-size: var(--fs-xs);
   line-height: var(--lh-base);
+}
+.checklist__desc .backfill-diagnostic__code {
+  display: block;
+  margin-top: 2px;
+}
+.backfill-meter__text,
+.backfill-meter__percent,
+.backfill-meter__count {
+  margin: 0;
+}
+.backfill-meter__percent {
+  margin-top: 4px;
+  color: var(--text);
+  font-size: var(--fs-md);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+.backfill-meter__count {
+  margin-top: 2px;
+  color: var(--text-faint);
+  font-size: var(--fs-2xs);
 }
 .checklist__action { flex: 0 0 auto; }
 

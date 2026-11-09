@@ -193,5 +193,165 @@ class Tests(unittest.TestCase):
             for line in out.getvalue().splitlines():
                 self.assertEqual(json.loads(line)["paper_confirmation"]["reason"],"PAPER_MODULE_UNAVAILABLE")
 
+    def test_missing_snapshot_stays_blocked_and_handler_does_not_crash(self):
+        # No snapshot is invented. The known code is the result, and the handler
+        # must not raise NameError while recording it.
+        with patch.object(p,"once",side_effect=m.Error("PAPER_MARKET_SNAPSHOT_MISSING")),\
+                contextlib.redirect_stderr(io.StringIO()) as err:
+            value=p.optional_step(object(),"freeze")
+        self.assertEqual(value["state"],"BLOCKED")
+        self.assertEqual(value["reason"],"PAPER_LOCAL_INPUT_OR_LEDGER_UNAVAILABLE")
+        self.assertEqual(value["detail"]["type"],"WarehouseError")
+        self.assertEqual(value["detail"]["message"],"PAPER_MARKET_SNAPSHOT_MISSING")
+        self.assertNotIn("snapshot",value)
+        self.assertNotIn("name 'sys' is not defined",err.getvalue())
+        self.assertNotIn("Traceback",err.getvalue())
+        with patch.object(p,"once",side_effect=RuntimeError("ledger helper failed")),\
+                contextlib.redirect_stderr(io.StringIO()) as err:
+            failed=p.optional_step(object(),"confirm")
+        self.assertEqual(failed["detail"]["type"],"RuntimeError")
+        self.assertIn("Traceback",err.getvalue())
+        self.assertIn("ledger helper failed",err.getvalue())
+        self.assertNotIn("name 'sys' is not defined",err.getvalue())
+
+    def test_cli_snapshot_missing_reports_blocked_without_nameerror(self):
+        with patch.object(p,"once",side_effect=m.Error("PAPER_MARKET_SNAPSHOT_MISSING")),\
+                patch.object(p.m,"Market",return_value=object()),\
+                patch.object(p.m,"default_root",return_value=Path(".")),\
+                contextlib.redirect_stdout(io.StringIO()) as out,\
+                contextlib.redirect_stderr(io.StringIO()) as err:
+            code=p.main(["once"])
+        self.assertEqual(code,1)
+        body=json.loads(out.getvalue())
+        self.assertEqual(body["state"],"BLOCKED")
+        self.assertEqual(body["detail"]["message"],"PAPER_MARKET_SNAPSHOT_MISSING")
+        self.assertIn("PAPER_MARKET_SNAPSHOT_MISSING",err.getvalue())
+        self.assertNotIn("name 'sys' is not defined",err.getvalue())
+
+    def test_watch_log_uses_real_screen_and_policy_shapes(self):
+        # Rejected rows come from market_research.screen, not a hand-built list.
+        # The policy document is the same object default_policy submits.
+        day="20261106"
+        securities=[]
+        for offset in range(40):
+            securities.append(dict(ts_code=f"{600000+offset:06d}.SH",reasons=["NOT_ELIGIBLE"],
+                                   category="QUOTED",name="样本",list_status="L",list_date="20200101"))
+        securities.append(dict(ts_code="600080.SH",reasons=[],category="QUOTED",name="样本",
+                               list_status="L",list_date="20200101"))
+        current=dict(eligible_symbols=["600080.SH"],securities=securities,
+                     catalog_sha256="a"*64,snapshot_sha256="b"*64)
+        screen=mr.screen([day],[current],[dict(daily=[],adj_factor=[],suspend_d=[])],
+                         "2026-11-06T10:00:00+00:00",8)
+        self.assertGreater(len(screen["rejected"]),30)
+        self.assertTrue(all(set(row)=={"instrument","reason"} for row in screen["rejected"]))
+        self.assertIn("NOT_ELIGIBLE",screen["rejection_counts"])
+        self.assertIn("CONTINUOUS_HISTORY_OR_ACTION_EVIDENCE_MISSING",screen["rejection_counts"])
+        self.assertIn("selected",screen)
+        self.assertIn("universe_count",screen)
+        universe=[p.policy_instrument(code) for code in ("600000.SH","000001.SZ","920001.BJ")]
+        universe=[item for item in universe if item is not None]
+        self.assertEqual(universe,[{"market":"Shanghai","code":"600000"},{"market":"Shenzhen","code":"000001"}])
+        policy=p.policy_body(universe,day)
+        fee_keys={"version","source","instrument","valid_from","valid_through","commission_ppm",
+                  "minimum_commission","transfer_ppm","sell_tax_ppm"}
+        self.assertEqual(set(policy["fees"][0]),fee_keys)
+        self.assertEqual(policy["fees"][0]["instrument"],universe[0])
+        self.assertEqual(policy["fees"][0]["commission_ppm"],p.DEFAULT_TARIFF["commission_ppm"])
+        self.assertEqual(policy["fees"][0]["minimum_commission"],p.DEFAULT_TARIFF["minimum_commission"])
+        self.assertEqual(policy["version"],p.POLICY_VERSION)
+        result=dict(state="ALREADY_FROZEN",
+                    research=dict(state="BLOCKED",reason="NO_FROZEN_MARKET_SNAPSHOT",screen=screen),
+                    paper_policy=dict(state="EXISTS",automatic=True,policy=policy))
+        rejected=len(screen["rejected"])
+        line=json.dumps(m.watch_log_line(result),ensure_ascii=False)
+        logged=json.loads(line)
+        self.assertLess(len(line),8000)
+        self.assertEqual(logged["research"]["screen"]["rejected_count"],rejected)
+        self.assertNotIn("rejected",logged["research"]["screen"])
+        self.assertEqual(logged["research"]["screen"]["rejection_counts"],screen["rejection_counts"])
+        self.assertEqual(logged["paper_policy"]["policy"]["universe_count"],len(universe))
+        self.assertEqual(logged["paper_policy"]["policy"]["fees_count"],len(policy["fees"]))
+        self.assertNotIn("universe",logged["paper_policy"]["policy"])
+        self.assertNotIn("fees",logged["paper_policy"]["policy"])
+        self.assertEqual(logged["paper_policy"]["policy"]["max_positions"],p.DEFAULT_POLICY["max_positions"])
+        self.assertNotIn("600001.SH",line)
+        self.assertNotIn("commission_ppm",line)
+        self.assertEqual(len(result["research"]["screen"]["rejected"]),rejected)
+        self.assertEqual(len(result["paper_policy"]["policy"]["fees"]),len(universe))
+
+    def test_watch_log_cap_keeps_existing_file_and_later_errors(self):
+        cap,preserve_above=1000,4000
+        with tempfile.TemporaryDirectory(dir=TEST_ROOT) as tmp:
+            path=Path(tmp)/"eod-watch.out.log"
+            marker=b"OWNER-LOG-MARKER\n"+b"x"*5000
+            path.write_bytes(marker)
+            flags=os.O_APPEND|os.O_WRONLY
+            if hasattr(os,"O_BINARY"):
+                flags|=os.O_BINARY
+            fd=os.open(path,flags)
+            log=m.BoundedLog(fd,path,cap=cap,preserve_above=preserve_above)
+            try:
+                log.make_room()
+                preserved=Path(str(path)+".preserved")
+                self.assertEqual(preserved.read_bytes(),marker)
+                error="PAPER_MARKET_SNAPSHOT_MISSING\n"
+                for i in range(30):
+                    log.write("y"*800+f"\n{i}\n")
+                log.write(error)
+                self.assertEqual(preserved.read_bytes(),marker)
+                self.assertFalse(any(item.name.startswith("eod-watch.out.log.preserved-") for item in Path(tmp).iterdir()))
+                active=path.read_text(encoding="utf-8") if path.is_file() else ""
+                rotated=Path(str(path)+".1")
+                rolled=rotated.read_text(encoding="utf-8") if rotated.is_file() else ""
+                self.assertIn("PAPER_MARKET_SNAPSHOT_MISSING",active+rolled)
+                self.assertNotIn("OWNER-LOG-MARKER",active+rolled)
+                self.assertLess(path.stat().st_size,cap+1200)
+                if rotated.is_file():
+                    self.assertLessEqual(rotated.stat().st_size,preserve_above)
+                self.assertLess(sum(item.stat().st_size for item in Path(tmp).iterdir() if item.name!="eod-watch.out.log.preserved"),
+                                cap+preserve_above+2000)
+            finally:
+                os.close(log.fd)
+
+    def test_watch_missing_snapshot_prints_code_not_handler_crash_or_bulk(self):
+        day="20261108"
+        securities=[dict(ts_code=f"{600000+offset:06d}.SH",reasons=["NOT_ELIGIBLE"],category="QUOTED",
+                         name="样本",list_status="L",list_date="20200101") for offset in range(25)]
+        screen=mr.screen([day],[dict(eligible_symbols=[],securities=securities,catalog_sha256="c"*64,
+                                     snapshot_sha256="d"*64)],
+                         [dict(daily=[],adj_factor=[],suspend_d=[])],"2026-11-08T10:00:00+00:00",8)
+        self.assertTrue(all(set(row)=={"instrument","reason"} for row in screen["rejected"]))
+        with tempfile.TemporaryDirectory(dir=TEST_ROOT) as tmp,\
+                patch.object(m,"common_root",return_value=Path(tmp)),\
+                patch.object(m.Market,"once",return_value=dict(state="ALREADY_FROZEN")),\
+                patch.object(p,"once",side_effect=m.Error("PAPER_MARKET_SNAPSHOT_MISSING")),\
+                patch.object(p,"ensure_policy",side_effect=m.Error("PAPER_MARKET_SNAPSHOT_REQUIRED")),\
+                patch.object(mr,"once",return_value=dict(state="BLOCKED",reason="NO_FROZEN_MARKET_SNAPSHOT",screen=screen)),\
+                patch.object(m.time,"sleep",side_effect=KeyboardInterrupt),\
+                contextlib.redirect_stdout(io.StringIO()) as out,\
+                contextlib.redirect_stderr(io.StringIO()) as err:
+            binding=Path(tmp)/"state/paper-portfolio/binding.json"
+            agent=Path(tmp)/"state/risk-portfolio/agent-binding.json"
+            binding.parent.mkdir(parents=True)
+            agent.parent.mkdir(parents=True)
+            binding.write_text("{}",encoding="utf-8")
+            agent.write_text("{}",encoding="utf-8")
+            with self.assertRaises(KeyboardInterrupt):
+                m.cli(["watch","--root",str(Path(tmp)/"market")])
+        self.assertNotIn("name 'sys' is not defined",err.getvalue())
+        self.assertNotIn("Traceback",err.getvalue())
+        lines=out.getvalue().splitlines()
+        self.assertEqual(len(lines),1)
+        value=json.loads(lines[0])
+        self.assertEqual(value["state"],"ALREADY_FROZEN")
+        self.assertEqual(value["paper_policy"]["reason"],"PAPER_POLICY_ENSURE_FAILED")
+        self.assertEqual(value["paper_policy"]["detail"]["message"],"PAPER_MARKET_SNAPSHOT_REQUIRED")
+        self.assertEqual(value["paper_confirmation"]["detail"]["message"],"PAPER_MARKET_SNAPSHOT_MISSING")
+        self.assertEqual(value["paper_decision"]["detail"]["message"],"PAPER_MARKET_SNAPSHOT_MISSING")
+        self.assertEqual(value["research"]["screen"]["rejected_count"],len(screen["rejected"]))
+        self.assertNotIn("rejected",value["research"]["screen"])
+        self.assertNotIn("600010.SH",lines[0])
+        self.assertLess(len(lines[0]),4000)
+
 
 if __name__=="__main__":unittest.main()

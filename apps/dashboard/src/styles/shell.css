@@ -38,20 +38,21 @@
 }
 
 .brand-mark {
-  display: grid;
+  display: block;
   flex: 0 0 auto;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
-  background: var(--brand-mark-bg);
-  color: var(--brand-mark-fg);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: transparent;
 }
 
-.brand-mark svg {
-  width: 18px;
-  height: 18px;
+.brand-mark img {
+  display: block;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 8px;
 }
 
 .brand-copy {
@@ -652,7 +653,10 @@
 
 .brand-link {
   display: flex;
+  align-items: center;
+  gap: 12px;
   flex: 0 0 auto;
+  min-width: 0;
   border-radius: 9px;
 }
 

@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 
 import market_eod as m
 import market_research as mr
@@ -75,12 +76,21 @@ def default_policy(market):
         if item is not None:
             universe.append(item)
     m.require(0 < len(universe) <= DEFAULT_POLICY["universe_limit"], "PAPER_UNIVERSE_UNAVAILABLE")
-    from_day = int(day)
-    fees = [dict(DEFAULT_TARIFF, instrument=item, valid_from=from_day, valid_through=20991231)
+    return policy_body(universe, day)
+
+
+def policy_body(universe, from_day):
+    """The ledger Policy document default_policy submits.
+
+    universe items are {market, code}. fees follow FeeSchedule field names and
+    integer fen, which is what status later returns inside book["policy"].
+    """
+    day = int(from_day)
+    fees = [dict(DEFAULT_TARIFF, instrument=item, valid_from=day, valid_through=20991231)
             for item in universe]
-    policy = dict(
+    return dict(
         version=POLICY_VERSION,
-        universe=universe,
+        universe=list(universe),
         target_value=DEFAULT_POLICY["target_value"],
         max_positions=DEFAULT_POLICY["max_positions"],
         max_daily_orders=DEFAULT_POLICY["max_daily_orders"],
@@ -98,7 +108,6 @@ def default_policy(market):
         approve_fixed_baseline=True,
         automatic=True,
     )
-    return policy
 
 
 def ensure_policy(market):
@@ -343,11 +352,15 @@ def once(market, phase="all"):
 def optional_step(market, phase):
     # Independent operational failure boundary, after durable collection. Never
     # infer that an uncertain ledger commit failed; next poll reads it first.
+    # A known warehouse code stays BLOCKED with that code. It is not a snapshot
+    # and it is not a success. Repeating the traceback every poll only fills
+    # eod-watch.err.log. Unexpected faults still keep a local traceback.
     try:
         return once(market, phase)
     except Exception as error:
-        import traceback
-        traceback.print_exc(file=sys.stderr)
+        if not isinstance(error, m.Error):
+            import traceback
+            traceback.print_exc(file=sys.stderr)
         return dict(state="BLOCKED", reason="PAPER_LOCAL_INPUT_OR_LEDGER_UNAVAILABLE",
                     detail=dict(type=type(error).__name__, message=str(error)[:200]))
 

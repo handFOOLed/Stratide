@@ -1,0 +1,114 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { checklistProgress, checklistVisible } from '../src/lib/checklist.ts';
+
+const readyStatus = {
+  setup_complete: true,
+  dependencies: {
+    tushare_credential: { state: 'CONFIGURED', reason: null, note: null },
+    market_eod: { state: 'INITIALIZED', reason: null, note: null },
+  },
+};
+
+const readyMarket = {
+  sessionsReady: 84,
+  targetSessions: 84,
+  remaining: 0,
+  lastSuccessfulDate: '20261105',
+  gaps: 0,
+  backfillRunning: false,
+  backfillComplete: true,
+  statusKnown: true,
+  statusError: null,
+};
+
+const readyAgent = {
+  status: { default_model: 'market-deepseek-fusion', budget: { state: 'configured' } },
+};
+
+test('a fully known checklist is hidden and stays hidden while data reloads', () => {
+  const done = checklistProgress({ status: readyStatus, market: readyMarket }, readyAgent);
+  assert.equal(done.knownComplete, true);
+  assert.equal(done.knownIncomplete, false);
+  assert.equal(checklistVisible(done, false), false);
+
+  const reloading = checklistProgress({ status: null, market: null }, { status: null });
+  assert.equal(reloading.knownComplete, false);
+  assert.equal(reloading.knownIncomplete, false);
+  assert.equal(checklistVisible(reloading, true), false);
+});
+
+test('a known gap shows the checklist again after it was dismissed', () => {
+  const gap = checklistProgress(
+    {
+      status: {
+        ...readyStatus,
+        dependencies: {
+          ...readyStatus.dependencies,
+          tushare_credential: { state: 'MISSING', reason: null, note: null },
+        },
+      },
+      market: readyMarket,
+    },
+    readyAgent,
+  );
+  assert.equal(gap.knownComplete, false);
+  assert.equal(gap.knownIncomplete, true);
+  assert.equal(checklistVisible(gap, true), true);
+});
+
+test('an unfinished first run still shows the checklist', () => {
+  const fresh = checklistProgress({ status: null, market: null }, { status: null });
+  assert.equal(checklistVisible(fresh, false), true);
+});
+
+test('partial progress stays visible, including a dismissed list with one known gap', () => {
+  const partial = checklistProgress(
+    {
+      status: readyStatus,
+      market: { ...readyMarket, backfillComplete: false, backfillRunning: true, remaining: 40, statusKnown: false },
+    },
+    readyAgent,
+  );
+  assert.equal(partial.knownComplete, false);
+  assert.equal(partial.knownIncomplete, true);
+  assert.equal(checklistVisible(partial, true), true);
+});
+
+test('a light credential check does not reopen a completed checklist', () => {
+  const light = checklistProgress(
+    {
+      status: {
+        ...readyStatus,
+        status_refresh: 'light',
+        dependencies: {
+          ...readyStatus.dependencies,
+          tushare_credential: { state: 'UNKNOWN', reason: 'CREDENTIAL_CHECK_DEFERRED', note: null },
+        },
+      },
+      market: readyMarket,
+    },
+    readyAgent,
+  );
+  assert.equal(light.knownComplete, false);
+  assert.equal(light.knownIncomplete, false);
+  assert.equal(checklistVisible(light, true), false);
+});
+
+test('a missing credential still reopens the checklist during a refresh', () => {
+  const missing = checklistProgress(
+    {
+      status: {
+        ...readyStatus,
+        dependencies: {
+          ...readyStatus.dependencies,
+          tushare_credential: { state: 'UNKNOWN', reason: 'CREDENTIAL_HELPER_MISSING', note: null },
+        },
+      },
+      market: null,
+    },
+    { status: null },
+  );
+  assert.equal(missing.knownIncomplete, true);
+  assert.equal(checklistVisible(missing, true), true);
+});

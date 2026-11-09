@@ -616,6 +616,114 @@ sys.exit(9)
         self.assertEqual(self.w.query(A,B,trade_date=A),before)
 
 
+class IdleWalCheckpoint(unittest.TestCase):
+    def test_checkpoint_if_idle_truncates_a_leftover_wal(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            warehouse = h.Warehouse(root)
+            (root / "writer.lock").write_bytes(b"0")
+            db = sqlite3.connect(warehouse.path)
+            db.execute("PRAGMA journal_mode=WAL")
+            db.execute("PRAGMA wal_autocheckpoint=0")
+            db.execute("CREATE TABLE probe(x INTEGER)")
+            db.execute("INSERT INTO probe VALUES (1)")
+            db.commit()
+            wal = Path(str(warehouse.path) + "-wal")
+            self.assertGreater(wal.stat().st_size, 0)
+            warehouse.checkpoint_if_idle()
+            self.assertEqual(wal.stat().st_size, 0)
+            self.assertEqual(db.execute("SELECT x FROM probe").fetchone()[0], 1)
+            db.close()
+
+    def test_checkpoint_if_idle_does_not_create_a_database(self):
+        with tempfile.TemporaryDirectory() as raw:
+            warehouse = h.Warehouse(Path(raw))
+            warehouse.checkpoint_if_idle()
+            self.assertFalse(warehouse.path.exists())
+
+    def test_checkpoint_if_idle_reports_a_busy_lock(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            warehouse = h.Warehouse(root)
+            (root / "writer.lock").write_bytes(b"0")
+            db = sqlite3.connect(warehouse.path)
+            db.execute("PRAGMA journal_mode=WAL")
+            db.execute("PRAGMA wal_autocheckpoint=0")
+            db.execute("CREATE TABLE probe(x INTEGER)")
+            db.execute("INSERT INTO probe VALUES (1)")
+            db.commit()
+            with h.writer_lock(root):
+                with self.assertRaises(h.WarehouseError) as caught:
+                    warehouse.checkpoint_if_idle()
+            self.assertEqual(str(caught.exception), "WAREHOUSE_WRITER_BUSY")
+            self.assertGreater(Path(str(warehouse.path) + "-wal").stat().st_size, 0)
+            self.assertEqual(db.execute("SELECT x FROM probe").fetchone()[0], 1)
+            db.close()
+
+    def test_checkpoint_if_idle_does_not_truncate_when_sqlite_is_busy(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            warehouse = h.Warehouse(root)
+            (root / "writer.lock").write_bytes(b"0")
+            db = sqlite3.connect(warehouse.path)
+            db.execute("PRAGMA journal_mode=WAL")
+            db.execute("PRAGMA wal_autocheckpoint=0")
+            db.execute("CREATE TABLE probe(x INTEGER)")
+            db.execute("INSERT INTO probe VALUES (7)")
+            db.commit()
+            wal = Path(str(warehouse.path) + "-wal")
+            self.assertGreater(wal.stat().st_size, 0)
+            reader = sqlite3.connect(warehouse.path)
+            reader.execute("BEGIN")
+            self.assertEqual(reader.execute("SELECT x FROM probe").fetchone()[0], 7)
+            with self.assertRaises(h.WarehouseError) as caught:
+                warehouse.checkpoint_if_idle()
+            self.assertEqual(str(caught.exception), "WAREHOUSE_WRITER_BUSY")
+            self.assertGreater(wal.stat().st_size, 0)
+            self.assertEqual(db.execute("SELECT x FROM probe").fetchone()[0], 7)
+            reader.close()
+            db.close()
+
+    def test_status_cli_surfaces_a_busy_lock_without_reading(self):
+        sys.path.insert(0, str(ROOT / "research"))
+        import market_eod
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            warehouse = h.Warehouse(root)
+            (root / "writer.lock").write_bytes(b"0")
+            db = sqlite3.connect(warehouse.path)
+            db.execute("PRAGMA journal_mode=WAL")
+            db.execute("PRAGMA wal_autocheckpoint=0")
+            db.execute("CREATE TABLE probe(x INTEGER)")
+            db.execute("INSERT INTO probe VALUES (1)")
+            db.commit()
+            with h.writer_lock(root), mock.patch.object(market_eod.Market, "report", side_effect=AssertionError("report")):
+                output = __import__("io").StringIO()
+                with contextlib.redirect_stdout(output):
+                    code = market_eod.cli(["status", "--root", str(root)])
+            self.assertEqual(code, 1)
+            self.assertIn("WAREHOUSE_WRITER_BUSY", output.getvalue())
+            self.assertNotIn("sessions_ready", output.getvalue())
+            db.close()
+
+
+class CoverageComplete(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(ROOT / "research"))
+        import market_eod
+        cls.complete = staticmethod(market_eod.coverage_complete)
+
+    def test_empty_gaps_are_not_complete_when_the_window_is_short(self):
+        self.assertFalse(self.complete(10, [], ["20261105"], "20260701", "20261106"))
+        self.assertFalse(self.complete(84, [], ["20261101", "20261106"], "20260701", "20261106"))
+        self.assertFalse(self.complete(84, [{"source_day": "20261105"}], ["20260701", "20261106"], "20260701", "20261106"))
+
+    def test_complete_requires_the_target_and_a_calendar_that_covers_the_window(self):
+        self.assertTrue(self.complete(84, [], ["20260701", "20261106"], "20260701", "20261106"))
+        self.assertFalse(self.complete(83, [], ["20260701", "20261106"], "20260701", "20261106"))
+
+
 def fingerprint(root):
     return {str(p.relative_to(root)):(p.stat().st_size,p.stat().st_mtime_ns,hashlib.sha256(p.read_bytes()).hexdigest())
             for p in root.rglob("*") if p.is_file()}

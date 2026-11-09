@@ -22,6 +22,9 @@ h = side.v1
 require, Error = h.require, h.WarehouseError
 canonical, sha = h.canonical, h.sha
 VERSION = "market-day-snapshot-v1"
+# Product backfill window. report() will not call this window complete just
+# because the stored calendar has no gap rows.
+BACKFILL_TARGET_SESSIONS = 84
 TZ = dt.timezone(dt.timedelta(hours=8))
 FIELDS = {**h.FIELDS, **{a: side.FIELDS[a] for a in ("adj_factor", "suspend_d", "daily_basic")}}
 PERMISSION = "Owner Issue #82 / existing Tushare account / local personal EOD research"
@@ -29,6 +32,22 @@ GOOD = ("OK", "EMPTY", "TRUNCATION_SUSPECTED")
 SAFE = dict(historical_pit_status="NOT_VERIFIED", opening_source="BLOCKED",
             paper_allowed=False, live_allowed=False, cloud_egress=False)
 RULES = "crates/contracts/src/paper.rs; research/timesfm_cpu/history.py (identity only; no trading admission)"
+
+
+def coverage_complete(sessions_ready, gaps, calendar_dates, start_date, today, target=BACKFILL_TARGET_SESSIONS):
+    """True only when the stored calendar covers the configured window and every open day is ready.
+
+    An empty gap list is not enough: the calendar may only contain the days
+    already downloaded, while the 84-session target is still missing.
+    """
+    dates = [day for day in calendar_dates if day]
+    if not dates or not start_date or not today:
+        return False
+    earliest, latest = min(dates), max(dates)
+    covers = earliest <= start_date and latest >= today
+    return covers and len(gaps) == 0 and sessions_ready >= target
+
+
 DDL = """
 CREATE TABLE IF NOT EXISTS market_control(id INTEGER PRIMARY KEY CHECK(id=1),config TEXT NOT NULL,
  config_sha TEXT NOT NULL,enabled INTEGER NOT NULL);
@@ -572,16 +591,23 @@ class Market(h.Warehouse):
             run = db.execute("SELECT status,started,ended FROM runs WHERE kind='market-eod' ORDER BY id DESC LIMIT 1").fetchone()
             latest = snapshots[-1] if snapshots else None
             by_date = {s["source_day"]: s for s in snapshots}
+            today = instant(h.now()).astimezone(TZ).strftime("%Y%m%d")
             calendar = {r["cal_date"]: r["is_open"] for r in self.latest_objects(db, "trade_cal") if r["exchange"] == "SSE"}
             gaps = [dict(source_day=date, missing=len(by_date[date]["missing_symbols"]) if date in by_date else None,
                          blockers=by_date[date]["blockers"] if date in by_date else ["NO_FROZEN_MARKET_SNAPSHOT"])
-                    for date in sorted(calendar) if calendar[date] == "1" and date <= instant(h.now()).astimezone(TZ).strftime("%Y%m%d") and
+                    for date in sorted(calendar) if calendar[date] == "1" and date <= today and
                     (date not in by_date or by_date[date]["state"] != "READY")]
             ready_sessions = sum(
                 1 for date in dates
                 if self.load_snapshot(db, date)["state"] == "READY")
+            calendar_dates = sorted(calendar)
             return dict(version=VERSION, state=run["status"] if run else "NOT_COLLECTED", enabled=enabled,
-                        sessions_ready=ready_sessions, **SAFE,
+                        sessions_ready=ready_sessions,
+                        coverage_complete=coverage_complete(
+                            ready_sessions, gaps, calendar_dates, config["start_date"], today),
+                        calendar_earliest=calendar_dates[0] if calendar_dates else None,
+                        configured_start=config["start_date"],
+                        **SAFE,
                         data_mode=config["data_mode"], config=config, last_run=dict(run) if run else None,
                         last_successful_date=max((s["source_day"] for s in snapshots if s["state"] == "READY"), default=None),
                         latest=latest, gaps=gaps,
@@ -608,6 +634,147 @@ class Market(h.Warehouse):
                         sources={api: sorted(rows.values(), key=canonical) for api, rows in parts.items()})
 
 
+def watch_log_line(result):
+    """One repeating watch status line, without the bulk that fills the log.
+
+    Screen rejection rows and the per-symbol policy universe/fees remain in
+    their stores. Counts and the small selected list stay visible. This does
+    not change the research or paper decision that was just made.
+    """
+    logged = dict(result)
+    research = logged.get("research")
+    if isinstance(research, dict) and isinstance(research.get("screen"), dict):
+        screen = dict(research["screen"])
+        rejected = screen.get("rejected")
+        if isinstance(rejected, list):
+            screen["rejected_count"] = len(rejected)
+            del screen["rejected"]
+        logged["research"] = dict(research, screen=screen)
+    policy_status = logged.get("paper_policy")
+    if isinstance(policy_status, dict) and isinstance(policy_status.get("policy"), dict):
+        inner = dict(policy_status["policy"])
+        for key in ("universe", "fees"):
+            rows = inner.get(key)
+            if isinstance(rows, list):
+                inner[key + "_count"] = len(rows)
+                del inner[key]
+        logged["paper_policy"] = dict(policy_status, policy=inner)
+    return logged
+
+
+# Active eod-watch logs stay at this size. An already-huge file, such as one
+# left by an older build, is renamed aside once and never deleted.
+WATCH_LOG_CAP = 8 * 1024 * 1024
+WATCH_LOG_PRESERVE_ABOVE = 32 * 1024 * 1024
+
+
+def roll_captured_log(path, cap=WATCH_LOG_CAP, preserve_above=WATCH_LOG_PRESERVE_ABOVE):
+    """Cap one captured log without deleting an already oversized file.
+
+    `name.preserved` and any later `name.preserved-<n>` are kept. Only a
+    previous bounded segment (`name.1`) at or below preserve_above is removed.
+    """
+    path = Path(path)
+    if not path.is_file() or path.stat().st_size < cap:
+        return
+    size = path.stat().st_size
+    preserved = Path(str(path) + ".preserved")
+    if size > preserve_above:
+        if not preserved.exists():
+            path.rename(preserved)
+        else:
+            path.rename(Path(f"{path}.preserved-{time.time_ns()}"))
+        return
+    rotated = Path(str(path) + ".1")
+    if rotated.exists():
+        if rotated.stat().st_size > preserve_above:
+            rotated.rename(Path(f"{path}.preserved-{time.time_ns()}"))
+        else:
+            rotated.unlink()
+    path.rename(rotated)
+
+
+class BoundedLog:
+    """stdout/stderr replacement for the long-running market watch process.
+
+    print and traceback keep writing. Crossing the cap rotates the file first,
+    so a blocked-snapshot line is not dropped to make the file smaller.
+    """
+
+    def __init__(self, fd, path, cap=WATCH_LOG_CAP, preserve_above=WATCH_LOG_PRESERVE_ABOVE):
+        self.fd = fd
+        self.path = Path(path)
+        self.cap = cap
+        self.preserve_above = preserve_above
+
+    def fileno(self):
+        return self.fd
+
+    def flush(self):
+        return None
+
+    def write(self, data):
+        if isinstance(data, bytes):
+            text = data.decode("utf-8", "replace")
+        else:
+            text = str(data)
+        self.make_room()
+        os.write(self.fd, text.encode("utf-8"))
+        return len(text)
+
+    def make_room(self):
+        if not self.path.is_file() or self.path.stat().st_size < self.cap:
+            return
+        # Windows refuses to rename a file that still has a handle. Close
+        # every descriptor we hold, then reopen. A duplicate kept for rollback
+        # would itself block the rename.
+        os.close(self.fd)
+        try:
+            roll_captured_log(self.path, self.cap, self.preserve_above)
+        except OSError:
+            self._reopen()
+            return
+        self._reopen()
+
+    def _reopen(self):
+        flags = os.O_CREAT | os.O_APPEND | os.O_WRONLY
+        if hasattr(os, "O_BINARY"):
+            flags |= os.O_BINARY
+        opened = os.open(self.path, flags, 0o644)
+        # open often reuses the descriptor we just closed. dup2 onto the
+        # same number is a no-op, and closing it would drop the new file.
+        if opened != self.fd:
+            os.dup2(opened, self.fd)
+            os.close(opened)
+
+
+def bind_watch_logs():
+    """Point this process's stdout and stderr at the captured watch files.
+
+    The supervisor passes the paths. A console or test stream has no path and
+    is left alone. launcher.log uses a different 8MiB rotator that deletes its
+    previous segment; these watch files do not.
+    """
+    for env_name, stream_name in (
+            ("STRATIDE_EOD_WATCH_STDOUT", "stdout"),
+            ("STRATIDE_EOD_WATCH_STDERR", "stderr")):
+        path = os.environ.get(env_name)
+        if not path:
+            continue
+        current = getattr(sys, stream_name)
+        try:
+            fd = os.dup(current.fileno())
+        except (AttributeError, OSError):
+            continue
+        # Drop the inherited handle. The BoundedLog owns the duplicate, so a
+        # later close of the original stream cannot rename-lock the file or
+        # close a recycled descriptor.
+        current.close()
+        bounded = BoundedLog(fd, path)
+        bounded.make_room()
+        setattr(sys, stream_name, bounded)
+
+
 def optional_paper_step(market, phase):
     # Include import/initialization in the optional boundary. Explicit process
     # stops (BaseException) still leave the foreground watch immediately.
@@ -631,7 +798,7 @@ def cli(argv=None):
     parser.add_argument("--rpm", type=int, default=10)
     parser.add_argument("--min-coverage-bps", type=int, default=10000)
     parser.add_argument("--credential-source", choices=("auto", "existing-tushare-mcp-config"), default="auto")
-    parser.add_argument("--sessions", type=int, default=84)
+    parser.add_argument("--sessions", type=int, default=BACKFILL_TARGET_SESSIONS)
     parser.add_argument("--rounds", type=int, default=6)
     args = parser.parse_args(argv)
     try:
@@ -644,6 +811,12 @@ def cli(argv=None):
         elif args.action == "backfill":
             result = market.backfill_rounds(args.sessions, args.rounds, token_source=args.credential_source)
         elif args.action in ("once", "watch"):
+            # Repeating output is this loop's one status line, plus stderr from
+            # an unexpected paper/research fault or a worker bridge. `once`
+            # prints the full result a single time below and is not capped.
+            # The legacy non-market operator watch is not what the launcher starts.
+            if args.action == "watch":
+                bind_watch_logs()
             while True:
                 result = market.once(token_source=args.credential_source)
                 # First successful collection enables the default simulated policy
@@ -654,8 +827,12 @@ def cli(argv=None):
                     if paper_portfolio.binding_path().is_file():
                         result["paper_policy"] = paper_portfolio.ensure_policy(market)
                 except Exception as error:
-                    import traceback
-                    traceback.print_exc(file=sys.stderr)
+                    # A missing snapshot is a closed gate, not a crash. Keep the
+                    # code in the status line and leave the traceback for faults
+                    # that are not already a warehouse reason.
+                    if not isinstance(error, Error):
+                        import traceback
+                        traceback.print_exc(file=sys.stderr)
                     result["paper_policy"] = dict(
                         state="BLOCKED", reason="PAPER_POLICY_ENSURE_FAILED",
                         detail=dict(type=type(error).__name__, message=str(error)[:200]))
@@ -676,10 +853,15 @@ def cli(argv=None):
                 result["paper_decision"] = optional_paper_step(market, "freeze")
                 if args.action == "once":
                     break
-                print(json.dumps(result, ensure_ascii=False), flush=True)
+                print(json.dumps(watch_log_line(result), ensure_ascii=False), flush=True)
                 # A blocked or incomplete attempt is retried, not hammered.
                 time.sleep(300 if result.get("state") in ("BLOCKED", "NETWORK_OUTCOME_UNKNOWN") else 30)
         else:
+            if args.action == "status":
+                # Status stays readonly. A busy lock or a checkpoint that does
+                # not finish must fail with that code. Swallowing it and calling
+                # report() mixes "writer busy" with a stale or half-read snapshot.
+                market.checkpoint_if_idle()
             result = market.report()
             if args.action == "verify":
                 with market.read(inspect_raw_paths=False) as db:

@@ -1,4 +1,4 @@
-import { ApiError } from './api';
+import { ApiError } from './api.ts';
 
 export interface ChildStatus {
   pid: number;
@@ -89,6 +89,7 @@ async function read<T>(path: string, init: RequestInit): Promise<T> {
   try {
     response = await fetch(path, init);
   } catch {
+    if (init.signal?.aborted) throw new ApiError('ABORTED', 'ABORTED', 0);
     throw new ApiError('OFFLINE', '无法连接本地服务；后台可能已停止。', 0);
   }
   let payload: EnvelopeShape<T>;
@@ -116,16 +117,48 @@ export async function loadRuntimeStatus(signal?: AbortSignal): Promise<RuntimeSt
   });
 }
 
-export async function runtimeAction<T>(path: string, body: Record<string, unknown> = {}): Promise<T> {
-  return read<T>('/api/runtime/' + path, {
-    method: 'POST',
-    credentials: 'omit',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
+export async function runtimeAction<T>(
+  path: string,
+  body: Record<string, unknown> = {},
+  options: { timeoutMs?: number; timeoutCode?: string; signal?: AbortSignal } = {},
+): Promise<T> {
+  const controller = new AbortController();
+  const onOuterAbort = () => controller.abort();
+  if (options.signal) {
+    if (options.signal.aborted) controller.abort();
+    else options.signal.addEventListener('abort', onOuterAbort);
+  }
+  let timedOut = false;
+  const timer =
+    options.timeoutMs === undefined
+      ? null
+      : setTimeout(() => {
+          timedOut = true;
+          controller.abort();
+        }, options.timeoutMs);
+  try {
+    return await read<T>('/api/runtime/' + path, {
+      method: 'POST',
+      credentials: 'omit',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    // Navigation and a replaced poll are ABORTED. The 8s timer is a timeout.
+    if (options.signal?.aborted) throw new ApiError('ABORTED', 'ABORTED', 0);
+    if (timedOut) {
+      const code = options.timeoutCode ?? 'REQUEST_TIMEOUT';
+      throw new ApiError(code, code, 0);
+    }
+    throw error;
+  } finally {
+    if (timer !== null) clearTimeout(timer);
+    options.signal?.removeEventListener('abort', onOuterAbort);
+  }
 }
 
 export interface SetupCompleteResult {
