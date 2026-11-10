@@ -18,15 +18,16 @@ def gh(*arguments):
         check=True,
         capture_output=True,
         text=True,
+        encoding="utf-8",
     )
     return json.loads(result.stdout)
 
 
-def eligible(pr, number, sha):
+def eligible(pr, number, sha, allow_draft=False):
     return (
         pr["number"] == number
         and pr["state"] == "open"
-        and pr["draft"] is False
+        and (pr["draft"] is False or (allow_draft and pr["draft"] is True))
         and pr["user"]["login"] == OWNER
         and pr["head"]["repo"] is not None
         and pr["head"]["repo"]["full_name"] == REPOSITORY
