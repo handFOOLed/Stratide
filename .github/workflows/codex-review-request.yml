@@ -1,0 +1,26 @@
+name: Request Codex review
+
+on:
+  pull_request_target:
+    types: [ready_for_review, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: write
+
+jobs:
+  request:
+    if: github.repository == 'handFOOLed/Stratide' && github.event.pull_request.user.login == 'handFOOLed' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.base.ref == 'main' && !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check out trusted base
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+      - name: Request review for current head
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/request_codex_review.py
