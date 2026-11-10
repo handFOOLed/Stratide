@@ -1,21 +1,16 @@
 # AGENTS.md — Stratide 工程与协作规则
 
-> **现行基线｜2026-11-06**：Stratide V2 / Windows **0.3.2**。`main` 已包含 PR #86–#93；公开安装包为 [v0.3.2](https://github.com/handFOOLed/Stratide/releases/tag/v0.3.2)（未签名，安装前核对 `SHA256SUMS.txt`）。当前没有已授权的下一模块开发任务；未来先由 Owner 确认 Issue/范围，再创建独立 Draft PR。用户操作见 [使用教程](docs/USER_GUIDE.md)；工程现状见 [STATUS](docs/STATUS.md)；运行前提与验证边界见 [KNOWN_LIMITATIONS](docs/KNOWN_LIMITATIONS.md)。
+> Stratide V2 已进入使用、数据观察和本机验收阶段。新开发以 Owner 最新授权的 Issue 或明确范围为准。涉及真实数据/PIT 前向评估、N100 或实盘的工作另行决策。
 
-> 原 #22/#23 的 UI/后端角色分工，以及 #85 “DeepSeek 正在实施 Windows 安装”均为**历史安排**。安全边界、独立审查、Owner 明确授权合并的原则仍有效；N100/实盘后续另行决策。
-
-[文档中心](docs/README.md) · [当前版本](docs/STATUS.md) · [系统架构](docs/ARCHITECTURE_OVERVIEW.md)
+[文档中心](docs/README.md) · [当前版本](docs/STATUS.md) · [系统架构](docs/ARCHITECTURE_OVERVIEW.md) · [使用教程](docs/USER_GUIDE.md) · [验证边界](docs/KNOWN_LIMITATIONS.md)
 
 ## 工程协作
 
 | 角色 | 职责 |
 | --- | --- |
-| **Owner** | 确定产品目标、任务范围、费用/云外发/风险授权和最终合并 |
-| **实施者（Codex / DeepSeek 等）** | 根据 Owner 最新 Issue 完整实现选定模块，提交一个 Draft PR；不自行 Ready/merge |
-| **ChatGPT** | 审阅固定 HEAD、风险分级、在 Owner 明确授权后执行合并 |
-| **其他独立审查者** | 对凭据、费用、持久账本等高风险修改做定向反证（按需） |
-
-**当前交付**：V2 工程完结，进入使用、日常数据观察和 Owner 本机验收阶段。新功能不沿用旧 #85 开发指令；是否开展真实数据/PIT 前向评估、N100 或其他优化，由 Owner 另发任务。
+| **Owner** | 确定任务范围，授权费用、云外发及风险例外，决定是否合并指定 PR 的当前 HEAD |
+| **实施 Agent** | 实现、测试、创建并维护 PR，处理审查意见、触发复审并整理合并证据 |
+| **审查 Agent** | 以 Codex 自动代码审查为常规入口，对具体 HEAD 报告问题；独立审查 Agent 按风险补做故障反证 |
 
 ## 不可突破的安全边界
 
@@ -26,11 +21,21 @@
 5. **不执行未隔离生成代码。** Worker 沙箱未经实测安全隔离前，不允许 Agent 任意 Python/shell 代码进入 Rust 核心或取得文件系统、网络和凭据权限。
 6. **已有状态与凭据保护。** 不改写旧 journal、六报告/原始数据、版本化证据或历史 Accepted ADR；不要删除/重建本地账户/模型状态。精确忽略 `/STRATIDE_TUSHARE_TOKEN.md`；不得读取或打印 Token。只在明确授权范围内变更。
 
-## 工程流程（Owner 当前补充）
+## PR 流程
 
-- 从最新 `main` 创建独立分支/worktree；交付**完整可用的纵向功能包**，避免只交空壳或无关重构。尊重新任务的明确变更范围；若执行环境安装了 Stop That Shit Skill 可用 `$stop-that-shit change hash=allow agents=0`，否则按相同的最小变更/证据纪律实现，不把另一工具的 Skill 当作 DeepSeek 必备依赖。
-- **P0**：重复下单、资金/仓位或 Risk 破坏、密钥泄漏、未经授权云消费；**P1**：数据/研究真实性、持久化/恢复、安全边界；**P2**：一般 UI 视觉；**P3**：不会影响决策的罕见边缘情况。按真实风险强度设计测试，不付费跑 CI，不为普通 UI 编造大矩阵。
-- Sol/DS 必须给出实际 base/HEAD、变更范围、运行方式、通过和未运行的测试、关键财务/权限反证及已知限制；**Draft PR，不自合并**。
-- 普通 UI/只读展示：Sol 或 DS 自测 + ChatGPT 同 HEAD 审查；**涉及预算、云数据授权、风险/ledger 等高风险变更**：补少量针对性独立故障反证。不得把开发者自测写成独立验收或复制别人 PASS；Owner 仍须显式授权合并。
-- **历史规范差异**：Accepted [ADR-037](docs/adr/0037-observable-paper-trading-first-and-independent-review-gates.md) 原定 Terra 每 PR 复测；Owner 已在 #21 及后续明确调整为**风险分级**。本文件记录当前执行补充，**不静默篡改原 ADR**；正式新 ADR/修订另行提交决定。
-- 用简体中文写 Owner 交流、Issue 和新说明；`README.md` 中文、`README.en.md` 英文同步。代码标识/API 字段保持规范英文。保留历史证据，不为了更新状态大量删除旧报告。
+1. **实施与自测。** 从最新 `main` 创建独立分支/worktree，交付授权范围内完整可用的改动。按风险设计测试，未经授权不使用付费 CI。普通 UI 和只读展示做针对性自测即可进入审查。
+2. **提交审查。** 创建一个 Draft PR，写明实际 base/HEAD、变更范围、运行方式、通过和未运行的测试、相关财务或权限反证及已知限制。具备审查条件后，实施 Agent 可标记 Ready for review。仓库目标是所有 PR 每次推送触发 Codex 审查。以 GitHub 上对应当前 HEAD 的审查记录为准。自动审查未触发时，可请求 `@codex review`。服务不可用时，由独立 Agent 审查同一 HEAD，在 PR 记录审查者、结果和降级原因。
+3. **返修与复审。** 实施 Agent 处理每条有效发现，记录修复或有证据的判断，推送后复跑相关测试并确认新 HEAD 已复审。涉及预算、云数据授权、凭据、Risk 或 ledger 时，由独立审查 Agent 针对受影响边界补做少量故障反证并附结果。自测、自动评论和独立反证分别记录，旧 HEAD 的结论不得当作当前 HEAD 的验收。
+4. **交给 Owner 批准。** 当前 HEAD 的审查和必需检查均有结果、P0/P1 已处理后，交付 PR 链接、HEAD、验证证据和剩余风险。Owner 批准该 HEAD 后才能合并。批准后如 HEAD 变更，重新验证并取得批准。禁止 Agent 自行合并或启用自动合并。
+
+**风险分级**按影响判断。P0 包括重复下单、资金/仓位或 Risk 破坏、密钥泄漏和未经授权云消费。P1 包括数据/研究真实性、持久化/恢复或安全边界的实质回归。P2 包括一般 UI 视觉问题。P3 包括不影响决策的罕见边缘情况。按 Owner 在 #21 后明确的风险分级补做独立反证。历史 Accepted [ADR-037](docs/adr/0037-observable-paper-trading-first-and-independent-review-gates.md) 保留原文。
+
+用简体中文写 Owner 交流、Issue、PR 和新说明。`README.md` 中文与 `README.en.md` 英文同步。代码标识与 API 字段使用规范英文。保留历史证据。
+
+## Code Review Rules
+
+- **Paper、Risk 与账本。** 检查所有纸面订单是否经过现有 Risk 和单账户 ledger，金额与数量是否使用整数。对重复请求、未知结果、部分失败或重启会造成重复执行或资金、仓位偏差的改动报 P0/P1，并指出触发条件。
+- **授权、费用与隔离。** 检查任何云调用和数据外发是否在已授权范围内，Budget Gate 在并发、跨期、取消和未知账单时是否仍拒绝越权。检查凭据是否会进入 Git、前端或日志，以及不可信策略是否获得文件、网络、凭据或账本权限。审查证据限于仓库差异、已提交上下文和脱敏验证结果。
+- **数据、证据与恢复。** 检查历史数据的来源、时点、复权、验证等级是否可追溯，未知 PIT、公司行为或开盘证据是否保持 BLOCKED，模拟和记录证据是否被误报成真实结果。对可能破坏账户状态、历史证据或重启恢复的改动，要求覆盖失败路径的证据。
+
+审查意见用简体中文，标出 P0/P1、改动位置、触发条件与可观察影响。格式与机械规则交由已有检查处理。
