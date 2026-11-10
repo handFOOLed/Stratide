@@ -40,5 +40,6 @@
 - [0035 record date corporate action group attribution](0035-record-date-corporate-action-group-attribution.md)
 - [0036 owner approval for voluntary corporate actions](0036-owner-approval-for-voluntary-corporate-actions.md)
 - [0037 observable paper trading first and independent review gates](0037-observable-paper-trading-first-and-independent-review-gates.md)
+- [0038 unattended Agent review, repair and SHA-locked merge](0038-unattended-agent-review-repair-and-sha-locked-merge.md)
 
 > ADR 原文没有因文档视觉改版而修改，以保留历史决策的审计含义。
