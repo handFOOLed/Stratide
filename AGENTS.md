@@ -4,6 +4,8 @@
 
 [文档中心](docs/README.md) · [当前版本](docs/STATUS.md) · [系统架构](docs/ARCHITECTURE_OVERVIEW.md) · [使用教程](docs/USER_GUIDE.md) · [验证边界](docs/KNOWN_LIMITATIONS.md)
 
+Rust 工作区包含本地服务 `apps/stratided`、Windows 启动器 `apps/stratide-launcher` 和 `crates/` 下的核心模块。React/TypeScript Dashboard 位于 `apps/dashboard/`，研究工具位于 `research/` 和 `scripts/`。涉及运行配置或数据位置时，查阅[本机配置](config/README.md)。
+
 ## 工程协作
 
 | 角色 | 职责 |
@@ -23,7 +25,7 @@
 
 ## PR 流程
 
-1. **实施与自测。** 从最新 `main` 创建独立分支/worktree，交付授权范围内完整可用的改动。按风险设计测试，未经授权不使用付费 CI。普通 UI 和只读展示做针对性自测即可进入审查。
+1. **实施与自测。** 用 `git remote -v` 核对目标。默认从 `origin` 的最新 `main` 创建独立分支/worktree，交付授权范围内完整可用的改动，并按下方验证规则自测。
 2. **提交审查。** 创建一个 Draft PR，写明实际 base/HEAD、变更范围、运行方式、通过和未运行的测试、相关财务或权限反证及已知限制。具备审查条件后，实施 Agent 可标记 Ready for review。仓库目标是所有 PR 每次推送触发 Codex 审查。以 GitHub 上对应当前 HEAD 的审查记录为准。自动审查未触发时，可请求 `@codex review`。服务不可用时，由独立 Agent 审查同一 HEAD，在 PR 记录审查者、结果和降级原因。
 3. **返修与复审。** 实施 Agent 处理每条有效发现，记录修复或有证据的判断，推送后复跑相关测试并确认新 HEAD 已复审。涉及预算、云数据授权、凭据、Risk 或 ledger 时，由独立审查 Agent 针对受影响边界补做少量故障反证并附结果。自测、自动评论和独立反证分别记录，旧 HEAD 的结论不得当作当前 HEAD 的验收。
 4. **审查通过后合并。** 在 PR 记录当前 HEAD 的审查结论、测试、独立反证（如适用）和剩余风险。P0/P1 全部处理完毕，且当前 HEAD 的审查、所需测试和必需检查均通过后，实施 Agent 可以合并授权范围内的 PR。任务明确要求 Owner 批准时，先取得该 HEAD 的批准。HEAD 变更后重新验证、复审，并按任务要求重新取得批准。
@@ -32,7 +34,19 @@
 
 **风险分级**按影响判断。P0 包括重复下单、资金/仓位或 Risk 破坏、密钥泄漏和未经授权云消费。P1 包括数据/研究真实性、持久化/恢复或安全边界的实质回归。P2 包括一般 UI 视觉问题。P3 包括不影响决策的罕见边缘情况。按 Owner 在 #21 后明确的风险分级补做独立反证。历史 Accepted [ADR-037](docs/adr/0037-observable-paper-trading-first-and-independent-review-gates.md) 保留原文。
 
-用简体中文写 Owner 交流、Issue、PR 和新说明。`README.md` 中文与 `README.en.md` 英文同步。代码标识与 API 字段使用规范英文。保留历史证据。
+### Git 与改动范围
+
+- 默认向 `handFOOLed/Stratide` 的 `origin` 推送任务分支，PR 目标为同仓库 `main`。推送前再次核对远端与分支，首次推送使用 `git push -u origin <branch>`。经授权的任务由 Agent 完成推送和 PR，禁止直接推送 `main`。目标与任务指定不一致时，先向 Owner 核实。
+- 提交用 Conventional Commits，例如 `fix:`、`feat:`、`docs:`。每次提交聚焦一件事，标题一行，可用中文。提交钩子失败后修复并重试。改写历史、跳过钩子、强推、硬重置、清理分支或工作树、修改 Git 配置均须明确授权。保留已有的用户改动。
+- 变更依赖、CI、构建或发布入口、删除已有文件，须在任务授权范围内。运行配置与密钥通过本机配置入口管理，仓库中的示例只使用通用名称与虚构值。
+
+## 设计、验证与文档
+
+- **设计。** 改动持久化格式、新增或调整公开 API、改变跨模块信任边界前，在 Issue 或 PR 草稿写清契约、对已有数据和调用者的影响、失败恢复和验证方案。有多条合理实现路径时，记录选择依据。需要持久记录架构决策时，查阅 [ADR 索引](docs/adr/README.md)。涉及授权范围变化时先由 Owner 确认。范围内的局部修复直接实施。
+- **验证。** 按影响选择现有入口。Rust 运行 `cargo test -p <package> --locked` 并选取相关集成测试。Dashboard 按[开发说明](apps/dashboard/README.md)运行类型检查和测试。用户可见的交互用 `npm --prefix apps/dashboard run test:browser` 的本地 fixture 验证主要流程与相关边界。Python、Windows 安装或恢复场景从[工具脚本](scripts/README.md)选对应检查。`scripts/test-windows-product.ps1` 会停止本机匹配的 Stratide 进程，应在独立测试环境用新建的测试数据根运行。
+- **验证记录。** 在 PR 区分构建、类型检查、自动测试、浏览器验证和安装版验证。标明未运行的项目及原因，并标明证据来自 fixture、回放还是真实环境。优先使用隔离数据和本地模拟，未经授权不使用付费 CI。
+- **同步说明。** 行为或配置变更时更新相关[使用教程](docs/USER_GUIDE.md)或[安装手册](docs/WINDOWS_INSTALL.md)。接口或架构变更时更新对应的 [Dashboard API](docs/DASHBOARD_API.md)、[Agent API](docs/AGENT_API.md)或[系统架构](docs/ARCHITECTURE_OVERVIEW.md)。导航目标变更时同步索引。新增文档前先检查能否更新已有页面，保留历史证据。
+- **语言与注释。** 用简体中文写 Owner 交流、Issue、PR 和新说明。`README.md` 中文与 `README.en.md` 英文同步。代码标识与 API 字段使用规范英文。注释用来解释代码本身难以看出的约束和取舍。
 
 ## Code Review Rules
 
