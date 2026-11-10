@@ -2,14 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError, friendlyError } from '../lib/api';
 import { loadRuntimeStatus, runtimeAction } from '../lib/runtime';
 import type { RuntimeStatus } from '../lib/runtime';
-import { runtimeStatusPollIntervalMs } from '../lib/runtimePoll';
-import {
-  createRuntimeRefreshLocks,
-  marketSummaryFrom,
-  mergeMarketRead,
-  refreshRuntimeSnapshot,
-} from '../lib/runtimeRefresh';
-import type { MarketSummary } from '../lib/runtimeRefresh';
+import { RUNTIME_STATUS_FAST_POLL_MS, RUNTIME_STATUS_POLL_MS, runtimeStatusPollIntervalMs } from '../lib/runtimePoll';
+import { marketSummaryFrom, mergeMarketRead } from '../lib/runtimeRefresh';
+import type { MarketBackfillState, MarketStatusSnapshot, MarketSummary } from '../lib/runtimeRefresh';
 import { useDocumentVisible, useInterval } from '../lib/hooks';
 
 export type { MarketSummary };
@@ -21,101 +16,102 @@ export interface RuntimeState {
   checkedAt: number | null;
   market: MarketSummary | null;
   refresh: () => void;
+  refreshAfterBackfill: () => void;
 }
 
-/**
- * 本机后台运行状态（服务 + 依赖 + 行情补录进度）。
- * 只读：所有操作仍由“系统与诊断”页显式触发。
- * 状态轮询与行情摘要分锁：慢的 market 请求不能跳过下一次 runtime status。
- */
 export function useRuntime(): RuntimeState {
   const [status, setStatus] = useState<RuntimeStatus | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
   const [checking, setChecking] = useState(false);
   const [checkedAt, setCheckedAt] = useState<number | null>(null);
   const [market, setMarket] = useState<MarketSummary | null>(null);
-  const mounted = useRef(true);
-  const controller = useRef<AbortController | null>(null);
-  const locks = useRef(createRuntimeRefreshLocks());
-  const marketRef = useRef<MarketSummary | null>(null);
+  const statusRead = useRef<AbortController | null>(null);
+  const marketRead = useRef<AbortController | null>(null);
   const visible = useDocumentVisible();
 
-  const refresh = useCallback((silent = false) => {
-    if (locks.current.statusBusy) return;
-    controller.current?.abort();
+  const refreshStatus = useCallback(async (force = false) => {
+    if (!force && statusRead.current !== null) return;
+    statusRead.current?.abort();
     const next = new AbortController();
-    controller.current = next;
-    if (!silent) setChecking(true);
-    void refreshRuntimeSnapshot(locks.current, {
-      loadStatus: () => loadRuntimeStatus(next.signal),
-      loadMarket: async () => {
-        // backfill-state is a local file read. status opens the warehouse and
-        // can fail or sit on the server's 60s limit while a writer holds the
-        // lock. Either failure still publishes a summary so the badge cannot
-        // stay on “正在读取”.
-        try {
-          const backfill = await runtimeAction<{
-            running?: boolean;
-            progress?: { sessions?: number; sessions_ready?: number; remaining?: number } | null;
-          }>('market', { action: 'backfill-state' }, { timeoutMs: 8000, timeoutCode: 'MARKET_BACKFILL_STATE_TIMEOUT', signal: next.signal });
-          try {
-            const summary = await runtimeAction<{
-              last_successful_date?: string | null;
-              gaps?: unknown[];
-              sessions_ready?: number;
-              coverage_complete?: boolean;
-            }>('market', { action: 'status' }, { timeoutMs: 8000, timeoutCode: 'MARKET_STATUS_TIMEOUT', signal: next.signal });
-            return marketSummaryFrom(backfill, summary, null);
-          } catch (caught) {
-            if (caught instanceof ApiError && caught.code === 'ABORTED') throw caught;
-            const code = caught instanceof ApiError ? caught.code : 'MARKET_STATUS_UNAVAILABLE';
-            return marketSummaryFrom(backfill, null, code);
-          }
-        } catch (caught) {
-          if (caught instanceof ApiError && caught.code === 'ABORTED') throw caught;
-          const code = caught instanceof ApiError ? caught.code : 'MARKET_STATUS_UNAVAILABLE';
-          return marketSummaryFrom({ running: false, progress: null }, null, code);
-        }
-      },
-      onStatus: (value) => {
-        if (!mounted.current || next.signal.aborted) return;
-        setStatus(value);
-        setError(null);
-        setCheckedAt(Date.now());
+    statusRead.current = next;
+    if (force) setChecking(true);
+    try {
+      const value = await loadRuntimeStatus(next.signal);
+      if (next.signal.aborted) return;
+      setStatus(value);
+      setError(null);
+      setCheckedAt(Date.now());
+    } catch (caught) {
+      if (!next.signal.aborted) setError(friendlyError(caught));
+    } finally {
+      if (statusRead.current === next) {
+        statusRead.current = null;
         setChecking(false);
-      },
-      onStatusError: (caught: unknown) => {
-        if (!mounted.current || next.signal.aborted) return;
-        setChecking(false);
-        const failure = friendlyError(caught);
-        if (failure.code === 'ABORTED') return;
-        setError(failure);
-      },
-      onMarket: (value) => {
-        // A newer refresh aborts this controller. Drop the result even if the
-        // response already arrived, so a cancelled true cannot publish.
-        if (!mounted.current || next.signal.aborted) return;
-        const merged = mergeMarketRead(marketRef.current, value);
-        marketRef.current = merged;
-        setMarket(merged);
-      },
-      onMarketMiss: () => {
-        // ABORTED (unmount or a newer poll) keeps the last summary. A real
-        // status failure returns a summary and is aged in mergeMarketRead.
-      },
-    });
+      }
+    }
   }, []);
 
+  const refreshMarket = useCallback(async (force = false) => {
+    if (!force && marketRead.current !== null) return;
+    marketRead.current?.abort();
+    const next = new AbortController();
+    marketRead.current = next;
+    let backfill: MarketBackfillState = {};
+    try {
+      backfill = await runtimeAction<MarketBackfillState>('market', { action: 'backfill-state' }, {
+        timeoutMs: 8000, timeoutCode: 'MARKET_BACKFILL_STATE_TIMEOUT', signal: next.signal,
+      });
+      if (next.signal.aborted) return;
+      const progress = marketSummaryFrom(backfill, null);
+      if (progress.backfillRunning || progress.backfillPhase === 'FAILED') {
+        setMarket(progress);
+        return;
+      }
+      setMarket((previous) =>
+        previous === null || previous.backfillRunning || previous.backfillPhase !== progress.backfillPhase
+          ? progress
+          : previous,
+      );
+      const summary = await runtimeAction<MarketStatusSnapshot>('market', { action: 'status' }, {
+        timeoutMs: 8000, timeoutCode: 'MARKET_STATUS_TIMEOUT', signal: next.signal,
+      });
+      if (!next.signal.aborted) setMarket(marketSummaryFrom(backfill, summary));
+    } catch (caught) {
+      if (next.signal.aborted) return;
+      const code = caught instanceof ApiError ? caught.code : 'MARKET_STATUS_UNAVAILABLE';
+      const failure = marketSummaryFrom(backfill, null, code);
+      setMarket((previous) => mergeMarketRead(previous, failure));
+    } finally {
+      if (marketRead.current === next) marketRead.current = null;
+    }
+  }, []);
+
+  const refresh = useCallback(() => {
+    void refreshStatus(true);
+    void refreshMarket(true);
+  }, [refreshStatus, refreshMarket]);
+
+  const refreshAfterBackfill = useCallback(() => {
+    setMarket(marketSummaryFrom({ running: true, phase: 'QUEUED' }, null));
+    refresh();
+  }, [refresh]);
+
   useEffect(() => {
-    mounted.current = true;
     refresh();
     return () => {
-      mounted.current = false;
-      controller.current?.abort();
+      statusRead.current?.abort();
+      marketRead.current?.abort();
+      statusRead.current = null;
+      marketRead.current = null;
     };
   }, [refresh]);
 
-  useInterval(() => refresh(true), runtimeStatusPollIntervalMs(status, visible));
+  useInterval(() => void refreshStatus(), runtimeStatusPollIntervalMs(status, visible));
+  const followingBackfill = market?.backfillRunning ||
+    (market?.backfillPhase === 'VERIFYING' && !market.statusKnown && !market.statusStale);
+  useInterval(() => void refreshMarket(), visible
+    ? (followingBackfill ? RUNTIME_STATUS_FAST_POLL_MS : RUNTIME_STATUS_POLL_MS)
+    : null);
 
-  return { status, error, checking, checkedAt, market, refresh: () => refresh() };
+  return { status, error, checking, checkedAt, market, refresh, refreshAfterBackfill };
 }

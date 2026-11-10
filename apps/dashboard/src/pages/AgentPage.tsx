@@ -272,7 +272,7 @@ export function AgentPage({ agent, workspace, titleRef }: { agent: AgentState; w
     />
   );
 
-  if (agent.phase === 'locked' || agent.phase === 'loading') {
+  if (agent.phase === 'loading') {
     return (
       <>
         {header}
@@ -299,7 +299,7 @@ export function AgentPage({ agent, workspace, titleRef }: { agent: AgentState; w
               icon="alert-octagon"
               title="AI 研究服务不可用"
               description={agent.error?.message ?? '研究服务没有返回状态。'}
-              actions={<Button variant="secondary" icon="refresh" onClick={() => void agent.refresh()}>重新读取</Button>}
+              actions={<Button variant="secondary" icon="refresh" loading={agent.refreshing} onClick={() => void agent.refresh()}>重新读取</Button>}
             />
             <Diagnostics items={[{ label: '原始错误码', value: agent.error?.code ?? COMMON.notAvailable }]} />
           </CardBody>

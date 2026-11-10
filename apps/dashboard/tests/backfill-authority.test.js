@@ -330,6 +330,8 @@ test('BackfillMeter and ProgressBar render the conflict without calling it ready
     marketSummaryFrom({ running: false, progress: null }, null, 'MARKET_STATUS_TIMEOUT'),
   );
   const waiting = rendered.renderMeter(unknown);
+  assert.match(waiting, /<details class="diagnostics">/);
+  assert.match(waiting, /MARKET_STATUS_TIMEOUT/);
   assert.match(waiting, /没有百分比/);
   assert.equal(waiting.includes('aria-valuenow'), false);
   assert.equal(waiting.includes('已就绪'), false);

@@ -105,8 +105,13 @@ pub fn reply(app: &App, agent: Option<&Agent>, req: &mut Request, port: u16) -> 
             if path == "/api/agent/provider" {
                 return stratide_research::provider_setup::configure(agent, &body);
             }
-            if path == "/api/agent/provider/test" && body == json!({}) {
-                return stratide_research::provider_setup::test(agent);
+            if path == "/api/agent/provider/test" {
+                let expected = body["provider"].as_str();
+                stratide_research::ensure(body == json!({}) || expected.is_some_and(|name| body == json!({"provider": name})), "PROVIDER_REQUIRED")?;
+                return stratide_research::provider_setup::test(agent, expected);
+            }
+            if path == "/api/agent/provider/price-review" {
+                return stratide_research::provider_setup::review_price(agent, &body);
             }
             if path == "/api/agent/provider/remove" && body == json!({}) {
                 return stratide_research::provider_setup::remove(agent);
@@ -199,7 +204,13 @@ pub fn reply(app: &App, agent: Option<&Agent>, req: &mut Request, port: u16) -> 
             } else {
                 None
             };
-            return agent.store().list(before);
+            let mut list = agent.store().list(before)?;
+            if let Some(tasks) = list["tasks"].as_array_mut() {
+                for task in tasks {
+                    project_retry(agent, task);
+                }
+            }
+            return Ok(list);
         }
         if method == "POST" && path == "/api/agent/tasks" {
             // Supervised installs run the one research worker in the background
@@ -234,12 +245,18 @@ pub fn reply(app: &App, agent: Option<&Agent>, req: &mut Request, port: u16) -> 
             let parts: Vec<_> = tail.split('/').collect();
             let id = parse_id(parts[0])?;
             if method == "GET" && parts.len() == 1 {
-                return agent.store().task(id);
+                let mut task = agent.store().task(id)?;
+                project_retry(agent, &mut task);
+                return Ok(task);
             }
             if method == "POST" && parts.len() == 2 && body == json!({}) {
                 match parts[1] {
                     "cancel" => agent.store().cancel(id, now)?,
-                    "retry" => agent.store().retry(id)?,
+                    "retry" => {
+                        let task = agent.store().task(id)?;
+                        stratide_research::ensure(can_consume_retry(agent, &task), "TASK_RETRY_UNAVAILABLE_IN_BACKGROUND_MODE")?;
+                        agent.store().retry(id)?;
+                    }
                     _ => return Err("AGENT_ROUTE_NOT_FOUND".into()),
                 }
                 return agent.store().task(id);
@@ -263,6 +280,16 @@ pub fn reply(app: &App, agent: Option<&Agent>, req: &mut Request, port: u16) -> 
         ),
     }
 }
+fn can_consume_retry(agent: &Agent, task: &Value) -> bool {
+    agent.is_worker() || task["provider_id"] == stratide_research::market_research::MODEL_ID
+}
+
+fn project_retry(agent: &Agent, task: &mut Value) {
+    if !can_consume_retry(agent, task) {
+        task["retryable"] = json!(false);
+    }
+}
+
 fn parse_id(s: &str) -> stratide_research::Result<i64> {
     let id = s.parse::<i64>().map_err(|_| "TASK_ID_INVALID")?;
     stratide_research::ensure(id > 0 && id.to_string() == s, "TASK_ID_INVALID")?;

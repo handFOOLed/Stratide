@@ -163,6 +163,9 @@ impl Agent {
     pub fn is_worker(&self) -> bool {
         self.0._lock.is_some()
     }
+    pub(crate) fn uses_market_budget(&self, settings: &Settings) -> bool {
+        !self.is_worker() || settings.models.iter().any(crate::market_research::is_model)
+    }
     pub fn authorized(&self, candidate: &str) -> bool {
         let expected = self.0.owner_token.as_bytes();
         let actual = candidate.as_bytes();
@@ -227,6 +230,12 @@ impl Agent {
     pub fn status(&self, now: DateTime<Utc>) -> Result<Value> {
         let settings = self.settings()?;
         let mut result = self.store().status(&settings, now)?;
+        if self.uses_market_budget(&settings) {
+            result["market_budget_caps"] = json!({
+                "daily_limit_micro": crate::config::MARKET_DAILY_CAP_MICRO.to_string(),
+                "monthly_limit_micro": crate::config::MARKET_MONTHLY_CAP_MICRO.to_string(),
+            });
+        }
         result["dashboard_mode"] = json!(if self.0._lock.is_some() {
             "worker"
         } else {
@@ -463,7 +472,10 @@ impl Agent {
                 "RETRY_UNSAFE_OR_EXHAUSTED",
             )?;
             ensure(
-                !crate::risk_portfolio::is_input(&input) || calls.is_empty(),
+                !crate::risk_portfolio::is_input(&input)
+                    || calls.is_empty()
+                    || (crate::market_research::is_input(&input)
+                        && crate::market_research::calls_confirmed_undispatched(calls)),
                 "CLOUD_SINGLE_ATTEMPT_REQUIRED",
             )?;
             let maximum = m.cost(m.max_input_tokens, m.max_output_tokens)?;

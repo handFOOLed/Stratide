@@ -21,7 +21,7 @@ import {
   supervisorDisplayView,
 } from '../../lib/status';
 import type { StatusView } from '../../lib/status';
-import { backfillPresentation } from '../../lib/runtimeRefresh';
+import { backfillPresentation, marketSummaryFrom } from '../../lib/runtimeRefresh';
 import { runtimeAction, setSetupComplete } from '../../lib/runtime';
 import type { DependencyStatus, RuntimeStatus, WslProbeResult } from '../../lib/runtime';
 import { ApiError } from '../../lib/api';
@@ -95,6 +95,7 @@ const ACTION_REASONS: Record<string, string> = {
   WSL_DETECT_OUTPUT_INVALID: '自动检测返回了无法识别的内容，请手动填写',
   TIMESFM_CLI_MISSING: '安装包缺少本地预测组件，请重新安装 Stratide',
   RUNTIME_CONFIG_INVALID: '运行配置无效，请检查安装',
+  RUNTIME_CONFIG_WRITE_FAILED: '本机运行配置未能保存，请检查配置目录权限后重试',
   UPDATE_CHECK_MISSING: '缺少检查更新组件，请重新安装 Stratide',
   FOLDER_OPEN_FAILED: '无法打开文件夹，请稍后重试',
   PYTHON_RUNTIME_MISSING: '缺少 Python 运行时，请重新安装 Stratide',
@@ -143,6 +144,12 @@ function actionReasonText(code: string): string | null {
 
 /** 依赖状态 → 统一 5 态 + 一句人话原因 / 下一步；原始 reason 只进诊断信息。 */
 function dependencyView(key: DependencyKey, dependency: DependencyStatus): StatusView {
+  if (key === 'tushare_credential' && dependency.reason === 'CREDENTIAL_CHECK_DEFERRED') {
+    return statusView('progress', '正在检查', '正在后台检查 Tushare 访问令牌');
+  }
+  if (key === 'tushare_credential' && dependency.state === 'UNKNOWN') {
+    return statusView('error', '无法检查', dependencyReasonText(dependency) ?? '暂时无法读取 Tushare 访问令牌状态');
+  }
   if (key === 'tushare_credential' && (dependency.state === 'ERROR' || dependency.state === 'INVALID')) {
     return statusView('error', '出错', '无法读取 Tushare 访问令牌，请重新保存');
   }
@@ -274,6 +281,7 @@ export function RuntimePanel({
   const [busy, setBusy] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [secret, setSecret] = useState('');
+  const [setupOpen, setSetupOpen] = useState(false);
   const [wslForm, setWslForm] = useState({
     distribution: '',
     workspace: '',
@@ -360,10 +368,11 @@ export function RuntimePanel({
       const result = await runtimeAction<WslProbeResult>('wsl-probe');
       setWslProbe(result);
       push({
-        title: result.state === 'READY' ? '本地预测引擎正常' : '本地预测引擎需要处理',
-        description:
-          result.state === 'READY' ? undefined : (humanReasonText(result.reason) ?? '原因未记录'),
-        tone: result.state === 'READY' ? 'success' : 'danger',
+        title: result.state === 'READY' ? '本地预测引擎正常'
+          : result.state === 'BUSY' ? '本地预测引擎正在运行' : '本地预测引擎需要处理',
+        description: result.state === 'BUSY' ? '本次检查未执行，请在任务结束后重查。'
+          : result.state === 'READY' ? undefined : (humanReasonText(result.reason) ?? '原因未记录'),
+        tone: result.state === 'READY' ? 'success' : result.state === 'BUSY' ? 'info' : 'danger',
       });
       runtime.refresh();
     } catch (caught) {
@@ -380,7 +389,9 @@ export function RuntimePanel({
   };
 
   const startBackfill = () => {
-    void act('backfill', 'market', { action: 'backfill', sessions: BACKFILL_TARGET }, '历史补录已开始').then((ok) => {
+    void act('backfill', 'market', { action: 'backfill', sessions: BACKFILL_TARGET }, '已提交补录请求', async () => {
+      runtime.refreshAfterBackfill();
+    }).then((ok) => {
       if (ok) setConfirm(null);
     });
   };
@@ -544,38 +555,45 @@ export function RuntimePanel({
     wsl_probe: wslProbe === null ? null : { state: wslProbe.state, reason: wslProbe.reason },
     last_action_error: actionError,
     market_status_error: runtime.market?.statusError ?? null,
+    market_backfill_error: runtime.market?.backfillError ?? null,
     market_status_failures: runtime.market?.statusFailures ?? 0,
     market_status_stale: runtime.market?.statusStale ?? false,
   };
   const copyText = JSON.stringify(diagnosticsData, null, 2);
 
   const backfillRunning = runtime.market !== null && runtime.market.backfillRunning;
-  const backfillViewModel = backfillPresentation(runtime.market, false);
+  const backfillViewModel = backfillPresentation(
+    busy === 'backfill' ? marketSummaryFrom({ phase: 'QUEUED' }, null) : runtime.market,
+    runtime.error !== null,
+  );
   const backfillDone = backfillViewModel.complete;
 
   const renderSections = (current: RuntimeStatus) => {
-    const criticalReady = CRITICAL_DEPENDENCIES.every(
-      (key) => dependencyStatusView(key, current.dependencies[key].state, null, null).kind === 'ok',
+    const credential = current.dependencies.tushare_credential;
+    const credentialDeferred = credential.reason === 'CREDENTIAL_CHECK_DEFERRED';
+    const criticalProblem = CRITICAL_DEPENDENCIES.some((key) =>
+      !(key === 'tushare_credential' && credentialDeferred) && dependencyView(key, current.dependencies[key]).kind !== 'ok',
     );
-    const setupReady = current.setup_complete && criticalReady;
     const marketInitialized = current.dependencies.market_eod.state === 'INITIALIZED';
-    const tushareConfigured = current.dependencies.tushare_credential.state === 'CONFIGURED';
+    const tokenPlaceholder = credential.state === 'CONFIGURED' ? '已设置；输入可覆盖'
+      : credentialDeferred ? '正在检查令牌状态'
+      : credential.state === 'UNKNOWN' ? '未能读取令牌状态' : '粘贴 Tushare 访问令牌';
     const service = serviceView(health);
     const supervisor = supervisorView(current.supervisor);
     const collector = collectorView(current, backfillRunning);
     // A fresh rejected report stays on the badge. The init hint only covers
     // the case where this read did not explicitly fail warehouse verification.
     const backfillView: StatusView =
-      !marketInitialized && backfillViewModel.verification !== 'rejected'
+      !marketInitialized && runtime.market?.backfillPhase !== 'FAILED' && backfillViewModel.verification !== 'rejected'
         ? statusView('attention', '需要处理', '请先完成行情采集初始化')
         : statusView(backfillViewModel.tone, backfillViewModel.title, backfillViewModel.text);
     const backfillDisabled = busy !== null || backfillRunning || !marketInitialized;
 
     const setupContent = (
       <div className="setup-body">
-        {current.setup_complete && !criticalReady ? (
+        {current.setup_complete && criticalProblem ? (
           <Callout tone="warning" title="首次设置已标记完成，但还有组件需要处理">
-            请先处理“依赖检查”中需要处理的项；处理完成后这里会自动折叠。
+            请先处理“依赖检查”中需要处理的项。
           </Callout>
         ) : null}
         <div className="setup-token">
@@ -590,8 +608,11 @@ export function RuntimePanel({
               autoComplete="off"
               spellCheck={false}
               value={secret}
-              placeholder={tushareConfigured ? '已设置；输入可覆盖' : '粘贴 Tushare 访问令牌'}
-              onChange={(event) => setSecret(event.target.value)}
+              placeholder={tokenPlaceholder}
+              onChange={(event) => {
+                setSetupOpen(true);
+                setSecret(event.target.value);
+              }}
               data-testid="tushare-token"
             />
           </Field>
@@ -644,7 +665,8 @@ export function RuntimePanel({
         </div>
         {current.setup_complete ? null : (
           <p className="setup-note">
-            {criticalReady ? '关键组件已就绪，可以完成首次设置。' : '关键组件尚未全部就绪；现在标记完成后，本块会保持展开直到组件都正常。'}
+            {criticalProblem ? '关键组件尚未全部就绪，请查看依赖检查。'
+              : credentialDeferred ? '正在检查 Tushare 访问令牌。' : '关键组件已就绪，可以完成首次设置。'}
           </p>
         )}
       </div>
@@ -677,6 +699,9 @@ export function RuntimePanel({
                   检查状态
                 </Button>
               </div>
+              {wslProbe?.state === 'BUSY' ? (
+                <p className="setup-note">上次检查时引擎正忙，任务结束后可再次检查。</p>
+              ) : null}
               <div className="runtime-form">
                 <Field label="WSL 发行版" htmlFor="wsl-distribution">
                   <TextInput
@@ -734,10 +759,17 @@ export function RuntimePanel({
           </details>
         </section>
 
-        {setupReady ? (
+        {current.setup_complete ? (
           <section className="runtime-section">
-            <details className="runtime-advanced" data-testid="setup-block">
-              <summary>首次设置 · 已完成</summary>
+            <details
+              className="runtime-advanced"
+              data-testid="setup-block"
+              open={criticalProblem || setupOpen}
+              onToggle={(event) => {
+                if (!criticalProblem) setSetupOpen(event.currentTarget.open);
+              }}
+            >
+              <summary>首次设置 · {criticalProblem ? '需要处理' : '已标记完成'}</summary>
               {setupContent}
             </details>
           </section>
@@ -772,11 +804,6 @@ export function RuntimePanel({
             <div className="backfill__meta">
               {runtime.market !== null && runtime.market.lastSuccessfulDate !== null ? (
                 <span>最近更新：{formatDay(runtime.market.lastSuccessfulDate)}</span>
-              ) : null}
-              {backfillViewModel.diagnosticCode !== null ? (
-                <span className="backfill-diagnostic" data-testid="backfill-diagnostic-code">
-                  <code className="backfill-diagnostic__code">{backfillViewModel.diagnosticCode}</code>
-                </span>
               ) : null}
             </div>
             <div className="runtime-actions">

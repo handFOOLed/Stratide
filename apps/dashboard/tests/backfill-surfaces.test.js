@@ -75,7 +75,7 @@ buildSync({
         );
       }
 
-      export function mountRuntime(holder) {
+      export function mountRuntime(holder, settings) {
         function Probe() {
           holder.current = useRuntime();
           const market = holder.current.market;
@@ -84,7 +84,7 @@ buildSync({
               ? null
               : { complete: market.backfillComplete, verification: market.verification },
           );
-          return null;
+          return settings ? settingsNode({ ...settings, runtime: holder.current }) : null;
         }
         return mount(createElement(Probe));
       }
@@ -287,6 +287,39 @@ function backfillText(host) {
   return block.textContent;
 }
 
+test('a deferred credential check does not open setup or remount an edited token field', () => {
+  const state = runtimeState(null);
+  const light = {
+    ...runtimeStatus,
+    status_refresh: 'light',
+    dependencies: {
+      ...runtimeStatus.dependencies,
+      tushare_credential: { state: 'UNKNOWN', reason: 'CREDENTIAL_CHECK_DEFERRED' },
+    },
+  };
+  const view = ui.mount(ui.settingsNode({ health, runtime: state, paper, agent }));
+  const setup = view.host.querySelector('[data-testid="setup-block"]');
+  assert.equal(setup.open, false);
+  view.render(ui.settingsNode({ health, runtime: { ...state, status: light }, paper, agent }));
+  assert.ok(view.host.querySelector('[data-testid="setup-block"]') === setup, 'setup was replaced on a light snapshot');
+  assert.equal(setup.open, false);
+  const token = setup.querySelector('input');
+  setup.open = true;
+  ui.act(() => setup.dispatchEvent(new window.Event('toggle')));
+  token.focus();
+  view.render(ui.settingsNode({ health, runtime: state, paper, agent }));
+  assert.equal(setup.open, true);
+  assert.equal(document.activeElement, token);
+  setup.open = false;
+  ui.act(() => setup.dispatchEvent(new window.Event('toggle')));
+  const missing = { ...light, status_refresh: undefined,
+    dependencies: { ...light.dependencies, tushare_credential: dep('MISSING') } };
+  view.render(ui.settingsNode({ health, runtime: { ...state, status: missing }, paper, agent }));
+  assert.equal(setup.open, true);
+  assert.match(token.placeholder, /粘贴/);
+  view.unmount();
+});
+
 test('settings panel renders 84/84 false as unverified, then true, then a failed read', () => {
   const rejected = marketSummaryFrom(fullProgress, report(false));
   const view = ui.mount(ui.settingsNode({ health, runtime: runtimeState(rejected), paper, agent }));
@@ -402,6 +435,83 @@ test('a verified checklist hides, a later false brings it back, and recovery hid
   assert.equal(done.host.textContent.includes('历史行情已就绪'), false);
   assert.equal(storageFlag(), '1');
   done.unmount();
+});
+
+test('starting backfill keeps setup closed and publishes progress through slow warehouse reads', async () => {
+  const envelope = (data) => ({ ok: true, status: 200, json: async () => ({ api_version: 1, data }) });
+  const pending = [];
+  const timers = new Map();
+  const { setInterval, clearInterval } = window;
+  let timer = 0;
+  let statusReads = 0;
+  let phase = 'IDLE';
+  window.setInterval = (fn, delay) => { timers.set(++timer, { fn, delay }); return timer; };
+  window.clearInterval = (id) => timers.delete(id);
+  const light = {
+    ...runtimeStatus,
+    status_refresh: 'light',
+    dependencies: {
+      ...runtimeStatus.dependencies,
+      tushare_credential: { state: 'UNKNOWN', reason: 'CREDENTIAL_CHECK_DEFERRED' },
+    },
+  };
+  globalThis.fetch = async (url, init) => {
+    if (url === '/api/runtime/status') {
+      statusReads += 1;
+      return envelope(phase === 'IDLE' ? runtimeStatus : light);
+    }
+    const { action } = JSON.parse(init.body);
+    if (action === 'backfill') {
+      phase = 'QUEUED';
+      return envelope({ state: 'QUEUED' });
+    }
+    if (action === 'backfill-state') {
+      return envelope({
+        phase,
+        running: ['QUEUED', 'RUNNING'].includes(phase),
+        progress: phase === 'RUNNING' ? { sessions_ready: 30, remaining: 54 } : null,
+      });
+    }
+    assert.equal(action, 'status');
+    if (phase === 'IDLE') return envelope(report(false, 0));
+    return new Promise((resolve) => pending.push({ resolve, signal: init.signal }));
+  };
+  const holder = { current: null, seen: [] };
+  const view = ui.mountRuntime(holder, { health, paper, agent });
+  const tick = async () => ui.act(async () => {
+    for (const entry of [...timers.values()]) if (entry.delay === 2000) entry.fn();
+  });
+  try {
+    await ui.act(async () => {});
+    const setup = view.host.querySelector('[data-testid="setup-block"]');
+    await ui.act(async () => view.host.querySelector('[data-testid="backfill-start"]').click());
+    assert.match(backfillText(view.host), /启动中/);
+    assert.equal(setup.open, false);
+
+    phase = 'RUNNING';
+    await tick();
+    assert.match(backfillText(view.host), /进行中/);
+    assert.match(backfillText(view.host), /30\/84/);
+    assert.equal(pending.length, 0, 'do not open the warehouse while the batch holds the writer lock');
+
+    phase = 'VERIFYING';
+    await tick();
+    assert.match(backfillText(view.host), /待校验/);
+    assert.equal(pending.length, 1);
+    const before = statusReads;
+    await tick();
+    await tick();
+    assert.equal(statusReads, before + 2);
+    assert.equal(pending.length, 1);
+    assert.equal(pending[0].signal.aborted, false);
+    await ui.act(async () => pending[0].resolve(envelope(report(true))));
+    assert.match(backfillText(view.host), /已完成/);
+    assert.equal(setup.open, false);
+  } finally {
+    view.unmount();
+    window.setInterval = setInterval;
+    window.clearInterval = clearInterval;
+  }
 });
 
 test('a cancelled market poll cannot publish a stale true over a later false', async () => {

@@ -4,6 +4,8 @@ use std::{collections::BTreeSet, fs, path::Path};
 
 pub const PURPOSE: &str = "paper_research_v1";
 pub const SCOPES: [&str; 3] = ["owner_task", "paper_summary_v1", "historical_summary_v1"];
+pub const MARKET_DAILY_CAP_MICRO: i64 = 5_000_000;
+pub const MARKET_MONTHLY_CAP_MICRO: i64 = 100_000_000;
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -235,8 +237,8 @@ impl Settings {
             budget: Some(Budget {
                 currency: "CNY".into(),
                 timezone: "Asia/Shanghai".into(),
-                daily_limit_micro: 5_000_000,
-                monthly_limit_micro: 100_000_000,
+                daily_limit_micro: MARKET_DAILY_CAP_MICRO,
+                monthly_limit_micro: MARKET_MONTHLY_CAP_MICRO,
             }),
             ..Self::default()
         }

@@ -132,14 +132,6 @@ impl Layout {
         let _ = std::fs::remove_file(self.stop_path());
     }
 
-    pub fn watch_restart_path(&self) -> PathBuf {
-        self.runtime.join("watch-restart.request")
-    }
-
-    pub fn clear_watch_restart(&self) {
-        let _ = std::fs::remove_file(self.watch_restart_path());
-    }
-
     /// A per-install secret used only by local runtime control endpoints and
     /// the desktop launcher. Never placed in logs, config or installer.
     pub fn runtime_token(&self) -> Result<String, String> {

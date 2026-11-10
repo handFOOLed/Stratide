@@ -220,6 +220,50 @@ def freeze_cpu(market, days, snapshots, sources, selected, as_of, batch, replace
     return plan
 
 
+def finish_fusion(day, run, task):
+    run["fusion_task_id"] = task["id"]
+    j.require(task["status"] == "completed", task["reason"])
+    run["state"] = "FUSION_DONE"
+    if "FUSION_DONE" not in run["events"]:
+        run["events"].append("FUSION_DONE")
+    save(day, run)
+    registry = c.Registry("market-" + day, create=True)
+    with registry.locked():
+        export = registry.root / "market-task.json"
+        c.write(export, task)
+        registration = registry.register(None, export)
+    run.update(state="CANDIDATE_FROZEN", registration_sha256=registration["registration_sha256"],
+               candidate_sha256=rp.digest(task["result"]["research"]["risk_portfolio"]["portfolio"]),
+               cloud_status="FUSION_DONE", reason=None)
+    run["events"].append("CANDIDATE_FROZEN")
+    run.pop("retry_pending", None)
+    save(day, run)
+    return run
+
+
+def resume_fusion(run):
+    day = run["source_day"]
+    task_id = run["fusion_task_id"]
+    if not run.get("retry_pending"):
+        # An older Dashboard may already have queued the same safe task.
+        run["retry_pending"] = True
+        save(day, run)
+    try:
+        task = bridge("once", dict(source_day=day, resume_task_id=int(task_id)))
+        j.require(task["id"] == task_id, "MARKET_RETRY_RUN_UNAVAILABLE")
+        if task["status"] == "completed":
+            return finish_fusion(day, run, task)
+        run.pop("retry_pending", None)
+        run.update(state="REJECTED", reason=task["reason"], cloud_status="CLOUD_RESEARCH_BLOCKED")
+        save(day, run)
+        return run
+    except Exception as error:
+        # Keep the intent across worker-lock contention and process death.
+        # The bridge recovers the same task and retains any dispatch marker.
+        reason = str(error) if isinstance(error, j.Rejected) else "MARKET_RESEARCH_LOCAL_FAILURE"
+        return dict(run, state="BLOCKED", reason=reason)
+
+
 def once(market):
     """Called only by the original market once/watch loop or explicit Owner CLI."""
     with database() as db:
@@ -228,6 +272,26 @@ def once(market):
         return dict(state="DISABLED", **rp.SAFE)
     # Cross-process OS exclusion releases after a crash, unlike expiring guesses.
     with d.writer(Path(rp.binding()["agent_dir"]) / "market-research.lock"):
+        with database() as db:
+            config = get(db, CONFIG)
+            pending = None
+            if config and config["automatic_timesfm"] and config["automatic_deepseek"] and not get(db, "paused"):
+                pending = db.execute("""
+                    SELECT m.value FROM tasks t JOIN meta m
+                    ON m.key='market_research_run:' || substr(t.trigger_key, length(?) + 1)
+                    WHERE t.provider_id='market-deepseek-fusion'
+                    AND CAST(t.id AS TEXT)=json_extract(m.value, '$.fusion_task_id')
+                    AND (json_extract(m.value, '$.retry_pending')=1
+                        OR (json_extract(m.value, '$.state')='REJECTED'
+                            AND t.status='queued' AND t.reason='OWNER_SAFE_RETRY'
+                            AND NOT EXISTS (SELECT 1 FROM calls WHERE task_id=t.id
+                                AND (state!='no_charge' OR COALESCE(reason,'')!='RESTART_BEFORE_DISPATCH'))))
+                    ORDER BY t.id LIMIT 1
+                """, (POLICY + ":",)).fetchone()
+        if pending:
+            return resume_fusion(j.loads(pending[0]))
+        if config is None or not config["automatic_timesfm"]:
+            return dict(state="DISABLED", **rp.SAFE)
         status = market.report()
         latest = status["latest"]
         if latest is None:
@@ -308,26 +372,8 @@ def once(market):
                 run["reason"] = "AUTOMATIC_CLOUD_DISABLED"
                 save(day, run)
                 return run
-            task = bridge("once", dict(source_day=day))
-            run["fusion_task_id"] = task["id"]
-            j.require(task["status"] == "completed", task["reason"])
-            run["state"] = "FUSION_DONE"
-            run["events"].append("FUSION_DONE")
-            save(day, run)
-            registry = c.Registry("market-" + day, create=True)
-            with registry.locked():
-                export = registry.root / "market-task.json"
-                c.write(export, task)
-                registration = registry.register(None, export)
-            run.update(state="CANDIDATE_FROZEN", registration_sha256=registration["registration_sha256"],
-                       candidate_sha256=rp.digest(task["result"]["research"]["risk_portfolio"]["portfolio"]),
-                       cloud_status="FUSION_DONE", reason=None)
-            run["events"].append("CANDIDATE_FROZEN")
-            save(day, run)
-            return run
+            return finish_fusion(day, run, bridge("once", dict(source_day=day)))
         except Exception as error:
-            import traceback
-            traceback.print_exc(file=sys.stderr)
             known = isinstance(error, (j.Rejected, c.Rejected, m.Error, timesfm_model.Rejected))
             code = str(error) if known else "MARKET_RESEARCH_LOCAL_FAILURE"
             # A failed/unknown paid task is terminal. A readiness/grant block can
@@ -340,9 +386,7 @@ def once(market):
                 run["state"] = "BLOCKED"
             run.update(reason=code, cloud_status="CLOUD_RESEARCH_BLOCKED")
             if not known:
-                # Bounded local diagnostic for the dashboard; the raw exception text
-                # stays local and is never sent to a cloud provider.
-                run["local_error"] = dict(type=type(error).__name__, message=str(error)[:300])
+                run["local_error"] = dict(type=type(error).__name__)
             if isinstance(code, str) and code.startswith(
                     ("TIMESFM_WSL_", "WORKER_", "MARKET_RESEARCH_LOCAL_FAILURE")):
                 run["blocked_at"] = m.h.now()

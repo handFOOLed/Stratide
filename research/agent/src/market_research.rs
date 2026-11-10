@@ -183,7 +183,7 @@ pub fn is_input(i: &InputSummary) -> bool {
 fn credential_config(c: &Connection) -> Result<ds::Config> {
     // Reuse only the existing provider/key/price configuration. Its old grant is
     // never a real-data permission. The independent Scope above is mandatory.
-    let cfg: ds::Config = get(c, "local_timesfm_fusion_config_v1")?
+    let cfg = crate::provider_setup::market_config(c)?
         .ok_or("MARKET_PROVIDER_CONFIGURATION_REQUIRED")?;
     let mut check = cfg.clone();
     check.grant_version = "deepseek-synthetic-grant-v1".into();
@@ -235,13 +235,7 @@ pub fn authorize(m: &Model, scopes: &[String], budget: Option<&Budget>) -> Resul
         "MARKET_RESEARCH_SCOPE_INVALID",
     )?;
     let b = budget.ok_or("BUDGET_UNCONFIGURED")?;
-    ensure(
-        b.currency == "CNY"
-            && b.timezone == "Asia/Shanghai"
-            && b.daily_limit_micro <= 5_000_000
-            && b.monthly_limit_micro <= 100_000_000,
-        "MARKET_SHARED_BUDGET_CAP_REQUIRED",
-    )?;
+    validate_budget(b)?;
     let mut shared = m.clone();
     shared.id = ds::ID.into();
     ds::authorize(&shared, b)?;
@@ -249,6 +243,16 @@ pub fn authorize(m: &Model, scopes: &[String], budget: Option<&Budget>) -> Resul
         m.cost(m.max_input_tokens, m.max_output_tokens)?
             <= m.cloud.as_ref().expect("cloud").max_call_micro,
         "PRICE_UNBOUNDED",
+    )
+}
+
+pub(crate) fn validate_budget(budget: &Budget) -> Result<()> {
+    ensure(
+        budget.currency == "CNY"
+            && budget.timezone == "Asia/Shanghai"
+            && budget.daily_limit_micro <= crate::config::MARKET_DAILY_CAP_MICRO
+            && budget.monthly_limit_micro <= crate::config::MARKET_MONTHLY_CAP_MICRO,
+        "MARKET_SHARED_BUDGET_CAP_REQUIRED",
     )
 }
 
@@ -333,8 +337,10 @@ pub fn control(agent: &Agent, action: &str, value: Value) -> Result<Value> {
 }
 pub fn install_model(agent: &Agent) -> Result<Value> {
     let binding = crate::risk_binding::read()?;
-    binding.verify(&agent.store().connect()?)?;
-    let cfg = credential_config(&agent.store().connect()?)?;
+    let mut c = agent.store().connect()?;
+    let tx = c.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+    binding.verify(&tx)?;
+    let cfg = credential_config(&tx)?;
     let mut settings = Settings::load(&binding.settings_path)?;
     let m = model(&cfg);
     authorize(
@@ -361,6 +367,7 @@ pub fn install_model(agent: &Agent) -> Result<Value> {
     file.sync_all().map_err(|_| "MARKET_CONFIG_WRITE")?;
     drop(file);
     std::fs::rename(pending, &binding.settings_path).map_err(|_| "MARKET_CONFIG_WRITE")?;
+    tx.commit()?;
     Ok(json!({"state":"MODEL_INSTALLED","automatic_research":false,"real_egress":false}))
 }
 pub fn status(agent: &Agent) -> Result<Value> {
@@ -448,6 +455,38 @@ fn run(c: &Connection, day: &str) -> Result<Value> {
     )?;
     Ok(v)
 }
+
+pub(crate) fn retry_run(c: &Connection, id: i64) -> Result<(String, Value)> {
+    let trigger: Option<String> = c.query_row(
+        "SELECT trigger_key FROM tasks WHERE id=?1 AND provider_id=?2",
+        params![id, MODEL_ID],
+        |row| row.get(0),
+    )?;
+    let day = trigger.as_deref().and_then(|key| key.strip_prefix("market-research-v1:"))
+        .ok_or("MARKET_RETRY_RUN_UNAVAILABLE")?;
+    let run = run(c, day).map_err(|_| "MARKET_RETRY_RUN_UNAVAILABLE")?;
+    ensure(
+        run["state"] == "REJECTED" && run["fusion_task_id"] == id.to_string(),
+        "MARKET_RETRY_RUN_UNAVAILABLE",
+    )?;
+    Ok((day.to_string(), run))
+}
+
+pub(crate) fn record_retry(c: &Connection, id: i64) -> Result<()> {
+    let (day, mut run) = retry_run(c, id)?;
+    let config: Config = get(c, CONFIG)?.ok_or("MARKET_RESEARCH_DISABLED")?;
+    config.validate()?;
+    ensure(config.automatic_timesfm && config.automatic_deepseek, "MARKET_RESEARCH_DISABLED")?;
+    ensure(get::<bool>(c, "paused")? == Some(false), "OWNER_PAUSED")?;
+    run["retry_pending"] = json!(true);
+    set(c, &format!("market_research_run:{day}"), &run)
+}
+
+pub(crate) fn calls_confirmed_undispatched(calls: &[Value]) -> bool {
+    calls.iter().all(|call| call["state"] == "no_charge"
+        && call["reason"] == "RESTART_BEFORE_DISPATCH")
+}
+
 fn parent(c: &Connection, ctx: &Context) -> Result<(cpu::Plan, Value)> {
     let r = run(c, &ctx.source_day)?;
     ensure(
@@ -682,7 +721,7 @@ pub fn preview(agent: &Agent, day: &str) -> Result<Value> {
         "currency":"CNY","budget":crate::budget::view(&c,settings.budget.as_ref(),Utc::now())?,"network_calls":0,"key_content_read":false}),
     )
 }
-pub fn execute(agent: &Agent, day: &str) -> Result<Value> {
+pub fn execute(agent: &Agent, day: &str, resume_id: Option<i64>) -> Result<Value> {
     let c = agent.store().connect()?;
     crate::risk_binding::read()?.verify(&c)?;
     let trigger = format!("{POLICY}:{day}");
@@ -693,6 +732,14 @@ pub fn execute(agent: &Agent, day: &str) -> Result<Value> {
             |r| r.get(0),
         )
         .optional()?;
+    if let Some(id) = resume_id {
+        ensure(prior == Some(id), "MARKET_RETRY_RUN_UNAVAILABLE")?;
+        let run = run(&c, day)?;
+        ensure(
+            run["fusion_task_id"] == id.to_string() && run["retry_pending"] == true,
+            "MARKET_RETRY_RUN_UNAVAILABLE",
+        )?;
+    }
     let id = match prior {
         Some(id) => id,
         None => {
@@ -1017,7 +1064,11 @@ mod tests {
                 Some(&b.settings_path),
                 crate::local_fusion::blank(),
             )?;
-            execute(&agent, v["source_day"].as_str().unwrap())
+            execute(
+                &agent,
+                v["source_day"].as_str().unwrap(),
+                v["resume_task_id"].as_i64(),
+            )
         })();
         println!(
             "MARKET_RESULT={}",

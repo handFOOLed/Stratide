@@ -171,25 +171,33 @@ def _wsl_command(settings, mode):
 
 def _wsl_execute(command, raw, timeout):
     try:
-        result = subprocess.run(command, input=raw, capture_output=True, timeout=timeout)
+        return communicate_bounded(command, raw, timeout=timeout, heartbeat=True, decode=_wsl_response)
     except subprocess.TimeoutExpired:
         raise Rejected("TIMESFM_WSL_TIMEOUT") from None
     except (OSError, subprocess.SubprocessError):
         raise Rejected("TIMESFM_WSL_UNAVAILABLE") from None
-    if result.returncode in (126, 127):
+    except Rejected as error:
+        if str(error) == "WORKER_TIMEOUT":
+            raise Rejected("TIMESFM_WSL_TIMEOUT") from None
+        if str(error) == "WORKER_OUTPUT_LIMIT":
+            raise Rejected("TIMESFM_WSL_OUTPUT_LIMIT") from None
+        raise
+
+
+def _wsl_response(code, stdout):
+    if code in (126, 127):
         raise Rejected("TIMESFM_WSL_VENV_MISSING")
-    require(len(result.stdout) <= MAX_OUTPUT + 4096, "TIMESFM_WSL_OUTPUT_LIMIT")
-    require(bool(result.stdout.strip()), "TIMESFM_WSL_BRIDGE_FAILED")
+    require(bool(stdout.strip()), "TIMESFM_WSL_BRIDGE_FAILED")
     try:
-        value = loads(result.stdout)
+        value = loads(stdout)
     except Exception:
         raise Rejected("TIMESFM_WSL_PROTOCOL_INVALID") from None
     require(isinstance(value, dict), "TIMESFM_WSL_PROTOCOL_INVALID")
-    if result.returncode != 0:
-        code = value.get("error_code")
-        require(isinstance(code, str) and re.fullmatch(r"[A-Z][A-Z0-9_]{0,100}", code) is not None,
+    if code != 0:
+        reason = value.get("error_code")
+        require(isinstance(reason, str) and re.fullmatch(r"[A-Z][A-Z0-9_]{0,100}", reason) is not None,
                 "TIMESFM_WSL_BRIDGE_FAILED")
-        raise Rejected(code)
+        raise Rejected(reason)
     return value
 
 
@@ -306,7 +314,8 @@ def stop():
     return dict(state="STOPPED", billing="LOCAL_NO_BILLING")
 
 
-def communicate_bounded(argv, raw, *, timeout=TIMEOUT + 15, env=None, cleanup=None, heartbeat=False, on_spawn=None):
+def communicate_bounded(argv, raw, *, timeout=TIMEOUT + 15, env=None, cleanup=None,
+                        heartbeat=False, on_spawn=None, decode=None):
     """Drain both pipes with bounded storage; kill and reap before returning failure."""
     require(len(raw) <= MAX_INPUT, "WORKER_INPUT_LIMIT")
     process = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -341,7 +350,8 @@ def communicate_bounded(argv, raw, *, timeout=TIMEOUT + 15, env=None, cleanup=No
             process.stdin.close()
         except (BrokenPipeError, OSError):
             pass
-    threads = [threading.Thread(target=reader, args=(process.stdout, True, MAX_OUTPUT), daemon=True),
+    output_limit = MAX_OUTPUT + 4096 if decode is not None else MAX_OUTPUT
+    threads = [threading.Thread(target=reader, args=(process.stdout, True, output_limit), daemon=True),
                threading.Thread(target=reader, args=(process.stderr, False, 16384), daemon=True),
                threading.Thread(target=writer, daemon=True)]
     for thread in threads:
@@ -356,6 +366,8 @@ def communicate_bounded(argv, raw, *, timeout=TIMEOUT + 15, env=None, cleanup=No
             thread.join(timeout=2)
         require(not any(t.is_alive() for t in threads), "WORKER_ORPHAN_PIPE")
         require(not failed.is_set(), "WORKER_OUTPUT_LIMIT")
+        if decode is not None:
+            return decode(process.returncode, out)
         if process.returncode != 0 and not out:
             raise Rejected("WORKER_KILLED_OR_OOM" if process.returncode in (-9,137) else "WORKER_EXIT_FAILED")
         value = loads(out)

@@ -112,6 +112,8 @@ pub fn text(code: &str) -> Option<&'static str> {
         "CATALOG_SCOPE_NOT_VERIFIED" => "证券目录范围尚未核验",
         "SOURCE_NOT_AVAILABLE_AT_DECISION" => "数据在决策时点尚不可用",
         "MARKET_RESEARCH_DISABLED" => "全市场自动研究已关闭",
+        "DEEPSEEK_PRICE_REVIEW_REQUIRED" => "请在 AI 服务设置确认 DeepSeek 价格",
+        "DEEPSEEK_PRICE_EXPIRED_REFRESH_FROZEN_CONFIG" => "DeepSeek 价格审核已过期，请在 AI 服务设置重新确认",
         "MARKET_PARENT_BINDING" => "研究输入与本地预测结果不一致，云端研究已停止",
         "MARKET_RUN_CHANGED" => "研究输入在运行期间发生变化，本轮研究已停止",
         "MARKET_RESEARCH_PLAN_CHANGED" => "本地预测计划已变化，正在重新准备研究",

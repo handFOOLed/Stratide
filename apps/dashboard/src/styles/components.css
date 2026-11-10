@@ -2489,10 +2489,6 @@ a.health-bar__item:hover { background: var(--surface-hover); }
   font-size: var(--fs-xs);
   line-height: var(--lh-base);
 }
-.checklist__desc .backfill-diagnostic__code {
-  display: block;
-  margin-top: 2px;
-}
 .backfill-meter__text,
 .backfill-meter__percent,
 .backfill-meter__count {

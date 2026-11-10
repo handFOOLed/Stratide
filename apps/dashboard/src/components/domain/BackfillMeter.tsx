@@ -26,7 +26,12 @@ export function BackfillMeter({
         tone={view.complete ? 'default' : 'warning'}
         label={view.complete ? '历史补录已校验' : '历史补录下载进度'}
       />
-      {view.diagnosticCode ? <code className="backfill-diagnostic__code">{view.diagnosticCode}</code> : null}
+      {view.diagnosticCode ? (
+        <details className="diagnostics">
+          <summary className="diagnostics__summary">补录诊断</summary>
+          <div className="diagnostics__body"><code>{view.diagnosticCode}</code></div>
+        </details>
+      ) : null}
     </div>
   );
 }

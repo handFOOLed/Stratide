@@ -19,8 +19,10 @@ const BUDGET_ERROR_TEXT: Record<string, string> = {
   BUDGET_BELOW_COMMITTED: '预算已变化：新上限低于已结算或未结预留的费用，请重新确认后再保存。',
   BUDGET_INPUT_INVALID: '预算金额格式不正确，请检查每日与每月上限。',
   BUDGET_CONFLICT_REREAD: '预算已在别处修改，请重新读取后再试。',
+  BUDGET_SAVE_RESULT_UNKNOWN: '额度文件已写入，审计记录未能确认。请核对重新读取的额度。',
   BUDGET_CONFIG_INVALID: '本机研究配置不可读或写入失败，请检查本机研究目录后重试。',
   BUDGET_CURRENCY_TIMEZONE_IMMUTABLE: '币种与时区在首次设置后不能修改。',
+  MARKET_SHARED_BUDGET_CAP_REQUIRED: '全市场研究使用人民币和上海时区，日上限最多 ¥5.00，月上限最多 ¥100.00。',
   AGENT_STORAGE_UNAVAILABLE: '本机研究配置保存失败，请检查本机目录写入权限。',
   OWNER_TOKEN_REQUIRED: '本机会话已失效，请重新打开页面。',
 };
@@ -85,17 +87,25 @@ export function BudgetEditor({
   const timezone = configuredBudget === null ? 'Asia/Shanghai' : configuredBudget.timezone;
   const currencyPrefix = currency === 'CNY' ? '¥' : currency;
   const amountHint = currency === 'CNY' ? '金额以元输入，最多两位小数。' : '金额以币种单位输入，最多两位小数。';
+  const caps = agent.status?.market_budget_caps;
+  const incompatibleIdentity = caps !== undefined && (currency !== 'CNY' || timezone !== 'Asia/Shanghai');
 
   const dailyMicro = inputToMicro(dailyInput);
   const monthlyMicro = inputToMicro(monthlyInput);
   const dailyValue = dailyMicro === null ? null : BigInt(dailyMicro);
   const monthlyValue = monthlyMicro === null ? null : BigInt(monthlyMicro);
+  const exceedsCap = caps !== undefined && (
+    (dailyValue !== null && dailyValue > BigInt(caps.daily_limit_micro)) ||
+    (monthlyValue !== null && monthlyValue > BigInt(caps.monthly_limit_micro))
+  );
   const formValid =
     dailyValue !== null &&
     monthlyValue !== null &&
     dailyValue > 0n &&
     monthlyValue > 0n &&
-    dailyValue <= monthlyValue;
+    dailyValue <= monthlyValue &&
+    !exceedsCap &&
+    !incompatibleIdentity;
 
   const dailyCommitted =
     configuredBudget === null ? null : committedMicro(configuredBudget.daily_settled_micro, configuredBudget.reserved_micro);
@@ -108,11 +118,15 @@ export function BudgetEditor({
   const requiresConfirm = dailyBelow || monthlyBelow;
 
   let validationMessage: string | null = null;
-  if (dirty) {
+  if (incompatibleIdentity) {
+    validationMessage = BUDGET_ERROR_TEXT.MARKET_SHARED_BUDGET_CAP_REQUIRED;
+  } else if (dirty) {
     if (dailyInput.trim() === '' || monthlyInput.trim() === '') {
       validationMessage = '请填写每日上限与每月上限。';
     } else if (dailyValue === null || monthlyValue === null || dailyValue <= 0n || monthlyValue <= 0n) {
       validationMessage = '请输入大于 0 的金额，最多两位小数。';
+    } else if (exceedsCap) {
+      validationMessage = BUDGET_ERROR_TEXT.MARKET_SHARED_BUDGET_CAP_REQUIRED;
     } else if (dailyValue > monthlyValue) {
       validationMessage = '每日上限不能高于每月上限。';
     }
@@ -149,19 +163,19 @@ export function BudgetEditor({
         request.currency = currency;
         request.timezone = timezone;
       }
-      await updateAgentBudget(agent.token ?? 'local', request);
+      const saved = await updateAgentBudget(agent.token ?? 'local', request);
+      agent.applyBudget(saved);
       toast.push({
         title: '预算已更新',
-        description: '每日与每月上限已保存，新的研究按新上限执行。',
+        description: '每日与每月上限已保存。额度不足以预留单次费用时，付费调用会等待可用额度。',
         tone: 'success',
       });
       setOpen(false);
-      await agent.refresh({ silent: true });
     } catch (caught) {
       const failure = friendlyError(caught);
       setError(failure);
-      if (failure.code === 'BUDGET_BELOW_COMMITTED' || failure.code === 'BUDGET_CONFLICT_REREAD') {
-        void agent.refresh({ silent: true });
+      if (['BUDGET_BELOW_COMMITTED', 'BUDGET_CONFLICT_REREAD', 'BUDGET_SAVE_RESULT_UNKNOWN'].includes(failure.code)) {
+        void agent.refresh();
       }
     } finally {
       setSubmitting(false);
@@ -223,7 +237,7 @@ export function BudgetEditor({
           }}
         >
           <div className="budget-editor__grid">
-            <Field label="每日上限" htmlFor="budget-daily" hint={amountHint}>
+            <Field label="每日上限" htmlFor="budget-daily" hint={caps === undefined ? amountHint : '¥0.01 至 ¥' + microToInput(caps.daily_limit_micro)}>
               <div className={'budget-input' + (currency === 'CNY' ? '' : ' budget-input--code')}>
                 <span className="budget-input__prefix" aria-hidden="true">{currencyPrefix}</span>
                 <TextInput
@@ -243,7 +257,7 @@ export function BudgetEditor({
                 />
               </div>
             </Field>
-            <Field label="每月上限" htmlFor="budget-monthly" hint={amountHint}>
+            <Field label="每月上限" htmlFor="budget-monthly" hint={caps === undefined ? amountHint : '¥0.01 至 ¥' + microToInput(caps.monthly_limit_micro)}>
               <div className={'budget-input' + (currency === 'CNY' ? '' : ' budget-input--code')}>
                 <span className="budget-input__prefix" aria-hidden="true">{currencyPrefix}</span>
                 <TextInput
@@ -297,7 +311,7 @@ export function BudgetEditor({
           ) : null}
 
           {error === null ? null : (
-            <Callout tone="danger" title="预算未更新" role="alert">
+            <Callout tone="danger" title={error.code === 'BUDGET_SAVE_RESULT_UNKNOWN' ? '预算保存待核对' : '预算未更新'} role="alert">
               {budgetErrorText(error)}
               <Diagnostics
                 items={[

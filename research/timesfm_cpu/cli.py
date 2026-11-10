@@ -272,8 +272,8 @@ def main():
             out = dict(state="READY", wsl=found) if found else dict(state="NOT_FOUND")
         elif args.command == "preflight":
             manifest = model_manifest()
-            runtime.preflight(2)
             with runtime.lock(state_root()/"worker.lock"):
+                runtime.preflight(2)
                 probe = runtime.run(b"probe")
             out = dict(state="READY", manifest_sha256=manifest["manifest_sha256"],
                        model_revision=manifest["model_revision"],

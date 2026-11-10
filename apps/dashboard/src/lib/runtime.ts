@@ -177,7 +177,7 @@ export function shanghaiToday(): string {
 }
 
 export interface WslProbeResult {
-  state: 'READY' | 'BLOCKED';
+  state: 'READY' | 'BUSY' | 'BLOCKED';
   reason: string | null;
   probe: Record<string, unknown>;
 }

@@ -53,6 +53,32 @@ impl SupervisorState {
     }
 }
 
+pub fn backfill_progress(data: &Path) -> Result<serde_json::Value, String> {
+    let path = data.join("backfill.progress.json");
+    match std::fs::read(path) {
+        Ok(bytes) => serde_json::from_slice::<serde_json::Value>(&bytes)
+            .ok()
+            .filter(serde_json::Value::is_object)
+            .ok_or_else(|| "BACKFILL_PROGRESS_UNREADABLE".into()),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(serde_json::json!({})),
+        Err(_) => Err("BACKFILL_PROGRESS_UNREADABLE".into()),
+    }
+}
+
+pub fn record_backfill(data: &Path, phase: &str, reason: Option<&str>) -> Result<(), String> {
+    let mut value = if phase == "QUEUED" {
+        serde_json::json!({})
+    } else {
+        backfill_progress(data).unwrap_or_else(|_| serde_json::json!({}))
+    };
+    value["phase"] = serde_json::json!(phase);
+    value["reason"] = serde_json::json!(reason);
+    atomic_write(
+        &data.join("backfill.progress.json"),
+        serde_json::to_vec(&value).expect("serializable backfill progress"),
+    )
+}
+
 pub fn atomic_write(path: &Path, body: Vec<u8>) -> Result<(), String> {
     let temporary = path.with_extension(format!("tmp-{}", std::process::id()));
     use std::io::Write;

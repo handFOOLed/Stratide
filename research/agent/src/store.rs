@@ -305,10 +305,15 @@ impl Store {
         let changed = tx.execute(
             "UPDATE tasks SET status='queued',reason='OWNER_SAFE_RETRY',finished_at=NULL
             WHERE id=?1 AND status='failed' AND provider_id!='local-timesfm-2.5-cpu' AND (SELECT COUNT(*) FROM calls WHERE task_id=?1)<2
-            AND NOT EXISTS(SELECT 1 FROM calls WHERE task_id=?1 AND state!='no_charge')",
-            [id],
+            AND NOT EXISTS(SELECT 1 FROM calls WHERE task_id=?1 AND (state!='no_charge'
+              OR (tasks.provider_id=?2 AND COALESCE(calls.reason,'')!='RESTART_BEFORE_DISPATCH')))",
+            params![id, crate::market_research::MODEL_ID],
         )?;
         ensure(changed == 1, "TASK_RETRY_UNSAFE_OR_EXHAUSTED")?;
+        let provider: String = tx.query_row("SELECT provider_id FROM tasks WHERE id=?1", [id], |row| row.get(0))?;
+        if provider == crate::market_research::MODEL_ID {
+            crate::market_research::record_retry(&tx, id)?;
+        }
         tx.commit()?;
         Ok(())
     }
@@ -349,7 +354,10 @@ impl Store {
         let retryable = value["status"] == "failed"
             && value["provider_id"] != "local-timesfm-2.5-cpu"
             && calls.len() < 2
-            && calls.iter().all(|c| c["state"] == "no_charge");
+            && calls.iter().all(|c| c["state"] == "no_charge")
+            && (value["provider_id"] != crate::market_research::MODEL_ID
+                || (crate::market_research::calls_confirmed_undispatched(&calls)
+                    && crate::market_research::retry_run(&c, id).is_ok()));
         value["calls"] = json!(calls);
         value["retryable"] = json!(retryable);
         Ok(value)
