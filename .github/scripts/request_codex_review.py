@@ -5,11 +5,14 @@ import os
 import re
 import subprocess
 import sys
+import time
 
 
 REPOSITORY = "handFOOLed/Stratide"
 OWNER = "handFOOLed"
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
+CODEX_BOT_ID = 199175422
+ACTION_BOT_ID = 41898282
 
 
 def gh(*arguments):
@@ -37,6 +40,27 @@ def eligible(pr, number, sha, allow_draft=False):
     )
 
 
+def wait_for_acknowledgement(comment_id):
+    if type(comment_id) is not int or comment_id <= 0:
+        raise ValueError("invalid request comment")
+    url = f"repos/{REPOSITORY}/issues/comments/{comment_id}/reactions?per_page=100"
+    for attempt in range(12):
+        reactions = gh(url)
+        if len(reactions) >= 100:
+            raise ValueError("reaction history exceeds safe limit")
+        if any(
+            reaction.get("content") == "eyes"
+            and (reaction.get("user") or {}).get("id") == CODEX_BOT_ID
+            and (reaction.get("user") or {}).get("login") == "chatgpt-codex-connector[bot]"
+            and (reaction.get("user") or {}).get("type") == "Bot"
+            for reaction in reactions
+        ):
+            return True
+        if attempt < 11:
+            time.sleep(5)
+    return False
+
+
 def main():
     if os.environ.get("GITHUB_REPOSITORY") != REPOSITORY:
         raise ValueError("unexpected repository")
@@ -59,16 +83,17 @@ def main():
         return 1
 
     marker = f"<!-- stratide-codex-review-request:{run_id}:{sha} -->"
+    body = f"@codex review\n\n{marker}"
     comments_url = f"repos/{REPOSITORY}/issues/{number}/comments"
+    request_comment = None
     for page in range(1, 101):
         comments = gh(f"{comments_url}?per_page=100&page={page}")
-        if any(
-            comment["user"]["login"] == "github-actions[bot]"
-            and marker in comment["body"]
-            for comment in comments
-        ):
-            print(f"Review already requested for {sha}; completion is unverified")
-            return 0
+        for comment in comments:
+            actor = comment.get("user") or {}
+            if actor.get("login") == "github-actions[bot]" and actor.get("id") == ACTION_BOT_ID and comment.get("body") == body:
+                if request_comment is not None:
+                    raise ValueError("duplicate request markers")
+                request_comment = comment
         if len(comments) < 100:
             break
     else:
@@ -77,8 +102,15 @@ def main():
     if not eligible(gh(pr_url), number, sha):
         print("BLOCKED: PR changed before the review request")
         return 1
-    gh(comments_url, "--method", "POST", "-f", f"body=@codex review\n\n{marker}")
-    print(f"Requested review for {sha}; completion is unverified")
+    if request_comment is None:
+        request_comment = gh(comments_url, "--method", "POST", "-f", f"body={body}")
+    if not wait_for_acknowledgement(request_comment["id"]):
+        print(f"BLOCKED: Codex did not acknowledge the request for {sha}")
+        return 1
+    if not eligible(gh(pr_url), number, sha):
+        print("BLOCKED: PR changed while awaiting acknowledgement")
+        return 1
+    print(f"Codex acknowledged the request for {sha}; completion is unverified")
     return 0
 
 

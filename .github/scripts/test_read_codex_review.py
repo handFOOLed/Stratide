@@ -24,7 +24,8 @@ def summary(**overrides):
 
 class CodexReviewEvidenceTests(unittest.TestCase):
     def evaluate(self, comments, final_pr=None):
-        with patch.object(reader, "gh", side_effect=[pull_request(), comments, final_pr or pull_request()]):
+        base = {"object": {"sha": "c" * 40}}
+        with patch.object(reader, "gh", side_effect=[pull_request(), base, comments, final_pr or pull_request(), base]):
             return reader.review_state(12, SHA)
 
     def test_completed_review_on_exact_sha(self):
@@ -37,7 +38,7 @@ class CodexReviewEvidenceTests(unittest.TestCase):
         wrong_app["performed_via_github_app"]["id"] = 1
         for comments in ([], [forged], [wrong_app], [summary(), summary()]):
             with self.subTest(comments=comments):
-                with patch.object(reader, "gh", side_effect=[pull_request(), comments]):
+                with patch.object(reader, "gh", side_effect=[pull_request(), {"object": {"sha": "c" * 40}}, comments]):
                     self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
 
     def test_old_sha_or_incomplete_review_blocks(self):
@@ -67,10 +68,21 @@ class CodexReviewEvidenceTests(unittest.TestCase):
         with patch.object(reader, "gh", return_value=pr):
             self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
 
+    def test_target_ref_stale_before_read_blocks(self):
+        stale = {"object": {"sha": "d" * 40}}
+        with patch.object(reader, "gh", side_effect=[pull_request(), stale]):
+            self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
+
+    def test_target_ref_changes_during_read_blocks(self):
+        base = {"object": {"sha": "c" * 40}}
+        changed = {"object": {"sha": "d" * 40}}
+        with patch.object(reader, "gh", side_effect=[pull_request(), base, [summary()], pull_request(), changed]):
+            self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
+
     def test_malformed_state_blocks(self):
         malformed = summary()
         malformed["body"] = reader.SUMMARY + "\n<!-- codex-review-state:v1 nope -->"
-        with patch.object(reader, "gh", side_effect=[pull_request(), [malformed]]):
+        with patch.object(reader, "gh", side_effect=[pull_request(), {"object": {"sha": "c" * 40}}, [malformed]]):
             self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
 
     def test_duplicate_state_or_json_keys_block(self):
@@ -81,7 +93,7 @@ class CodexReviewEvidenceTests(unittest.TestCase):
             comment = summary()
             comment["body"] = body
             with self.subTest(body=body):
-                with patch.object(reader, "gh", side_effect=[pull_request(), [comment]]):
+                with patch.object(reader, "gh", side_effect=[pull_request(), {"object": {"sha": "c" * 40}}, [comment]]):
                     try:
                         result = reader.review_state(12, SHA)
                     except ValueError:
@@ -91,13 +103,14 @@ class CodexReviewEvidenceTests(unittest.TestCase):
     def test_draft_review_can_be_inspected_without_merging(self):
         draft = pull_request()
         draft["draft"] = True
-        with patch.object(reader, "gh", side_effect=[draft, [summary()], draft]):
+        base = {"object": {"sha": "c" * 40}}
+        with patch.object(reader, "gh", side_effect=[draft, base, [summary()], draft, base]):
             self.assertEqual(reader.review_state(12, SHA), "CODE_REVIEW_NO_FINDINGS")
 
     def test_null_user_is_ignored(self):
         comment = summary()
         comment["user"] = None
-        with patch.object(reader, "gh", side_effect=[pull_request(), [comment]]):
+        with patch.object(reader, "gh", side_effect=[pull_request(), {"object": {"sha": "c" * 40}}, [comment]]):
             self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
 
 

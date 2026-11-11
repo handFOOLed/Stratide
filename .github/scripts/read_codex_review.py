@@ -38,6 +38,9 @@ def review_state(number, sha):
     base_sha = initial_pr["base"]["sha"]
     if not isinstance(base_sha, str) or not SHA_PATTERN.fullmatch(base_sha):
         return "BLOCKED"
+    base_url = f"repos/{REPOSITORY}/git/ref/heads/main"
+    if gh(base_url)["object"]["sha"] != base_sha:
+        return "BLOCKED"
 
     summaries = []
     comments_url = f"repos/{REPOSITORY}/issues/{number}/comments"
@@ -70,6 +73,8 @@ def review_state(number, sha):
     if not eligible(current_pr, number, sha, allow_draft=True):
         return "BLOCKED"
     if current_pr["base"]["sha"] != base_sha:
+        return "BLOCKED"
+    if gh(base_url)["object"]["sha"] != base_sha:
         return "BLOCKED"
     if result.get("commit_sha") != sha or result.get("status") != "completed":
         return "BLOCKED"
