@@ -4,6 +4,7 @@ import json
 import re
 import subprocess
 import sys
+from datetime import datetime, timezone
 
 from request_codex_review import REPOSITORY, SHA_PATTERN, eligible, gh
 
@@ -13,6 +14,7 @@ BOT_ID = 199175422
 APP_ID = 1144995
 SUMMARY = "<!-- codex-pull-request-review-summary -->"
 STATE = re.compile(r"<!-- codex-review-state:v1 (\{[^\n]*\}) -->")
+COMPLETED_AT = re.compile(r'^\|[^\n]*\*\*Code Review\*\*[^\n]*<relative-time datetime="([^"]+)"', re.MULTILINE)
 
 
 def unique_object(pairs):
@@ -26,6 +28,30 @@ def unique_object(pairs):
 
 def reject_constant(value):
     raise ValueError(f"invalid JSON constant: {value}")
+
+
+def utc_time(value):
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if parsed.tzinfo is None:
+        raise ValueError("timestamp has no timezone")
+    return parsed.astimezone(timezone.utc)
+
+
+def no_later_lifecycle_change(number, body):
+    matches = COMPLETED_AT.findall(body)
+    if len(matches) != 1:
+        return False
+    completed_at = utc_time(matches[0]).replace(microsecond=0)
+    timeline_url = f"repos/{REPOSITORY}/issues/{number}/timeline"
+    for page in range(1, 101):
+        events = gh(f"{timeline_url}?per_page=100&page={page}")
+        for event in events:
+            if event.get("event") in {"ready_for_review", "reopened"}:
+                if utc_time(event["created_at"]) >= completed_at:
+                    return False
+        if len(events) < 100:
+            return True
+    return False
 
 
 def review_state(number, sha):
@@ -69,6 +95,10 @@ def review_state(number, sha):
     result = json.loads(matches[0], object_pairs_hook=unique_object, parse_constant=reject_constant)["code_review"]
     if not isinstance(result, dict):
         return "BLOCKED"
+    if result.get("commit_sha") != sha or result.get("status") != "completed":
+        return "BLOCKED"
+    if not no_later_lifecycle_change(number, body):
+        return "BLOCKED"
     current_pr = gh(pr_url)
     if not eligible(current_pr, number, sha, allow_draft=True):
         return "BLOCKED"
@@ -76,7 +106,7 @@ def review_state(number, sha):
         return "BLOCKED"
     if gh(base_url)["object"]["sha"] != base_sha:
         return "BLOCKED"
-    if result.get("commit_sha") != sha or result.get("status") != "completed":
+    if not no_later_lifecycle_change(number, body):
         return "BLOCKED"
     if result.get("has_any_findings") is False and result.get("has_unresolved_findings") is False:
         return "CODE_REVIEW_NO_FINDINGS"
@@ -88,8 +118,8 @@ def review_state(number, sha):
 if __name__ == "__main__":
     try:
         state = review_state(int(sys.argv[1]), sys.argv[2])
-        print(json.dumps({"review": state, "sha": sys.argv[2], "merge_eligible": False}))
+        print(json.dumps({"review": state, "sha": sys.argv[2], "event_verified": False, "merge_eligible": False}))
         sys.exit(0 if state == "CODE_REVIEW_NO_FINDINGS" else 1)
     except (AttributeError, IndexError, KeyError, OSError, TypeError, ValueError, subprocess.CalledProcessError):
-        print(json.dumps({"review": "BLOCKED"}))
+        print(json.dumps({"review": "BLOCKED", "event_verified": False, "merge_eligible": False}))
         sys.exit(1)

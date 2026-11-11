@@ -18,14 +18,14 @@ def summary(**overrides):
         "user": {"id": reader.BOT_ID, "login": reader.BOT_LOGIN, "type": "Bot"},
         "performed_via_github_app": {"id": reader.APP_ID, "slug": "chatgpt-codex-connector"},
         "body": reader.SUMMARY + "\n<!-- codex-review-state:v1 "
-        + json.dumps({"code_review": result}) + " -->",
+        + json.dumps({"code_review": result}) + ' -->\n| 📝 **Code Review** | Completed <relative-time datetime="2026-11-11T01:17:33Z">time</relative-time> |',
     }
 
 
 class CodexReviewEvidenceTests(unittest.TestCase):
     def evaluate(self, comments, final_pr=None):
         base = {"object": {"sha": "c" * 40}}
-        with patch.object(reader, "gh", side_effect=[pull_request(), base, comments, final_pr or pull_request(), base]):
+        with patch.object(reader, "gh", side_effect=[pull_request(), base, comments, [], final_pr or pull_request(), base, []]):
             return reader.review_state(12, SHA)
 
     def test_completed_review_on_exact_sha(self):
@@ -76,7 +76,34 @@ class CodexReviewEvidenceTests(unittest.TestCase):
     def test_target_ref_changes_during_read_blocks(self):
         base = {"object": {"sha": "c" * 40}}
         changed = {"object": {"sha": "d" * 40}}
-        with patch.object(reader, "gh", side_effect=[pull_request(), base, [summary()], pull_request(), changed]):
+        with patch.object(reader, "gh", side_effect=[pull_request(), base, [summary()], [], pull_request(), changed]):
+            self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
+
+    def test_reopened_after_review_blocks_even_when_sha_is_unchanged(self):
+        base = {"object": {"sha": "c" * 40}}
+        events = [{"event": "reopened", "created_at": "2026-11-11T01:18:55Z"}]
+        with patch.object(reader, "gh", side_effect=[pull_request(), base, [summary()], events]):
+            self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
+
+    def test_same_second_reopen_blocks_microsecond_review(self):
+        comment = summary()
+        comment["body"] = comment["body"].replace("01:17:33Z", "01:17:33.100000Z")
+        base = {"object": {"sha": "c" * 40}}
+        events = [{"event": "reopened", "created_at": "2026-11-11T01:17:33Z"}]
+        with patch.object(reader, "gh", side_effect=[pull_request(), base, [comment], events]):
+            self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
+
+    def test_missing_completion_timestamp_blocks(self):
+        comment = summary()
+        comment["body"] = comment["body"].split("\n|")[0]
+        base = {"object": {"sha": "c" * 40}}
+        with patch.object(reader, "gh", side_effect=[pull_request(), base, [comment]]):
+            self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
+
+    def test_reopen_between_timeline_reads_blocks(self):
+        base = {"object": {"sha": "c" * 40}}
+        events = [{"event": "reopened", "created_at": "2026-11-11T01:18:55Z"}]
+        with patch.object(reader, "gh", side_effect=[pull_request(), base, [summary()], [], pull_request(), base, events]):
             self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
 
     def test_malformed_state_blocks(self):
@@ -104,7 +131,7 @@ class CodexReviewEvidenceTests(unittest.TestCase):
         draft = pull_request()
         draft["draft"] = True
         base = {"object": {"sha": "c" * 40}}
-        with patch.object(reader, "gh", side_effect=[draft, base, [summary()], draft, base]):
+        with patch.object(reader, "gh", side_effect=[draft, base, [summary()], [], draft, base, []]):
             self.assertEqual(reader.review_state(12, SHA), "CODE_REVIEW_NO_FINDINGS")
 
     def test_null_user_is_ignored(self):
