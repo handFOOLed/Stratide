@@ -66,6 +66,7 @@ def no_later_lifecycle_change(number, body):
 
 def review_threads_clear(number):
     cursor = None
+    seen_cursors = set()
     owner, repository = REPOSITORY.split("/", 1)
     for _ in range(100):
         arguments = [
@@ -75,17 +76,21 @@ def review_threads_clear(number):
         if cursor is not None:
             arguments.extend(["-f", f"after={cursor}"])
         response = gh(*arguments)
-        if response.get("errors"):
+        if "errors" in response and response["errors"] != []:
             return False
         threads = response["data"]["repository"]["pullRequest"]["reviewThreads"]
-        if any(thread.get("isResolved") is not True for thread in threads["nodes"]):
+        nodes = threads["nodes"]
+        if not isinstance(nodes, list):
+            return False
+        if any(not isinstance(thread, dict) or thread.get("isResolved") is not True for thread in nodes):
             return False
         page = threads["pageInfo"]
         if page["hasNextPage"] is False:
             return True
         cursor = page["endCursor"]
-        if page["hasNextPage"] is not True or not isinstance(cursor, str) or not cursor:
+        if page["hasNextPage"] is not True or not nodes or not isinstance(cursor, str) or not cursor or cursor in seen_cursors:
             return False
+        seen_cursors.add(cursor)
     return False
 
 
@@ -134,6 +139,9 @@ def review_state(number, sha):
         return "BLOCKED"
     if not no_later_lifecycle_change(number, body):
         return "BLOCKED"
+    clean = result.get("has_any_findings") is False and result.get("has_unresolved_findings") is False
+    if clean and not review_threads_clear(number):
+        return "BLOCKED"
     current_pr = gh(pr_url)
     if not eligible(current_pr, number, sha, allow_draft=True):
         return "BLOCKED"
@@ -143,11 +151,9 @@ def review_state(number, sha):
         return "BLOCKED"
     if not no_later_lifecycle_change(number, body):
         return "BLOCKED"
-    if result.get("has_any_findings") is False and result.get("has_unresolved_findings") is False:
-        if not review_threads_clear(number):
-            return "BLOCKED"
+    if clean:
         return "CODE_REVIEW_NO_FINDINGS"
-    if result.get("has_unresolved_findings") is True:
+    if result.get("has_any_findings") is True and result.get("has_unresolved_findings") is True:
         return "CHANGES_REQUESTED"
     return "BLOCKED"
 

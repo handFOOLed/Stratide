@@ -32,7 +32,11 @@ def threads(*resolved, has_next=False, cursor=None):
 class CodexReviewEvidenceTests(unittest.TestCase):
     def evaluate(self, comments, final_pr=None):
         base = {"object": {"sha": "c" * 40}}
-        with patch.object(reader, "gh", side_effect=[pull_request(), base, comments, [], final_pr or pull_request(), base, [], threads()]):
+        queue = [pull_request(), base, comments, []]
+        if comments and '"has_any_findings": false' in comments[0].get("body", ""):
+            queue.append(threads())
+        queue.extend([final_pr or pull_request(), base, []])
+        with patch.object(reader, "gh", side_effect=queue):
             return reader.review_state(12, SHA)
 
     def test_completed_review_on_exact_sha(self):
@@ -55,6 +59,12 @@ class CodexReviewEvidenceTests(unittest.TestCase):
 
     def test_unresolved_findings_request_changes(self):
         self.assertEqual(self.evaluate([summary(has_any_findings=True, has_unresolved_findings=True)]), "CHANGES_REQUESTED")
+
+    def test_inconsistent_finding_flags_block(self):
+        base = {"object": {"sha": "c" * 40}}
+        comment = summary(has_any_findings=False, has_unresolved_findings=True)
+        with patch.object(reader, "gh", side_effect=[pull_request(), base, [comment], [], pull_request(), base, []]):
+            self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
 
     def test_resolved_findings_do_not_imply_clean_review(self):
         self.assertEqual(self.evaluate([summary(has_any_findings=True)]), "BLOCKED")
@@ -83,7 +93,7 @@ class CodexReviewEvidenceTests(unittest.TestCase):
     def test_target_ref_changes_during_read_blocks(self):
         base = {"object": {"sha": "c" * 40}}
         changed = {"object": {"sha": "d" * 40}}
-        with patch.object(reader, "gh", side_effect=[pull_request(), base, [summary()], [], pull_request(), changed]):
+        with patch.object(reader, "gh", side_effect=[pull_request(), base, [summary()], [], threads(), pull_request(), changed]):
             self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
 
     def test_reopened_after_review_blocks_even_when_sha_is_unchanged(self):
@@ -110,7 +120,7 @@ class CodexReviewEvidenceTests(unittest.TestCase):
     def test_reopen_between_timeline_reads_blocks(self):
         base = {"object": {"sha": "c" * 40}}
         events = [{"event": "reopened", "created_at": "2026-11-11T01:18:55Z"}]
-        with patch.object(reader, "gh", side_effect=[pull_request(), base, [summary()], [], pull_request(), base, events]):
+        with patch.object(reader, "gh", side_effect=[pull_request(), base, [summary()], [], threads(), pull_request(), base, events]):
             self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
 
     def test_malformed_state_blocks(self):
@@ -138,12 +148,12 @@ class CodexReviewEvidenceTests(unittest.TestCase):
         draft = pull_request()
         draft["draft"] = True
         base = {"object": {"sha": "c" * 40}}
-        with patch.object(reader, "gh", side_effect=[draft, base, [summary()], [], draft, base, [], threads()]):
+        with patch.object(reader, "gh", side_effect=[draft, base, [summary()], [], threads(), draft, base, []]):
             self.assertEqual(reader.review_state(12, SHA), "CODE_REVIEW_NO_FINDINGS")
 
     def test_unresolved_outdated_thread_blocks_clean_summary(self):
         base = {"object": {"sha": "c" * 40}}
-        with patch.object(reader, "gh", side_effect=[pull_request(), base, [summary()], [], pull_request(), base, [], threads(False)]):
+        with patch.object(reader, "gh", side_effect=[pull_request(), base, [summary()], [], threads(False)]):
             self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
 
     def test_review_threads_pagination_and_unknown_state(self):
@@ -155,6 +165,22 @@ class CodexReviewEvidenceTests(unittest.TestCase):
     def test_review_threads_api_error_blocks(self):
         with patch.object(reader, "gh", return_value={"errors": [{"message": "unavailable"}]}):
             self.assertFalse(reader.review_threads_clear(12))
+
+    def test_invalid_pagination_blocks(self):
+        with patch.object(reader, "gh", return_value=threads(has_next=True, cursor="cursor")):
+            self.assertFalse(reader.review_threads_clear(12))
+        with patch.object(reader, "gh", side_effect=[threads(True, has_next=True, cursor="same"), threads(True, has_next=True, cursor="same")]):
+            self.assertFalse(reader.review_threads_clear(12))
+        with patch.object(reader, "gh", return_value={"errors": None}):
+            self.assertFalse(reader.review_threads_clear(12))
+
+    def test_invalid_review_thread_nodes_block(self):
+        for invalid_nodes in (None, "", {}, [None], ["resolved"]):
+            with self.subTest(nodes=invalid_nodes):
+                response = threads()
+                response["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"] = invalid_nodes
+                with patch.object(reader, "gh", return_value=response):
+                    self.assertFalse(reader.review_threads_clear(12))
 
     def test_null_user_is_ignored(self):
         comment = summary()
