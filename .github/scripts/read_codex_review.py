@@ -32,7 +32,11 @@ def review_state(number, sha):
     if type(number) is not int or number <= 0 or not SHA_PATTERN.fullmatch(sha):
         raise ValueError("invalid PR or SHA")
     pr_url = f"repos/{REPOSITORY}/pulls/{number}"
-    if not eligible(gh(pr_url), number, sha, allow_draft=True):
+    initial_pr = gh(pr_url)
+    if not eligible(initial_pr, number, sha, allow_draft=True):
+        return "BLOCKED"
+    base_sha = initial_pr["base"]["sha"]
+    if not isinstance(base_sha, str) or not SHA_PATTERN.fullmatch(base_sha):
         return "BLOCKED"
 
     summaries = []
@@ -62,7 +66,10 @@ def review_state(number, sha):
     result = json.loads(matches[0], object_pairs_hook=unique_object, parse_constant=reject_constant)["code_review"]
     if not isinstance(result, dict):
         return "BLOCKED"
-    if not eligible(gh(pr_url), number, sha, allow_draft=True):
+    current_pr = gh(pr_url)
+    if not eligible(current_pr, number, sha, allow_draft=True):
+        return "BLOCKED"
+    if current_pr["base"]["sha"] != base_sha:
         return "BLOCKED"
     if result.get("commit_sha") != sha or result.get("status") != "completed":
         return "BLOCKED"
@@ -76,7 +83,7 @@ def review_state(number, sha):
 if __name__ == "__main__":
     try:
         state = review_state(int(sys.argv[1]), sys.argv[2])
-        print(json.dumps({"review": state, "sha": sys.argv[2]}))
+        print(json.dumps({"review": state, "sha": sys.argv[2], "merge_eligible": False}))
         sys.exit(0 if state == "CODE_REVIEW_NO_FINDINGS" else 1)
     except (AttributeError, IndexError, KeyError, OSError, TypeError, ValueError, subprocess.CalledProcessError):
         print(json.dumps({"review": "BLOCKED"}))

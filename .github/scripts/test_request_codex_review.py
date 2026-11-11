@@ -21,7 +21,7 @@ def pull_request():
         "draft": False,
         "user": {"login": "handFOOLed"},
         "head": {"sha": SHA, "repo": {"full_name": request.REPOSITORY}},
-        "base": {"ref": "main", "repo": {"full_name": request.REPOSITORY}},
+        "base": {"ref": "main", "sha": "c" * 40, "repo": {"full_name": request.REPOSITORY}},
     }
 
 

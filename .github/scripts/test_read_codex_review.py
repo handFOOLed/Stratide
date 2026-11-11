@@ -56,6 +56,17 @@ class CodexReviewEvidenceTests(unittest.TestCase):
         changed["head"]["sha"] = "b" * 40
         self.assertEqual(self.evaluate([summary()], changed), "BLOCKED")
 
+    def test_base_drift_blocks(self):
+        changed = pull_request()
+        changed["base"]["sha"] = "d" * 40
+        self.assertEqual(self.evaluate([summary()], changed), "BLOCKED")
+
+    def test_invalid_base_sha_blocks(self):
+        pr = pull_request()
+        pr["base"]["sha"] = "main"
+        with patch.object(reader, "gh", return_value=pr):
+            self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
+
     def test_malformed_state_blocks(self):
         malformed = summary()
         malformed["body"] = reader.SUMMARY + "\n<!-- codex-review-state:v1 nope -->"
