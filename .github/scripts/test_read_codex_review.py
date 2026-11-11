@@ -22,10 +22,17 @@ def summary(**overrides):
     }
 
 
+def threads(*resolved, has_next=False, cursor=None):
+    return {"data": {"repository": {"pullRequest": {"reviewThreads": {
+        "nodes": [{"isResolved": value} for value in resolved],
+        "pageInfo": {"hasNextPage": has_next, "endCursor": cursor},
+    }}}}}
+
+
 class CodexReviewEvidenceTests(unittest.TestCase):
     def evaluate(self, comments, final_pr=None):
         base = {"object": {"sha": "c" * 40}}
-        with patch.object(reader, "gh", side_effect=[pull_request(), base, comments, [], final_pr or pull_request(), base, []]):
+        with patch.object(reader, "gh", side_effect=[pull_request(), base, comments, [], final_pr or pull_request(), base, [], threads()]):
             return reader.review_state(12, SHA)
 
     def test_completed_review_on_exact_sha(self):
@@ -131,8 +138,23 @@ class CodexReviewEvidenceTests(unittest.TestCase):
         draft = pull_request()
         draft["draft"] = True
         base = {"object": {"sha": "c" * 40}}
-        with patch.object(reader, "gh", side_effect=[draft, base, [summary()], [], draft, base, []]):
+        with patch.object(reader, "gh", side_effect=[draft, base, [summary()], [], draft, base, [], threads()]):
             self.assertEqual(reader.review_state(12, SHA), "CODE_REVIEW_NO_FINDINGS")
+
+    def test_unresolved_outdated_thread_blocks_clean_summary(self):
+        base = {"object": {"sha": "c" * 40}}
+        with patch.object(reader, "gh", side_effect=[pull_request(), base, [summary()], [], pull_request(), base, [], threads(False)]):
+            self.assertEqual(reader.review_state(12, SHA), "BLOCKED")
+
+    def test_review_threads_pagination_and_unknown_state(self):
+        with patch.object(reader, "gh", side_effect=[threads(True, has_next=True, cursor="next"), threads(True)]):
+            self.assertTrue(reader.review_threads_clear(12))
+        with patch.object(reader, "gh", return_value=threads(None)):
+            self.assertFalse(reader.review_threads_clear(12))
+
+    def test_review_threads_api_error_blocks(self):
+        with patch.object(reader, "gh", return_value={"errors": [{"message": "unavailable"}]}):
+            self.assertFalse(reader.review_threads_clear(12))
 
     def test_null_user_is_ignored(self):
         comment = summary()

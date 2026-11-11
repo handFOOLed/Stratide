@@ -15,6 +15,16 @@ APP_ID = 1144995
 SUMMARY = "<!-- codex-pull-request-review-summary -->"
 STATE = re.compile(r"<!-- codex-review-state:v1 (\{[^\n]*\}) -->")
 COMPLETED_AT = re.compile(r'^\|[^\n]*\*\*Code Review\*\*[^\n]*<relative-time datetime="([^"]+)"', re.MULTILINE)
+THREADS_QUERY = """query($owner:String!,$repo:String!,$number:Int!,$after:String) {
+  repository(owner:$owner,name:$repo) {
+    pullRequest(number:$number) {
+      reviewThreads(first:100,after:$after) {
+        nodes { isResolved }
+        pageInfo { hasNextPage endCursor }
+      }
+    }
+  }
+}"""
 
 
 def unique_object(pairs):
@@ -51,6 +61,31 @@ def no_later_lifecycle_change(number, body):
                     return False
         if len(events) < 100:
             return True
+    return False
+
+
+def review_threads_clear(number):
+    cursor = None
+    owner, repository = REPOSITORY.split("/", 1)
+    for _ in range(100):
+        arguments = [
+            "graphql", "-f", f"query={THREADS_QUERY}", "-f", f"owner={owner}",
+            "-f", f"repo={repository}", "-F", f"number={number}",
+        ]
+        if cursor is not None:
+            arguments.extend(["-f", f"after={cursor}"])
+        response = gh(*arguments)
+        if response.get("errors"):
+            return False
+        threads = response["data"]["repository"]["pullRequest"]["reviewThreads"]
+        if any(thread.get("isResolved") is not True for thread in threads["nodes"]):
+            return False
+        page = threads["pageInfo"]
+        if page["hasNextPage"] is False:
+            return True
+        cursor = page["endCursor"]
+        if page["hasNextPage"] is not True or not isinstance(cursor, str) or not cursor:
+            return False
     return False
 
 
@@ -109,6 +144,8 @@ def review_state(number, sha):
     if not no_later_lifecycle_change(number, body):
         return "BLOCKED"
     if result.get("has_any_findings") is False and result.get("has_unresolved_findings") is False:
+        if not review_threads_clear(number):
+            return "BLOCKED"
         return "CODE_REVIEW_NO_FINDINGS"
     if result.get("has_unresolved_findings") is True:
         return "CHANGES_REQUESTED"
