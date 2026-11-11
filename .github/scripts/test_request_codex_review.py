@@ -20,9 +20,9 @@ def pull_request():
         "number": 12,
         "state": "open",
         "draft": False,
-        "user": {"login": "handFOOLed"},
-        "head": {"sha": SHA, "repo": {"full_name": request.REPOSITORY}},
-        "base": {"ref": "main", "sha": "c" * 40, "repo": {"full_name": request.REPOSITORY}},
+        "user": {"login": "handFOOLed", "id": request.OWNER_ID},
+        "head": {"sha": SHA, "repo": {"full_name": request.REPOSITORY, "id": request.REPOSITORY_ID}},
+        "base": {"ref": "main", "sha": "c" * 40, "repo": {"full_name": request.REPOSITORY, "id": request.REPOSITORY_ID}},
     }
 
 
@@ -34,7 +34,7 @@ class RequestReviewTests(unittest.TestCase):
         self.addCleanup(self.event_file.stop)
         self.environment = patch.dict(
             os.environ,
-            {"GITHUB_REPOSITORY": request.REPOSITORY, "GITHUB_EVENT_PATH": "event.json", "GITHUB_RUN_ID": "41"},
+            {"GITHUB_REPOSITORY": request.REPOSITORY, "GITHUB_EVENT_PATH": "event.json", "GITHUB_RUN_ID": "41", "GITHUB_RUN_ATTEMPT": "1"},
         )
         self.environment.start()
         self.addCleanup(self.environment.stop)
@@ -51,6 +51,29 @@ class RequestReviewTests(unittest.TestCase):
         with patch.object(request, "gh", side_effect=[pull_request(), comments, pull_request(), ACK, pull_request()]) as gh:
             self.assertEqual(request.main(), 0)
         self.assertEqual(gh.call_count, 5)
+
+    def test_rerun_does_not_reuse_or_repeat_an_unknown_request(self):
+        with patch.dict(os.environ, {"GITHUB_RUN_ATTEMPT": "2"}):
+            with patch.object(request, "gh") as gh:
+                self.assertEqual(request.main(), 1)
+        gh.assert_not_called()
+
+    def test_invalid_attempt_prevents_api_access(self):
+        for attempt in ("", "0", "01", "not-a-number"):
+            with self.subTest(attempt=attempt):
+                with patch.dict(os.environ, {"GITHUB_RUN_ATTEMPT": attempt}):
+                    with patch.object(request, "gh") as gh:
+                        with self.assertRaises(ValueError):
+                            request.main()
+                    gh.assert_not_called()
+
+    def test_missing_attempt_prevents_api_access(self):
+        with patch.dict(os.environ):
+            os.environ.pop("GITHUB_RUN_ATTEMPT", None)
+            with patch.object(request, "gh") as gh:
+                with self.assertRaises(KeyError):
+                    request.main()
+            gh.assert_not_called()
 
     def test_untrusted_marker_does_not_suppress_request(self):
         comments = [{"user": {"login": "other"}, "body": f"<!-- stratide-codex-review-request:41:{SHA} -->"}]
@@ -115,6 +138,20 @@ class RequestReviewTests(unittest.TestCase):
                 with patch.object(request, "gh", return_value=pr) as gh:
                     self.assertEqual(request.main(), 1)
                 self.assertEqual(gh.call_count, 1)
+
+    def test_wrong_or_missing_numeric_identity_prevents_request(self):
+        for part in ("user", "head", "base"):
+            for identifier in (None, 1):
+                with self.subTest(part=part, identifier=identifier):
+                    pr = pull_request()
+                    identity = pr[part] if part == "user" else pr[part]["repo"]
+                    if identifier is None:
+                        del identity["id"]
+                    else:
+                        identity["id"] = identifier
+                    with patch.object(request, "gh", return_value=pr) as gh:
+                        self.assertEqual(request.main(), 1)
+                    self.assertEqual(gh.call_count, 1)
 
     def test_api_failure_prevents_request(self):
         error = subprocess.CalledProcessError(1, "gh")

@@ -10,6 +10,8 @@ import time
 
 REPOSITORY = "handFOOLed/Stratide"
 OWNER = "handFOOLed"
+OWNER_ID = 193497331
+REPOSITORY_ID = 1435572921
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 CODEX_BOT_ID = 199175422
 ACTION_BOT_ID = 41898282
@@ -32,9 +34,12 @@ def eligible(pr, number, sha, allow_draft=False):
         and pr["state"] == "open"
         and (pr["draft"] is False or (allow_draft and pr["draft"] is True))
         and pr["user"]["login"] == OWNER
+        and pr["user"].get("id") == OWNER_ID
         and pr["head"]["repo"] is not None
         and pr["head"]["repo"]["full_name"] == REPOSITORY
+        and pr["head"]["repo"].get("id") == REPOSITORY_ID
         and pr["base"]["repo"]["full_name"] == REPOSITORY
+        and pr["base"]["repo"].get("id") == REPOSITORY_ID
         and pr["base"]["ref"] == "main"
         and pr["head"]["sha"] == sha
     )
@@ -69,13 +74,18 @@ def main():
     number = event["number"]
     sha = event["pull_request"]["head"]["sha"]
     run_id = os.environ["GITHUB_RUN_ID"]
+    run_attempt = os.environ["GITHUB_RUN_ATTEMPT"]
     if (
         type(number) is not int
         or number <= 0
         or not SHA_PATTERN.fullmatch(sha)
-        or not re.fullmatch(r"[0-9]+", run_id)
+        or not re.fullmatch(r"[1-9][0-9]*", run_id)
+        or not re.fullmatch(r"[1-9][0-9]*", run_attempt)
     ):
         raise ValueError("invalid event identity")
+    if run_attempt != "1":
+        print("BLOCKED: rerun requires reconciliation of the previous request")
+        return 1
 
     pr_url = f"repos/{REPOSITORY}/pulls/{number}"
     if not eligible(gh(pr_url), number, sha):
