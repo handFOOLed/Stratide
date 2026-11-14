@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import signal
 import sys
 import tempfile
 
@@ -97,6 +98,18 @@ def main():
         require(model_dir.is_dir(), "TIMESFM_WSL_MODEL_MISSING")
         stage = prepare(app_code, model_dir)
         model_module = load_model(stage)
+        from owner_pipe import read_request_line, watch_owner
+        input_fd = sys.stdin.fileno()
+        raw, pending = read_request_line(input_fd, model_module.MAX_INPUT)
+        require(len(raw) <= model_module.MAX_INPUT, "WORKER_INPUT_LIMIT")
+
+        def stop_bridge(_signal, _frame):
+            raise SystemExit(3)
+
+        # A Windows Job owns wsl.exe. The Linux side has its own pipe lease so
+        # losing that Job also stops the bridge and its owned systemd worker.
+        signal.signal(signal.SIGTERM, stop_bridge)
+        watch_owner(input_fd, pending, lambda: os.kill(os.getpid(), signal.SIGTERM))
         if args.mode == "preflight":
             runtime = load_runtime(stage)
             runtime.command(2)
@@ -118,8 +131,6 @@ def main():
                              model_revision=manifest["revision"],
                              weight_sha256=manifest["files"]["model.safetensors"],
                              code_bundle_sha256=code_bundle_sha(app_code), manifest=manifest))
-        raw = sys.stdin.buffer.read(model_module.MAX_INPUT + 1)
-        require(len(raw) <= model_module.MAX_INPUT, "WORKER_INPUT_LIMIT")
         runtime = load_runtime(stage)
         response = runtime.run(raw)
         require(isinstance(response, dict), "TIMESFM_WSL_PROTOCOL_INVALID")

@@ -102,7 +102,14 @@ mod win {
     }
 
     pub fn exists(target: &str) -> bool {
-        read_raw(target).is_ok()
+        let target = wide(target);
+        let mut entry: *mut Credential = ptr::null_mut();
+        let ok = unsafe { CredReadW(target.as_ptr(), CRED_TYPE_GENERIC, 0, &mut entry) };
+        if ok == 0 || entry.is_null() {
+            return false;
+        }
+        unsafe { CredFree(entry.cast()) };
+        true
     }
 
     pub fn delete(target: &str) -> Result<()> {

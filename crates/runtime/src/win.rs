@@ -10,6 +10,7 @@ const MOVEFILE_REPLACE_EXISTING: u32 = 0x1;
 const MOVEFILE_WRITE_THROUGH: u32 = 0x8;
 const JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE: u32 = 0x2000;
 const JOB_OBJECT_EXTENDED_LIMIT_INFORMATION_CLASS: i32 = 9;
+const JOB_OBJECT_BASIC_ACCOUNTING_INFORMATION_CLASS: i32 = 1;
 const MB_OK: u32 = 0x0;
 const MB_YESNO: u32 = 0x4;
 const MB_ICONERROR: u32 = 0x10;
@@ -102,6 +103,19 @@ struct ExtendedLimitInformation {
     peak_job_memory_used: usize,
 }
 
+#[repr(C)]
+#[derive(Default)]
+struct BasicAccountingInformation {
+    total_user_time: i64,
+    total_kernel_time: i64,
+    period_user_time: i64,
+    period_kernel_time: i64,
+    page_faults: u32,
+    total_processes: u32,
+    active_processes: u32,
+    terminated_processes: u32,
+}
+
 /// Children of the shell die with it, so a crashed supervisor cannot leave a
 /// second EOD watch or ledger writer behind after the next logon.
 pub struct Job {
@@ -162,6 +176,36 @@ impl Job {
             Err(std::io::Error::last_os_error())
         } else {
             Ok(())
+        }
+    }
+
+    pub fn terminate_and_wait(&self) -> std::io::Result<()> {
+        use std::time::{Duration, Instant};
+        if unsafe { TerminateJobObject(self.handle, 1) } == 0 {
+            return Err(std::io::Error::last_os_error());
+        }
+        let deadline = Instant::now() + Duration::from_secs(5);
+        loop {
+            let mut accounting = BasicAccountingInformation::default();
+            let ok = unsafe {
+                QueryInformationJobObject(
+                    self.handle,
+                    JOB_OBJECT_BASIC_ACCOUNTING_INFORMATION_CLASS,
+                    (&mut accounting as *mut BasicAccountingInformation).cast(),
+                    std::mem::size_of::<BasicAccountingInformation>() as u32,
+                    std::ptr::null_mut(),
+                )
+            };
+            if ok == 0 {
+                return Err(std::io::Error::last_os_error());
+            }
+            if accounting.active_processes == 0 {
+                return Ok(());
+            }
+            if Instant::now() >= deadline {
+                return Err(std::io::ErrorKind::TimedOut.into());
+            }
+            std::thread::sleep(Duration::from_millis(20));
         }
     }
 }
@@ -227,6 +271,14 @@ extern "system" {
         length: u32,
     ) -> i32;
     fn AssignProcessToJobObject(job: Handle, process: Handle) -> i32;
+    fn TerminateJobObject(job: Handle, exit_code: u32) -> i32;
+    fn QueryInformationJobObject(
+        job: Handle,
+        information_class: i32,
+        information: *mut std::ffi::c_void,
+        length: u32,
+        return_length: *mut u32,
+    ) -> i32;
     fn CloseHandle(handle: Handle) -> i32;
     fn MoveFileExW(from: *const u16, to: *const u16, flags: u32) -> i32;
 }

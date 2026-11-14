@@ -318,15 +318,19 @@ fn market(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
         return Err(layout_error(400, "MARKET_INPUT_INVALID"));
     }
     if action == "backfill-state" {
-        let request = layout.data.join("backfill.request");
-        let running = request.is_file();
-        let progress: Value = std::fs::read(layout.data.join("backfill.progress.json"))
-            .ok()
-            .and_then(|raw| serde_json::from_slice(&raw).ok())
-            .unwrap_or(Value::Null);
+        let running = layout.data.join("backfill.request").is_file();
+        let progress = stratide_runtime::state::backfill_progress(&layout.data)
+            .map_err(|code| layout_error(409, &code))?;
+        let phase = match (running, progress["phase"].as_str()) {
+            (true, Some("QUEUED")) | (true, None) => "QUEUED",
+            (true, _) => "RUNNING",
+            (false, Some("FAILED")) => "FAILED",
+            (false, Some("VERIFYING")) => "VERIFYING",
+            (false, _) => "IDLE",
+        };
         return Ok(layout_envelope(
             200,
-            json!({"running": running, "progress": progress}),
+            json!({"running": running, "phase": phase, "reason": progress["reason"], "progress": progress}),
         ));
     }
     let script = layout.app.join("scripts").join("eod-operator.py");
@@ -358,7 +362,7 @@ fn market(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
         command.arg("--start-date").arg(start_date);
     }
     if action == "backfill" {
-        return backfill(layout, command);
+        return backfill(layout);
     }
     let timeout = if action == "status" { 60 } else { 180 };
     match stratide_runtime::run_capture(command, Duration::from_secs(timeout)) {
@@ -386,13 +390,15 @@ fn market(layout: &Layout, body: &Value) -> Result<Reply, Reply> {
 /// The collector may run for tens of minutes at the provider rate limit, so the
 /// dashboard only leaves a request file; the long-lived supervisor owns the
 /// process and clears the request when it exits.
-fn backfill(layout: &Layout, _command: Command) -> Result<Reply, Reply> {
+fn backfill(layout: &Layout) -> Result<Reply, Reply> {
     let request = layout.data.join("backfill.request");
     if request.is_file() {
         return Err(layout_error(409, "BACKFILL_ALREADY_RUNNING"));
     }
-    std::fs::write(&request, b"84").map_err(|_| layout_error(409, "BACKFILL_REQUEST_FAILED"))?;
-    Ok(layout_envelope(200, json!({"state": "STARTED", "sessions": 84})))
+    stratide_runtime::state::record_backfill(&layout.data, "QUEUED", None)
+        .and_then(|()| stratide_runtime::state::atomic_write(&request, b"84".to_vec()))
+        .map_err(|_| layout_error(409, "BACKFILL_REQUEST_FAILED"))?;
+    Ok(layout_envelope(200, json!({"state": "QUEUED", "sessions": 84})))
 }
 fn update_check(layout: &Layout) -> Result<Reply, Reply> {
     let script = layout.app.join("scripts").join("update-check.py");
@@ -486,19 +492,15 @@ fn store_wsl(layout: &Layout, wsl: stratide_runtime::WslSettings) -> Result<bool
     let mut config = layout
         .config()
         .map_err(|_| layout_error(409, "RUNTIME_CONFIG_INVALID"))?;
-    let restart = config.wsl.as_ref() != Some(&wsl);
-    if restart {
-        stratide_runtime::state::atomic_write(&layout.watch_restart_path(), b"{}".to_vec())
-            .map_err(|_| layout_error(409, "WATCH_RESTART_REQUEST_FAILED"))?;
+    if config.wsl.as_ref() == Some(&wsl) {
+        return Ok(false);
     }
     config.wsl = Some(wsl);
     config
         .save(&layout.config_path)
         .map_err(|_| layout_error(409, "RUNTIME_CONFIG_WRITE_FAILED"))?;
-    if restart {
-        stratide_runtime::wsl_probe::clear(layout);
-    }
-    Ok(restart)
+    stratide_runtime::wsl_probe::clear(layout);
+    Ok(true)
 }
 
 /// One-click local model discovery: find an existing WSL venv + TimesFM model
@@ -711,11 +713,6 @@ fn probe_wsl_inner(app: &App, layout: &Layout) -> Result<Reply, Reply> {
             reason = Some("WSL_RUNTIME_UNAVAILABLE".into());
         }
     }
-    let record = stratide_runtime::wsl_probe::WslProbeRecord::new(
-        &wsl,
-        if ready { "READY" } else { "BLOCKED" },
-        reason.clone(),
-    );
     let _write = RUNTIME_WRITE
         .write()
         .map_err(|_| layout_error(503, "RUNTIME_WRITE_BUSY"))?;
@@ -725,6 +722,16 @@ fn probe_wsl_inner(app: &App, layout: &Layout) -> Result<Reply, Reply> {
         drop(_write);
         return Err(layout_error(409, "WSL_PROBE_CONFIG_CHANGED"));
     }
+    if reason.as_deref() == Some("WORKER_BUSY") {
+        return Ok(layout_envelope(200, json!({
+            "state": "BUSY", "reason": reason, "probe": value, "persisted": false,
+        })));
+    }
+    let record = stratide_runtime::wsl_probe::WslProbeRecord::new(
+        &wsl,
+        if ready { "READY" } else { "BLOCKED" },
+        reason.clone(),
+    );
     runtime_status_cache::invalidate_cache();
     stratide_runtime::wsl_probe::write(layout, record).map_err(|_| {
         layout_error(409, "WSL_PROBE_PERSIST_FAILED")
@@ -918,6 +925,8 @@ mod tests {
         };
         assert!(store_wsl(&layout, changed).is_err());
         assert!(wsl_probe::path(&layout).is_file());
+        assert!(!layout.runtime.join("watch-restart.request").exists());
+        assert_eq!(layout.config().unwrap().wsl.unwrap().workspace, "/home/a");
         clear_readonly(&config_path);
     }
 

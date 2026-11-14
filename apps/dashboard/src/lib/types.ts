@@ -329,6 +329,7 @@ export interface AgentStatus {
   qualification: string;
   automatic_fallback: string;
   budget_settings: string;
+  market_budget_caps?: { daily_limit_micro: string; monthly_limit_micro: string };
 }
 
 export interface AgentCall {

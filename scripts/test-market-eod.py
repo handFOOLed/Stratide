@@ -137,8 +137,12 @@ class MarketTests(unittest.TestCase):
         bound = dict(schema_version=1, agent_dir=str(agent), settings_path=str(settings), authority_id="a"*64)
         (binding_dir / "agent-binding.json").write_text(json.dumps(bound), encoding="utf-8")
         with contextlib.closing(sqlite3.connect(agent / "agent.sqlite")) as db, db:
-            db.executescript("PRAGMA application_id=1397899569; PRAGMA user_version=1; "
-                             "CREATE TABLE meta(key TEXT PRIMARY KEY,value TEXT NOT NULL);")
+            db.executescript("""PRAGMA application_id=1397899569; PRAGMA user_version=1;
+                CREATE TABLE meta(key TEXT PRIMARY KEY,value TEXT NOT NULL);
+                CREATE TABLE tasks(id INTEGER PRIMARY KEY, request TEXT, input TEXT, provider_id TEXT,
+                    provider_hash TEXT, status TEXT, reason TEXT, created_at TEXT, finished_at TEXT, trigger_key TEXT UNIQUE);
+                CREATE TABLE calls(task_id INTEGER, state TEXT, reason TEXT);
+            """)
             db.executemany("INSERT INTO meta VALUES(?,?)", [
                 ("risk_portfolio_authority_id", bound["authority_id"]),
                 ("risk_portfolio_settings_path", str(settings)), (research.CONFIG, json.dumps(config))])
@@ -258,6 +262,13 @@ class MarketTests(unittest.TestCase):
             self.assertEqual(db.execute("SELECT COUNT(*) FROM day_rows").fetchone()[0], 4)
             self.assertGreater(sum(r[0] for r in db.execute("SELECT duplicates FROM attempts")), 0)
         self.assertEqual(report["last_successful_date"], DAY)
+
+    def test_download_progress_advances_only_after_a_session_commits(self):
+        progress = []
+        result = self.once(progress=progress.append)
+        self.assertEqual(result["state"], "READY")
+        self.assertEqual(progress, [0, 1])
+        self.assertEqual(self.market.report()["sessions_ready"], 1)
 
     def test_partial_late_arrival_retry_preserves_old_snapshot(self):
         self.http.missing.add(B)

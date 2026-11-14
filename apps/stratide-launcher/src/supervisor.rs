@@ -1,8 +1,8 @@
-use std::path::Path;
+use std::{io::Write, path::Path};
 use std::process::{Child, Command, Stdio};
 use std::time::{Duration, Instant};
 use stratide_runtime::state::{ChildState, ExitState, SupervisorState};
-use stratide_runtime::{autostart, health, win, Layout};
+use stratide_runtime::{autostart, health, win, Layout, WslSettings};
 
 struct Dashboard {
     child: Option<Child>,
@@ -13,12 +13,42 @@ struct Dashboard {
 }
 
 struct Watch {
-    child: Option<Child>,
+    child: Option<ChildTree>,
+    wsl: Option<WslSettings>,
     pid: u32,
     started_at: String,
     last_exit: Option<ExitState>,
     next_start: Instant,
     restarts: u32,
+}
+
+struct ChildTree {
+    child: Child,
+    job: win::Job,
+}
+
+impl ChildTree {
+    fn spawn(command: &mut Command) -> std::io::Result<Self> {
+        let job = win::Job::create()?;
+        command.env("STRATIDE_EOD_SUPERVISOR_GATE", "1").stdin(Stdio::piped());
+        win::hide_console(command);
+        let mut child = command.spawn()?;
+        let mut gate = child.stdin.take().expect("piped startup gate");
+        let start = job.assign(&child).and_then(|()| gate.write_all(b"1"));
+        drop(gate);
+        if let Err(error) = start {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err(error);
+        }
+        Ok(Self { child, job })
+    }
+
+    fn stop(self) -> Result<(), String> {
+        drop(self.child);
+        self.job.terminate_and_wait()
+            .map_err(|error| format!("CHILD_TREE_STOP_FAILED: {error}"))
+    }
 }
 
 struct Supervisor {
@@ -30,7 +60,7 @@ struct Supervisor {
     previous: Option<SupervisorState>,
     dashboard: Option<Dashboard>,
     watch: Option<Watch>,
-    backfill: Option<Child>,
+    backfill: Option<ChildTree>,
     dashboard_next: Instant,
     dashboard_failures: u32,
     dashboard_healthy: bool,
@@ -84,6 +114,7 @@ pub fn run() -> Result<i32, String> {
     log(&supervisor.layout, "supervisor starting");
     supervisor.publish()?;
     let outcome = supervisor.run_loop();
+    drop(supervisor);
     let _ = lock.unlock();
     outcome
 }
@@ -174,8 +205,8 @@ impl Supervisor {
                 last_autostart_check = Instant::now();
             }
             self.ensure_dashboard()?;
-            self.ensure_watch()?;
             self.ensure_backfill()?;
+            self.ensure_watch()?;
             self.publish()?;
             std::thread::sleep(Duration::from_millis(750));
         }
@@ -185,34 +216,35 @@ impl Supervisor {
     /// object kills the dashboard's children on every restart, while a batch can
     /// take tens of minutes at the provider rate limit.
     fn ensure_backfill(&mut self) -> Result<(), String> {
-        if let Some(child) = self.backfill.as_mut() {
-            match child.try_wait() {
+        if let Some(tree) = self.backfill.as_mut() {
+            let reason = match tree.child.try_wait() {
                 Ok(None) => return Ok(()),
                 Ok(Some(exit)) => {
                     log(
                         &self.layout,
                         &format!("market backfill exited code={:?}", exit.code()),
                     );
-                    let _ = std::fs::remove_file(self.backfill_request());
-                    self.backfill = None;
-                    return Ok(());
+                    (!exit.success()).then_some("BACKFILL_PROCESS_FAILED")
                 }
-                Err(_) => return Ok(()),
-            }
+                Err(_) => Some("BACKFILL_PROCESS_STATUS_FAILED"),
+            };
+            self.backfill.take().expect("backfill exists after poll").stop()?;
+            return self.finish_backfill(reason);
         }
         let request = self.backfill_request();
         if !request.is_file() {
             return Ok(());
         }
+        let progress = stratide_runtime::state::backfill_progress(&self.layout.data);
+        match progress.as_ref().ok().and_then(|value| value["phase"].as_str()) {
+            Some("RUNNING") => return self.finish_backfill(Some("BACKFILL_INTERRUPTED")),
+            Some("VERIFYING" | "FAILED") => return self.clear_backfill_request(),
+            _ => {}
+        }
         let script = self.layout.app.join("scripts").join("eod-operator.py");
         // Both processes take the warehouse writer lock; the watch resumes by
         // itself after the batch because ensure_watch sees no live child.
-        if let Some(mut watch) = self.watch.take() {
-            if let Some(watch_child) = watch.child.as_mut() {
-                let _ = watch_child.kill();
-                let _ = watch_child.wait();
-            }
-        }
+        self.stop_watch()?;
         let mut command = Command::new(self.layout.python());
         command
             .args(["-B", "-X", "utf8"])
@@ -225,41 +257,48 @@ impl Supervisor {
             .env("PYTHONIOENCODING", "utf-8")
             .env_remove("STRATIDE_TUSHARE_TOKEN")
             .stdin(Stdio::null());
-        let stdout = append_log(&self.layout.logs.join("market-backfill.out.log"))?;
-        let stderr = append_log(&self.layout.logs.join("market-backfill.err.log"))?;
+        let (Ok(stdout), Ok(stderr)) = (
+            append_log(&self.layout.logs.join("market-backfill.out.log")),
+            append_log(&self.layout.logs.join("market-backfill.err.log")),
+        ) else {
+            return self.finish_backfill(Some("BACKFILL_LOG_UNAVAILABLE"));
+        };
         command.stdout(stdout).stderr(stderr);
-        win::hide_console(&mut command);
-        let mut child = match command.spawn() {
-            Ok(child) => child,
+        stratide_runtime::state::record_backfill(&self.layout.data, "RUNNING", None)?;
+        let tree = match ChildTree::spawn(&mut command) {
+            Ok(tree) => tree,
             Err(error) => {
                 log(
                     &self.layout,
                     &format!("market backfill spawn failed: {error}"),
                 );
-                let _ = std::fs::remove_file(&request);
-                return Ok(());
+                return self.finish_backfill(Some("BACKFILL_SPAWN_FAILED"));
             }
         };
-        if let Err(error) = self.job.assign(&child) {
-            let _ = child.kill();
-            let _ = child.wait();
-            log(
-                &self.layout,
-                &format!("market backfill job assign failed: {error}"),
-            );
-            let _ = std::fs::remove_file(&request);
-            return Ok(());
-        }
         log(
             &self.layout,
-            &format!("market backfill started pid={:?}", child.id()),
+            &format!("market backfill started pid={}", tree.child.id()),
         );
-        self.backfill = Some(child);
+        self.backfill = Some(tree);
         Ok(())
     }
 
     fn backfill_request(&self) -> std::path::PathBuf {
         self.layout.data.join("backfill.request")
+    }
+
+    fn finish_backfill(&self, reason: Option<&str>) -> Result<(), String> {
+        let phase = if reason.is_some() { "FAILED" } else { "VERIFYING" };
+        stratide_runtime::state::record_backfill(&self.layout.data, phase, reason)?;
+        self.clear_backfill_request()
+    }
+
+    fn clear_backfill_request(&self) -> Result<(), String> {
+        match std::fs::remove_file(self.backfill_request()) {
+            Ok(()) => Ok(()),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
+            Err(error) => Err(format!("BACKFILL_REQUEST_CLEAR_FAILED: {error}")),
+        }
     }
 
     fn ensure_dashboard(&mut self) -> Result<(), String> {
@@ -483,19 +522,20 @@ impl Supervisor {
         if self.backfill.is_some() {
             return Ok(());
         }
-        if self.layout.watch_restart_path().is_file() {
-            self.layout.clear_watch_restart();
-            if let Some(watch) = self.watch.as_mut() {
-                if let Some(child) = watch.child.as_mut() {
-                    let _ = child.kill();
-                    let _ = child.wait();
-                }
+        let config = match self.layout.config() {
+            Ok(config) => config,
+            Err(_) => {
+                self.stop_watch()?;
+                self.reason = "RUNTIME_CONFIG_INVALID".into();
+                return Ok(());
             }
-            self.watch = None;
+        };
+        if self.watch.as_ref().is_some_and(|watch| watch.wsl != config.wsl) {
+            self.stop_watch()?;
             self.reason = "WATCH_RESTARTING".into();
-            log(&self.layout, "eod watch restart requested");
+            log(&self.layout, "eod watch restarting for saved WSL settings");
         }
-        let exited = self.poll_watch_exit();
+        let exited = self.poll_watch_exit()?;
         if let Some(exit) = exited {
             let watch = self.watch.as_mut().expect("watch exists after poll");
             watch.restarts += 1;
@@ -537,30 +577,25 @@ impl Supervisor {
         self.start_watch()
     }
 
-    fn poll_watch_exit(&mut self) -> Option<ExitState> {
-        let watch = self.watch.as_mut()?;
-        let child = watch.child.as_mut()?;
-        match child.try_wait() {
-            Ok(Some(status)) => {
-                let exit = ExitState {
-                    code: status.code(),
-                    at: stratide_runtime::timestamp(),
-                };
-                watch.last_exit = Some(exit.clone());
-                watch.child = None;
-                Some(exit)
-            }
-            Ok(None) => None,
-            Err(_) => {
-                let exit = ExitState {
-                    code: None,
-                    at: stratide_runtime::timestamp(),
-                };
-                watch.last_exit = Some(exit.clone());
-                watch.child = None;
-                Some(exit)
-            }
+    fn stop_watch(&mut self) -> Result<(), String> {
+        if let Some(tree) = self.watch.take().and_then(|watch| watch.child) {
+            tree.stop()?;
         }
+        Ok(())
+    }
+
+    fn poll_watch_exit(&mut self) -> Result<Option<ExitState>, String> {
+        let Some(watch) = self.watch.as_mut() else { return Ok(None) };
+        let Some(tree) = watch.child.as_mut() else { return Ok(None) };
+        let code = match tree.child.try_wait() {
+            Ok(Some(status)) => status.code(),
+            Ok(None) => return Ok(None),
+            Err(_) => None,
+        };
+        watch.child.take().expect("watch exists after poll").stop()?;
+        let exit = ExitState { code, at: stratide_runtime::timestamp() };
+        watch.last_exit = Some(exit.clone());
+        Ok(Some(exit))
     }
 
     /// The market warehouse is created and enabled automatically: the product has
@@ -660,9 +695,8 @@ impl Supervisor {
         let stdout = append_log(&stdout_path)?;
         let stderr = append_log(&stderr_path)?;
         command.stdout(stdout).stderr(stderr);
-        win::hide_console(&mut command);
-        let mut child = match command.spawn() {
-            Ok(child) => child,
+        let tree = match ChildTree::spawn(&mut command) {
+            Ok(tree) => tree,
             Err(error) => {
                 self.reason = "EOD_WATCH_START_FAILED".into();
                 log(&self.layout, &format!("eod watch spawn failed: {error}"));
@@ -672,21 +706,12 @@ impl Supervisor {
                 return Ok(());
             }
         };
-        if let Err(error) = self.job.assign(&child) {
-            let _ = child.kill();
-            let _ = child.wait();
-            self.reason = "WINDOWS_JOB_ASSIGN_FAILED".into();
-            log(
-                &self.layout,
-                &format!("eod watch job assign failed: {error}"),
-            );
-            return Ok(());
-        }
-        let pid = child.id();
+        let pid = tree.child.id();
         let restarts = self.watch.as_ref().map(|watch| watch.restarts).unwrap_or(0);
         let started_at = stratide_runtime::timestamp();
         self.watch = Some(Watch {
-            child: Some(child),
+            child: Some(tree),
+            wsl: config.wsl,
             pid,
             started_at,
             last_exit: None,
@@ -703,11 +728,10 @@ impl Supervisor {
         self.reason = "STOPPED_BY_OWNER".into();
         self.last_publish = Instant::now() - Duration::from_secs(60);
         self.publish()?;
-        if let Some(watch) = self.watch.as_mut() {
-            if let Some(child) = watch.child.as_mut() {
-                let _ = child.kill();
-                let _ = child.wait();
-            }
+        self.stop_watch()?;
+        if let Some(tree) = self.backfill.take() {
+            tree.stop()?;
+            self.finish_backfill(Some("BACKFILL_INTERRUPTED"))?;
         }
         let health = health::probe(self.port);
         if health.is_ok() {

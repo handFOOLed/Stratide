@@ -64,11 +64,14 @@ dist/installer/
 ## 验证
 
 ```powershell
-# 运行本机隔离式产品检查（不使用真实凭据）
-pwsh -NoProfile -File scripts/test-windows-product.ps1 -Port 8794
-
 # 检查下载文件的哈希
 Get-FileHash -Algorithm SHA256 "Stratide-Setup-0.3.2-x64.exe"
+
+# 本地构建后核对打包身份，再用假服务验证打包产物
+pwsh -NoProfile -File scripts/verify-windows-installer-identity.ps1 -SourceSha (git rev-parse HEAD) -Version 0.3.2
+python -B scripts/test-windows-usability.py dist/app
 ```
+
+可用性验证使用临时程序和数据目录，覆盖补录、预算、WSL 配置切换和子进程停止。它使用打包的二进制与 Python，采集和 WSL 检查由假服务提供。
 
 首次运行的接口权限、自动研究、T+1 Paper 假设、系统要求和已知技术边界集中在 [问题排查](KNOWN_LIMITATIONS.md)。项目为个人本地 **Paper-only** 应用；不连接券商执行真实资金订单。

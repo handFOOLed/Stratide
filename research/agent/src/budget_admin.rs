@@ -12,6 +12,7 @@ use crate::{
     ensure, hash, Agent, Result,
 };
 use chrono::{DateTime, SecondsFormat, Utc};
+use rusqlite::{params, Connection, OptionalExtension, TransactionBehavior};
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::{
@@ -49,6 +50,8 @@ pub fn update(agent: &Agent, body: &Value, now: DateTime<Utc>) -> Result<Value> 
     )?;
 
     let path = agent.settings_path();
+    let mut conn = agent.store().connect()?;
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
     // One read supplies both the parsed settings and the sha256 that the atomic
     // replacement re-checks immediately before rename.
     let original = read_settings(path)?;
@@ -58,18 +61,21 @@ pub fn update(agent: &Agent, body: &Value, now: DateTime<Utc>) -> Result<Value> 
         None => Settings::default(),
     };
     let old_budget = settings.budget.clone();
-    let (currency, timezone) = identity(agent, old_budget.as_ref(), &input)?;
+    let (currency, timezone) = identity(&tx, old_budget.as_ref(), &input)?;
     let new_budget = Budget {
         currency,
         timezone,
         daily_limit_micro,
         monthly_limit_micro,
     };
+    if agent.uses_market_budget(&settings) {
+        crate::market_research::validate_budget(&new_budget)?;
+    }
 
     // Committed = settled for the current day/month plus every unsettled hold
     // (the same worst-case amount reserve() keeps until Owner invoice
     // reconciliation). Lowering a cap below that needs explicit confirmation.
-    let committed = budget::view(&agent.store().connect()?, Some(&new_budget), now)?;
+    let committed = budget::view(&tx, Some(&new_budget), now)?;
     let held = i128::from(micro_field(&committed, "reserved_micro"));
     let below_committed = i128::from(daily_limit_micro)
         < i128::from(micro_field(&committed, "daily_settled_micro")) + held
@@ -82,19 +88,11 @@ pub fn update(agent: &Agent, body: &Value, now: DateTime<Utc>) -> Result<Value> 
 
     settings.budget = Some(new_budget.clone());
     settings.validate()?;
-    write_atomic(
-        path,
-        &serde_json::to_vec_pretty(&settings).expect("settings JSON"),
-        original_sha256,
-    )?;
-
-    // From here the file change is durable. Keep the store identity and its
-    // audit record in step; the new caps only bind future reservations.
     let identity = format!("{}|{}", new_budget.currency, new_budget.timezone);
-    match agent.store().setting(IDENTITY_KEY)? {
-        Some(stored) => ensure(stored == identity, "BUDGET_CURRENCY_TIMEZONE_IMMUTABLE")?,
-        None => agent.store().set(IDENTITY_KEY, &identity)?,
-    }
+    tx.execute(
+        "INSERT OR IGNORE INTO meta(key,value) VALUES(?1,?2)",
+        params![IDENTITY_KEY, identity],
+    )?;
     let at = now.to_rfc3339_opts(SecondsFormat::Nanos, true);
     let audit = json!({
         "old": budget_record(old_budget.as_ref()),
@@ -102,13 +100,18 @@ pub fn update(agent: &Agent, body: &Value, now: DateTime<Utc>) -> Result<Value> 
         "at": at,
         "source": SOURCE,
     });
-    agent
-        .store()
-        .set(&format!("{AUDIT_PREFIX}{at}"), &audit.to_string())?;
+    tx.execute(
+        "INSERT INTO meta(key,value) VALUES(?1,?2) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+        params![format!("{AUDIT_PREFIX}{at}"), audit.to_string()],
+    )?;
+    write_atomic(
+        path,
+        &serde_json::to_vec_pretty(&settings).expect("settings JSON"),
+        original_sha256,
+    )?;
+    tx.commit().map_err(|_| "BUDGET_SAVE_RESULT_UNKNOWN")?;
 
-    Ok(json!({
-        "budget": budget::view(&agent.store().connect()?, Some(&new_budget), now)?,
-    }))
+    Ok(json!({"budget": committed}))
 }
 
 fn limit(raw: &str) -> Result<i64> {
@@ -140,8 +143,8 @@ fn budget_record(budget: Option<&Budget>) -> Value {
 /// Currency and timezone are fixed by the first configuration (or by the
 /// store identity written when that configuration first loaded). Later edits
 /// may only repeat them, never change them.
-fn identity(agent: &Agent, current: Option<&Budget>, input: &Input) -> Result<(String, String)> {
-    let stored = agent.store().setting(IDENTITY_KEY)?;
+fn identity(c: &Connection, current: Option<&Budget>, input: &Input) -> Result<(String, String)> {
+    let stored: Option<String> = c.query_row("SELECT value FROM meta WHERE key=?1", [IDENTITY_KEY], |row| row.get(0)).optional()?;
     let configured = current.map(|budget| format!("{}|{}", budget.currency, budget.timezone));
     if let (Some(stored), Some(configured)) = (&stored, &configured) {
         ensure(stored == configured, "BUDGET_CURRENCY_TIMEZONE_IMMUTABLE")?;

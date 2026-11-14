@@ -20,6 +20,8 @@ pub const ENDPOINT: &str = "https://api.deepseek.com/chat/completions";
 pub const KEY_ENV: &str = "STRATIDE_RESEARCH_KEY_DEEPSEEK";
 pub const PRICE_SOURCE: &str = "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/";
 pub const PRICE_VERSION: &str = "deepseek-cny-20261103-peak-v1";
+pub const INPUT_MICRO_PER_MILLION: i64 = 2_000_000;
+pub const OUTPUT_MICRO_PER_MILLION: i64 = 8_000_000;
 const CONFIG: &str = "structured_deepseek_config_v1";
 const PERMIT: &str = "structured_deepseek_once_v1";
 
@@ -43,10 +45,6 @@ pub struct Config {
 impl Config {
     pub(crate) fn validate(&self) -> Result<()> {
         let now = Utc::now();
-        let reviewed = DateTime::parse_from_rfc3339(&self.price_reviewed_at)
-            .map_err(|_| "DEEPSEEK_PRICE_REVIEW_REQUIRED")?;
-        let until = DateTime::parse_from_rfc3339(&self.price_valid_until)
-            .map_err(|_| "DEEPSEEK_PRICE_REVIEW_REQUIRED")?;
         ensure(
             self.version == 1
                 && self.synthetic_only
@@ -56,16 +54,23 @@ impl Config {
                 && self.key_file.is_absolute(),
             "DEEPSEEK_OWNER_AUTHORIZATION_REQUIRED",
         )?;
+        self.validate_price_at(now)?;
+        ensure(
+            (98_304..=1_000_000_000_000).contains(&self.max_call_micro),
+            "DEEPSEEK_CALL_CAP_TOO_SMALL",
+        )
+    }
+    pub(crate) fn validate_price_at(&self, now: DateTime<Utc>) -> Result<()> {
+        let reviewed = DateTime::parse_from_rfc3339(&self.price_reviewed_at)
+            .map_err(|_| "DEEPSEEK_PRICE_REVIEW_REQUIRED")?;
+        let until = DateTime::parse_from_rfc3339(&self.price_valid_until)
+            .map_err(|_| "DEEPSEEK_PRICE_REVIEW_REQUIRED")?;
         ensure(
             reviewed <= now
                 && until > now
                 && until > reviewed
                 && (until - reviewed).num_seconds() <= 7 * 86400,
             "DEEPSEEK_PRICE_EXPIRED_REFRESH_FROZEN_CONFIG",
-        )?;
-        ensure(
-            (98_304..=1_000_000_000_000).contains(&self.max_call_micro),
-            "DEEPSEEK_CALL_CAP_TOO_SMALL",
         )
     }
     pub fn model(&self) -> Model {
@@ -82,8 +87,8 @@ impl Config {
             version: PRICE_VERSION.into(),
             source: PRICE_SOURCE.into(),
             currency: "CNY".into(),
-            input_micro_per_million: 2_000_000,
-            output_micro_per_million: 8_000_000,
+            input_micro_per_million: INPUT_MICRO_PER_MILLION,
+            output_micro_per_million: OUTPUT_MICRO_PER_MILLION,
             bounded_text_billing_verified: true,
         });
         m.grant = Some(Grant {
@@ -127,8 +132,8 @@ pub fn authorize(m: &Model, b: &Budget) -> Result<()> {
             && p.currency == "CNY"
             && p.source == PRICE_SOURCE
             && p.version == PRICE_VERSION
-            && p.input_micro_per_million == 2_000_000
-            && p.output_micro_per_million == 8_000_000
+            && p.input_micro_per_million == INPUT_MICRO_PER_MILLION
+            && p.output_micro_per_million == OUTPUT_MICRO_PER_MILLION
             && c.billing_bound_source == PRICE_SOURCE
             && c.billing_bound_version == PRICE_VERSION,
         "DEEPSEEK_CURRENT_CNY_PEAK_PRICE_REQUIRED",

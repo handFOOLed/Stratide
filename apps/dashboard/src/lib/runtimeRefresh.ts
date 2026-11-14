@@ -1,16 +1,11 @@
 /**
- * Runtime status polls and market-summary reads use separate in-flight gates.
- * A slow `/api/runtime/market` summary must not skip the next status poll,
- * or the UI keeps a light UNKNOWN / UNVERIFIED snapshot after full diagnostics.
- */
-
-/**
  * verified: the latest successful warehouse report says coverage_complete.
  * rejected: that report explicitly says coverage_complete false.
  * unknown: no fresh report, a missing flag, or a backfill still running.
  * A progress file cannot change this.
  */
 export type WarehouseVerification = 'verified' | 'rejected' | 'unknown';
+type BackfillPhase = 'IDLE' | 'QUEUED' | 'RUNNING' | 'VERIFYING' | 'FAILED';
 
 export interface MarketSummary {
   sessionsReady: number;
@@ -32,6 +27,8 @@ export interface MarketSummary {
   lastSuccessfulDate: string | null;
   gaps: number | null;
   backfillRunning: boolean;
+  backfillPhase: BackfillPhase;
+  backfillError: string | null;
   /** True only when verification is verified. Progress files and cached trues cannot set this. */
   backfillComplete: boolean;
   /** True only after a successful market status read. */
@@ -46,6 +43,8 @@ export interface MarketSummary {
 
 export interface MarketBackfillState {
   running?: boolean;
+  phase?: BackfillPhase;
+  reason?: string | null;
   progress?: { sessions?: number; sessions_ready?: number; remaining?: number } | null;
 }
 
@@ -126,9 +125,10 @@ export function marketSummaryFrom(
   const target = 84;
   const coverageComplete = coverageFlag(summary);
   const gaps = gapCount(summary);
-  const running = backfill.running === true;
+  const phase = backfill.phase ?? (backfill.running === true ? 'RUNNING' : 'IDLE');
+  const running = phase === 'QUEUED' || phase === 'RUNNING';
   const statusKnown = summary !== null;
-  const verification = warehouseVerification(
+  const verification = phase === 'FAILED' ? 'unknown' : warehouseVerification(
     running,
     statusKnown,
     coverageComplete,
@@ -152,6 +152,8 @@ export function marketSummaryFrom(
     lastSuccessfulDate: summary?.last_successful_date ?? null,
     gaps,
     backfillRunning: running,
+    backfillPhase: phase,
+    backfillError: backfill.reason ?? null,
     backfillComplete: verification === 'verified',
     statusKnown,
     statusError: summary !== null ? null : statusError,
@@ -187,6 +189,8 @@ export function mergeMarketRead(previous: MarketSummary | null, incoming: Market
     lastSuccessfulDate: incoming.lastSuccessfulDate ?? kept.lastSuccessfulDate,
     gaps: incoming.gaps ?? kept.gaps,
     backfillRunning: incoming.backfillRunning,
+    backfillPhase: incoming.backfillPhase,
+    backfillError: incoming.backfillError,
     backfillComplete: false,
     statusKnown: false,
     statusError: incoming.statusError,
@@ -261,13 +265,27 @@ export function backfillPresentation(market: MarketSummary | null, runtimeUnread
       complete,
       verification: market.verification,
       downloadPercent: percent,
-      title: '进行中',
+      title: market.backfillPhase === 'QUEUED' ? '启动中' : '进行中',
       text:
-        (market.remaining === null ? '历史行情补录已开始。' : '待补齐 ' + String(market.remaining) + ' 个交易日。') +
+        (market.backfillPhase === 'QUEUED' ? '补录请求已受理，等待后台启动。'
+          : market.remaining !== null ? '待补齐 ' + String(market.remaining) + ' 个交易日。'
+          : countText !== null ? '正在下载，本轮结束后更新校验。' : '正在补录，等待下载进度。') +
         rejected,
       countText,
       diagnosticCode: null,
       tone: 'progress',
+    };
+  }
+  if (market.backfillPhase === 'FAILED') {
+    return {
+      complete: false,
+      verification: 'unknown',
+      downloadPercent: percent,
+      title: '补录失败',
+      text: '后台补录未完成，请查看诊断信息后重试。',
+      countText,
+      diagnosticCode: market.backfillError,
+      tone: 'attention',
     };
   }
   if (complete) {
@@ -312,8 +330,9 @@ export function backfillPresentation(market: MarketSummary | null, runtimeUnread
       complete,
       verification: 'unknown',
       downloadPercent: percent,
-      title: percent === null ? '正在读取' : '尚未确认',
-      text: percent === null ? '正在读取历史行情补录进度' : '已有下载计数，仓库校验还没有读到。',
+      title: market.backfillPhase === 'VERIFYING' ? '待校验' : percent === null ? '正在读取' : '尚未确认',
+      text: market.backfillPhase === 'VERIFYING' ? '本轮补录已退出，正在读取仓库校验结果。'
+        : percent === null ? '正在读取历史行情补录进度' : '已有下载计数，仓库校验还没有读到。',
       countText,
       diagnosticCode: null,
       tone: 'progress',
@@ -332,89 +351,4 @@ export function backfillPresentation(market: MarketSummary | null, runtimeUnread
     diagnosticCode: null,
     tone: 'unset',
   };
-}
-
-export interface RuntimeRefreshLocks {
-  statusBusy: boolean;
-  marketBusy: boolean;
-  marketPending: boolean;
-  loadMarket: (() => Promise<unknown>) | null;
-  publishMarket: ((market: unknown) => void) | null;
-  publishMarketMiss: (() => void) | null;
-}
-
-export function createRuntimeRefreshLocks(): RuntimeRefreshLocks {
-  return {
-    statusBusy: false,
-    marketBusy: false,
-    marketPending: false,
-    loadMarket: null,
-    publishMarket: null,
-    publishMarketMiss: null,
-  };
-}
-
-export interface RuntimeRefreshJob<Status, Market> {
-  loadStatus: () => Promise<Status>;
-  loadMarket: () => Promise<Market>;
-  onStatus: (status: Status) => void;
-  onStatusError: (error: unknown) => void;
-  onMarket: (market: Market) => void;
-  onMarketMiss: () => void;
-}
-
-export type RuntimeRefreshResult = 'skipped' | 'ok' | 'error';
-
-export async function refreshRuntimeSnapshot<Status, Market>(
-  locks: RuntimeRefreshLocks,
-  job: RuntimeRefreshJob<Status, Market>,
-): Promise<RuntimeRefreshResult> {
-  if (locks.statusBusy) return 'skipped';
-  locks.statusBusy = true;
-  let failed = false;
-  try {
-    const status = await job.loadStatus();
-    job.onStatus(status);
-  } catch (error) {
-    failed = true;
-    job.onStatusError(error);
-  } finally {
-    locks.statusBusy = false;
-  }
-  if (failed) return 'error';
-  locks.loadMarket = () => job.loadMarket();
-  locks.publishMarket = (market) => {
-    job.onMarket(market as Market);
-  };
-  locks.publishMarketMiss = () => {
-    job.onMarketMiss();
-  };
-  locks.marketPending = true;
-  drainMarket(locks);
-  return 'ok';
-}
-
-function drainMarket(locks: RuntimeRefreshLocks): void {
-  if (locks.marketBusy) return;
-  locks.marketBusy = true;
-  void (async () => {
-    try {
-      while (locks.marketPending) {
-        locks.marketPending = false;
-        const loadMarket = locks.loadMarket;
-        const publishMarket = locks.publishMarket;
-        const publishMarketMiss = locks.publishMarketMiss;
-        if (loadMarket === null || publishMarket === null || publishMarketMiss === null) break;
-        try {
-          const market = await loadMarket();
-          publishMarket(market);
-        } catch {
-          publishMarketMiss();
-        }
-      }
-    } finally {
-      locks.marketBusy = false;
-      if (locks.marketPending) drainMarket(locks);
-    }
-  })();
 }

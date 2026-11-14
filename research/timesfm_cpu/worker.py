@@ -7,10 +7,10 @@ import os
 from pathlib import Path
 import sys
 import time
-import threading
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from model import Engine, MAX_INPUT, MAX_OUTPUT, MEMORY_MAX, Rejected, digest, loads, require, validate_request
+from owner_pipe import read_request_line, watch_owner
 
 
 def linux_limits():
@@ -54,47 +54,16 @@ def execute(v, directory, engine_factory=Engine):
 
 
 
-def read_request_line(fd):
-    # Use raw FD reads: a daemon must never hold Python's buffered-stdin lock
-    # during interpreter shutdown. Preserve any already-read heartbeat bytes.
-    data=bytearray()
-    while True:
-        newline=data.find(b"\n")
-        if newline >= 0:
-            return bytes(data[:newline]),bytes(data[newline+1:])
-        require(len(data) <= MAX_INPUT,"WORKER_INPUT_LIMIT")
-        block=os.read(fd,min(65536,MAX_INPUT+1-len(data)))
-        if not block:return bytes(data),b""
-        data.extend(block)
-
-
 def main():
     try:
         diagnostic = sys.argv[1:] == ["--development-cpu-diagnostic"]
         require(not sys.argv[1:] or diagnostic, "WORKER_ARGUMENTS")
         limits = dict(mechanism="UNISOLATED_DEVELOPMENT_DIAGNOSTIC", memory_max_bytes=None) if diagnostic else linux_limits()
         input_fd=sys.stdin.fileno()
-        raw,pending=read_request_line(input_fd)
+        raw,pending=read_request_line(input_fd, MAX_INPUT)
         require(len(raw) <= MAX_INPUT, "WORKER_INPUT_LIMIT")
         if not diagnostic:
-            last = [time.monotonic()]
-            def heartbeat():
-                buffered=pending
-                while True:
-                    while b"\n" in buffered:
-                        line,buffered=buffered.split(b"\n",1)
-                        if line != b".":os._exit(3)
-                        last[0] = time.monotonic()
-                    if len(buffered)>1:os._exit(3)
-                    block=os.read(input_fd,4096)
-                    if not block:os._exit(3)
-                    buffered+=block
-            def watchdog():
-                while time.monotonic() - last[0] < 5:
-                    time.sleep(.5)
-                os._exit(3)
-            threading.Thread(target=heartbeat, daemon=True).start()
-            threading.Thread(target=watchdog, daemon=True).start()
+            watch_owner(input_fd, pending, lambda: os._exit(3))
         if raw == b"probe":
             value = dict(isolation=limits)
         else:

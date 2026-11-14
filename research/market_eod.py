@@ -458,7 +458,8 @@ class Market(h.Warehouse):
                        (date, canonical(value).decode(), sha(canonical(value))))
         return value
 
-    def once(self, *, transport=None, clock=h.now, token_source="auto", fault=lambda point: None):
+    def once(self, *, transport=None, clock=h.now, token_source="auto", fault=lambda point: None,
+             progress=None):
         with self.write() as db:
             config, enabled = self.config(db)
             if not enabled:
@@ -475,6 +476,11 @@ class Market(h.Warehouse):
                 if not pending:
                     return dict(state="ALREADY_FROZEN", snapshot_sha256=old["snapshot_sha256"], **SAFE)
             require(config["start_date"] <= today, "START_DATE_IN_FUTURE")
+            if progress is not None:
+                sessions_ready = sum(
+                    self.load_snapshot(db, row[0])["state"] == "READY"
+                    for row in db.execute("SELECT DISTINCT source_day FROM market_snapshots"))
+                progress(sessions_ready)
             if transport is None:
                 token, source = h.credential(token_source)
                 transport = h.TushareHTTP(token)
@@ -519,6 +525,9 @@ class Market(h.Warehouse):
                     fault("before_snapshot")
                     snapshot = self.publish(db, date, config, catalog, cal_refs, data, refs, states)
                     fault("after_snapshot")
+                    if progress is not None and snapshot["state"] == "READY":
+                        sessions_ready += 1
+                        progress(sessions_ready)
                     published += 1
                     if snapshot["state"] == "BLOCKED":
                         state = "BLOCKED"
@@ -530,7 +539,7 @@ class Market(h.Warehouse):
                 download.finish(str(error))
                 return dict(state=str(error), requests_this_run=download.calls, **SAFE)
 
-    def backfill(self, sessions=84, *, transport=None, clock=h.now, token_source="auto"):
+    def backfill(self, sessions=84, *, transport=None, clock=h.now, token_source="auto", progress=None):
         """Collect past sessions, then continue from the latest trading day.
 
         Each run stays inside the normal per-run call cap, so a wide range is
@@ -549,7 +558,7 @@ class Market(h.Warehouse):
                 with db:
                     db.execute("UPDATE market_control SET config=?,config_sha=? WHERE id=1",
                                (blob, sha(blob.encode())))
-        outcome = self.once(transport=transport, clock=clock, token_source=token_source)
+        outcome = self.once(transport=transport, clock=clock, token_source=token_source, progress=progress)
         report = self.report()
         return dict(outcome, target_start=floor, sessions=sessions,
                     remaining=len(report["gaps"]),
@@ -561,21 +570,31 @@ class Market(h.Warehouse):
         require(1 <= rounds <= 12, "INVALID_BACKFILL_ROUNDS")
         history, outcome = [], None
         progress = self.root.parents[2] / "backfill.progress.json"
+
+        def publish_progress(sessions_ready, remaining=None, state=None):
+            # Counts follow committed snapshots without opening a second warehouse reader.
+            pending = progress.with_suffix(f".tmp-{os.getpid()}")
+            try:
+                pending.write_text(json.dumps(dict(
+                    phase="RUNNING",
+                    sessions=sessions,
+                    sessions_ready=sessions_ready,
+                    remaining=remaining,
+                    state=state,
+                    updated_at=instant(h.now()).astimezone(TZ).isoformat(),
+                )), encoding="utf-8")
+                pending.replace(progress)
+            except OSError:
+                # A temporarily unreadable progress file must not abort collection.
+                pass
+
         for _ in range(rounds):
             outcome = self.backfill(sessions, transport=transport, clock=clock,
-                                    token_source=token_source)
+                                    token_source=token_source, progress=publish_progress)
             history.append(dict(state=outcome["state"],
                                 requests=outcome.get("requests_this_run", 0),
                                 remaining=outcome["remaining"]))
-            # The collector holds the warehouse writer lock for a whole batch, so
-            # the dashboard reads this small file instead of the database.
-            progress.write_text(json.dumps(dict(
-                sessions=sessions,
-                sessions_ready=outcome["sessions_ready"],
-                remaining=outcome["remaining"],
-                state=outcome["state"],
-                updated_at=instant(h.now()).astimezone(TZ).isoformat(),
-            )), encoding="utf-8")
+            publish_progress(outcome["sessions_ready"], outcome["remaining"], outcome["state"])
             if outcome["remaining"] == 0 or history[-1]["requests"] == 0:
                 break
         return dict(state="COMPLETE" if outcome["remaining"] == 0 else "PARTIAL",

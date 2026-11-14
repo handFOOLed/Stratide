@@ -11,6 +11,10 @@ fn run() -> Result<Value> {
         .map_err(|_| "MARKET_INPUT")?;
     ensure(raw.len() <= 8192, "MARKET_INPUT_SIZE")?;
     let v: Value = serde_json::from_slice(&raw).map_err(|_| "MARKET_INPUT")?;
+    let resume_id = match v.get("resume_task_id") {
+        None | Some(Value::Null) => None,
+        Some(id) => Some(id.as_i64().filter(|id| *id > 0).ok_or("TASK_ID_INVALID")?),
+    };
     let b = stratide_research::risk_binding::read()?;
     let agent = if action == "once" || action == "install-model" {
         Agent::open(&b.agent_dir, Some(&b.settings_path), local_fusion::blank())?
@@ -28,6 +32,7 @@ fn run() -> Result<Value> {
         "once" => m::execute(
             &agent,
             v["source_day"].as_str().ok_or("MARKET_DAY_INVALID")?,
+            resume_id,
         ),
         "task" => {
             let task = agent

@@ -17,6 +17,8 @@ import sys
 import threading
 import time
 import unittest
+import urllib.error
+import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from unittest.mock import patch
 
@@ -35,7 +37,7 @@ spec=importlib.util.spec_from_file_location("cpu_fixture",ROOT/"scripts/test-tim
 fixture=importlib.util.module_from_spec(spec);spec.loader.exec_module(fixture)
 DAY="20261104"
 ALL=list(m.h.dates("20260601",DAY))
-DAYS=[d for d in ALL if m.h.day(d).weekday()<5][-92:]
+DAYS=[d for d in ALL if m.h.day(d).weekday()<5][-96:]
 CODES=["600000.SH","600001.SH","600002.SH","600003.SH","600004.SH","600005.SH","600006.SH","000001.SZ","000004.SZ","920001.BJ"]
 CONFIG=dict(automatic_timesfm=True,automatic_deepseek=True,candidate_count=8,daily_call_limit=8,
             trading_day_call_limit=1,model_version="DeepSeek-V4.1-Flash-1017_ALIAS_MUTABLE")
@@ -85,35 +87,78 @@ class Server:
     def __exit__(self,*args):self.http.shutdown();self.http.server_close();self.thread.join()
 
 
-def driver(day,server,*,env_extra=None,popen=False):
+def driver(day,server,*,env_extra=None,popen=False,resume_task_id=None):
     env=dict(os.environ,STRATIDE_MARKET_TEST_DRIVER="1",STRATIDE_MARKET_TEST_PORT=str(server.http.server_port))
     if env_extra:env.update(env_extra)
     command=[os.environ["MARKET_TEST_DRIVER"],"market_research::tests::process_driver","--exact","--nocapture"]
+    body=json.dumps(dict(source_day=day,resume_task_id=resume_task_id)).encode()
     if popen:
         p=subprocess.Popen(command,cwd=ROOT,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        p.stdin.write(json.dumps(dict(source_day=day)).encode());p.stdin.close();p.stdin=None;return p
-    p=subprocess.run(command,input=json.dumps(dict(source_day=day)).encode(),cwd=ROOT,env=env,capture_output=True,timeout=20)
+        p.stdin.write(body);p.stdin.close();p.stdin=None;return p
+    p=subprocess.run(command,input=body,cwd=ROOT,env=env,capture_output=True,timeout=20)
     assert p.returncode==0,p.stdout.decode()+p.stderr.decode()
     return json.loads(next(line.removeprefix("MARKET_RESULT=") for line in p.stdout.decode().splitlines() if line.startswith("MARKET_RESULT=")))
+
+@contextlib.contextmanager
+def attached_api():
+    binding = rp.binding()
+    with socket.socket() as sock:
+        sock.bind(("127.0.0.1", 0))
+        port = sock.getsockname()[1]
+    url = f"http://127.0.0.1:{port}"
+    http = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    with subprocess.Popen([str(r.paths.executable("stratided")), "--port", str(port),
+                           "--agent-observer", "--agent-dir", binding["agent_dir"],
+                           "--agent-config", binding["settings_path"],
+                           "--assets-dir", str(ROOT / "apps/dashboard/dist")],
+                          cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) as service:
+        def call(path, body=None, status=200):
+            request = urllib.request.Request(url + "/api/" + path,
+                data=None if body is None else json.dumps(body).encode(),
+                headers={"Content-Type": "application/json", "Origin": url})
+            try:
+                response = http.open(request, timeout=5)
+            except urllib.error.HTTPError as error:
+                response = error
+            with response:
+                value = json.load(response)
+                assert response.status == status, (path, response.status, value)
+                return value["data"] if status == 200 else value["error"]["code"]
+        try:
+            deadline = time.monotonic() + 10
+            while True:
+                try:
+                    call("health")
+                    break
+                except OSError:
+                    if time.monotonic() >= deadline or service.poll() is not None:
+                        raise
+                    time.sleep(.05)
+            yield call
+        finally:
+            service.kill()
+            service.wait(10)
 
 
 class Tests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        assert cpu.common_root()==ROOT,"Disposable standalone checkout required"
+        fixture_root = cpu.common_root()
+        assert fixture_root == ROOT or ROOT / "target" in fixture_root.parents, "Disposable fixture root required"
         reuse=os.environ.get("MARKET_TEST_REUSE_FIXTURE")=="1"
         assert not reuse or ROOT.name=="issue83-acceptance","Reuse only the explicit disposable fixture"
         assert reuse or not (rp.root()/"agent-binding.json").exists(),"Never reuse Owner state"
-        (ROOT/"state").mkdir(exist_ok=True)
-        key=ROOT/"state/test-key.md";key.write_text("sk-"+"Q"*32)
+        state = fixture_root / "state"
+        state.mkdir(exist_ok=True)
+        key=state/"test-key.md";key.write_text("sk-"+"Q"*32)
         now=dt.datetime.now(dt.timezone.utc)-dt.timedelta(minutes=5)
-        cfg=ROOT/"state/test-provider.json"
+        cfg=state/"test-provider.json"
         cfg.write_text(json.dumps(dict(version=1,key_file=str(key),grant_version="deepseek-synthetic-fusion-grant-v1",
             synthetic_only=True,provider_terms_reviewed=True,authorized_at=now.isoformat(),price_reviewed_at=now.isoformat(),
             price_valid_until=(now+dt.timedelta(days=1)).isoformat(),max_call_micro=100000)))
         if not reuse:
             legacy.bridge("init-cny");legacy.bridge("configure",cfg);r.bridge("install-model")
-        cls.market=m.Market(ROOT/"state/recorded-market")
+        cls.market=m.Market(state/"recorded-market")
         if not reuse:
             cls.market.initialize(DAYS[0],data_mode="synthetic_test");cls.market.control(True)
         original=m.Download.__init__
@@ -277,6 +322,11 @@ class Tests(unittest.TestCase):
             self.assertEqual(value["status"],"outcome_uncertain",value)
             self.assertEqual(value["calls"][0]["state"],"outcome_uncertain")
             self.assertEqual(server.count,0)
+            with attached_api() as call:
+                path = "agent/tasks/" + value["id"]
+                self.assertFalse(call(path)["retryable"])
+                self.assertEqual(call(path + "/retry", {}, 409), "TASK_RETRY_UNSAFE_OR_EXHAUSTED")
+            self.assertEqual(server.count, 0)
 
     def test_09_wsl_worker_block_is_bounded_and_never_reaches_cloud(self):
         # The installed Windows chain reaches TimesFM through WSL; a missing or
@@ -308,6 +358,88 @@ class Tests(unittest.TestCase):
             self.assertEqual(freeze.call_count,2,"an expired cooldown retries once")
         # The frozen EOD snapshot is untouched and stays usable for research.
         self.assertEqual(self.market.report()["latest"]["source_day"],day)
+
+    def test_10_owner_retry_reaches_watch_and_recovers_before_dispatch(self):
+        run, _ = self.prepare()
+        self.grant()
+        with Server() as server, attached_api() as call:
+            def budget(daily):
+                return call("agent/budget", dict(daily_limit_micro=str(daily),
+                            monthly_limit_micro="100000000", confirm_below_committed=True))
+            budget(10_000)
+            failed = driver(self.day, server)
+            self.assertEqual(failed["status"], "failed", failed)
+            self.assertEqual(failed["reason"], "DAILY_BUDGET_EXHAUSTED")
+            self.assertEqual(server.count, 0)
+            task_id = failed["id"]
+            run.update(state="REJECTED", fusion_task_id=task_id, reason=failed["reason"])
+            r.save(self.day, run)
+            budget(5_000_000)
+            path = "agent/tasks/" + task_id
+            self.assertTrue(call(path)["retryable"])
+            self.assertEqual(call(path + "/retry", {})["status"], "queued")
+            self.assertEqual(call(path + "/retry", {}, 409), "TASK_RETRY_UNSAFE_OR_EXHAUSTED")
+
+            marker = rp.root() / ("rp-test-market-crash-" + os.urandom(4).hex())
+            marker.mkdir()
+            fault = json.dumps(dict(point="after_reserve", batch=marker.name))
+            process = driver(self.day, server, env_extra={"STRATIDE_RP_TEST_FAULT": fault},
+                             popen=True, resume_task_id=int(task_id))
+            try:
+                deadline = time.monotonic() + 8
+                while not (marker / "test-marker").exists() and time.monotonic() < deadline:
+                    time.sleep(.02)
+                self.assertTrue((marker / "test-marker").exists())
+            finally:
+                process.kill()
+                process.communicate(timeout=5)
+            self.assertEqual(server.count, 0)
+
+            original_bridge = r.bridge
+            def bridge(action, value):
+                if action == "once":
+                    self.assertEqual(value, dict(source_day=self.day, resume_task_id=int(task_id)))
+                    return driver(self.day, server, resume_task_id=value["resume_task_id"])
+                return original_bridge(action, value)
+            with patch.object(r, "bridge", side_effect=bridge), \
+                    patch.object(r, "freeze_cpu", side_effect=AssertionError("must reuse frozen TimesFM")):
+                recovered = r.once(self.market)
+            self.assertEqual(recovered["state"], "CANDIDATE_FROZEN", recovered)
+            self.assertEqual(recovered["fusion_task_id"], task_id)
+            self.assertEqual(recovered["screen_sha256"], run["screen_sha256"])
+            self.assertNotIn("retry_pending", recovered)
+            task = call(path)
+            self.assertEqual(task["input"], failed["input"])
+            self.assertEqual([row["state"] for row in task["calls"]], ["no_charge", "usage_received"])
+            self.assertEqual(driver(self.day, server)["id"], task_id)
+            self.assertEqual(server.count, 1)
+
+    def test_11_saved_openai_does_not_change_market_provider_or_expired_gate(self):
+        self.prepare()
+        self.grant()
+        config_key = "local_timesfm_fusion_config_v1"
+        profile_key = "provider_profile_v1"
+        with r.database(True) as db:
+            original = r.get(db, config_key)
+            expired = dict(original, price_reviewed_at="2020-01-01T00:00:00Z",
+                           price_valid_until="2020-01-08T00:00:00Z")
+            db.execute("UPDATE meta SET value=? WHERE key=?", (json.dumps(expired), config_key))
+            db.execute("INSERT INTO meta VALUES(?,?)", (profile_key, json.dumps(dict(provider="openai"))))
+        try:
+            with Server() as server, attached_api() as call:
+                status = call("agent/provider")
+                self.assertEqual(status["provider"], "openai")
+                self.assertEqual(status["research_provider"], "deepseek")
+                self.assertEqual(status["research_price"]["state"], "EXPIRED")
+                self.assertEqual(call("agent/provider/test", dict(provider="deepseek"), 409),
+                                 "PROVIDER_SELECTION_CHANGED")
+                self.assertEqual(driver(self.day, server)["error_code"],
+                                 "DEEPSEEK_PRICE_EXPIRED_REFRESH_FROZEN_CONFIG")
+                self.assertEqual(server.count, 0)
+        finally:
+            with r.database(True) as db:
+                db.execute("DELETE FROM meta WHERE key=?", (profile_key,))
+                db.execute("UPDATE meta SET value=? WHERE key=?", (json.dumps(original), config_key))
 
 
 if __name__=="__main__":unittest.main(verbosity=2)
